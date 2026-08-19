@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CLOUT – Reset Link Sent</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Acme&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --orange: #E04F00;
+            --black: #020202;
+            --white: #FFFFFF;
+            --off-white: #FBF8F4;
+
+            --heading: "Acme", sans-serif;
+            --body: "DM Sans", sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+
+            background: var(--off-white);
+
+            font-family: var(--body);
+
+            color: var(--black);
+
+            display: flex;
+
+            flex-direction: column;
+        }
+
+
+        .navbar {
+            height: 62px;
+
+            background: var(--black);
+
+            border-top: 1px solid var(--orange);
+
+            border-bottom: 1px solid rgba(255,255,255,.08);
+
+            display: flex;
+
+            align-items: center;
+        }
+
+        .nav-container {
+            width: min(1380px, calc(100% - 50px));
+
+            margin: auto;
+        }
+
+        .logo {
+            color: var(--orange);
+
+            font-family: var(--heading);
+
+            font-size: 15px;
+
+            font-weight: bold;
+
+            letter-spacing: 1.5px;
+
+            text-decoration: none;
+        }
+
+
+        .main {
+            flex: 1;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            padding: 40px 20px;
+
+            background: white;
+        }
+
+
+        .card {
+            width: 100%;
+
+            max-width: 400px;
+
+            padding: 36px;
+
+            background: white;
+
+            border: 1px solid #e1e1e1;
+
+            border-radius: 10px;
+
+            text-align: center;
+        }
+
+
+        .success-icon {
+            width: 60px;
+
+            height: 60px;
+
+            margin: 0 auto 20px;
+
+            border-radius: 50%;
+
+            background: #edf8ef;
+
+            color: #28733a;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            font-size: 30px;
+
+            font-weight: bold;
+        }
+
+
+        .title {
+            font-size: 28px;
+
+            margin-bottom: 12px;
+
+            font-family: var(--heading);
+        }
+
+
+        .description {
+            color: #536071;
+
+            font-size: 14px;
+
+            line-height: 1.6;
+
+            margin-bottom: 25px;
+        }
+
+
+        .email-box {
+            background: #f7f7f7;
+
+            border: 1px solid #e5e5e5;
+
+            border-radius: 6px;
+
+            padding: 12px;
+
+            font-size: 14px;
+
+            margin-bottom: 22px;
+
+            word-break: break-word;
+        }
+
+
+        .button {
+            display: block;
+
+            width: 100%;
+
+            height: 48px;
+
+            background: var(--orange);
+
+            font-family: var(--body);
+
+            color: white;
+
+            border: none;
+            
+
+            border-radius: 8px;
+
+            text-decoration: none;
+
+            font-size: 16px;
+
+            font-weight: 600;
+
+            line-height: 48px;
+        }
+
+
+        .button:hover {
+            background: #d34800;
+        }
+
+
+        .resend {
+            margin-top: 18px;
+
+            font-size: 13px;
+
+            color: #536071;
+        }
+
+
+        .link {
+            color: var(--orange);
+
+            text-decoration: none;
+
+            font-weight: 500;
+        }
+
+
+        .footer {
+            height: 80px;
+
+            background: var(--off-white);
+
+            border-top: 1px solid #e3e3e3;
+        }
+
+
+        .footer-container {
+            width: min(950px, calc(100% - 48px));
+
+            margin: auto;
+        }
+
+
+        .copyright {
+            padding-top: 30px;
+
+            font-size: 18px;
+        }
+
+
+        @media (max-width: 500px) {
+
+            .nav-container {
+                width: calc(100% - 36px);
+            }
+
+            .card {
+                padding: 28px 20px;
+            }
+
+            .title {
+                font-size: 24px;
+            }
+
+            .copyright {
+                font-size: 13px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a href="{% url 'index' %}" class="logo">
+                CLOUT
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <main class="main">
+
+        <div class="card">
+
+            <div class="success-icon">
+                ✓
+            </div>
+
+
+            <h1 class="title">
+                Reset Link Sent
+            </h1>
+
+
+            <p class="description">
+                We've sent a password reset link
+                to the email address you provided.
+            </p>
+
+
+            <div class="email-box">
+                Check your email inbox and follow
+                the link to reset your password.
+            </div>
+
+
+            <a
+                href="{% url 'login' %}"
+                class="button"
+            >
+                Back to Log In
+            </a>
+
+
+            <div class="resend">
+
+                Didn't receive the email?
+
+                <a
+                    href="{% url 'forgot_password' %}"
+                    class="link"
+                >
+                    Try again
+                </a>
+
+            </div>
+
+        </div>
+
+    </main>
+
+
+    <footer class="footer">
+
+        <div class="footer-container">
+
+            <div class="copyright">
+                © 2026 Clout
+            </div>
+
+        </div>
+
+    </footer>
+
+
+</body>
+
+</html>

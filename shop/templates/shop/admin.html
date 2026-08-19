@@ -1,0 +1,3224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>CLOUT - Admin Dashboard</title>
+
+
+    <!-- =====================================================
+         FONTS
+    ====================================================== -->
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Acme&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+
+    <style>
+
+        /* =====================================================
+           RESET
+        ====================================================== */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        /* =====================================================
+           VARIABLES
+        ====================================================== */
+
+        :root {
+
+            --orange: #E04F00;
+
+            --black: #020202;
+
+            --white: #FFFFFF;
+
+            --background: #F8F6F3;
+
+            --border: #E5E5E5;
+
+            --muted: #667085;
+
+            --green: #218739;
+
+            --red: #C62828;
+
+            --heading: "Acme", sans-serif;
+
+            --body: "DM Sans", sans-serif;
+        }
+
+
+        /* =====================================================
+           BODY
+        ====================================================== */
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+
+            min-height: 100vh;
+
+            background: var(--background);
+
+            color: var(--black);
+
+            font-family: var(--body);
+        }
+
+
+        /* =====================================================
+           NAVBAR
+        ====================================================== */
+
+        .navbar {
+
+            height: 64px;
+
+            background: var(--black);
+
+            border-top:
+                1px solid var(--orange);
+
+            display: flex;
+
+            align-items: center;
+
+            position: sticky;
+
+            top: 0;
+
+            z-index: 100;
+        }
+
+
+        .nav-container {
+
+            width:
+                min(1400px, calc(100% - 40px));
+
+            height: 100%;
+
+            margin: auto;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+        }
+
+
+        .logo {
+
+            color: var(--orange);
+
+            font-family: var(--heading);
+
+            font-size: 18px;
+
+            font-weight: bold;
+
+            letter-spacing: 1.5px;
+
+            text-decoration: none;
+        }
+
+
+        .admin-title {
+
+            color: white;
+
+            font-size: 13px;
+
+            font-weight: 500;
+        }
+
+
+        /* =====================================================
+           MAIN LAYOUT
+        ====================================================== */
+
+        .layout {
+
+            width:
+                min(1400px, calc(100% - 40px));
+
+            margin: 25px auto;
+
+            display: grid;
+
+            grid-template-columns: 220px 1fr;
+
+            gap: 25px;
+        }
+
+
+        /* =====================================================
+           SIDEBAR
+        ====================================================== */
+
+        .sidebar {
+
+            background: var(--black);
+
+            border-radius: 10px;
+
+            padding: 18px 12px;
+
+            height: fit-content;
+
+            position: sticky;
+
+            top: 89px;
+        }
+
+
+        .sidebar-heading {
+
+            color: #777;
+
+            font-size: 10px;
+
+            text-transform: uppercase;
+
+            letter-spacing: 1px;
+
+            padding: 10px 12px;
+
+            margin-top: 5px;
+        }
+
+
+        .sidebar-link {
+
+            display: block;
+
+            padding: 11px 12px;
+
+            margin-bottom: 3px;
+
+            border-radius: 6px;
+
+            color: #d5d5d5;
+
+            font-size: 13px;
+
+            text-decoration: none;
+
+            transition: .15s;
+        }
+
+
+        .sidebar-link:hover,
+
+        .sidebar-link.active {
+
+            background: var(--orange);
+
+            color: white;
+        }
+
+
+        /* =====================================================
+           CONTENT
+        ====================================================== */
+
+        .content {
+
+            min-width: 0;
+        }
+
+
+        .page-header {
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            margin-bottom: 25px;
+        }
+
+
+        .page-title {
+
+            font-size: 30px;
+
+            font-weight: 600;
+        }
+
+
+        .page-subtitle {
+
+            color: var(--muted);
+
+            font-size: 14px;
+
+            margin-top: 4px;
+        }
+
+
+        /* =====================================================
+           STAT CARDS
+        ====================================================== */
+
+        .stats {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .stat-card {
+
+            background: white;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 9px;
+
+            padding: 20px;
+        }
+
+
+        .stat-label {
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .stat-value {
+
+            font-size: 27px;
+
+            font-weight: 600;
+        }
+
+
+        .stat-description {
+
+            color: var(--green);
+
+            font-size: 11px;
+
+            margin-top: 6px;
+        }
+
+
+        /* =====================================================
+           PANEL
+        ====================================================== */
+
+        .panel {
+
+            background: white;
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 9px;
+
+            overflow: hidden;
+
+            margin-bottom: 20px;
+        }
+
+
+        .panel-header {
+
+            min-height: 60px;
+
+            padding: 16px 20px;
+
+            border-bottom:
+                1px solid var(--border);
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+        }
+
+
+        .panel-title {
+
+            font-size: 17px;
+
+            font-weight: 600;
+        }
+
+
+        .manage-link {
+
+            color: var(--orange);
+
+            font-size: 12px;
+
+            text-decoration: none;
+        }
+
+
+        /* =====================================================
+           TABLE
+        ====================================================== */
+
+        .table-wrapper {
+
+            width: 100%;
+
+            overflow-x: auto;
+        }
+
+
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 650px;
+        }
+
+
+        th {
+
+            background: #FAFAFA;
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            font-weight: 600;
+
+            text-align: left;
+
+            padding: 13px 20px;
+
+            border-bottom:
+                1px solid var(--border);
+        }
+
+
+        td {
+
+            padding: 14px 20px;
+
+            font-size: 13px;
+
+            border-bottom:
+                1px solid #EEEEEE;
+        }
+
+
+        tr:last-child td {
+
+            border-bottom: none;
+        }
+
+
+        /* =====================================================
+           STATUS
+        ====================================================== */
+
+        .status {
+
+            display: inline-block;
+
+            padding: 5px 9px;
+
+            border-radius: 20px;
+
+            font-size: 10px;
+
+            font-weight: 600;
+        }
+
+
+        .status-paid {
+
+            background: #EDF8EF;
+
+            color: var(--green);
+        }
+
+
+        .status-not-paid {
+
+            background: #FFF0ED;
+
+            color: var(--red);
+        }
+
+
+        .status-pending {
+
+            background: #FFF4E8;
+
+            color: #A95C00;
+        }
+
+
+        /* =====================================================
+           PAYMENT SECTION
+        ====================================================== */
+
+        .payment-grid {
+
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 15px;
+
+            padding: 20px;
+        }
+
+
+        .payment-card {
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 8px;
+
+            padding: 20px;
+        }
+
+
+        .payment-label {
+
+            color: var(--muted);
+
+            font-size: 12px;
+
+            margin-bottom: 8px;
+        }
+
+
+        .payment-value {
+
+            font-size: 25px;
+
+            font-weight: 600;
+        }
+
+
+        /* =====================================================
+           COURSE SECTION
+        ====================================================== */
+
+        .course-container {
+
+            display: grid;
+
+            grid-template-columns:
+                260px 1fr;
+
+            gap: 25px;
+
+            padding: 20px;
+        }
+
+
+        .course-info {
+
+            border:
+                1px solid var(--border);
+
+            border-radius: 8px;
+
+            padding: 20px;
+
+            height: fit-content;
+        }
+
+
+        .course-name {
+
+            font-size: 17px;
+
+            font-weight: 600;
+
+            line-height: 1.4;
+
+            margin-bottom: 20px;
+        }
+
+
+        .buyers-label {
+
+            color: var(--muted);
+
+            font-size: 12px;
+        }
+
+
+        .buyers-number {
+
+            font-size: 32px;
+
+            font-weight: 600;
+
+            margin-top: 5px;
+        }
+
+
+        .buyers-text {
+
+            color: var(--green);
+
+            font-size: 11px;
+
+            margin-top: 5px;
+        }
+
+
+        /* =====================================================
+           SMOOTH GRAPH
+        ====================================================== */
+
+        .graph-container {
+
+            width: 100%;
+
+            height: 280px;
+
+            position: relative;
+        }
+
+
+        #buyerChart {
+
+            width: 100% !important;
+
+            height: 100% !important;
+        }
+
+
+        /* =====================================================
+           CONTACT CHAT
+        ====================================================== */
+
+        .chat-container {
+
+            height: 600px;
+
+            display: grid;
+
+            grid-template-columns: 280px 1fr;
+        }
+
+
+        /* =====================================================
+           CHAT USERS
+        ====================================================== */
+
+        .chat-users {
+
+            border-right:
+                1px solid var(--border);
+
+            background: #FAFAFA;
+
+            overflow-y: auto;
+            
+            min-height: 0;
+        }
+
+
+        .chat-user {
+
+            padding: 14px;
+
+            display: flex;
+
+            align-items: center;
+
+            gap: 11px;
+
+            cursor: pointer;
+
+            border-bottom:
+                1px solid #EEEEEE;
+        }
+
+
+        .chat-user:hover,
+
+        .chat-user.active {
+
+            background: white;
+        }
+
+
+        .chat-avatar {
+
+            width: 38px;
+
+            height: 38px;
+
+            flex-shrink: 0;
+
+            border-radius: 50%;
+
+            background: var(--black);
+
+            color: white;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        .chat-user-info {
+
+            min-width: 0;
+        }
+
+
+        .chat-user-name {
+
+            font-size: 13px;
+
+            font-weight: 600;
+        }
+
+
+        .chat-user-email {
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            margin-top: 3px;
+
+            white-space: nowrap;
+
+            overflow: hidden;
+
+            text-overflow: ellipsis;
+        }
+
+
+        /* =====================================================
+           CHAT AREA
+        ====================================================== */
+
+        .chat-area {
+
+            display: flex;
+
+            flex-direction: column;
+
+            flex: 1;
+
+            min-width: 0;
+            
+            min-height: 0;
+        }
+
+
+        .chat-header {
+
+            height: 62px;
+
+            padding: 12px 18px;
+
+            border-bottom:
+                1px solid var(--border);
+
+            display: flex;
+
+            align-items: center;
+        }
+
+
+        .chat-header-name {
+
+            font-size: 14px;
+
+            font-weight: 600;
+        }
+
+
+        .chat-header-email {
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            margin-top: 2px;
+        }
+
+
+        /* =====================================================
+           MESSAGES
+        ====================================================== */
+
+        .messages {
+
+            flex: 1;
+
+            padding: 20px;
+
+            background: #F7F7F7;
+
+            overflow-y: auto;
+
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 10px;
+        }
+
+
+        .message {
+
+            max-width: 70%;
+
+            padding: 10px 13px;
+
+            font-size: 13px;
+
+            line-height: 1.45;
+
+            border-radius: 10px;
+        }
+
+
+        .message-user {
+
+            align-self: flex-start;
+
+            background: white;
+
+            border:
+                1px solid #E5E5E5;
+
+            border-radius:
+                10px 10px 10px 2px;
+        }
+
+
+        .message-admin {
+
+            align-self: flex-end;
+
+            background: var(--orange);
+
+            color: white;
+
+            border-radius:
+                10px 10px 2px 10px;
+        }
+
+
+        .message-time {
+
+            font-size: 9px;
+
+            opacity: .55;
+
+            margin-top: 4px;
+
+            text-align: right;
+        }
+
+
+        /* =====================================================
+           CHAT INPUT
+        ====================================================== */
+
+        .chat-input {
+
+            padding: 12px;
+
+            border-top:
+                1px solid var(--border);
+
+            display: flex;
+
+            gap: 8px;
+        }
+
+
+        .chat-input input {
+
+            flex: 1;
+
+            height: 42px;
+
+            border:
+                1px solid #DCDCDC;
+
+            border-radius: 7px;
+
+            padding:
+                0 12px;
+
+            outline: none;
+
+            font-family: var(--body);
+
+            font-size: 13px;
+        }
+
+
+        .chat-input input:focus {
+
+            border-color:
+                var(--orange);
+        }
+
+
+        .send-button {
+
+            width: 80px;
+
+            border: none;
+
+            border-radius: 7px;
+
+            background: var(--orange);
+
+            color: white;
+
+            font-weight: 600;
+
+            cursor: pointer;
+        }
+
+
+        .send-button:hover {
+
+            background: #C94500;
+        }
+
+
+        /* =====================================================
+           FOOTER
+        ====================================================== */
+
+        .footer {
+
+            text-align: center;
+
+            color: var(--muted);
+
+            font-size: 11px;
+
+            padding: 25px;
+
+            border-top:
+                1px solid var(--border);
+        }
+
+
+        /* =====================================================
+           AJAX TOAST
+        ====================================================== */
+
+        .ajax-toast {
+            position: fixed;
+            right: 22px;
+            bottom: 22px;
+            z-index: 9999;
+            background: #020202;
+            color: #fff;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            box-shadow: 0 10px 30px rgba(0,0,0,.16);
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+            transition: opacity .2s ease, transform .2s ease;
+        }
+
+        .ajax-toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .ajax-toast.error {
+            background: #B42318;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE
+        ====================================================== */
+
+        @media (max-width: 1100px) {
+
+            .stats {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+
+            .payment-grid {
+
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+
+            .course-container {
+
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+
+        @media (max-width: 800px) {
+
+            .layout {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .sidebar {
+
+                position: static;
+            }
+
+
+            .sidebar-link {
+
+                display: inline-block;
+
+                margin-right: 3px;
+            }
+
+
+            .chat-container {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .chat-users {
+
+                display: none;
+            }
+
+        }
+
+
+        @media (max-width: 500px) {
+
+            .stats {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .payment-grid {
+
+                grid-template-columns: 1fr;
+            }
+
+
+            .layout,
+            .nav-container {
+
+                width:
+                    calc(100% - 24px);
+            }
+
+
+            .page-title {
+
+                font-size: 25px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<!-- =====================================================
+     NAVBAR
+====================================================== -->
+
+<nav class="navbar">
+
+    <div class="nav-container">
+
+        <a
+            href="{% url 'index' %}"
+            class="logo"
+        >
+            CLOUT
+        </a>
+
+
+        <div class="admin-title">
+            Admin Dashboard
+        </div>
+
+    </div>
+
+</nav>
+
+
+<!-- =====================================================
+     MAIN LAYOUT
+====================================================== -->
+
+<div class="layout">
+
+
+    <!-- =================================================
+         SIDEBAR
+    ================================================== -->
+
+    <aside class="sidebar">
+
+
+        <div class="sidebar-heading">
+            Dashboard
+        </div>
+
+
+        <a
+            href="#dashboard"
+            class="sidebar-link active"
+        >
+            Dashboard
+        </a>
+
+
+        <div class="sidebar-heading">
+            Management
+        </div>
+
+
+        <a
+            href="#users"
+            class="sidebar-link"
+        >
+            Users
+        </a>
+
+
+        <a
+            href="#payments"
+            class="sidebar-link"
+        >
+            Payments
+        </a>
+
+
+        <a
+            href="#courses"
+            class="sidebar-link"
+        >
+            Courses
+        </a>
+
+
+        <a
+            href="#contacts"
+            class="sidebar-link"
+        >
+            Contact
+        </a>
+
+
+        <div class="sidebar-heading">
+            System
+        </div>
+
+
+        <a
+            href="/admin/"
+            class="sidebar-link"
+        >
+            Django Admin
+        </a>
+
+
+        <a
+            href="{% url 'logout' %}"
+            class="sidebar-link"
+        >
+            Logout
+        </a>
+
+    </aside>
+
+
+    <!-- =================================================
+         CONTENT
+    ================================================== -->
+
+    <main
+        class="content"
+        id="dashboard"
+    >
+
+
+        <!-- =================================================
+             HEADER
+        ================================================== -->
+
+        <div class="page-header">
+
+            <div>
+
+                <h1 class="page-title">
+                    Dashboard
+                </h1>
+
+                <p class="page-subtitle">
+                    Welcome, {{ current_admin.name|default:current_admin.username }}
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             SUMMARY
+        ================================================== -->
+
+        <section class="stats">
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Total Users
+                </div>
+
+                <div class="stat-value">
+                    {{ total_users|default:"0" }}
+                </div>
+
+                <div class="stat-description">
+                    Registered users
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Total Payments
+                </div>
+
+                <div class="stat-value">
+                    {{ total_payments|default:"0" }}
+                </div>
+
+                <div class="stat-description">
+                    Successful payments
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Course Buyers
+                </div>
+
+                <div class="stat-value">
+                    {{ course_buyers|default:"0" }}
+                </div>
+
+                <div class="stat-description">
+                    Paid customers
+                </div>
+
+            </div>
+
+
+            <div class="stat-card">
+
+                <div class="stat-label">
+                    Messages
+                </div>
+
+                <div class="stat-value">
+                    {{ contact_count|default:"0" }}
+                </div>
+
+                <div class="stat-description">
+                    Customer messages
+                </div>
+
+            </div>
+
+
+        </section>
+
+
+        <!-- =================================================
+             USERS
+        ================================================== -->
+
+        <section
+            class="panel"
+            id="users"
+        >
+
+
+            <div class="panel-header">
+
+                <h2 class="panel-title">
+                    Users
+                </h2>
+
+
+                <a
+                    href="/admin/shop/customuser/"
+                    class="manage-link"
+                >
+                    Manage
+                </a>
+
+            </div>
+
+
+            <div class="table-wrapper">
+
+                <table>
+
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                Profile
+                            </th>
+
+                            <th>
+                                Name
+                            </th>
+
+                            <th>
+                                Username
+                            </th>
+
+                            <th>
+                                Phone Number
+                            </th>
+
+                            <th>
+                                Email
+                            </th>
+
+                            <th>
+                                Paid
+                            </th>
+
+                            <th>
+                                Access
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+
+                        {% for user in users %}
+
+                        <tr>
+
+                            <td>
+                                <div style="
+                                    width: 40px;
+                                    height: 40px;
+                                    border-radius: 50%;
+                                    background: #E5E5E5;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                    font-size: 20px;
+                                    overflow: hidden;
+                                    flex-shrink: 0;
+                                ">
+                                    {% if user.profile_image %}
+                                        <img src="{{ user.profile_image.url }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
+                                    {% else %}
+                                        👤
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <td>
+                                {{ user.name|default:user.username }}
+                            </td>
+
+
+                            <td>
+                                @{{ user.username }}
+                            </td>
+
+
+                            <td>
+                                {{ user.phone_number }}
+                            </td>
+
+
+                            <td>
+                                {{ user.email }}
+                            </td>
+
+
+                            <td>
+
+
+                                {% if user.has_paid %}
+
+                                <span
+                                    class="status status-paid"
+                                >
+                                    Paid
+                                </span>
+
+                                {% else %}
+
+                                <span
+                                    class="status status-not-paid"
+                                >
+                                    Not Paid
+                                </span>
+
+                                {% endif %}
+
+
+                            </td>
+
+                            <td>
+                                <form method="POST"
+                                      action="{% url 'toggle_course_access' user.id %}"
+                                      class="ajax-toggle-access"
+                                      data-user-id="{{ user.id }}"
+                                      style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" style="
+                                        border: none;
+                                        border-radius: 999px;
+                                        padding: 8px 12px;
+                                        font-weight: 700;
+                                        font-size: 12px;
+                                        cursor: pointer;
+                                        background: {% if user.course_access_approved %}#dff4e7{% else %}#fdecea{% endif %};
+                                        color: {% if user.course_access_approved %}#1f7a3d{% else %}#b42318{% endif %};
+                                    ">
+                                        {% if user.course_access_approved %}Accepted{% else %}Denied{% endif %}
+                                    </button>
+                                </form>
+                            </td>
+
+
+                        </tr>
+
+
+                        {% empty %}
+
+                        <tr>
+
+                            <td
+                                colspan="4"
+                                style="
+                                    text-align:center;
+                                    color:#667085;
+                                "
+                            >
+                                No users found.
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             PAYMENTS
+        ================================================== -->
+
+        <section
+            class="panel"
+            id="payments"
+        >
+
+
+            <div class="panel-header">
+
+                <h2 class="panel-title">
+                    Payments
+                </h2>
+
+
+                <a
+                    href="/admin/shop/order/"
+                    class="manage-link"
+                >
+                    Manage
+                </a>
+
+            </div>
+
+
+            <div class="payment-grid">
+
+
+                <!-- TODAY -->
+
+                <div class="payment-card">
+
+                    <div class="payment-label">
+                        Today's Payments
+                    </div>
+
+                    <div class="payment-value">
+                        {{ today_payments|default:"0" }}
+                    </div>
+
+                </div>
+
+
+                <!-- WEEK -->
+
+                <div class="payment-card">
+
+                    <div class="payment-label">
+                        Weekly Payments
+                    </div>
+
+                    <div class="payment-value">
+                        {{ weekly_payments|default:"0" }}
+                    </div>
+
+                </div>
+
+
+                <!-- MONTH -->
+
+                <div class="payment-card">
+
+                    <div class="payment-label">
+                        Monthly Payments
+                    </div>
+
+                    <div class="payment-value">
+                        {{ monthly_payments|default:"0" }}
+                    </div>
+
+                </div>
+
+
+                <!-- YEAR -->
+
+                <div class="payment-card">
+
+                    <div class="payment-label">
+                        Yearly Payments
+                    </div>
+
+                    <div class="payment-value">
+                        {{ yearly_payments|default:"0" }}
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             COURSE
+        ================================================== -->
+
+        <section
+            class="panel"
+            id="courses"
+        >
+
+
+            <div class="panel-header">
+
+                <h2 class="panel-title">
+                    Courses
+                </h2>
+
+
+                <span class="manage-link">
+                    Buyer Growth
+                </span>
+
+            </div>
+
+
+            <div class="course-container">
+
+
+                <!-- COURSE INFO -->
+
+                <div class="course-info">
+
+
+                    <div class="course-name">
+                        The AI Income Playbook
+                    </div>
+
+
+                    <div class="buyers-label">
+                        Total Buyers
+                    </div>
+
+
+                    <div class="buyers-number">
+                        {{ course_buyers|default:"0" }}
+                    </div>
+
+
+                    <div class="buyers-text">
+                        Paid customers
+                    </div>
+
+
+                </div>
+
+
+                <!-- SMOOTH GRAPH -->
+
+                <div class="graph-container">
+
+                    <canvas
+                        id="buyerChart"
+                    ></canvas>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             COURSE MANAGEMENT
+        ================================================== -->
+
+        <section
+            class="panel"
+            id="course-management"
+        >
+
+            <div class="panel-header">
+
+                <h2 class="panel-title">
+                    Course Management
+                </h2>
+
+                <span class="manage-link" id="course-count">
+                    {{ course_count|default:"0" }} Active Course(s)
+                </span>
+
+            </div>
+
+            <div id="course-management-list"
+                 data-delete-url-template="{% url 'admin_course_delete' 0 %}"
+                 style="display:flex; flex-direction:column; gap:18px; padding: 8px 0 4px;">
+
+                <div style="padding:18px; border:1px solid #E5E7EB; border-radius:14px; background:#F9FAFB;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap;">
+                        <h3 style="margin:0; font-size:18px; color:#111827;">
+                            {% if editing_course %}Edit Course{% else %}Add New Course{% endif %}
+                        </h3>
+                        {% if editing_course %}
+                            <a href="{% url 'admin_dashboard' %}#course-management" style="color:#E04F00; font-weight:700; text-decoration:none;">Cancel</a>
+                        {% endif %}
+                    </div>
+
+                    <form method="POST"
+                          id="course-form"
+                          class="ajax-course-form"
+                          data-mode="{% if editing_course %}edit{% else %}add{% endif %}"
+                          data-course-id="{% if editing_course %}{{ editing_course.id }}{% endif %}"
+                          action="{% if editing_course %}{% url 'admin_course_edit' editing_course.id %}{% else %}{% url 'admin_course_add' %}{% endif %}"
+                          enctype="multipart/form-data"
+                          style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
+                        {% csrf_token %}
+
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <label for="id_title" style="font-weight:700; color:#344054;">Title</label>
+                            {{ course_form.title }}
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:8px; grid-column:1 / -1;">
+                            <label for="id_description" style="font-weight:700; color:#344054;">Description</label>
+                            {{ course_form.description }}
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <label for="id_instructor" style="font-weight:700; color:#344054;">Instructor</label>
+                            {{ course_form.instructor }}
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <label for="id_duration" style="font-weight:700; color:#344054;">Duration</label>
+                            {{ course_form.duration }}
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <label for="id_level" style="font-weight:700; color:#344054;">Level</label>
+                            {{ course_form.level }}
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <label for="id_thumbnail" style="font-weight:700; color:#344054;">Thumbnail</label>
+                            {{ course_form.thumbnail }}
+                        </div>
+
+                        <div style="display:flex; flex-direction:column; gap:8px;">
+                            <label for="id_video" style="font-weight:700; color:#344054;">Video</label>
+                            {{ course_form.video }}
+                        </div>
+
+                        <div style="display:flex; align-items:center; gap:10px; grid-column:1 / -1; color:#344054; font-weight:600;">
+                            {{ course_form.is_active }}
+                            <label for="id_is_active">Active course</label>
+                        </div>
+
+                        <div style="grid-column:1 / -1; display:flex; justify-content:flex-end;">
+                            <button type="submit" style="background:#E04F00; color:#fff; border:none; border-radius:10px; padding:12px 18px; font-weight:700; cursor:pointer;">
+                                {% if editing_course %}Update Course{% else %}Add Course{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                {% for course in courses %}
+
+                <div class="course-card"
+                     data-course-id="{{ course.id }}"
+                     style="display:flex; gap:18px; padding:18px; border:1px solid #E5E7EB; border-radius:14px; background:#F9FAFB; align-items:flex-start;">
+
+                    <div style="width:180px; min-width:180px; height:120px; border-radius:10px; overflow:hidden; background:#E5E5E5; display:flex; align-items:center; justify-content:center;">
+                        {% if course.thumbnail %}
+                            <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" style="width:100%; height:100%; object-fit:cover;">
+                        {% else %}
+                            <span style="color:#667085; font-size:14px;">No Image</span>
+                        {% endif %}
+                    </div>
+
+                    <div style="flex:1; min-width:0;">
+                        <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
+                            <h3 class="course-card-title" style="margin:0; font-size:20px; color:#111827;">{{ course.title }}</h3>
+                            <span class="course-card-price" style="background:#E8F5E9; color:#1F7A3D; border-radius:999px; padding:6px 12px; font-size:12px; font-weight:700;">
+                                ${{ course.price }}
+                            </span>
+                        </div>
+
+                        <p class="course-card-description" style="margin:0 0 12px; color:#475467; line-height:1.6;">
+                            {{ course.description|default:"No description available."|truncatechars:180 }}
+                        </p>
+
+                        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; font-size:12px; color:#344054;">
+                            <span class="course-card-instructor" style="padding:6px 10px; border-radius:999px; background:#EEF2FF;">Instructor: {{ course.instructor|default:"N/A" }}</span>
+                            <span class="course-card-duration" style="padding:6px 10px; border-radius:999px; background:#F2F4F7;">Duration: {{ course.duration|default:"N/A" }}</span>
+                            <span class="course-card-level" style="padding:6px 10px; border-radius:999px; background:#F2F4F7;">Level: {{ course.level|default:"Beginner" }}</span>
+                        </div>
+
+                        {% if course.video %}
+                            <video controls preload="metadata" style="width:100%; max-height:200px; border-radius:10px; background:#000;">
+                                <source src="{{ course.video.url }}" type="video/mp4">
+                                Your browser does not support the video tag.
+                            </video>
+                        {% else %}
+                            <div style="padding:12px 14px; border:1px dashed #D0D5DD; border-radius:10px; background:#FFF; color:#667085; font-size:13px;">
+                                No course video uploaded yet.
+                            </div>
+                        {% endif %}
+
+                        <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
+                            <a href="{% url 'admin_dashboard' %}?edit_course_id={{ course.id }}#course-management" style="background:#111827; color:#fff; border-radius:10px; padding:10px 14px; text-decoration:none; font-weight:700;">
+                                Edit Course
+                            </a>
+                            <form method="POST"
+                                  action="{% url 'admin_course_delete' course.id %}"
+                                  class="ajax-course-delete"
+                                  data-course-id="{{ course.id }}"
+                                  onsubmit="return false;"
+                                  style="display:inline;">
+                                {% csrf_token %}
+                                <button type="submit" style="background:#D92D20; color:#fff; border:none; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer;">
+                                    Delete Course
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+
+                {% empty %}
+
+                <div style="padding:18px; border:1px dashed #D0D5DD; border-radius:12px; color:#667085; background:#F9FAFB; text-align:center;">
+                    No active course available.
+                </div>
+
+                {% endfor %}
+
+            </div>
+
+        </section>
+
+
+        <!-- =================================================
+             CONTACT / CHAT
+        ================================================== -->
+
+        <section
+            class="panel"
+            id="contacts"
+        >
+
+
+            <div class="panel-header">
+
+                <h2 class="panel-title">
+                    Contact
+                </h2>
+
+
+                <span class="manage-link">
+                    Customer Chat
+                </span>
+
+            </div>
+
+
+            <div class="chat-container">
+
+
+                <!-- =========================================
+                     USER LIST
+                ========================================== -->
+
+                <div class="chat-users">
+
+
+                    {% for contact_user in chat_users %}
+
+
+                    <a
+                        href="?user_id={{ contact_user.id }}"
+                        class="
+                            chat-user
+                            {% if selected_user and selected_user.id == contact_user.id %}
+                                active
+                            {% endif %}
+                        "
+                        style="text-decoration: none; color: inherit; display: flex;"
+                    >
+
+
+                        <div class="chat-avatar">
+                            {% if contact_user.profile_image %}
+                                <img src="{{ contact_user.profile_image.url }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
+                            {% else %}
+                                {{ contact_user.name|first|upper }}
+                            {% endif %}
+                        </div>
+
+
+                        <div class="chat-user-info">
+
+
+                            <div class="chat-user-name">
+
+                                {{ contact_user.name }}
+
+                            </div>
+
+
+                            <div class="chat-user-email">
+
+                                {{ contact_user.email }}
+
+                            </div>
+
+
+                        </div>
+
+
+                    </a>
+
+
+                    {% empty %}
+
+
+                    <div style="
+                        padding:20px;
+                        color:#667085;
+                        font-size:13px;
+                    ">
+
+                        No conversations yet.
+
+                    </div>
+
+
+                    {% endfor %}
+
+
+                </div>
+
+
+                <!-- =========================================
+                     CHAT AREA
+                ========================================== -->
+
+                <div class="chat-area">
+
+
+                    <!-- CHAT HEADER -->
+
+                    <div class="chat-header">
+
+
+                        {% if selected_user %}
+
+
+                        <div>
+
+                            <div class="chat-header-name">
+
+                                {{ selected_user.name }}
+
+                            </div>
+
+
+                            <div class="chat-header-email">
+
+                                {{ selected_user.email }}
+
+                            </div>
+
+                        </div>
+
+
+                        {% else %}
+
+
+                        <div>
+
+                            <div class="chat-header-name">
+
+                                Customer Support
+
+                            </div>
+
+
+                            <div class="chat-header-email">
+
+                                Select a conversation
+
+                            </div>
+
+                        </div>
+
+
+                        {% endif %}
+
+
+                    </div>
+
+
+                    <!-- MESSAGES -->
+
+                    <div class="messages" id="admin-messages">
+
+
+                        {% for message in chat_messages %}
+
+
+                            {% if message.sender_is_admin %}
+
+
+                            <div
+                                class="
+                                    message
+                                    message-admin
+                                "
+                            >
+
+                                {{ message.message }}
+
+                                {% if message.image %}
+                                    <div class="message-media" style="margin-top: 8px; max-width: 250px;">
+                                        <img src="{{ message.image.url }}" alt="Message image" style="width: 100%; border-radius: 6px;">
+                                    </div>
+                                {% endif %}
+
+                                {% if message.video %}
+                                    <div class="message-media" style="margin-top: 8px; max-width: 250px;">
+                                        <video controls style="width: 100%; border-radius: 6px;">
+                                            <source src="{% url 'message_video' message.id %}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                {% endif %}
+
+                                <div class="message-time">
+
+                                    {{ message.created_at|date:"H:i" }}
+
+                                </div>
+
+                            </div>
+
+
+                            {% else %}
+
+
+                            <div
+                                class="
+                                    message
+                                    message-user
+                                "
+                            >
+
+                                {{ message.message }}
+
+                                {% if message.image %}
+                                    <div class="message-media" style="margin-top: 8px; max-width: 250px;">
+                                        <img src="{{ message.image.url }}" alt="Message image" style="width: 100%; border-radius: 6px;">
+                                    </div>
+                                {% endif %}
+
+                                {% if message.video %}
+                                    <div class="message-media" style="margin-top: 8px; max-width: 250px;">
+                                        <video controls style="width: 100%; border-radius: 6px;">
+                                            <source src="{% url 'message_video' message.id %}" type="video/mp4">
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </div>
+                                {% endif %}
+
+                                <div class="message-time">
+
+                                    {{ message.created_at|date:"H:i" }}
+
+                                </div>
+
+                            </div>
+
+
+                            {% endif %}
+
+
+                        {% empty %}
+
+
+                        <div data-chat-empty style="
+                            margin:auto;
+                            color:#667085;
+                            font-size:13px;
+                        ">
+
+                            Select a conversation.
+
+                        </div>
+
+
+                        {% endfor %}
+
+
+                    </div>
+
+
+                    <!-- SEND MESSAGE -->
+
+                    {% if selected_user %}
+
+                    <form
+                        method="POST"
+                        id="admin-chat-form"
+                        class="ajax-chat-form"
+                        action="{% url 'admin_send_message' selected_user.id %}"
+                        enctype="multipart/form-data"
+                        style="
+                            width: 100%;
+                            padding: 16px;
+                            border-top: 1px solid var(--border);
+                            display: flex;
+                            align-items: center;
+                            gap: 12px;
+                            background: white;
+                            flex-shrink: 0;
+                            box-sizing: border-box;
+                        "
+                    >
+
+                        {% csrf_token %}
+
+                        <!-- Image Button -->
+                        <button
+                            type="button"
+                            onclick="document.getElementById('admin-image-input').click()"
+                            style="
+                                width: 48px;
+                                height: 48px;
+                                flex-shrink: 0;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: #ffffff;
+                                color: var(--orange);
+                                border: 1.5px solid var(--orange);
+                                border-radius: 50%;
+                                font-size: 20px;
+                                cursor: pointer;
+                                transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+                            "
+                            onmouseover="this.style.background='var(--orange)'; this.style.color='white'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 7px 18px rgba(224, 79, 0, 0.22)';"
+                            onmouseout="this.style.background='white'; this.style.color='var(--orange)'; this.style.transform='none'; this.style.boxShadow='none';"
+                            onmousedown="this.style.transform='scale(0.94)';"
+                            onmouseup="this.style.transform='translateY(-2px)';"
+                            title="Upload Image"
+                        >
+                            🖼
+                        </button>
+
+                        <input 
+                            type="file" 
+                            id="admin-image-input" 
+                            name="image" 
+                            accept="image/*" 
+                            style="display: none;"
+                        >
+
+                        <!-- Video Button -->
+                        <button
+                            type="button"
+                            onclick="document.getElementById('admin-video-input').click()"
+                            style="
+                                width: 48px;
+                                height: 48px;
+                                flex-shrink: 0;
+                                display: flex;
+                                align-items: center;
+                                justify-content: center;
+                                background: #ffffff;
+                                color: var(--orange);
+                                border: 1.5px solid var(--orange);
+                                border-radius: 50%;
+                                font-size: 18px;
+                                cursor: pointer;
+                                transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+                            "
+                            onmouseover="this.style.background='var(--orange)'; this.style.color='white'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 7px 18px rgba(224, 79, 0, 0.22)';"
+                            onmouseout="this.style.background='white'; this.style.color='var(--orange)'; this.style.transform='none'; this.style.boxShadow='none';"
+                            onmousedown="this.style.transform='scale(0.94)';"
+                            onmouseup="this.style.transform='translateY(-2px)';"
+                            title="Upload Video"
+                        >
+                            🎥
+                        </button>
+
+                        <input 
+                            type="file" 
+                            id="admin-video-input" 
+                            name="video" 
+                            accept="video/*" 
+                            style="display: none;"
+                        >
+
+                        <!-- Message Input -->
+                        <input
+                            type="text"
+                            name="message"
+                            placeholder="Message..."
+                            autocomplete="off"
+                            style="
+                                flex: 1;
+                                min-width: 0;
+                                height: 46px;
+                                padding: 0 18px;
+                                background: #ffffff;
+                                border: 1px solid #dedede;
+                                border-radius: 25px;
+                                outline: none;
+                                font-size: 14px;
+                                color: #333333;
+                                transition: border-color 0.2s ease, box-shadow 0.2s ease;
+                                font-family: var(--body);
+                            "
+                            onfocus="this.style.borderColor='var(--orange)'; this.style.boxShadow='0 0 0 3px rgba(224, 79, 0, 0.08)';"
+                            onblur="this.style.borderColor='#dedede'; this.style.boxShadow='none';"
+                        >
+
+                        <!-- Send Button -->
+                        <button
+                            type="submit"
+                            style="
+                                height: 46px;
+                                padding: 0 28px;
+                                flex-shrink: 0;
+                                border: none;
+                                border-radius: 25px;
+                                background: var(--orange);
+                                color: #ffffff;
+                                font-size: 14px;
+                                font-weight: 600;
+                                cursor: pointer;
+                                transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+                                font-family: var(--body);
+                                letter-spacing: 0.3px;
+                            "
+                            onmouseover="this.style.background='#d94f00'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 7px 18px rgba(224, 79, 0, 0.25)';"
+                            onmouseout="this.style.background='var(--orange)'; this.style.transform='none'; this.style.boxShadow='none';"
+                            onmousedown="this.style.transform='scale(0.96)';"
+                            onmouseup="this.style.transform='translateY(-2px)';"
+                        >
+                            Send
+                        </button>
+
+                    </form>
+
+                    {% endif %}
+
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+</div>
+
+
+<!-- =====================================================
+     FOOTER
+====================================================== -->
+
+<footer class="footer">
+
+    © 2026 CLOUT Admin Dashboard
+
+</footer>
+
+
+<!-- =====================================================
+     CHART.JS
+====================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/chart.js"
+></script>
+
+
+<script>
+
+    const canvas =
+        document.getElementById("buyerChart");
+
+
+    if (canvas) {
+
+
+        const ctx =
+            canvas.getContext("2d");
+
+
+        /* =================================================
+           GRADIENT
+        ================================================= */
+
+        const gradient =
+            ctx.createLinearGradient(
+                0,
+                0,
+                0,
+                280
+            );
+
+
+        gradient.addColorStop(
+            0,
+            "rgba(224, 79, 0, 0.14)"
+        );
+
+
+        gradient.addColorStop(
+            1,
+            "rgba(224, 79, 0, 0.01)"
+        );
+
+
+        /* =================================================
+           DATA FROM DJANGO
+        ================================================= */
+
+        const labels = [
+
+            {% for point in buyer_graph %}
+
+                "{{ point.label|escapejs }}"
+
+                {% if not forloop.last %},{% endif %}
+
+            {% endfor %}
+
+        ];
+
+
+        const buyers = [
+
+            {% for point in buyer_graph %}
+
+                {{ point.buyers|default:0 }}
+
+                {% if not forloop.last %},{% endif %}
+
+            {% endfor %}
+
+        ];
+
+
+        /* =================================================
+           CHART
+        ================================================= */
+
+        new Chart(
+            ctx,
+            {
+
+                type: "line",
+
+                data: {
+
+                    labels: labels,
+
+                    datasets: [
+
+                        {
+
+                            data: buyers,
+
+                            borderColor:
+                                "#E04F00",
+
+                            backgroundColor:
+                                gradient,
+
+                            borderWidth: 2,
+
+                            fill: true,
+
+                            tension: 0.45,
+
+                            pointRadius: 0,
+
+                            pointHoverRadius: 5,
+
+                            pointHoverBackgroundColor:
+                                "#E04F00",
+
+                            pointHoverBorderColor:
+                                "#FFFFFF",
+
+                            pointHoverBorderWidth: 2
+
+                        }
+
+                    ]
+
+                },
+
+
+                options: {
+
+                    responsive: true,
+
+                    maintainAspectRatio: false,
+
+
+                    plugins: {
+
+                        legend: {
+
+                            display: false
+
+                        },
+
+
+                        tooltip: {
+
+                            displayColors: false,
+
+                            backgroundColor:
+                                "#020202",
+
+                            titleFont: {
+
+                                family:
+                                    "DM Sans",
+
+                                size: 12
+
+                            },
+
+                            bodyFont: {
+
+                                family:
+                                    "DM Sans",
+
+                                size: 12
+
+                            },
+
+
+                            callbacks: {
+
+                                label: function(context) {
+
+                                    return (
+                                        context.parsed.y +
+                                        " buyers"
+                                    );
+
+                                }
+
+                            }
+
+                        }
+
+                    },
+
+
+                    scales: {
+
+                        x: {
+
+                            display: false,
+
+                            grid: {
+
+                                display: false
+
+                            }
+
+                        },
+
+
+                        y: {
+
+                            display: false,
+
+                            beginAtZero: true,
+
+                            grid: {
+
+                                display: false
+
+                            }
+
+                        }
+
+                    },
+
+
+                    interaction: {
+
+                        mode: "index",
+
+                        intersect: false
+
+                    }
+
+                }
+
+            }
+        );
+
+    }
+
+</script>
+
+
+
+<script>
+(function () {
+    "use strict";
+
+    const toast = document.createElement("div");
+    toast.className = "ajax-toast";
+    document.body.appendChild(toast);
+
+    let toastTimer;
+
+    function showToast(message, isError = false) {
+        clearTimeout(toastTimer);
+        toast.textContent = message || (isError ? "Something went wrong." : "Updated.");
+        toast.classList.toggle("error", isError);
+        toast.classList.add("show");
+        toastTimer = setTimeout(() => toast.classList.remove("show"), 2200);
+    }
+
+    function csrfToken() {
+        const input = document.querySelector(
+            "#admin-chat-form input[name='csrfmiddlewaretoken'], " +
+            "#course-form input[name='csrfmiddlewaretoken'], " +
+            ".ajax-toggle-access input[name='csrfmiddlewaretoken']"
+        );
+        return input ? input.value : "";
+    }
+
+    async function postAjax(form) {
+        const response = await fetch(form.action, {
+            method: "POST",
+            body: new FormData(form),
+            credentials: "same-origin",
+            headers: {
+                "X-Requested-With": "XMLHttpRequest",
+                "X-CSRFToken": csrfToken()
+            }
+        });
+
+        let data = {};
+        try {
+            data = await response.json();
+        } catch (e) {
+            throw new Error("Invalid server response.");
+        }
+
+        if (!response.ok || !data.success) {
+            let message = data.message || "Request failed.";
+
+            if (data.errors) {
+                const keys = Object.keys(data.errors);
+                if (keys.length &&
+                    data.errors[keys[0]] &&
+                    data.errors[keys[0]][0]) {
+                    message =
+                        data.errors[keys[0]][0].message || message;
+                }
+            }
+
+            throw new Error(message);
+        }
+
+        return data;
+    }
+
+    function setLoading(button, text, loading) {
+        if (!button) return;
+
+        if (loading) {
+            button.dataset.oldText = button.textContent.trim();
+            button.disabled = true;
+            button.style.opacity = ".65";
+            button.style.cursor = "wait";
+            button.textContent = text;
+        } else {
+            button.disabled = false;
+            button.style.opacity = "";
+            button.style.cursor = "";
+            button.textContent =
+                button.dataset.oldText || button.textContent;
+        }
+    }
+
+    /* =========================================================
+       ACCEPT / DENY
+    ========================================================= */
+
+    document.querySelectorAll(".ajax-toggle-access").forEach(form => {
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const button = form.querySelector("button[type='submit']");
+            if (!button || button.disabled) return;
+
+            setLoading(button, "Saving...", true);
+
+            try {
+                const data = await postAjax(form);
+                const accepted = !!data.course_access_approved;
+
+                button.textContent = accepted ? "Accepted" : "Denied";
+                button.style.background =
+                    accepted ? "#dff4e7" : "#fdecea";
+                button.style.color =
+                    accepted ? "#1f7a3d" : "#b42318";
+
+                showToast(data.message || "Access updated.");
+            } catch (error) {
+                showToast(error.message, true);
+            } finally {
+                button.disabled = false;
+                button.style.opacity = "";
+                button.style.cursor = "";
+            }
+        });
+    });
+
+
+    /* =========================================================
+       CHAT
+    ========================================================= */
+
+    const chatForm = document.getElementById("admin-chat-form");
+    const messagesBox = document.getElementById("admin-messages");
+
+    if (chatForm && messagesBox) {
+
+        chatForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const button =
+                chatForm.querySelector("button[type='submit']");
+            const input =
+                chatForm.querySelector("input[name='message']");
+            const image =
+                document.getElementById("admin-image-input");
+            const video =
+                document.getElementById("admin-video-input");
+
+            const hasText = input && input.value.trim();
+            const hasImage = image && image.files.length;
+            const hasVideo = video && video.files.length;
+
+            if (!hasText && !hasImage && !hasVideo) {
+                showToast("Write a message or select a file.", true);
+                return;
+            }
+
+            setLoading(button, "Sending...", true);
+
+            try {
+                const data = await postAjax(chatForm);
+                appendMessage(data.data || {});
+
+                if (input) input.value = "";
+                if (image) image.value = "";
+                if (video) video.value = "";
+
+                messagesBox.scrollTop = messagesBox.scrollHeight;
+            } catch (error) {
+                showToast(error.message, true);
+            } finally {
+                setLoading(button, "Sending...", false);
+            }
+        });
+
+        const input =
+            chatForm.querySelector("input[name='message']");
+
+        if (input) {
+            input.addEventListener("keydown", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+
+                    if (!chatForm.querySelector(
+                        "button[type='submit']"
+                    ).disabled) {
+                        chatForm.requestSubmit();
+                    }
+                }
+            });
+        }
+
+        requestAnimationFrame(() => {
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        });
+    }
+
+    function appendMessage(data) {
+
+        const empty =
+            messagesBox.querySelector("[data-chat-empty]");
+
+        if (empty) empty.remove();
+
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className =
+            "message message-admin";
+
+        if (data.message) {
+            const text = document.createElement("div");
+            text.textContent = data.message;
+            wrapper.appendChild(text);
+        }
+
+        if (data.image) {
+            const media = document.createElement("div");
+            media.style.marginTop = "8px";
+            media.style.maxWidth = "250px";
+
+            const img = document.createElement("img");
+            img.src = data.image;
+            img.alt = "Message image";
+            img.style.width = "100%";
+            img.style.borderRadius = "6px";
+
+            media.appendChild(img);
+            wrapper.appendChild(media);
+        }
+
+        if (data.video) {
+            const media = document.createElement("div");
+            media.style.marginTop = "8px";
+            media.style.maxWidth = "250px";
+
+            const video = document.createElement("video");
+            video.controls = true;
+            video.style.width = "100%";
+            video.style.borderRadius = "6px";
+
+            const source = document.createElement("source");
+            source.src = data.video;
+            source.type = "video/mp4";
+
+            video.appendChild(source);
+            media.appendChild(video);
+            wrapper.appendChild(media);
+        }
+
+        const time = document.createElement("div");
+        time.className = "message-time";
+        time.textContent = data.created_at || "";
+        wrapper.appendChild(time);
+
+        messagesBox.appendChild(wrapper);
+        messagesBox.scrollTop = messagesBox.scrollHeight;
+    }
+
+
+    /* =========================================================
+       COURSE ADD / EDIT
+    ========================================================= */
+
+    const courseForm =
+        document.getElementById("course-form");
+
+    if (courseForm) {
+        courseForm.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            const button =
+                courseForm.querySelector("button[type='submit']");
+
+            const editing =
+                courseForm.dataset.mode === "edit";
+
+            setLoading(
+                button,
+                editing ? "Updating..." : "Adding...",
+                true
+            );
+
+            try {
+                const data = await postAjax(courseForm);
+
+                if (editing) {
+                    updateCourseCard(
+                        courseForm.dataset.courseId
+                    );
+
+                    showToast(
+                        data.message || "Course updated successfully."
+                    );
+                } else {
+                    addCourseCard(data.course || {});
+                    courseForm.reset();
+
+                    showToast(
+                        data.message || "Course added successfully."
+                    );
+                }
+            } catch (error) {
+                showToast(error.message, true);
+            } finally {
+                setLoading(button, "", false);
+            }
+        });
+    }
+
+    function courseField(name) {
+        const field =
+            courseForm.querySelector("[name='" + name + "']");
+        return field ? field.value.trim() : "";
+    }
+
+    function updateCourseCard(courseId) {
+
+        const card =
+            document.querySelector(
+                '.course-card[data-course-id="' +
+                courseId +
+                '"]'
+            );
+
+        if (!card) return;
+
+        const title =
+            courseField("title");
+        const price =
+            courseField("price");
+        const description =
+            courseField("description");
+        const instructor =
+            courseField("instructor");
+        const duration =
+            courseField("duration");
+        const level =
+            courseField("level");
+
+        const titleEl =
+            card.querySelector(".course-card-title");
+        const priceEl =
+            card.querySelector(".course-card-price");
+        const descriptionEl =
+            card.querySelector(".course-card-description");
+        const instructorEl =
+            card.querySelector(".course-card-instructor");
+        const durationEl =
+            card.querySelector(".course-card-duration");
+        const levelEl =
+            card.querySelector(".course-card-level");
+
+        if (titleEl)
+            titleEl.textContent = title || "Untitled Course";
+
+        if (priceEl)
+            priceEl.textContent = "$" + (price || "0");
+
+        if (descriptionEl)
+            descriptionEl.textContent =
+                description || "No description available.";
+
+        if (instructorEl)
+            instructorEl.textContent =
+                "Instructor: " + (instructor || "N/A");
+
+        if (durationEl)
+            durationEl.textContent =
+                "Duration: " + (duration || "N/A");
+
+        if (levelEl)
+            levelEl.textContent =
+                "Level: " + (level || "Beginner");
+    }
+
+    function addCourseCard(course) {
+
+        const container =
+            document.getElementById("course-management-list");
+
+        if (!container) return;
+
+        const title = courseField("title");
+        const price = courseField("price");
+        const description = courseField("description");
+        const instructor = courseField("instructor");
+        const duration = courseField("duration");
+        const level = courseField("level");
+
+        const card =
+            document.createElement("div");
+
+        card.className = "course-card";
+        card.dataset.courseId = course.id || "";
+
+        card.style.cssText =
+            "display:flex;gap:18px;padding:18px;" +
+            "border:1px solid #E5E7EB;border-radius:14px;" +
+            "background:#F9FAFB;align-items:flex-start;";
+
+        const imageInput =
+            courseForm.querySelector("[name='thumbnail']");
+
+        const videoInput =
+            courseForm.querySelector("[name='video']");
+
+        let imageUrl = "";
+
+        let videoUrl = "";
+
+        if (imageInput &&
+            imageInput.files &&
+            imageInput.files[0]) {
+            imageUrl =
+                URL.createObjectURL(imageInput.files[0]);
+        }
+
+        if (videoInput &&
+            videoInput.files &&
+            videoInput.files[0]) {
+            videoUrl =
+                URL.createObjectURL(videoInput.files[0]);
+        }
+
+        const imageWrap =
+            document.createElement("div");
+
+        imageWrap.style.cssText =
+            "width:180px;min-width:180px;height:120px;" +
+            "border-radius:10px;overflow:hidden;" +
+            "background:#E5E5E5;display:flex;" +
+            "align-items:center;justify-content:center;";
+
+        if (imageUrl) {
+            const img =
+                document.createElement("img");
+
+            img.src = imageUrl;
+            img.alt = title || "Course";
+            img.style.cssText =
+                "width:100%;height:100%;object-fit:cover;";
+
+            imageWrap.appendChild(img);
+        } else {
+            const noImage =
+                document.createElement("span");
+
+            noImage.textContent = "No Image";
+            noImage.style.cssText =
+                "color:#667085;font-size:14px;";
+
+            imageWrap.appendChild(noImage);
+        }
+
+        const body =
+            document.createElement("div");
+
+        body.style.cssText =
+            "flex:1;min-width:0;";
+
+        body.innerHTML = `
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                gap:12px;
+                align-items:center;
+                margin-bottom:8px;
+                flex-wrap:wrap;
+            ">
+                <h3 class="course-card-title"
+                    style="
+                        margin:0;
+                        font-size:20px;
+                        color:#111827;
+                    ">
+                    ${escapeHtml(title || "Untitled Course")}
+                </h3>
+
+                <span class="course-card-price"
+                      style="
+                          background:#E8F5E9;
+                          color:#1F7A3D;
+                          border-radius:999px;
+                          padding:6px 12px;
+                          font-size:12px;
+                          font-weight:700;
+                      ">
+                    $${escapeHtml(price || "0")}
+                </span>
+            </div>
+
+            <p class="course-card-description"
+               style="
+                   margin:0 0 12px;
+                   color:#475467;
+                   line-height:1.6;
+               ">
+                ${escapeHtml(
+                    description ||
+                    "No description available."
+                )}
+            </p>
+
+            <div style="
+                display:flex;
+                flex-wrap:wrap;
+                gap:8px;
+                margin-bottom:12px;
+                font-size:12px;
+                color:#344054;
+            ">
+                <span class="course-card-instructor"
+                      style="
+                          padding:6px 10px;
+                          border-radius:999px;
+                          background:#EEF2FF;
+                      ">
+                    Instructor:
+                    ${escapeHtml(instructor || "N/A")}
+                </span>
+
+                <span class="course-card-duration"
+                      style="
+                          padding:6px 10px;
+                          border-radius:999px;
+                          background:#F2F4F7;
+                      ">
+                    Duration:
+                    ${escapeHtml(duration || "N/A")}
+                </span>
+
+                <span class="course-card-level"
+                      style="
+                          padding:6px 10px;
+                          border-radius:999px;
+                          background:#F2F4F7;
+                      ">
+                    Level:
+                    ${escapeHtml(level || "Beginner")}
+                </span>
+            </div>
+        `;
+
+        if (videoUrl) {
+            const video =
+                document.createElement("video");
+
+            video.controls = true;
+            video.preload = "metadata";
+            video.style.cssText =
+                "width:100%;max-height:200px;" +
+                "border-radius:10px;background:#000;";
+
+            const source =
+                document.createElement("source");
+
+            source.src = videoUrl;
+            source.type = "video/mp4";
+
+            video.appendChild(source);
+            body.appendChild(video);
+        } else {
+            const noVideo =
+                document.createElement("div");
+
+            noVideo.textContent =
+                "No course video uploaded yet.";
+
+            noVideo.style.cssText =
+                "padding:12px 14px;border:1px dashed #D0D5DD;" +
+                "border-radius:10px;background:#FFF;" +
+                "color:#667085;font-size:13px;";
+
+            body.appendChild(noVideo);
+        }
+
+        const actions =
+            document.createElement("div");
+
+        actions.style.cssText =
+            "margin-top:16px;display:flex;" +
+            "justify-content:flex-end;gap:10px;";
+
+        const added =
+            document.createElement("span");
+
+        added.textContent = "Added";
+        added.style.cssText =
+            "background:#111827;color:#fff;" +
+            "border-radius:10px;padding:10px 14px;" +
+            "font-weight:700;";
+
+        actions.appendChild(added);
+        body.appendChild(actions);
+
+        card.appendChild(imageWrap);
+        card.appendChild(body);
+
+        const firstCard =
+            container.querySelector(".course-card");
+
+        if (firstCard) {
+            firstCard.before(card);
+        } else {
+            container.appendChild(card);
+        }
+
+        updateCourseCount();
+    }
+
+
+    /* =========================================================
+       COURSE DELETE
+    ========================================================= */
+
+    document.querySelectorAll(
+        ".ajax-course-delete"
+    ).forEach(bindDeleteForm);
+
+    function bindDeleteForm(form) {
+
+        form.addEventListener("submit", async function (event) {
+            event.preventDefault();
+
+            if (!window.confirm("Delete this course?")) {
+                return;
+            }
+
+            const button =
+                form.querySelector("button[type='submit']");
+
+            setLoading(button, "Deleting...", true);
+
+            try {
+                const data =
+                    await postAjax(form);
+
+                const card =
+                    form.closest(".course-card");
+
+                if (card) {
+                    card.style.opacity = "0";
+                    card.style.transition = "opacity .2s ease";
+
+                    setTimeout(() => {
+                        card.remove();
+                        updateCourseCount();
+                    }, 200);
+                }
+
+                showToast(
+                    data.message ||
+                    "Course deleted successfully."
+                );
+            } catch (error) {
+                showToast(error.message, true);
+
+                if (button) {
+                    button.disabled = false;
+                    button.style.opacity = "";
+                    button.style.cursor = "";
+                    button.textContent = "Delete Course";
+                }
+            }
+        });
+    }
+
+    function updateCourseCount() {
+        const count =
+            document.querySelectorAll(
+                "#course-management-list .course-card"
+            ).length;
+
+        const element =
+            document.getElementById("course-count");
+
+        if (element) {
+            element.textContent =
+                count + " Active Course(s)";
+        }
+    }
+
+    function escapeHtml(value) {
+        const div =
+            document.createElement("div");
+
+        div.textContent =
+            value == null ? "" : String(value);
+
+        return div.innerHTML;
+    }
+
+
+    /* =========================================================
+       FILE SELECTION
+    ========================================================= */
+
+    ["admin-image-input", "admin-video-input"].forEach(id => {
+        const input = document.getElementById(id);
+
+        if (input) {
+            input.addEventListener("change", function () {
+                if (this.files && this.files.length) {
+                    showToast(this.files[0].name);
+                }
+            });
+        }
+    });
+
+})();
+</script>
+
+</body>
+
+</html>

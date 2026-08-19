@@ -1,0 +1,618 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zero to Dangerous · Clout</title>
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Acme&display=swap" rel="stylesheet">
+  <style>
+    /* =========================================================
+       RESET
+    ========================================================= */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Helvetica', 'Arial', sans-serif;
+      color: #212121;
+      background: #FFFFFF;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+    button,
+    input {
+      font-family: inherit;
+    }
+
+    /* =========================================================
+       NAVBAR
+    ========================================================= */
+    .navbar {
+      height: 62px;
+      background: #000000;
+      border-top: 1px solid #E04F00;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      display: flex;
+      align-items: center;
+      top: 0;
+      z-index: 1000;
+    }
+    .nav-container {
+      width: min(1380px, calc(100% - 50px));
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      color: #E04F00;
+      font-size: 15px;
+      font-weight: bold;
+      text-decoration: none;
+      font-family: 'Acme', 'Helvetica', sans-serif;
+      letter-spacing: 1.5px;
+    }
+    .mobile-menu {
+      display: none;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 25px;
+      cursor: pointer;
+    }
+
+    /* =========================================================
+       COURSE INTRO
+    ========================================================= */
+    .course-intro {
+      background: #fcede5;
+      height: auto;
+      padding: 20px 0 55px;
+    }
+    .intro-container {
+      width: min(950px, calc(100% - 48px));
+      margin: auto;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+    }
+
+    /* =========================================================
+       INTRO CONTENT
+    ========================================================= */
+    .intro-content {
+      flex: 1;
+      padding: 33px 0 28px;
+      max-width: 590px;
+    }
+    .intro-content h1 {
+      font-family: 'Acme', 'Helvetica', sans-serif;
+      font-size: 24px;
+      font-weight: 400;
+      line-height: 1.3;
+      color: #212121;
+      margin-bottom: 16px;
+      letter-spacing: 0.3px;
+    }
+    .intro-content p {
+      font-family: 'Helvetica', 'Arial', sans-serif;
+      font-size: 17.5px;
+      line-height: 1.6;
+      color: #212121;
+      font-weight: 400;
+    }
+
+    /* =========================================================
+       READ MORE
+    ========================================================= */
+    .read-more {
+      display: inline-block;
+      color: #212121;
+      font-family: 'Helvetica', 'Arial', sans-serif;
+      font-size: 15.8px;
+      font-weight: 450;
+      text-decoration: underline;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      padding: 0;
+      margin-top: 4px;
+      transition: color 0.2s;
+    }
+
+    /* =========================================================
+       EXTRA CONTENT
+    ========================================================= */
+    .extra-content {
+      display: none;
+      margin-top: 12px;
+    }
+    .extra-content.show {
+      display: block;
+    }
+    .extra-content p {
+      font-size: 17.5px;
+      line-height: 1.6;
+      color: #212121;
+      margin-bottom: 10px;
+    }
+
+    /* =========================================================
+       PURCHASE CARD WRAPPER
+       DESKTOP: STICKY
+    ========================================================= */
+    .card-buy {
+      display: flex;
+      position: sticky;
+      top: 80px;
+      margin-left: 950px;
+      margin-top: -320px;
+      z-index: 10;
+      align-self: flex-start;
+    }
+
+    /* =========================================================
+       PURCHASE CARD
+    ========================================================= */
+    .purchase-card {
+      width: 390.39px;
+      background: #FFFFFF;
+      padding: 0 0 9px 0;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+      border: 1px solid #E3E3E3;
+      height: fit-content;
+      flex-shrink: 0;
+      overflow: hidden;
+      align-self: flex-start;
+    }
+
+    /* =========================================================
+       CARD IMAGE
+    ========================================================= */
+    .card-image img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    /* =========================================================
+       CARD BODY
+    ========================================================= */
+    .card-body {
+      padding: 18px 8px 9px 8px;
+    }
+
+    /* =========================================================
+       PRICE
+    ========================================================= */
+    .price-box {
+      width: 100%;
+      height: 51.6px;
+      border: 1px solid #000000;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 11px;
+      font-size: 17px;
+      color: #212121;
+      font-weight: 550;
+      background: #FFFFFF;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .price-box:hover {
+      background: #6a728210;
+    }
+    .price-box span {
+      margin-left: 6px;
+      font-weight: 400;
+      color: #212121;
+      font-size: 16px;
+    }
+
+    /* =========================================================
+       BUY BUTTON
+    ========================================================= */
+    .buy-btn {
+      display: inline-block;
+      width: 100%;
+      height: 43px;
+      margin-top: 12px;
+      border: none;
+      border-radius: 4px;
+      background: #E04F00;
+      color: #FFFFFF;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      letter-spacing: 0.3px;
+      text-align: center;
+      line-height: 43px;
+      text-decoration: none;
+      box-sizing: border-box;
+    }
+    .buy-btn:hover {
+      background: #c24400;
+    }
+
+    /* =========================================================
+       COURSE CONTENT
+    ========================================================= */
+    .course-content {
+      background: #FFFFFF;
+      min-height: 456px;
+    }
+    .content-container {
+      width: min(590px, calc(100% - 48px));
+      margin-left: calc((100% - min(980px, calc(100% - 48px))) / 2 + 15px);
+    }
+
+    /* =========================================================
+       CONTENT HEADER
+    ========================================================= */
+    .content-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 13px;
+    }
+    .content-header h2 {
+      font-family: 'Acme', 'Helvetica', sans-serif;
+      font-size: 24px;
+      font-weight: 600;
+      color: #212121;
+    }
+
+    /* =========================================================
+       COURSE META
+    ========================================================= */
+    .course-meta {
+      font-size: 11px;
+      color: #6A7282;
+      margin-bottom: 13px;
+      font-weight: 400;
+    }
+
+    /* =========================================================
+       COURSE SECTION
+    ========================================================= */
+    .course-section {
+      width: 520.33px;
+      height: 50.6px;
+      border: 1.3px solid #E3E3E3;
+      border-radius: 4px;
+      margin-bottom: 6px;
+      background: #FFFFFF;
+      transition: background 0.2s ease, border-color 0.2s ease;
+    }
+    .course-section:hover {
+      border-color: #212121;
+    }
+
+    /* =========================================================
+       SECTION TITLE
+    ========================================================= */
+    .section-title {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 9px;
+      font-family: 'Acme', 'Helvetica', sans-serif;
+      font-size: 16px;
+      color: #212121;
+      font-weight: 500;
+    }
+
+    /* =========================================================
+       FOOTER
+    ========================================================= */
+    .footer {
+      height: 95px;
+      background: #FBF8F4;
+      border-top: 1px solid #E3E3E3;
+    }
+    .footer-container {
+      width: min(950px, calc(100% - 48px));
+      height: 100%;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .copyright {
+      font-size: 18px;
+      font-family: sans-serif;
+      color: #020202;
+      font-weight: 400;
+    }
+
+    /* =========================================================
+       EXPANDED STATE (optional, kept for consistency)
+    ========================================================= */
+    .course-section.expanded {
+      background: #FBF8F4;
+      border-color: #212121;
+      height: auto;
+      min-height: 32px;
+      padding: 4px 0;
+    }
+    .course-section.expanded .section-title {
+      flex-wrap: wrap;
+      gap: 4px;
+    }
+
+    /* =========================================================
+       TABLET <= 900px
+    ========================================================= */
+    @media (max-width: 900px) {
+      .purchase-card {
+        width: 280px;
+      }
+    }
+
+    /* =========================================================
+       MOBILE / TABLET <= 800px
+    ========================================================= */
+    @media (max-width: 800px) {
+      .intro-container {
+        width: calc(100% - 32px);
+        flex-direction: column;
+      }
+      .intro-content {
+        width: 100%;
+        max-width: 100%;
+        padding-bottom: 20px;
+      }
+      .card-buy {
+        position: relative;
+        top: auto;
+        margin-top: -35px;
+        margin-left: 16px;
+        margin-right: 16px;
+        display: flex;
+        z-index: 5;
+      }
+      .purchase-card {
+        position: relative;
+        width: 100%;
+        max-width: 390px;
+        margin: 0 auto 20px;
+        align-self: center;
+      }
+      .content-container {
+        width: calc(100% - 32px);
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .footer-container {
+        width: calc(100% - 32px);
+      }
+      .course-section {
+        width: 100%;
+        max-width: 520px;
+      }
+    }
+
+    /* =========================================================
+       SMALL MOBILE <= 600px
+    ========================================================= */
+    @media (max-width: 600px) {
+      .intro-container {
+        width: calc(100% - 24px);
+      }
+      .course-intro {
+        min-height: auto;
+        height: auto;
+        padding-bottom: 35px;
+      }
+      .content-container {
+        width: calc(100% - 24px);
+      }
+      .content-header {
+        align-items: flex-start;
+        gap: 10px;
+      }
+      .footer {
+        height: auto;
+        padding: 25px 0;
+      }
+      .footer-container {
+        width: calc(100% - 24px);
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+      }
+      .card-buy {
+        position: relative;
+        top: auto;
+        margin-top: -20px;
+        margin-left: 12px;
+        margin-right: 12px;
+      }
+      .purchase-card {
+        position: relative;
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 20px;
+      }
+      .price-box {
+        height: 54px;
+        font-size: 18px;
+      }
+      .price-box span {
+        font-size: 14px;
+      }
+      .buy-btn {
+        height: 44px;
+        font-size: 15px;
+      }
+      .course-section {
+        width: 100%;
+        height: auto;
+        min-height: 50.6px;
+      }
+      .section-title {
+        font-size: 15px;
+        padding: 8px 9px;
+        height: auto;
+        min-height: 50.6px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =========================================================
+       NAVBAR
+  ========================================================= -->
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="{% url "index" %}" class="logo">CLOUT</a>
+    </div>
+  </nav>
+
+  <!-- =========================================================
+       COURSE INTRO
+  ========================================================= -->
+  <section class="course-intro">
+    <div class="intro-container">
+      <div class="intro-content">
+        <h1>The AI Income Playbook</h1>
+        <!-- MAIN TEXT -->
+        <p>
+This beginner-friendly program teaches you how to use Claude AI to discover profitable ideas and create digital products, PDFs, apps, websites, and AI-powered businesses.
+Through practical tutorials and real-world workflows, you'll learn how to use AI for research, planning, content creation, product development, marketing, and launching products faster.Whether you want to make your first money online,start
+        </p>
+        <!-- EXTRA TEXT -->
+        <div class="extra-content" id="extraContent">
+          <p>
+a side hustle, or build a scalable digital business, you'll gain the practical skills and confidence to turn ideas into products people can buy.
+          </p>
+          <p>
+            Whether you're a complete beginner or have some experience,
+            this course will give you the confidence to build and sell
+            digital products using AI.
+          </p>
+        </div>
+        <!-- READ MORE BUTTON -->
+        <button class="read-more" id="readMoreBtn" type="button">Read more</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       PURCHASE CARD (DESKTOP STICKY, MOBILE NORMAL)
+  ========================================================= -->
+  <section class="card-buy">
+    <div class="purchase-card">
+      <div class="card-image">
+        <img src="{% static 'buy.png' %}" alt="AI Income Playbook cover">
+      </div>
+      <div class="card-body">
+        <div class="price-box">
+          $18
+          <span>one-time purchase</span>
+        </div>
+        <a class="buy-btn" href="{% if user.is_authenticated %}{% url 'checkout' %}{% else %}{% url 'login' %}{% endif %}">
+          Buy now
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       COURSE CONTENT
+  ========================================================= -->
+  <main class="course-content">
+    <div class="content-container">
+      <div class="content-header">
+        <h2>Course content</h2>
+      </div>
+      <div class="course-meta">
+        <span>6 sections | 22 lessons</span>
+      </div>
+      <!-- SECTION 1 -->
+      <div class="course-section">
+        <div class="section-title">
+          <span>Lesson 1: AI Income Foundations The Landscape</span>
+        </div>
+      </div>
+      <!-- SECTION 2 -->
+      <div class="course-section">
+        <div class="section-title">
+          <span>Lesson 2: Digital Products & PDFs</span>
+        </div>
+      </div>
+      <!-- SECTION 3 -->
+      <div class="course-section">
+        <div class="section-title">
+          <span>Lesson 3: AI Apps & Websites</span>
+        </div>
+      </div>
+      <!-- SECTION 4 -->
+      <div class="course-section">
+        <div class="section-title">
+          <span>Lesson 4: AI Games & Automation</span>
+        </div>
+      </div>
+      <!-- SECTION 5 -->
+      <div class="course-section">
+        <div class="section-title">
+          <span>Lesson 5: AI E-commerce Systems</span>
+        </div>
+      </div>
+      <!-- SECTION 6 -->
+      <div class="course-section">
+        <div class="section-title">
+          <span>Lesson 6: Scale to $10K+/Month</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       FOOTER
+  ========================================================= -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="copyright">© 2026 Coult</div>
+    </div>
+  </footer>
+
+  <!-- =========================================================
+       JAVASCRIPT - READ MORE / READ LESS ONLY
+  ========================================================= -->
+  <script>
+    (function() {
+      const readMoreBtn = document.getElementById('readMoreBtn');
+      const extraContent = document.getElementById('extraContent');
+      if (!readMoreBtn || !extraContent) return;
+
+      readMoreBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        if (!extraContent.classList.contains('show')) {
+          extraContent.classList.add('show');
+          readMoreBtn.textContent = 'Read less';
+        } else {
+          extraContent.classList.remove('show');
+          readMoreBtn.textContent = 'Read more';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

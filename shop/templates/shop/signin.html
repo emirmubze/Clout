@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Acme&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CLOUT – Sign In</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --orange: #E04F00;
+            --black: #020202;
+            --white: #FFFFFF;
+            --off-white: #FBF8F4;
+
+            --heading: "Acme", sans-serif;
+            --body: "DM Sans", sans-serif;
+        }
+
+        body {
+            background: var(--white);
+            font-family: var(--body);
+            color: var(--black);
+
+
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .navbar {
+            height: 62px;
+
+            background: var(--black);
+
+            border-top: 1px solid var(--orange);
+            border-bottom: 1px solid rgba(255,255,255,.08);
+
+            display: flex;
+            align-items: center;
+
+            z-index: 1000;
+        }
+
+        .nav-container {
+            width: min(1380px, calc(100% - 50px));
+
+            margin: auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            color: var(--orange);
+
+            font-size: 15px;
+            font-weight: bold;
+
+            text-decoration: none;
+
+            font-family: var(--heading);
+
+            letter-spacing: 1.5px;
+        }
+
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main {
+            flex: 1;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            padding: 40px 20px;
+            
+            
+            background: var(--white);
+        }
+
+
+        /* =========================
+           CARD
+        ========================= */
+
+        .card {
+            background: #ffffff;
+
+            border: 1px solid #e1e1e1;
+
+            border-radius: 10px;
+
+            padding: 30px 36px 36px;
+
+            width: 100%;
+            max-width: 400px;
+
+            box-shadow:
+                0 2px 12px rgba(0,0,0,0.02);
+        }
+
+        .card-title {
+            font-size: 28px;
+
+            font-weight: 600;
+
+            font-family: var(--heading);
+
+            text-align: center;
+
+            margin-bottom: 28px;
+            margin-top: 10px;
+
+            letter-spacing: -0.2px;
+        }
+
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+
+            font-size: 14px;
+
+            color: #536071;
+
+            margin-bottom: 5px;
+
+            font-weight: 500;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .form-input {
+            width: 100%;
+
+            height: 40px;
+
+            padding: 0 14px;
+
+            border: 1px solid #d8dce2;
+
+            border-radius: 6px;
+
+            font-size: 14px;
+
+            background: #fff;
+
+            outline: none;
+
+            transition:
+                border 0.15s,
+                box-shadow 0.15s;
+        }
+
+        .form-input:focus {
+            border-color: #e04f00;
+
+            box-shadow:
+                0 0 0 3px rgba(224,79,0,0.06);
+        }
+
+        .form-input::placeholder {
+            color: #a7adb5;
+
+            font-size: 13px;
+        }
+
+        .form-error {
+            background: #fff3f1;
+            border: 1px solid #f5c4bc;
+            border-radius: 8px;
+            color: #b42318;
+            font-size: 13px;
+            font-weight: 500;
+            padding: 10px 12px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .form-error p {
+            margin: 0;
+        }
+
+
+        /* =========================
+           PASSWORD
+        ========================= */
+
+        .password-input {
+            padding-right: 42px;
+        }
+
+        .eye-btn {
+            position: absolute;
+
+            right: 12px;
+
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            background: transparent;
+
+            border: none;
+
+            color: #a7adb5;
+
+            cursor: pointer;
+
+            width: 20px;
+            height: 20px;
+
+            display: flex;
+
+            align-items: center;
+            justify-content: center;
+
+            padding: 0;
+        }
+
+        .eye-btn:hover {
+            color: #536071;
+        }
+
+        .eye-btn svg {
+            width: 17px;
+            height: 17px;
+
+            stroke: currentColor;
+
+            stroke-width: 2;
+
+            fill: none;
+        }
+
+
+        /* =========================
+           OPTIONS
+        ========================= */
+
+        .options-row {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-top: 2px;
+
+            flex-wrap: wrap;
+
+            gap: 4px 0;
+        }
+
+        .remember {
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+        }
+
+        .remember input[type="checkbox"] {
+            appearance: none;
+            -webkit-appearance: none;
+
+            width: 16px;
+            height: 16px;
+
+            background: #fff;
+
+            border: 1px solid #536071;
+
+            border-radius: 3px;
+
+            cursor: pointer;
+
+            position: relative;
+
+            flex-shrink: 0;
+        }
+
+        .remember input[type="checkbox"]:checked::after {
+            content: "✓";
+
+            position: absolute;
+
+            left: 2px;
+            top: -2px;
+
+            color: #e04f00;
+
+            font-size: 12px;
+
+            font-weight: 700;
+        }
+
+        .remember label {
+            font-size: 14px;
+
+            cursor: pointer;
+
+            user-select: none;
+        }
+
+        .forgot-link {
+            color: #e04f00;
+
+            text-decoration: none;
+
+            font-size: 14px;
+        }
+
+        .forgot-link:hover {
+            color: #c04400;
+        }
+
+
+        /* =========================
+           SIGN IN BUTTON
+        ========================= */
+
+        .signin-btn {
+            width: 100%;
+
+            height: 48px;
+
+            background: #e04f00;
+
+            border: none;
+
+            border-radius: 8px;
+
+            font-family: var(--body);
+
+            color: #fff;
+
+            font-size: 16px;
+
+            font-weight: 600;
+
+            cursor: pointer;
+
+            margin-top: 34px;
+
+            transition:
+                background 0.15s,
+                transform 0.1s,
+                box-shadow 0.15s;
+
+            letter-spacing: 0.2px;
+
+                  width: 100%;
+
+
+
+        }
+
+        .signin-btn:hover {
+            background: #d34800;
+
+            box-shadow:
+                0 3px 10px rgba(224,79,0,0.2);
+        }
+
+        .signin-btn:active {
+            transform: scale(0.98);
+        }
+
+
+        /* =========================
+           DIVIDER
+        ========================= */
+
+        .divider {
+            margin-top: 18px;
+
+            height: 1px;
+
+            background: #e8e8e8;
+        }
+
+
+        /* =========================
+           SIGN UP LINK
+        ========================= */
+
+        .signup-text {
+            text-align: center;
+
+            margin-top: 20px;
+
+            font-size: 14px;
+
+            color: #536071;
+        }
+
+        .signup-link {
+            color: #e04f00;
+
+            text-decoration: none;
+
+            font-weight: 500;
+        }
+
+        .signup-link:hover {
+            color: #c04400;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            height: 80px;
+
+            background: #FBF8F4;
+
+            border-top: 1px solid #E3E3E3;
+
+            margin-top: 50px;
+        }
+
+        .footer-container {
+            width: min(950px, calc(100% - 48px));
+
+            margin: auto;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+        }
+
+        .copyright {
+            font-size: 18px;
+
+            font-family: sans-serif;
+
+            color: #020202;
+
+            font-weight: 400;
+
+            margin-top: 30px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 500px) {
+
+            .nav-container {
+                width: calc(100% - 36px);
+            }
+
+            .card {
+                padding: 24px 20px 28px;
+
+                max-width: 100%;
+            }
+
+            .card-title {
+                font-size: 24px;
+
+                margin-bottom: 22px;
+            }
+
+            .options-row {
+                flex-direction: column;
+
+                align-items: flex-start;
+
+                gap: 4px;
+            }
+
+            .forgot-link {
+                font-size: 13px;
+            }
+
+            .form-input {
+                height: 38px;
+
+                font-size: 13px;
+            }
+
+            .signin-btn {
+                height: 44px;
+
+                font-size: 16px;
+
+                margin-top: 28px;
+            }
+
+            .footer {
+                padding: 14px 18px;
+            }
+
+            .copyright {
+                font-size: 13px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- NAVBAR -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a
+                href="{% url 'index' %}"
+                class="logo"
+            >
+                CLOUT
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- MAIN -->
+
+    <main class="main">
+
+        <div class="card">
+
+            <h1 class="card-title">
+                Log In
+            </h1>
+
+
+            <form
+                id="signinForm"
+                method="POST"
+            >
+                {% csrf_token %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-error" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p>{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- USERNAME -->
+
+                <div class="form-group">
+
+                    <label
+                        class="form-label"
+                        for="username"
+                    >
+                        Username
+                    </label>
+
+                    <input
+                        class="form-input"
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="your username"
+                        autocomplete="username"
+                        required
+                    >
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="form-group">
+
+                    <label
+                        class="form-label"
+                        for="password"
+                    >
+                        Password
+                    </label>
+
+
+                    <div class="input-wrap">
+
+                        <input
+                            class="form-input password-input"
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required
+                        >
+
+
+                        <button
+                            class="eye-btn"
+                            type="button"
+                            id="togglePassword"
+                            aria-label="Show password"
+                        >
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <path
+                                    d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"
+                                />
+
+                                <circle
+                                    cx="12"
+                                    cy="12"
+                                    r="2.5"
+                                />
+
+                            </svg>
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- OPTIONS -->
+
+                <div class="options-row">
+
+                    <div class="remember">
+
+                        <input
+                            type="checkbox"
+                            id="rememberMe"
+                            name="remember_me"
+                            checked
+                        >
+
+                        <label for="rememberMe">
+                            Remember Me
+                        </label>
+
+                    </div>
+
+
+                    <a
+                        href="{% url 'forgot_password' %}"
+                        class="forgot-link"
+                    >
+                        Forgot Password
+                    </a>
+
+                </div>
+
+
+                <!-- SIGN IN -->
+
+                <button
+                    class="signin-btn"
+                    type="submit"
+                >
+                    Log In
+                </button>
+
+
+                <!-- DIVIDER -->
+
+                <div class="divider"></div>
+
+
+                <!-- SIGN UP -->
+
+                <div class="signup-text">
+
+                    Don't have an account?
+
+                    <a
+                        href="{% url 'register' %}"
+                        class="signup-link"
+                    >
+                        Sign Up
+                    </a>
+
+                </div>
+
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    <!-- FOOTER -->
+
+    <footer class="footer">
+
+        <div class="footer-container">
+
+            <div class="copyright">
+                © 2026 Clout
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- JAVASCRIPT -->
+
+    <script>
+
+        const passwordInput =
+            document.getElementById("password");
+
+        const togglePassword =
+            document.getElementById("togglePassword");
+
+        const signinForm =
+            document.getElementById("signinForm");
+
+        const usernameInput =
+            document.getElementById("username");
+
+
+        /* Password visibility */
+
+        togglePassword.addEventListener(
+            "click",
+            function () {
+
+                const isPassword =
+                    passwordInput.type === "password";
+
+                passwordInput.type =
+                    isPassword
+                        ? "text"
+                        : "password";
+
+                this.setAttribute(
+                    "aria-label",
+                    isPassword
+                        ? "Hide password"
+                        : "Show password"
+                );
+
+            }
+        );
+
+
+        /* Form submits normally to Django LoginView */
+        /* No preventDefault - allows normal form submission */
+
+    </script>
+
+</body>
+
+</html>

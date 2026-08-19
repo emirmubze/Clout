@@ -1,0 +1,1830 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Acme&family=DM+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CLOUT – Sign Up</title>
+
+    <style>
+
+        /* =========================
+           RESET
+        ========================= */
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+
+        :root {
+            --orange: #E04F00;
+            --black: #020202;
+            --dark: #0E0E0E;
+            --dark-gray: #383838;
+            --white: #FFFFFF;
+            --off-white: #FBF8F4;
+
+            --heading: "Acme", sans-serif;
+            --body: "DM Sans", sans-serif;
+        }
+
+
+        /* =========================
+           BODY
+        ========================= */
+
+        body {
+            background: var(--white);
+            font-family: var(--body);
+            color: var(--black);
+
+            min-height: 100vh;
+
+            display: flex;
+            flex-direction: column;
+        }
+
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .navbar {
+            height: 62px;
+
+            background: var(--black);
+
+            border-top: 1px solid var(--orange);
+            border-bottom: 1px solid rgba(255,255,255,.08);
+
+            display: flex;
+            align-items: center;
+
+            z-index: 1000;
+        }
+
+
+        .nav-container {
+            width: min(1380px, calc(100% - 50px));
+
+            margin: auto;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+
+        .logo {
+            color: var(--orange);
+
+            font-size: 15px;
+            font-weight: bold;
+
+            text-decoration: none;
+
+            font-family: var(--heading);
+
+            letter-spacing: 1.5px;
+        }
+
+
+        /* =========================
+           MAIN
+        ========================= */
+
+        .main {
+            flex: 1;
+
+            display: flex;
+
+            justify-content: center;
+            align-items: center;
+
+            padding: 40px 20px;
+
+            background: var(--white);
+        }
+
+
+        /* =========================
+           CARD
+        ========================= */
+
+        .card {
+            background: #ffffff;
+
+            border: 1px solid #e1e1e1;
+
+            border-radius: 10px;
+
+            padding: 30px 36px 36px;
+
+            width: 100%;
+
+            max-width: 430px;
+
+            box-shadow:
+                0 2px 12px rgba(0,0,0,0.02);
+        }
+
+
+        .card-title {
+            font-size: 28px;
+
+            font-weight: 600;
+
+            text-align: center;
+
+            font-family: var(--heading);
+
+            margin-bottom: 28px;
+
+            letter-spacing: -0.2px;
+        }
+
+
+        /* =========================
+           FORM
+        ========================= */
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+
+        .form-label {
+            display: block;
+
+            font-size: 14px;
+
+            color: #536071;
+
+            margin-bottom: 5px;
+
+            font-weight: 500;
+        }
+
+
+        .form-input {
+            width: 100%;
+
+            height: 40px;
+
+            padding: 0 14px;
+
+            border: 1px solid #d8dce2;
+
+            border-radius: 6px;
+
+            font-size: 14px;
+
+            background: #fff;
+
+            outline: none;
+
+            transition:
+                border 0.15s,
+                box-shadow 0.15s;
+        }
+
+
+        .form-input:focus {
+            border-color: #e04f00;
+
+            box-shadow:
+                0 0 0 3px rgba(224,79,0,0.06);
+        }
+
+
+        .form-input::placeholder {
+            color: #a7adb5;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           PHONE
+        ========================= */
+
+        .phone-input {
+            display: flex;
+
+            width: 100%;
+
+            gap: 8px;
+        }
+
+
+        .country-code {
+            height: 40px;
+
+            width: 145px;
+
+            flex-shrink: 0;
+
+            padding: 0 8px;
+
+            border: 1px solid #d8dce2;
+
+            border-radius: 6px;
+
+            background: #fff;
+
+            color: #222;
+
+            font-family: var(--body);
+
+            font-size: 13px;
+
+            outline: none;
+
+            cursor: pointer;
+        }
+
+
+        .country-code:focus {
+            border-color: #e04f00;
+
+            box-shadow:
+                0 0 0 3px rgba(224,79,0,0.06);
+        }
+
+
+        .phone-number {
+            flex: 1;
+
+            min-width: 0;
+        }
+
+
+        /* =========================
+           PASSWORD
+        ========================= */
+
+        .input-wrap {
+            position: relative;
+        }
+
+
+        .password-input {
+            padding-right: 42px;
+        }
+
+
+        .eye-btn {
+            position: absolute;
+
+            right: 12px;
+
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            background: transparent;
+
+            border: none;
+
+            color: #a7adb5;
+
+            cursor: pointer;
+
+            width: 20px;
+
+            height: 20px;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            padding: 0;
+        }
+
+
+        .eye-btn:hover {
+            color: #536071;
+        }
+
+
+        .eye-btn svg {
+            width: 17px;
+
+            height: 17px;
+
+            stroke: currentColor;
+
+            stroke-width: 2;
+
+            fill: none;
+        }
+
+
+        /* =========================
+           SIGN UP BUTTON
+        ========================= */
+
+        .signup-btn {
+            width: 100%;
+
+            height: 48px;
+
+            background: #e04f00;
+
+            border: none;
+
+            border-radius: 8px;
+
+            color: #fff;
+
+            font-size: 16px;
+
+            font-weight: 600;
+
+            font-family: var(--body);
+
+            cursor: pointer;
+
+            margin-top: 16px;
+
+            transition:
+                background 0.15s,
+                transform 0.1s,
+                box-shadow 0.15s;
+
+            letter-spacing: 0.2px;
+        }
+
+
+        .signup-btn:hover {
+            background: #d34800;
+
+            box-shadow:
+                0 3px 10px rgba(224,79,0,0.2);
+        }
+
+
+        .signup-btn:active {
+            transform: scale(0.98);
+        }
+
+
+        /* =========================
+           LOGIN LINK
+        ========================= */
+
+        .login-text {
+            text-align: center;
+
+            margin-top: 20px;
+
+            font-size: 14px;
+
+            color: #536071;
+        }
+
+
+        .login-link {
+            color: #e04f00;
+
+            text-decoration: none;
+
+            font-weight: 500;
+        }
+
+
+        .login-link:hover {
+            color: #c04400;
+        }
+
+
+        /* =========================
+           DIVIDER
+        ========================= */
+
+        .divider {
+            margin-top: 20px;
+
+            height: 1px;
+
+            background: #e8e8e8;
+        }
+
+
+        /* =========================
+           FOOTER
+        ========================= */
+
+        .footer {
+            height: 80px;
+
+            background: #FBF8F4;
+
+            border-top: 1px solid #E3E3E3;
+
+            margin-top: 50px;
+        }
+
+
+        .footer-container {
+            width: min(950px, calc(100% - 48px));
+
+            margin: auto;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+        }
+
+
+        .copyright {
+            font-size: 18px;
+
+            font-family: sans-serif;
+
+            color: #020202;
+
+            font-weight: 400;
+
+            margin-top: 30px;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 500px) {
+
+            .nav-container {
+                width: calc(100% - 36px);
+            }
+
+
+            .card {
+                padding: 24px 20px 28px;
+
+                max-width: 100%;
+            }
+
+
+            .card-title {
+                font-size: 24px;
+
+                margin-bottom: 22px;
+            }
+
+
+            .form-input {
+                height: 38px;
+
+                font-size: 13px;
+            }
+
+
+            .country-code {
+                width: 125px;
+
+                height: 38px;
+
+                font-size: 12px;
+            }
+
+
+            .signup-btn {
+                height: 44px;
+
+                font-size: 16px;
+
+                margin-top: 14px;
+            }
+
+
+            .footer {
+                padding: 14px 18px;
+            }
+
+
+            .copyright {
+                font-size: 13px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- =========================
+         NAVBAR
+    ========================= -->
+
+    <nav class="navbar">
+
+        <div class="nav-container">
+
+            <a
+                href="{% url 'course_detail' %}"
+                class="logo"
+            >
+                CLOUT
+            </a>
+
+        </div>
+
+    </nav>
+
+
+    <!-- =========================
+         MAIN
+    ========================= -->
+
+    <main class="main">
+
+        <div class="card">
+
+            <h1 class="card-title">
+                Sign Up
+            </h1>
+
+
+            <form
+                id="signupForm"
+                method="POST"
+                novalidate
+            >
+
+                {% csrf_token %}
+
+                <div
+                    id="signupClientError"
+                    role="alert"
+                    aria-live="polite"
+                    style="display:none; margin-top:6px; color:#c62828; font-size:13px;"
+                ></div>
+
+
+                <!-- USERNAME -->
+
+                <div class="form-group">
+
+                    <label
+                        class="form-label"
+                        for="username"
+                    >
+                        Username
+                    </label>
+
+
+                    <input
+                        class="form-input"
+                        type="text"
+                        id="username"
+                        name="username"
+                        placeholder="Choose a username"
+                        autocomplete="username"
+                        required
+                    >
+
+                    {% for error in form.username.errors %}
+                        <div style="margin-top:6px; color:#c62828; font-size:13px;">{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- FULL NAME -->
+
+                <div class="form-group">
+
+                    <label
+                        class="form-label"
+                        for="name"
+                    >
+                         Name
+                    </label>
+
+
+                    <input
+                        class="form-input"
+                        type="text"
+                        id="name"
+                        name="name"
+                        placeholder="Enter your name"
+                        autocomplete="name"
+                        required
+                    >
+
+                    {% for error in form.name.errors %}
+                        <div style="margin-top:6px; color:#c62828; font-size:13px;">{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- EMAIL -->
+
+                <div class="form-group">
+
+                    <label
+                        class="form-label"
+                        for="email"
+                    >
+                        Email
+                    </label>
+
+
+                    <input
+                        class="form-input"
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="your@email.com"
+                        autocomplete="email"
+                        required
+                    >
+
+                    {% for error in form.email.errors %}
+                        <div style="margin-top:6px; color:#c62828; font-size:13px;">{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- PHONE NUMBER -->
+
+                <div class="form-group">
+
+                    <label
+                        class="form-label"
+                        for="phone"
+                    >
+                        Phone Number
+                    </label>
+
+
+                    <div class="phone-input">
+
+                        <select
+                            class="country-code"
+                            id="countryCode"
+                            name="country_code"
+                            required
+                        >
+
+                            <option value="+91" selected>
+                                🇮🇳 +91 India
+                            </option>
+
+                            <option value="+93">
+                                🇦🇫 +93 Afghanistan
+                            </option>
+
+                            <option value="+355">
+                                🇦🇱 +355 Albania
+                            </option>
+
+                            <option value="+213">
+                                🇩🇿 +213 Algeria
+                            </option>
+
+                            <option value="+1684">
+                                🇦🇸 +1 684 American Samoa
+                            </option>
+
+                            <option value="+376">
+                                🇦🇩 +376 Andorra
+                            </option>
+
+                            <option value="+244">
+                                🇦🇴 +244 Angola
+                            </option>
+
+                            <option value="+1264">
+                                🇦🇮 +1 264 Anguilla
+                            </option>
+
+                            <option value="+1268">
+                                🇦🇬 +1 268 Antigua and Barbuda
+                            </option>
+
+                            <option value="+54">
+                                🇦🇷 +54 Argentina
+                            </option>
+
+                            <option value="+374">
+                                🇦🇲 +374 Armenia
+                            </option>
+
+                            <option value="+297">
+                                🇦🇼 +297 Aruba
+                            </option>
+
+                            <option value="+61">
+                                🇦🇺 +61 Australia
+                            </option>
+
+                            <option value="+43">
+                                🇦🇹 +43 Austria
+                            </option>
+
+                            <option value="+994">
+                                🇦🇿 +994 Azerbaijan
+                            </option>
+
+                            <option value="+1242">
+                                🇧🇸 +1 242 Bahamas
+                            </option>
+
+                            <option value="+973">
+                                🇧🇭 +973 Bahrain
+                            </option>
+
+                            <option value="+880">
+                                🇧🇩 +880 Bangladesh
+                            </option>
+
+                            <option value="+1246">
+                                🇧🇧 +1 246 Barbados
+                            </option>
+
+                            <option value="+375">
+                                🇧🇾 +375 Belarus
+                            </option>
+
+                            <option value="+32">
+                                🇧🇪 +32 Belgium
+                            </option>
+
+                            <option value="+501">
+                                🇧🇿 +501 Belize
+                            </option>
+
+                            <option value="+229">
+                                🇧🇯 +229 Benin
+                            </option>
+
+                            <option value="+1441">
+                                🇧🇲 +1 441 Bermuda
+                            </option>
+
+                            <option value="+975">
+                                🇧🇹 +975 Bhutan
+                            </option>
+
+                            <option value="+591">
+                                🇧🇴 +591 Bolivia
+                            </option>
+
+                            <option value="+387">
+                                🇧🇦 +387 Bosnia and Herzegovina
+                            </option>
+
+                            <option value="+267">
+                                🇧🇼 +267 Botswana
+                            </option>
+
+                            <option value="+55">
+                                🇧🇷 +55 Brazil
+                            </option>
+
+                            <option value="+673">
+                                🇧🇳 +673 Brunei
+                            </option>
+
+                            <option value="+359">
+                                🇧🇬 +359 Bulgaria
+                            </option>
+
+                            <option value="+226">
+                                🇧🇫 +226 Burkina Faso
+                            </option>
+
+                            <option value="+257">
+                                🇧🇮 +257 Burundi
+                            </option>
+
+                            <option value="+855">
+                                🇰🇭 +855 Cambodia
+                            </option>
+
+                            <option value="+237">
+                                🇨🇲 +237 Cameroon
+                            </option>
+
+                            <option value="+1">
+                                🇨🇦 +1 Canada
+                            </option>
+
+                            <option value="+236">
+                                🇨🇫 +236 Central African Republic
+                            </option>
+
+                            <option value="+235">
+                                🇹🇩 +235 Chad
+                            </option>
+
+                            <option value="+56">
+                                🇨🇱 +56 Chile
+                            </option>
+
+                            <option value="+86">
+                                🇨🇳 +86 China
+                            </option>
+
+                            <option value="+57">
+                                🇨🇴 +57 Colombia
+                            </option>
+
+                            <option value="+506">
+                                🇨🇷 +506 Costa Rica
+                            </option>
+
+                            <option value="+385">
+                                🇭🇷 +385 Croatia
+                            </option>
+
+                            <option value="+53">
+                                🇨🇺 +53 Cuba
+                            </option>
+
+                            <option value="+357">
+                                🇨🇾 +357 Cyprus
+                            </option>
+
+                            <option value="+420">
+                                🇨🇿 +420 Czech Republic
+                            </option>
+
+                            <option value="+45">
+                                🇩🇰 +45 Denmark
+                            </option>
+
+                            <option value="+253">
+                                🇩🇯 +253 Djibouti
+                            </option>
+
+                            <option value="+1767">
+                                🇩🇲 +1 767 Dominica
+                            </option>
+
+                            <option value="+1809">
+                                🇩🇴 +1 809 Dominican Republic
+                            </option>
+
+                            <option value="+593">
+                                🇪🇨 +593 Ecuador
+                            </option>
+
+                            <option value="+20">
+                                🇪🇬 +20 Egypt
+                            </option>
+
+                            <option value="+503">
+                                🇸🇻 +503 El Salvador
+                            </option>
+
+                            <option value="+240">
+                                🇬🇶 +240 Equatorial Guinea
+                            </option>
+
+                            <option value="+291">
+                                🇪🇷 +291 Eritrea
+                            </option>
+
+                            <option value="+372">
+                                🇪🇪 +372 Estonia
+                            </option>
+
+                            <option value="+268">
+                                🇸🇿 +268 Eswatini
+                            </option>
+
+                            <option value="+251">
+                                🇪🇹 +251 Ethiopia
+                            </option>
+
+                            <option value="+679">
+                                🇫🇯 +679 Fiji
+                            </option>
+
+                            <option value="+358">
+                                🇫🇮 +358 Finland
+                            </option>
+
+                            <option value="+33">
+                                🇫🇷 +33 France
+                            </option>
+
+                            <option value="+241">
+                                🇬🇦 +241 Gabon
+                            </option>
+
+                            <option value="+220">
+                                🇬🇲 +220 Gambia
+                            </option>
+
+                            <option value="+995">
+                                🇬🇪 +995 Georgia
+                            </option>
+
+                            <option value="+49">
+                                🇩🇪 +49 Germany
+                            </option>
+
+                            <option value="+233">
+                                🇬🇭 +233 Ghana
+                            </option>
+
+                            <option value="+30">
+                                🇬🇷 +30 Greece
+                            </option>
+
+                            <option value="+299">
+                                🇬🇱 +299 Greenland
+                            </option>
+
+                            <option value="+1473">
+                                🇬🇩 +1 473 Grenada
+                            </option>
+
+                            <option value="+502">
+                                🇬🇹 +502 Guatemala
+                            </option>
+
+                            <option value="+224">
+                                🇬🇳 +224 Guinea
+                            </option>
+
+                            <option value="+592">
+                                🇬🇾 +592 Guyana
+                            </option>
+
+                            <option value="+509">
+                                🇭🇹 +509 Haiti
+                            </option>
+
+                            <option value="+504">
+                                🇭🇳 +504 Honduras
+                            </option>
+
+                            <option value="+852">
+                                🇭🇰 +852 Hong Kong
+                            </option>
+
+                            <option value="+36">
+                                🇭🇺 +36 Hungary
+                            </option>
+
+                            <option value="+354">
+                                🇮🇸 +354 Iceland
+                            </option>
+
+                            <option value="+62">
+                                🇮🇩 +62 Indonesia
+                            </option>
+
+                            <option value="+98">
+                                🇮🇷 +98 Iran
+                            </option>
+
+                            <option value="+964">
+                                🇮🇶 +964 Iraq
+                            </option>
+
+                            <option value="+353">
+                                🇮🇪 +353 Ireland
+                            </option>
+
+                            <option value="+972">
+                                🇮🇱 +972 Israel
+                            </option>
+
+                            <option value="+39">
+                                🇮🇹 +39 Italy
+                            </option>
+
+                            <option value="+1876">
+                                🇯🇲 +1 876 Jamaica
+                            </option>
+
+                            <option value="+81">
+                                🇯🇵 +81 Japan
+                            </option>
+
+                            <option value="+962">
+                                🇯🇴 +962 Jordan
+                            </option>
+
+                            <option value="+7">
+                                🇰🇿 +7 Kazakhstan
+                            </option>
+
+                            <option value="+254">
+                                🇰🇪 +254 Kenya
+                            </option>
+
+                            <option value="+686">
+                                🇰🇮 +686 Kiribati
+                            </option>
+
+                            <option value="+82">
+                                🇰🇷 +82 South Korea
+                            </option>
+
+                            <option value="+965">
+                                🇰🇼 +965 Kuwait
+                            </option>
+
+                            <option value="+996">
+                                🇰🇬 +996 Kyrgyzstan
+                            </option>
+
+                            <option value="+856">
+                                🇱🇦 +856 Laos
+                            </option>
+
+                            <option value="+371">
+                                🇱🇻 +371 Latvia
+                            </option>
+
+                            <option value="+961">
+                                🇱🇧 +961 Lebanon
+                            </option>
+
+                            <option value="+266">
+                                🇱🇸 +266 Lesotho
+                            </option>
+
+                            <option value="+231">
+                                🇱🇷 +231 Liberia
+                            </option>
+
+                            <option value="+218">
+                                🇱🇾 +218 Libya
+                            </option>
+
+                            <option value="+423">
+                                🇱🇮 +423 Liechtenstein
+                            </option>
+
+                            <option value="+370">
+                                🇱🇹 +370 Lithuania
+                            </option>
+
+                            <option value="+352">
+                                🇱🇺 +352 Luxembourg
+                            </option>
+
+                            <option value="+853">
+                                🇲🇴 +853 Macao
+                            </option>
+
+                            <option value="+261">
+                                🇲🇬 +261 Madagascar
+                            </option>
+
+                            <option value="+265">
+                                🇲🇼 +265 Malawi
+                            </option>
+
+                            <option value="+60">
+                                🇲🇾 +60 Malaysia
+                            </option>
+
+                            <option value="+960">
+                                🇲🇻 +960 Maldives
+                            </option>
+
+                            <option value="+223">
+                                🇲🇱 +223 Mali
+                            </option>
+
+                            <option value="+356">
+                                🇲🇹 +356 Malta
+                            </option>
+
+                            <option value="+692">
+                                🇲🇭 +692 Marshall Islands
+                            </option>
+
+                            <option value="+222">
+                                🇲🇷 +222 Mauritania
+                            </option>
+
+                            <option value="+230">
+                                🇲🇺 +230 Mauritius
+                            </option>
+
+                            <option value="+52">
+                                🇲🇽 +52 Mexico
+                            </option>
+
+                            <option value="+691">
+                                🇫🇲 +691 Micronesia
+                            </option>
+
+                            <option value="+373">
+                                🇲🇩 +373 Moldova
+                            </option>
+
+                            <option value="+377">
+                                🇲🇨 +377 Monaco
+                            </option>
+
+                            <option value="+976">
+                                🇲🇳 +976 Mongolia
+                            </option>
+
+                            <option value="+382">
+                                🇲🇪 +382 Montenegro
+                            </option>
+
+                            <option value="+212">
+                                🇲🇦 +212 Morocco
+                            </option>
+
+                            <option value="+258">
+                                🇲🇿 +258 Mozambique
+                            </option>
+
+                            <option value="+95">
+                                🇲🇲 +95 Myanmar
+                            </option>
+
+                            <option value="+264">
+                                🇳🇦 +264 Namibia
+                            </option>
+
+                            <option value="+977">
+                                🇳🇵 +977 Nepal
+                            </option>
+
+                            <option value="+31">
+                                🇳🇱 +31 Netherlands
+                            </option>
+
+                            <option value="+687">
+                                🇳🇨 +687 New Caledonia
+                            </option>
+
+                            <option value="+64">
+                                🇳🇿 +64 New Zealand
+                            </option>
+
+                            <option value="+505">
+                                🇳🇮 +505 Nicaragua
+                            </option>
+
+                            <option value="+227">
+                                🇳🇪 +227 Niger
+                            </option>
+
+                            <option value="+234">
+                                🇳🇬 +234 Nigeria
+                            </option>
+
+                            <option value="+47">
+                                🇳🇴 +47 Norway
+                            </option>
+
+                            <option value="+968">
+                                🇴🇲 +968 Oman
+                            </option>
+
+                            <option value="+92">
+                                🇵🇰 +92 Pakistan
+                            </option>
+
+                            <option value="+680">
+                                🇵🇼 +680 Palau
+                            </option>
+
+                            <option value="+970">
+                                🇵🇸 +970 Palestine
+                            </option>
+
+                            <option value="+507">
+                                🇵🇦 +507 Panama
+                            </option>
+
+                            <option value="+675">
+                                🇵🇬 +675 Papua New Guinea
+                            </option>
+
+                            <option value="+595">
+                                🇵🇾 +595 Paraguay
+                            </option>
+
+                            <option value="+51">
+                                🇵🇪 +51 Peru
+                            </option>
+
+                            <option value="+63">
+                                🇵🇭 +63 Philippines
+                            </option>
+
+                            <option value="+48">
+                                🇵🇱 +48 Poland
+                            </option>
+
+                            <option value="+351">
+                                🇵🇹 +351 Portugal
+                            </option>
+
+                            <option value="+974">
+                                🇶🇦 +974 Qatar
+                            </option>
+
+                            <option value="+40">
+                                🇷🇴 +40 Romania
+                            </option>
+
+                            <option value="+7">
+                                🇷🇺 +7 Russia
+                            </option>
+
+                            <option value="+250">
+                                🇷🇼 +250 Rwanda
+                            </option>
+
+                            <option value="+966">
+                                🇸🇦 +966 Saudi Arabia
+                            </option>
+
+                            <option value="+221">
+                                🇸🇳 +221 Senegal
+                            </option>
+
+                            <option value="+381">
+                                🇷🇸 +381 Serbia
+                            </option>
+
+                            <option value="+248">
+                                🇸🇨 +248 Seychelles
+                            </option>
+
+                            <option value="+232">
+                                🇸🇱 +232 Sierra Leone
+                            </option>
+
+                            <option value="+65">
+                                🇸🇬 +65 Singapore
+                            </option>
+
+                            <option value="+421">
+                                🇸🇰 +421 Slovakia
+                            </option>
+
+                            <option value="+386">
+                                🇸🇮 +386 Slovenia
+                            </option>
+
+                            <option value="+677">
+                                🇸🇧 +677 Solomon Islands
+                            </option>
+
+                            <option value="+252">
+                                🇸🇴 +252 Somalia
+                            </option>
+
+                            <option value="+27">
+                                🇿🇦 +27 South Africa
+                            </option>
+
+                            <option value="+211">
+                                🇸🇸 +211 South Sudan
+                            </option>
+
+                            <option value="+34">
+                                🇪🇸 +34 Spain
+                            </option>
+
+                            <option value="+94">
+                                🇱🇰 +94 Sri Lanka
+                            </option>
+
+                            <option value="+249">
+                                🇸🇩 +249 Sudan
+                            </option>
+
+                            <option value="+597">
+                                🇸🇷 +597 Suriname
+                            </option>
+
+                            <option value="+46">
+                                🇸🇪 +46 Sweden
+                            </option>
+
+                            <option value="+41">
+                                🇨🇭 +41 Switzerland
+                            </option>
+
+                            <option value="+963">
+                                🇸🇾 +963 Syria
+                            </option>
+
+                            <option value="+886">
+                                🇹🇼 +886 Taiwan
+                            </option>
+
+                            <option value="+992">
+                                🇹🇯 +992 Tajikistan
+                            </option>
+
+                            <option value="+255">
+                                🇹🇿 +255 Tanzania
+                            </option>
+
+                            <option value="+66">
+                                🇹🇭 +66 Thailand
+                            </option>
+
+                            <option value="+670">
+                                🇹🇱 +670 Timor-Leste
+                            </option>
+
+                            <option value="+228">
+                                🇹🇬 +228 Togo
+                            </option>
+
+                            <option value="+676">
+                                🇹🇴 +676 Tonga
+                            </option>
+
+                            <option value="+1868">
+                                🇹🇹 +1 868 Trinidad and Tobago
+                            </option>
+
+                            <option value="+216">
+                                🇹🇳 +216 Tunisia
+                            </option>
+
+                            <option value="+90">
+                                🇹🇷 +90 Türkiye
+                            </option>
+
+                            <option value="+993">
+                                🇹🇲 +993 Turkmenistan
+                            </option>
+
+                            <option value="+688">
+                                🇹🇻 +688 Tuvalu
+                            </option>
+
+                            <option value="+256">
+                                🇺🇬 +256 Uganda
+                            </option>
+
+                            <option value="+380">
+                                🇺🇦 +380 Ukraine
+                            </option>
+
+                            <option value="+971">
+                                🇦🇪 +971 United Arab Emirates
+                            </option>
+
+                            <option value="+44">
+                                🇬🇧 +44 United Kingdom
+                            </option>
+
+                            <option value="+1">
+                                🇺🇸 +1 United States
+                            </option>
+
+                            <option value="+598">
+                                🇺🇾 +598 Uruguay
+                            </option>
+
+                            <option value="+998">
+                                🇺🇿 +998 Uzbekistan
+                            </option>
+
+                            <option value="+678">
+                                🇻🇺 +678 Vanuatu
+                            </option>
+
+                            <option value="+58">
+                                🇻🇪 +58 Venezuela
+                            </option>
+
+                            <option value="+84">
+                                🇻🇳 +84 Vietnam
+                            </option>
+
+                            <option value="+681">
+                                🇼🇫 +681 Wallis and Futuna
+                            </option>
+
+                            <option value="+967">
+                                🇾🇪 +967 Yemen
+                            </option>
+
+                            <option value="+260">
+                                🇿🇲 +260 Zambia
+                            </option>
+
+                            <option value="+263">
+                                🇿🇼 +263 Zimbabwe
+                            </option>
+
+                        </select>
+
+
+                        <input
+                            class="form-input phone-number"
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder="9876543210"
+                            autocomplete="tel"
+                            inputmode="numeric"
+                            maxlength="15"
+                            required
+                        >
+
+                    </div>
+
+                    {% for error in form.phone_number.errors %}
+                        <div style="margin-top:6px; color:#c62828; font-size:13px;">{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- PASSWORD -->
+
+                <div class="form-group">
+
+                    <label
+                        class="form-label"
+                        for="password"
+                    >
+                        Password
+                    </label>
+
+
+                    <div class="input-wrap">
+
+                        <input
+                            class="form-input password-input"
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="Create a password"
+                            autocomplete="new-password"
+                            required
+                        >
+
+
+                        <button
+                            class="eye-btn"
+                            type="button"
+                            id="togglePassword"
+                            aria-label="Show password"
+                        >
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <path
+                                    d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"
+                                />
+
+                                <circle
+                                    cx="12"
+                                    cy="12"
+                                    r="2.5"
+                                />
+
+                            </svg>
+
+                        </button>
+
+                        {% for error in form.password1.errors %}
+                            <div style="margin-top:6px; color:#c62828; font-size:13px;">{{ error }}</div>
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- CONFIRM PASSWORD -->
+
+                <div class="form-group">
+
+                    <label
+                        class="form-label"
+                        for="confirmPassword"
+                    >
+                        Confirm Password
+                    </label>
+
+
+                    <div class="input-wrap">
+
+                        <input
+                            class="form-input password-input"
+                            type="password"
+                            id="confirmPassword"
+                            name="confirm_password"
+                            placeholder="Confirm your password"
+                            autocomplete="new-password"
+                            required
+                        >
+
+
+                        <button
+                            class="eye-btn"
+                            type="button"
+                            id="toggleConfirmPassword"
+                            aria-label="Show password"
+                        >
+
+                            <svg
+                                viewBox="0 0 24 24"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            >
+
+                                <path
+                                    d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6S2 12 2 12Z"
+                                />
+
+                                <circle
+                                    cx="12"
+                                    cy="12"
+                                    r="2.5"
+                                />
+
+                            </svg>
+
+                        </button>
+
+                        {% for error in form.password2.errors %}
+                            <div style="margin-top:6px; color:#c62828; font-size:13px;">{{ error }}</div>
+                        {% endfor %}
+
+                    </div>
+
+                </div>
+
+
+                <!-- SIGN UP -->
+
+                <button
+                    class="signup-btn"
+                    type="submit"
+                >
+                    Sign Up
+                </button>
+
+
+                <!-- DIVIDER -->
+
+                <div class="divider"></div>
+
+
+                <!-- LOGIN -->
+
+                <div class="login-text">
+
+                    Already have an account?
+
+                    <a
+                        href="{% url 'login' %}"
+                        class="login-link"
+                    >
+                        Log in
+                    </a>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </main>
+
+
+    <!-- =========================
+         FOOTER
+    ========================= -->
+
+    <footer class="footer">
+
+        <div class="footer-container">
+
+            <div class="copyright">
+                © 2026 Clout
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================= -->
+
+    <script>
+
+        /* =========================
+           PASSWORD TOGGLE
+        ========================= */
+
+        const passwordInput =
+            document.getElementById("password");
+
+        const togglePassword =
+            document.getElementById("togglePassword");
+
+
+        togglePassword.addEventListener(
+            "click",
+            function () {
+
+                const isPassword =
+                    passwordInput.type === "password";
+
+                passwordInput.type =
+                    isPassword ? "text" : "password";
+
+                this.setAttribute(
+                    "aria-label",
+                    isPassword
+                        ? "Hide password"
+                        : "Show password"
+                );
+
+            }
+        );
+
+
+        /* =========================
+           CONFIRM PASSWORD TOGGLE
+        ========================= */
+
+        const confirmPasswordInput =
+            document.getElementById("confirmPassword");
+
+        const toggleConfirmPassword =
+            document.getElementById(
+                "toggleConfirmPassword"
+            );
+
+
+        toggleConfirmPassword.addEventListener(
+            "click",
+            function () {
+
+                const isPassword =
+                    confirmPasswordInput.type === "password";
+
+                confirmPasswordInput.type =
+                    isPassword ? "text" : "password";
+
+                this.setAttribute(
+                    "aria-label",
+                    isPassword
+                        ? "Hide password"
+                        : "Show password"
+                );
+
+            }
+        );
+
+
+        /* =========================
+           PHONE INPUT
+        ========================= */
+
+        const phoneInput =
+            document.getElementById("phone");
+
+
+        phoneInput.addEventListener(
+            "input",
+            function () {
+
+                this.value =
+                    this.value.replace(
+                        /[^0-9]/g,
+                        ""
+                    );
+
+            }
+        );
+
+
+        /* =========================
+           FORM VALIDATION
+        ========================= */
+
+        const signupForm =
+            document.getElementById("signupForm");
+
+        const usernameInput =
+            document.getElementById("username");
+
+        const nameInput =
+            document.getElementById("name");
+
+        const emailInput =
+            document.getElementById("email");
+
+
+        signupForm.addEventListener(
+            "submit",
+            function (e) {
+
+                const clientError =
+                    document.getElementById("signupClientError");
+
+                function showClientError(message, field) {
+                    e.preventDefault();
+                    const fieldGroup =
+                        field.closest(".form-group");
+
+                    clientError.textContent = message;
+                    clientError.style.display = "block";
+                    fieldGroup.appendChild(clientError);
+                    field.focus();
+                }
+
+                const requiredFields = [
+                    [usernameInput, "Username"],
+                    [nameInput, "Name"],
+                    [emailInput, "Email"],
+                    [phoneInput, "Phone number"],
+                    [passwordInput, "Password"],
+                    [confirmPasswordInput, "Confirm password"],
+                ];
+
+                const missingField = requiredFields.find(
+                    ([field]) => !field.value.trim()
+                );
+
+                if (missingField) {
+                    showClientError(
+                        "Please fill in the " + missingField[1] + " field.",
+                        missingField[0]
+                    );
+                    return;
+                }
+
+                const password =
+                    passwordInput.value;
+
+                const confirmPassword =
+                    confirmPasswordInput.value;
+
+
+                if (password !== confirmPassword) {
+                    showClientError(
+                        "Passwords do not match.",
+                        confirmPasswordInput
+                    );
+                    return;
+                }
+
+
+                if (phoneInput.value.length < 6) {
+                    showClientError(
+                        "Please enter a valid phone number.",
+                        phoneInput
+                    );
+                    return;
+                }
+
+            }
+        );
+
+    </script>
+
+</body>
+
+</html>

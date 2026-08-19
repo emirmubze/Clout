@@ -1,0 +1,13 @@
+        </section>
+
+        {% endfor %}
+
+    {% else %}
+
+    <div class="empty">
+
+        No course modules have been added yet.
+
+    </div>
+
+    {% endif %}
