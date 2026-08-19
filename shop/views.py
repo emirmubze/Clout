@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import razorpay
+from smtplib import SMTPException
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -1614,15 +1615,21 @@ def forgot_password(request):
                     kwargs={"uidb64": uid, "token": token},
                 )
             )
-            send_mail(
-                "Reset your Clout password",
-                render_to_string(
-                    "shop/password-reset-email.txt",
-                    {"user": user, "reset_url": reset_url},
-                ),
-                None,
-                [user.email],
-            )
+            try:
+                send_mail(
+                    "Reset your Clout password",
+                    render_to_string(
+                        "shop/password-reset-email.txt",
+                        {"user": user, "reset_url": reset_url},
+                    ),
+                    None,
+                    [user.email],
+                )
+            except (SMTPException, OSError):
+                logger.exception(
+                    "Password reset email could not be sent to %s",
+                    user.email,
+                )
 
         # Do not reveal whether the email address exists.
         return redirect("reset_link_sent")

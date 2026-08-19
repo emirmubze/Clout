@@ -1,10 +1,47 @@
-from django.test import Client, TestCase
+from unittest.mock import patch
+from smtplib import SMTPException
+
+from django.core import mail
+from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
 from .models import CustomUser, ContactMessage, Course, Module
 
 
 class UserAuthAndDashboardTests(TestCase):
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_forgot_password_sends_reset_email(self):
+        user = CustomUser.objects.create_user(
+            username="resetuser",
+            email="reset@example.com",
+            password="StrongPass123!",
+        )
+
+        response = self.client.post(
+            reverse("forgot_password"),
+            {"email": user.email},
+        )
+
+        self.assertRedirects(response, reverse("reset_link_sent"))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn("/reset-password/", mail.outbox[0].body)
+
+    @patch("shop.views.send_mail", side_effect=SMTPException("SMTP unavailable"))
+    def test_forgot_password_does_not_error_when_email_fails(self, send_mail_mock):
+        user = CustomUser.objects.create_user(
+            username="failedresetuser",
+            email="failed-reset@example.com",
+            password="StrongPass123!",
+        )
+
+        response = self.client.post(
+            reverse("forgot_password"),
+            {"email": user.email},
+        )
+
+        self.assertRedirects(response, reverse("reset_link_sent"))
+        send_mail_mock.assert_called_once()
+
     def test_registration_form_saves_username_and_name(self):
         form_data = {
             "username": "aliceuser",
