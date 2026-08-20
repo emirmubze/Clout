@@ -356,6 +356,15 @@ def contact(request):
 
             message_obj.save()
 
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return JsonResponse({
+                    "id": message_obj.id,
+                    "message": message_obj.message,
+                    "image_url": message_obj.image.url if message_obj.image else "",
+                    "video_url": reverse("message_video", args=[message_obj.id]) if message_obj.video else "",
+                    "created_at": message_obj.created_at.strftime("%d %b, %H:%M"),
+                })
+
         return redirect("contact")
 
     form = ContactMessageForm()

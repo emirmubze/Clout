@@ -572,7 +572,7 @@
 
         <!-- INPUT AREA -->
 
-        <form method="POST" enctype="multipart/form-data" class="message-bar">
+        <form method="POST" enctype="multipart/form-data" class="message-bar" id="messageForm">
             
             {% csrf_token %}
 
@@ -675,6 +675,81 @@
         if (messagesContainer) {
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
+
+        const messageForm = document.getElementById("messageForm");
+        if (!messageForm) return;
+
+        messageForm.addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            const sendButton = messageForm.querySelector(".send-btn");
+            const input = messageForm.querySelector(".message-input");
+            const formData = new FormData(messageForm);
+
+            sendButton.disabled = true;
+            sendButton.textContent = "Sending...";
+
+            try {
+                const response = await fetch(messageForm.action || window.location.href, {
+                    method: "POST",
+                    body: formData,
+                    headers: { "X-Requested-With": "XMLHttpRequest" },
+                });
+
+                if (!response.ok) throw new Error("Message could not be sent.");
+
+                const message = await response.json();
+                const emptyState = messagesContainer.querySelector(".empty");
+                if (emptyState) emptyState.remove();
+
+                const messageElement = document.createElement("div");
+                messageElement.className = "message user-message";
+
+                if (message.message) {
+                    const text = document.createElement("div");
+                    text.textContent = message.message;
+                    messageElement.appendChild(text);
+                }
+
+                if (message.image_url) {
+                    const media = document.createElement("div");
+                    media.className = "message-media";
+                    const image = document.createElement("img");
+                    image.src = message.image_url;
+                    image.alt = "Message image";
+                    media.appendChild(image);
+                    messageElement.appendChild(media);
+                }
+
+                if (message.video_url) {
+                    const media = document.createElement("div");
+                    media.className = "message-media";
+                    const video = document.createElement("video");
+                    video.controls = true;
+                    const source = document.createElement("source");
+                    source.src = message.video_url;
+                    source.type = "video/mp4";
+                    video.appendChild(source);
+                    media.appendChild(video);
+                    messageElement.appendChild(media);
+                }
+
+                const time = document.createElement("div");
+                time.className = "time";
+                time.textContent = message.created_at;
+                messageElement.appendChild(time);
+                messagesContainer.appendChild(messageElement);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+                messageForm.reset();
+            } catch (error) {
+                messageForm.submit();
+            } finally {
+                sendButton.disabled = false;
+                sendButton.textContent = "Send";
+                input.focus();
+            }
+        });
     });
 
 </script>

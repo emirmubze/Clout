@@ -142,6 +142,29 @@ class UserAuthAndDashboardTests(TestCase):
         self.assertContains(dashboard_response, "Customer User")
         self.assertContains(dashboard_response, "I need help with my course")
 
+    def test_contact_ajax_message_returns_saved_message(self):
+        customer = CustomUser.objects.create_user(
+            username="ajaxcustomer",
+            email="ajaxcustomer@example.com",
+            password="StrongPass123!",
+        )
+
+        self.client.force_login(customer)
+        response = self.client.post(
+            reverse("contact"),
+            {"message": "Instant message"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["message"], "Instant message")
+        self.assertTrue(
+            ContactMessage.objects.filter(
+                sender=customer,
+                message="Instant message",
+            ).exists()
+        )
+
     def test_user_can_log_in_after_logout(self):
         user = CustomUser.objects.create_user(
             username="logoutuser",
