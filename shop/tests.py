@@ -165,6 +165,35 @@ class UserAuthAndDashboardTests(TestCase):
             ).exists()
         )
 
+    def test_contact_ajax_poll_returns_new_admin_reply(self):
+        customer = CustomUser.objects.create_user(
+            username="pollcustomer",
+            email="pollcustomer@example.com",
+            password="StrongPass123!",
+        )
+        admin = CustomUser.objects.create_user(
+            username="polladmin",
+            email="polladmin@example.com",
+            password="StrongPass123!",
+            is_staff=True,
+        )
+        reply = ContactMessage.objects.create(
+            sender=admin,
+            recipient=customer,
+            sender_is_admin=True,
+            message="New support reply",
+        )
+
+        self.client.force_login(customer)
+        response = self.client.get(
+            reverse("contact") + "?after=0",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["messages"][0]["id"], reply.id)
+        self.assertEqual(response.json()["messages"][0]["message"], "New support reply")
+
     def test_user_can_log_in_after_logout(self):
         user = CustomUser.objects.create_user(
             username="logoutuser",

@@ -44,6 +44,8 @@
         ========================= */
 
         body {
+            min-height: 100svh;
+            overflow-x: hidden;
             background: var(--white);
             font-family: var(--body);
             color: var(--black);
@@ -105,6 +107,7 @@
 
         .main {
             flex: 1;
+            width: 100%;
 
             display: flex;
 
@@ -428,13 +431,17 @@
         ========================= */
 
         .footer {
-            height: 80px;
+            min-height: 80px;
+            height: auto;
 
             background: #FBF8F4;
 
             border-top: 1px solid #E3E3E3;
 
-            margin-top: 50px;
+            margin-top: 0;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
         }
 
 
@@ -448,6 +455,7 @@
             align-items: center;
 
             justify-content: space-between;
+            min-height: 80px;
         }
 
 
@@ -460,7 +468,7 @@
 
             font-weight: 400;
 
-            margin-top: 30px;
+            margin-top: 0;
         }
 
 
@@ -515,7 +523,13 @@
 
 
             .footer {
-                padding: 14px 18px;
+                min-height: 64px;
+                padding: 14px 18px max(14px, env(safe-area-inset-bottom));
+            }
+
+            .footer-container {
+                width: 100%;
+                min-height: 34px;
             }
 
 

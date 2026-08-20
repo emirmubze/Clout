@@ -406,6 +406,31 @@ def contact(request):
         "created_at"
     )
 
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        after_id = request.GET.get("after", "0")
+        try:
+            after_id = int(after_id)
+        except (TypeError, ValueError):
+            after_id = 0
+
+        new_messages = chat_messages.filter(
+            sender_is_admin=True,
+            id__gt=after_id,
+        )
+
+        return JsonResponse({
+            "messages": [
+                {
+                    "id": message.id,
+                    "message": message.message or "",
+                    "image_url": message.image.url if message.image else "",
+                    "video_url": reverse("message_video", args=[message.id]) if message.video else "",
+                    "created_at": message.created_at.strftime("%d %b, %H:%M"),
+                }
+                for message in new_messages
+            ]
+        })
+
     return render(
         request,
         "shop/contact.html",

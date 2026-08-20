@@ -492,7 +492,7 @@
 
                 {% if message.sender_is_admin %}
 
-                    <div class="
+                    <div data-message-id="{{ message.id }}" class="
                         message
                         admin-message
                     ">
@@ -524,7 +524,7 @@
 
                 {% else %}
 
-                    <div class="
+                    <div data-message-id="{{ message.id }}" class="
                         message
                         user-message
                     ">
@@ -704,6 +704,7 @@
 
                 const messageElement = document.createElement("div");
                 messageElement.className = "message user-message";
+                messageElement.dataset.messageId = message.id;
 
                 if (message.message) {
                     const text = document.createElement("div");
@@ -750,6 +751,76 @@
                 input.focus();
             }
         });
+
+        const appendAdminMessage = (message) => {
+            if (messagesContainer.querySelector(`[data-message-id="${message.id}"]`)) return;
+
+            const messageElement = document.createElement("div");
+            messageElement.className = "message admin-message";
+            messageElement.dataset.messageId = message.id;
+
+            if (message.message) {
+                const text = document.createElement("div");
+                text.textContent = message.message;
+                messageElement.appendChild(text);
+            }
+
+            if (message.image_url) {
+                const media = document.createElement("div");
+                media.className = "message-media";
+                const image = document.createElement("img");
+                image.src = message.image_url;
+                image.alt = "Message image";
+                media.appendChild(image);
+                messageElement.appendChild(media);
+            }
+
+            if (message.video_url) {
+                const media = document.createElement("div");
+                media.className = "message-media";
+                const video = document.createElement("video");
+                video.controls = true;
+                const source = document.createElement("source");
+                source.src = message.video_url;
+                source.type = "video/mp4";
+                video.appendChild(source);
+                media.appendChild(video);
+                messageElement.appendChild(media);
+            }
+
+            const time = document.createElement("div");
+            time.className = "time";
+            time.textContent = message.created_at;
+            messageElement.appendChild(time);
+            messagesContainer.appendChild(messageElement);
+        };
+
+        const pollForAdminMessages = async () => {
+            const ids = [...messagesContainer.querySelectorAll("[data-message-id]")]
+                .map(element => Number(element.dataset.messageId))
+                .filter(Number.isFinite);
+            const afterId = ids.length ? Math.max(...ids) : 0;
+
+            try {
+                const response = await fetch(`${window.location.pathname}?after=${afterId}`, {
+                    headers: { "X-Requested-With": "XMLHttpRequest" },
+                    cache: "no-store",
+                });
+                if (!response.ok) return;
+
+                const data = await response.json();
+                if (!data.messages.length) return;
+
+                const emptyState = messagesContainer.querySelector(".empty");
+                if (emptyState) emptyState.remove();
+                data.messages.forEach(appendAdminMessage);
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            } catch (error) {
+                // The next poll retries when the connection is available.
+            }
+        };
+
+        window.setInterval(pollForAdminMessages, 2000);
     });
 
 </script>
