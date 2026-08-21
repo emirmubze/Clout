@@ -1149,16 +1149,13 @@ a side hustle, or build a scalable digital business, you'll gain the practical s
 
             const options = {
               key: data.key,
-              amount: data.amount,
-              currency: data.currency,
+              amount: 1882,
+              currency: 'INR',
               name: 'Clout',
-              description: 'The AI Income Playbook',
+              description: 'Course Purchase',
               order_id: data.order_id,
-              method: {
-                upi: true,
-                card: false,
-                netbanking: false,
-                wallet: false
+              theme: {
+                color: '#E04F00'
               },
               handler: async function(paymentResponse) {
                 const body = new URLSearchParams();
