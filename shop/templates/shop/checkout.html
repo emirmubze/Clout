@@ -246,41 +246,6 @@
       text-decoration: underline;
     }
 
-    .payment-methods {
-      display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 10px;
-      margin: 8px 0 18px;
-    }
-    .payment-option {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      border: 1px solid #e5e7eb;
-      background: #f9fafb;
-      border-radius: 12px;
-      padding: 12px 10px;
-      color: #1f2937;
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-      text-align: center;
-    }
-    .payment-option.active {
-      border-color: #E04F00;
-      background: #fff5f0;
-      box-shadow: 0 0 0 2px rgba(224, 79, 0, 0.08);
-    }
-    .payment-option i {
-      color: #E04F00;
-      font-size: 15px;
-      width: 18px;
-      text-align: center;
-    }
-
     .buy-button {
       width: 100%;
       height: 54px;
@@ -483,46 +448,9 @@
       </label>
     </div>
 
-    <div class="payment-methods" aria-label="Payment methods">
-      <div class="payment-option active" data-method="card" role="button" tabindex="0">
-        <i class="fas fa-credit-card"></i>
-        <span>Card</span>
-      </div>
-      <div class="payment-option" data-method="upi" role="button" tabindex="0">
-        <i class="fas fa-mobile-alt"></i>
-        <span>UPI</span>
-      </div>
-      <div class="payment-option" data-method="netbanking" role="button" tabindex="0">
-        <i class="fas fa-university"></i>
-        <span>Netbanking</span>
-      </div>
-      <div class="payment-option" data-method="wallet" role="button" tabindex="0">
-        <i class="fas fa-wallet"></i>
-        <span>Wallet</span>
-      </div>
-    </div>
-
     <button class="buy-button" id="pay-button" type="button">
       <span>Pay now</span>
     </button>
-
-    <div class="payment-powered">
-      <i class="fas fa-lock small-lock"></i>
-      <span>Secure payment powered by Razorpay</span>
-    </div>
-
-    <div class="security-card">
-      <div class="security-icon">
-        <svg viewBox="0 0 24 24">
-          <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" />
-          <path d="M9 12L11 14L15 10" />
-        </svg>
-      </div>
-      <div class="security-content">
-        <h3>100% Secure Payment</h3>
-        <p>Your payment information is encrypted and safe with Razorpay.</p>
-      </div>
-    </div>
   </div>
 
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -532,20 +460,10 @@
       const closeBtn = document.getElementById('closeBtn');
       const payButton = document.getElementById('pay-button');
       const termsCheck = document.getElementById('termsCheck');
-      const paymentOptions = document.querySelectorAll('.payment-option');
-      let selectedMethod = 'card';
 
       function closeCheckout() {
         modal.style.display = 'none';
       }
-
-      paymentOptions.forEach(option => {
-        option.addEventListener('click', () => {
-          paymentOptions.forEach(item => item.classList.remove('active'));
-          option.classList.add('active');
-          selectedMethod = option.dataset.method;
-        });
-      });
 
       closeBtn.addEventListener('click', closeCheckout);
 
@@ -576,12 +494,6 @@
             name: 'Clout',
             description: "{{ product_name|escapejs }}",
             order_id: data.order_id,
-            method: {
-              card: selectedMethod === 'card',
-              upi: selectedMethod === 'upi',
-              netbanking: selectedMethod === 'netbanking',
-              wallet: selectedMethod === 'wallet'
-            },
             handler: async function(response) {
               const body = new URLSearchParams();
               body.append('razorpay_payment_id', response.razorpay_payment_id);
