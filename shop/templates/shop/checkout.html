@@ -13,6 +13,10 @@
 <title>THE BAG CODE</title>
 
 <style>
+:root {
+    --orange: #E04F00;
+}
+
 * {
     box-sizing: border-box;
 }
@@ -646,7 +650,7 @@ body {
 }
 
 .terms input:checked {
-    background: #E04F00;
+    background: var(--orange);
     border-color: #E04F00;
 }
 
@@ -702,7 +706,7 @@ body {
 }
 
 .buy-btn:disabled {
-    opacity: .5;
+    opacity: 1;
 
     cursor: not-allowed;
 }
