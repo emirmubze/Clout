@@ -1,0 +1,83 @@
+/* Shared responsive safeguards for every page. */
+html {
+    max-width: 100%;
+    overflow-x: hidden;
+}
+
+body {
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+}
+
+img,
+video,
+svg,
+canvas,
+iframe {
+    max-width: 100%;
+}
+
+img,
+video {
+    height: auto;
+}
+
+input,
+select,
+textarea,
+button {
+    max-width: 100%;
+    min-width: 0;
+}
+
+button,
+a {
+    overflow-wrap: anywhere;
+}
+
+table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+}
+
+footer {
+    width: 100%;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    body {
+        min-width: 0;
+    }
+
+    .container,
+    .wrapper,
+    .content,
+    .layout {
+        max-width: 100%;
+    }
+
+    input,
+    select,
+    textarea {
+        font-size: 16px;
+    }
+
+    footer {
+        min-height: 0 !important;
+        height: auto !important;
+        padding: 16px !important;
+    }
+
+    footer > *,
+    footer .footer-container {
+        width: 100% !important;
+        min-height: 0 !important;
+        height: auto !important;
+        margin: 0 auto !important;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+}

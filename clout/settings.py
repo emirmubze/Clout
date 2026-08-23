@@ -387,7 +387,7 @@ if not DEBUG:
 
     SECURE_CONTENT_TYPE_NOSNIFF = True
 
-    X_FRAME_OPTIONS = "DENY"
+    X_FRAME_OPTIONS = "SAMEORIGIN"
 
 
 # =========================================================
@@ -397,3 +397,5 @@ if not DEBUG:
 else:
 
     SECURE_SSL_REDIRECT = False
+
+    X_FRAME_OPTIONS = "SAMEORIGIN"

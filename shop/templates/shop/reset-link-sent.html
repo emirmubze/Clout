@@ -23,6 +23,7 @@
 
         :root {
             --orange: #E04F00;
+            --success: #E04F00;
             --black: #020202;
             --white: #FFFFFF;
             --off-white: #FBF8F4;
@@ -99,7 +100,7 @@
         .card {
             width: 100%;
 
-            max-width: 400px;
+            max-width: 520px;
 
             padding: 36px;
 
@@ -113,28 +114,15 @@
         }
 
 
-        .success-icon {
-            width: 60px;
-
-            height: 60px;
-
-            margin: 0 auto 20px;
-
-            border-radius: 50%;
-
-            background: #edf8ef;
-
-            color: #28733a;
-
+        .success-illustration {
             display: flex;
-
             justify-content: center;
+            margin: 0 auto 18px;
+        }
 
-            align-items: center;
-
-            font-size: 30px;
-
-            font-weight: bold;
+        .success-illustration svg {
+            width: 170px;
+            height: 130px;
         }
 
 
@@ -182,7 +170,7 @@
 
             height: 48px;
 
-            background: var(--orange);
+            background: var(--success);
 
             font-family: var(--body);
 
@@ -204,7 +192,15 @@
 
 
         .button:hover {
-            background: #d34800;
+            background: #C2410C;
+        }
+
+        .button-icon {
+            width: 18px;
+            height: 18px;
+            margin-right: 8px;
+            vertical-align: -4px;
+            fill: currentColor;
         }
 
 
@@ -214,6 +210,39 @@
             font-size: 13px;
 
             color: #536071;
+        }
+
+        .resend-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            margin: 22px 0;
+            padding: 16px;
+            border-radius: 10px;
+            background: #FFF7F2;
+            color: #536071;
+            font-size: 14px;
+            line-height: 1.5;
+            text-align: left;
+        }
+
+        .resend-box svg {
+            flex: 0 0 22px;
+            width: 22px;
+            height: 22px;
+            margin-top: 1px;
+        }
+
+        .back-link {
+            display: block;
+            margin-top: 20px;
+            color: #536071;
+            font-size: 16px;
+            text-decoration: none;
+        }
+
+        .back-link:hover {
+            color: var(--success);
         }
 
 
@@ -297,6 +326,7 @@
 
     </style>
 
+<link rel="stylesheet" href="/static/responsive.css">
 </head>
 
 
@@ -320,48 +350,54 @@
 
         <div class="card">
 
-            <div class="success-icon">
-                ✓
+            <div class="success-illustration" aria-hidden="true">
+                <svg viewBox="0 0 170 130">
+                    <circle cx="85" cy="56" r="42" fill="#FFF0E8" />
+                    <path d="M42 42h86v61H42z" fill="#FFF" stroke="#F5B9A0" stroke-width="2" />
+                    <path d="m43 43 42 34 42-34" fill="#FFF8F4" stroke="#F5B9A0" stroke-width="2" />
+                    <path d="M53 57h29M53 68h41M53 79h34" stroke="#A7ADB5" stroke-width="2" />
+                    <path d="m48 99 37-30 37 30" fill="#E04F00" opacity=".9" />
+                    <circle cx="121" cy="42" r="20" fill="#E04F00" />
+                    <path d="m111 42 7 7 13-14" fill="none" stroke="#FFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+                </svg>
             </div>
 
 
             <h1 class="title">
-                Reset Link Sent
+                Reset Link Sent!
             </h1>
 
 
             <p class="description">
-                We've sent a password reset link
-                to the email address you provided.
+                We've sent a password reset link to
+                the email address you provided.
             </p>
 
 
-            <div class="email-box">
-                Check your email inbox and follow
-                the link to reset your password.
+            <div class="resend-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M12 3 21 6v5c0 5.2-3.7 8.8-9 10-5.3-1.2-9-4.8-9-10V6l9-3Z" />
+                    <path d="m8 12 2.5 2.5L16 9" />
+                </svg>
+                <span>
+                    Didn't receive the email? Check your spam folder
+                    or <a href="{% url 'forgot_password' %}" class="link">try resending the link.</a>
+                </span>
             </div>
 
 
             <a
-                href="{% url 'login' %}"
+                href="{% url 'forgot_password' %}"
                 class="button"
             >
-                Back to Log In
+                <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="m3 11 18-8-5 18-5-7-8-3Z" />
+                    <path d="m11 14 4-5" fill="none" stroke="#FFF" stroke-width="1.5" />
+                </svg>
+                Send Resent Link
             </a>
 
-
-            <div class="resend">
-
-                Didn't receive the email?
-
-                <a
-                    href="{% url 'forgot_password' %}"
-                    class="link"
-                >
-                    Try again
-                </a>
-
-            </div>
+            <a href="{% url 'login' %}" class="back-link">Back to Login</a>
 
         </div>
 

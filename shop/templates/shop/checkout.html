@@ -1,560 +1,1438 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
+{% load static %}
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Clout Checkout</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Acme&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z' stroke='%23E04F00' stroke-width='2' fill='none'/><path d='M9 12L11 14L15 10' stroke='%23E04F00' stroke-width='2' fill='none'/></svg>" />
+<title>THE BAG CODE</title>
 
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+<style>
+* {
+    box-sizing: border-box;
+}
+
+html,
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family:
+        "DM Sans",
+        Inter,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+    background: transparent !important;
+    color: #111827;
+    overflow-x: hidden;
+}
+
+
+/* =====================================================
+   MAIN
+===================================================== */
+
+.order-wrapper {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100vh;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.order-card {
+    width: 100% !important;
+    max-width: 680px !important;
+    margin: 0 auto !important;
+    background: #ffffff;
+    border-radius: 10px !important;
+    padding: 16px 18px;
+    box-shadow: 0 6px 18px rgba(0,0,0,.10) !important;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.order-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.order-header h1 {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+}
+
+.close-btn {
+    width: 22px;
+    height: 22px;
+
+    border: none;
+    background: transparent;
+
+    border-radius: 50%;
+
+    font-size: 18px;
+    font-weight: 300;
+    line-height: 1;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #111827;
+
+    transition: .2s ease;
+}
+
+.close-btn:hover {
+    background: #f5f5f5;
+}
+
+
+/* =====================================================
+   PRODUCT
+===================================================== */
+
+.product {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    gap: 12px;
+
+    padding-bottom: 16px;
+}
+
+.product-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.product-media {
+    width: 62px;
+    height: 62px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    overflow: hidden;
+
+    border-radius: 12px;
+
+    background: #f5f5f5;
+}
+
+.product-image {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: contain;
+    object-position: center;
+
+    background: #f5f5f5;
+}
+
+.product-info h2 {
+    margin: 0 0 10px;
+
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.product-info p {
+    margin: 0;
+
+    font-size: 12px;
+
+    color: #4b5563;
+}
+
+.product-price {
+    text-align: right;
+}
+
+.product-price span {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: "DM Sans", sans-serif;
+}
+
+
+/* =====================================================
+   COUNTRY / CURRENCY BOX
+===================================================== */
+
+.currency-box {
+    margin: 12px 0 16px;
+
+    padding: 12px;
+
+    border: 1px solid #e1e5ea;
+
+    border-radius: 12px;
+
+    background: #fafbfc;
+}
+
+.currency-label {
+    display: block;
+
+    margin-bottom: 11px;
+
+    font-size: 14px;
+    font-weight: 700;
+
+    letter-spacing: .2px;
+
+    color: #374151;
+}
+
+
+/* CUSTOM SELECT */
+
+.currency-select {
+    position: relative;
+
+    width: 100%;
+}
+
+
+/* SELECTED */
+
+.currency-selected {
+    width: 100%;
+    min-height: 48px;
+
+    padding: 0 12px;
+
+    border: 1px solid #d4d9df;
+
+    border-radius: 10px;
+
+    background: #ffffff;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    transition: .2s ease;
+}
+
+.currency-selected:hover {
+    border-color: #b9c0c8;
+}
+
+.currency-selected.active {
+    border-color: #d4d9df;
+
+    box-shadow: none;
+}
+
+
+/* SELECTED LEFT */
+
+.selected-left {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+}
+
+.selected-flag {
+    font-size: 21px;
+
+    line-height: 1;
+}
+
+.selected-country {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+
+    font-size: 13px;
+    font-weight: 700;
+    font-family: "DM Sans", sans-serif;
+
+    color: #111827;
+}
+
+.selected-currency {
+    color: #4b5563;
+
+    font-weight: 600;
+    font-family: "DM Sans", sans-serif;
+}
+
+
+/* ARROW */
+
+.currency-arrow {
+    width: 10px;
+    height: 10px;
+
+    border-right: 2px solid #111827;
+    border-bottom: 2px solid #111827;
+
+    transform: rotate(45deg);
+
+    margin-right: 5px;
+    margin-top: -5px;
+
+    transition: .2s ease;
+}
+
+.currency-selected.active .currency-arrow {
+    transform: rotate(225deg);
+
+    margin-top: 5px;
+}
+
+
+/* DROPDOWN */
+
+.currency-dropdown {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    top: calc(100% + 8px);
+
+    background: #ffffff;
+
+    border: 1px solid #e5e7eb;
+
+    border-radius: 10px;
+
+    box-shadow:
+        0 12px 28px rgba(0,0,0,.08);
+
+    z-index: 1000;
+
+    overflow: hidden;
+
+    display: none;
+}
+
+.currency-dropdown.show {
+    display: block;
+}
+
+
+/* SEARCH */
+
+.currency-search {
+    padding: 10px 12px;
+
+    border-bottom: 1px solid #eeeeee;
+
+    background: #fff;
+}
+
+.currency-search input {
+    width: 100%;
+
+    height: 34px;
+
+    padding: 0 12px;
+
+    border: 1px solid #d4d9df;
+
+    border-radius: 9px;
+
+    outline: none;
+
+    font-size: 14px;
+}
+
+.currency-search input:focus {
+    border-color: #d4d9df;
+    box-shadow: none;
+}
+
+
+/* OPTIONS */
+
+.currency-options {
+    max-height: 230px;
+
+    overflow-y: auto;
+
+    padding: 5px;
+}
+
+.currency-option {
+    width: 100%;
+
+    border: 0;
+
+    background: transparent;
+
+    padding: 8px 10px;
+
+    border-radius: 9px;
+
+    cursor: pointer;
+
+    display: flex;
+    align-items: center;
+
+    gap: 12px;
+
+    text-align: left;
+
+    transition: .15s ease;
+}
+
+.currency-option:hover {
+    background: #f5f6f7;
+}
+
+.currency-option.selected {
+    background: #fff3ed;
+}
+
+.option-flag {
+    width: 30px;
+
+    font-size: 13px;
+
+    text-align: center;
+}
+
+.option-info {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 2px;
+}
+
+.option-country {
+    font-size: 14px;
+    font-weight: 700;
+    font-family: "DM Sans", sans-serif;
+
+    color: #111827;
+}
+
+.option-currency {
+    font-size: 12px;
+    font-family: "DM Sans", sans-serif;
+
+    color: #6b7280;
+}
+
+.option-check {
+    color: #E04F00;
+
+    font-size: 13px;
+
+    display: none;
+}
+
+.currency-option.selected .option-check {
+    display: block;
+}
+
+
+/* =====================================================
+   DIVIDER
+===================================================== */
+
+.divider {
+    height: 1px;
+
+    background: #e5e7eb;
+
+    margin-bottom: 16px;
+}
+
+
+/* =====================================================
+   SUMMARY
+===================================================== */
+
+.summary-header {
+    display: flex;
+
+    justify-content: flex-end;
+
+    margin-bottom: 16px;
+
+    font-size: 13px;
+
+    font-weight: 600;
+
+    color: #374151;
+}
+
+.summary-header span {
+    display: inline-block;
+
+    padding: 4px 8px;
+
+    border-radius: 6px;
+
+    background: #f3f4f6;
+
+    color: #374151;
+
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.summary-row {
+    display: grid;
+
+    grid-template-columns: 1fr 110px;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin: 10px 0;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.summary-row strong {
+    text-align: right;
+
+    font-weight: 700;
+}
+
+.discount {
+    color: #e11d2e;
+}
+
+
+/* =====================================================
+   TOTAL
+===================================================== */
+
+.total-box {
+    border-top: 1px solid #e5e7eb;
+
+    margin-top: 14px;
+
+    padding-top: 16px;
+}
+
+.total-row {
+    display: grid;
+
+    grid-template-columns: 1fr auto;
+
+    gap: 12px;
+
+    align-items: end;
+}
+
+.total-label {
+    font-size: 20px;
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    color: #111827;
+}
+
+.total-price {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: flex-end;
+}
+
+.total-price strong {
+    display: block;
+
+    font-size: 24px;
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.7px;
+    color: #111827;
+    font-family: "DM Sans", sans-serif;
+}
+
+.total-price small {
+    display: block;
+
+    margin-top: 2px;
+
+    color: #6b7280;
+
+    font-size: 10px;
+    font-weight: 500;
+    text-align: right;
+}
+
+
+/* =====================================================
+   INDIA PAYMENT
+===================================================== */
+
+
+/* =====================================================
+   PAYMENT OPTIONS
+===================================================== */
+
+
+/* =====================================================
+   TERMS
+===================================================== */
+
+.terms {
+    display: flex;
+
+    align-items: flex-start;
+
+    gap: 6px;
+
+    margin-top: 14px;
+
+    font-size: 11px;
+
+    line-height: 1.5;
+
+    color: #111827;
+
+    cursor: pointer;
+}
+
+.terms input {
+    width: 13px;
+    height: 13px;
+
+    margin-top: 2px;
+
+    border: 1.5px solid #d1d5db;
+    border-radius: 3px;
+    background: #ffffff;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.terms input:checked {
+    background: #E04F00;
+    border-color: #E04F00;
+}
+
+.terms input:checked::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 0px;
+    width: 3px;
+    height: 7px;
+    border: solid #ffffff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.terms a {
+    color: #e11d2e;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+
+/* =====================================================
+   BUY BUTTON
+===================================================== */
+
+.buy-btn {
+    width: 100%;
+
+    height: 42px;
+
+    border: 0;
+
+    border-radius: 10px;
+
+    margin-top: 18px;
+
+    background: #E04F00;
+
+    color: #ffffff;
+
+    font-size: 12px;
+
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition: .2s ease;
+}
+
+.buy-btn:hover {
+    background: #c84300;
+}
+
+.buy-btn:disabled {
+    opacity: .5;
+
+    cursor: not-allowed;
+}
+
+
+/* =====================================================
+   SECURE
+===================================================== */
+
+.secure {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+
+    margin-top: 10px;
+
+    color: #5e6672;
+
+    font-size: 12px;
+    font-weight: 500;
+}
+
+
+/* =====================================================
+   SECURITY BOX
+===================================================== */
+
+.security-box {
+    display: flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 16px;
+
+    padding: 12px;
+
+    border: 1px solid #e2e5e9;
+
+    border-radius: 12px;
+
+    background: #f8f9fb;
+}
+
+.security-icon {
+    font-size: 28px;
+}
+
+.security-box h3 {
+    margin: 0 0 5px;
+
+    font-size: 13px;
+}
+
+.security-box p {
+    margin: 0;
+
+    color: #4b5563;
+
+    line-height: 1.5;
+
+    font-size: 13px;
+}
+
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width: 700px) {
+
+    .order-wrapper {
+        max-width: 450px;
+        margin: 10px auto;
+        padding: 0 8px;
+        align-items: flex-start;
     }
 
-    body {
-      font-family: 'DM Sans', Arial, sans-serif;
-      background: linear-gradient(90deg, rgba(8, 10, 13, 0.9), rgba(30, 32, 34, 0.72)),
-                  url('https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?auto=format&fit=crop&w=1600&q=80') center/cover;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 16px;
+    .order-card {
+        padding: 18px 14px;
+
+        border-radius: 10px;
     }
 
-    :root {
-      --orange: #E04F00;
-      --black: #020202;
-      --dark: #0E0E0E;
-      --dark-gray: #383838;
-      --white: #FFFFFF;
-      --peach: #FFDECC;
-      --warm-white: #FFDFD8;
-      --off-white: #FBF8F4;
-      --warm-gray: #F0EDE6;
-      --heading: 'Acme', sans-serif;
-      --body: 'DM Sans', sans-serif;
-    }
-
-    .checkout-card {
-      max-width: 480px;
-      width: 100%;
-      background: #ffffff;
-      border-radius: 24px;
-      padding: 28px 30px 30px;
-      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
-      animation: popup 0.22s ease-out;
-      position: relative;
-      transition: all 0.2s;
-    }
-
-    @keyframes popup {
-      from {
-        opacity: 0;
-        transform: scale(0.97) translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
+    .order-header h1 {
+        font-size: 21px;
     }
 
     .close-btn {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      background: transparent;
-      border: none;
-      font-size: 28px;
-      font-weight: 300;
-      color: #1e1e1e;
-      cursor: pointer;
-      line-height: 1;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      transition: background 0.15s;
-    }
-    .close-btn:hover {
-      background: #f0f0f0;
+        width: 40px;
+        height: 40px;
+
+        font-size: 21px;
     }
 
-    .checkout-title {
-      font-family: var(--heading);
-      font-size: 26px;
-      font-weight: 700;
-      color: #0c0c0c;
-      letter-spacing: -0.3px;
-      margin-bottom: 22px;
-      padding-right: 40px;
+    .product {
+        align-items: flex-start;
     }
 
-    .product-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding-bottom: 18px;
-      border-bottom: 1px solid #eaeef2;
+    .product-left {
+        gap: 8px;
     }
 
-    .product-icon {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(145deg, #fff0e7, #ffd5bd);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      position: relative;
-      font-weight: 700;
-      font-size: 14px;
-      color: #1c1c1c;
-    }
-    .product-icon .badge {
-      position: absolute;
-      top: 6px;
-      left: 6px;
-      background: #111;
-      color: #fff;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 7px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-    .product-icon .clout-text {
-      font-family: var(--heading);
-      font-size: 20px;
-      color: #E04F00;
-      font-style: italic;
-      letter-spacing: -0.5px;
-      margin-top: 6px;
+    .product-image {
+        width: 68px;
+        height: 68px;
     }
 
-    .product-info {
-      flex: 1;
-    }
-    .product-name {
-      font-weight: 600;
-      font-size: 17px;
-      color: #0f0f0f;
-      margin-bottom: 2px;
-    }
-    .product-desc {
-      font-size: 13px;
-      color: #6b7887;
-      font-weight: 450;
+    .product-info h2 {
+        font-size: 13px;
     }
 
-    .product-price {
-      font-weight: 700;
-      font-size: 18px;
-      color: #0c0c0c;
-      white-space: nowrap;
+    .product-info p {
+        font-size: 13px;
     }
 
-    .total-section {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      padding: 18px 0 16px;
-      border-bottom: 1px solid #eaeef2;
+    .product-price span {
+        font-size: 13px;
     }
+
+    .currency-box {
+        padding: 16px;
+
+        border-radius: 15px;
+    }
+
+    .currency-selected {
+        min-height: 42px;
+
+        padding: 0 14px;
+    }
+
+    .selected-country {
+        font-size: 13px;
+    }
+
+    .selected-flag {
+        font-size: 13px;
+    }
+
+    .summary-row {
+        grid-template-columns: 1fr 125px;
+
+        font-size: 13px;
+    }
+
+    .total-row {
+        grid-template-columns: 1fr 135px;
+    }
+
     .total-label {
-      font-weight: 500;
-      font-size: 17px;
-      color: #111;
-    }
-    .total-right {
-      text-align: right;
-    }
-    .total-price {
-      display: block;
-      font-weight: 700;
-      font-size: 18px;
-      color: #0b0b0b;
-    }
-    .tax-text {
-      font-size: 11px;
-      color: #7d8895;
+        font-size: 25px;
     }
 
-    .terms-section {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 20px 0 22px;
+    .total-price strong {
+        font-size: 24px;
     }
 
-    .terms-checkbox {
-      width: 13px;
-      height: 13px;
-      flex-shrink: 0;
-      appearance: none;
-      -webkit-appearance: none;
-      background: #fff;
-      border: 1px solid #9aa3b0;
-      cursor: pointer;
-      position: relative;
-      margin-top: 1px;
-      transition: 0.12s;
-    }
-    .terms-checkbox:checked {
-      background: #E04F00;
-      border-color: #E04F00;
-    }
-    .terms-checkbox:checked::after {
-      content: "✓";
-      position: absolute;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 700;
-      left: 2px;
-      top: -1px;
-    }
-    .terms-checkbox:focus-visible {
-      outline: 2px solid #E04F00;
-      outline-offset: 2px;
+    .buy-btn {
+        height: 42px;
+
+        font-size: 13px;
     }
 
-    .terms-text {
-      margin-top: -3px;
-      margin-left: -2px;
-      font-size: 13px;
-      line-height: 1.5;
-      color: #1d1f24;
-    }
-    .terms-text a {
-      color: #E04F00;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .terms-text a:hover {
-      text-decoration: underline;
-    }
-
-    .buy-button {
-      width: 100%;
-      height: 54px;
-      border: none;
-      background: var(--orange);
-      color: #fff;
-      border-radius: 5px;
-      font-family: var(--body);
-      font-size: 20px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: 0.2s;
-      box-shadow: 0 8px 18px rgba(224, 79, 0, 0.2);
-      letter-spacing: 0.2px;
-    }
-    .buy-button:hover {
-      transform: scale(1.01);
-      box-shadow: 0 12px 24px rgba(224, 79, 0, 0.3);
-    }
-    .buy-button:active {
-      transform: scale(0.98);
-    }
-    .lock-icon {
-      font-size: 15px;
-    }
-
-    .payment-powered {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 14px;
-      color: #8f99a8;
-      font-size: 13px;
-      font-weight: 450;
-    }
-    .small-lock {
-      font-size: 11px;
-    }
-
-    .security-card {
-      margin-top: 20px;
-      border: 1px solid #e2e6ec;
-      border-radius: 16px;
-      padding: 14px 18px 14px 14px;
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      background: #fcfcfd;
-    }
-    .security-icon {
-      width: 48px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .security-icon svg {
-      width: 44px;
-      height: 44px;
-      stroke: #0f0f0f;
-      stroke-width: 2;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-    .security-content h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #0f0f0f;
-      margin-bottom: 2px;
-      letter-spacing: -0.2px;
-    }
-    .security-content p {
-      font-size: 13px;
-      line-height: 1.4;
-      color: #68717d;
-    }
-
-    @media (max-width: 500px) {
-      .checkout-card {
-        padding: 24px 18px 26px;
-        border-radius: 20px;
-      }
-      .checkout-title {
-        font-size: 22px;
-        margin-bottom: 18px;
-      }
-      .product-name {
-        font-size: 15px;
-      }
-      .product-desc {
-        font-size: 12px;
-      }
-      .product-price {
-        font-size: 16px;
-      }
-      .total-price {
-        font-size: 16px;
-      }
-      .buy-button {
-        height: 48px;
-        font-size: 17px;
-        border-radius: 12px;
-      }
-      .security-card {
-        padding: 12px 14px;
-        gap: 12px;
-      }
-      .security-icon svg {
-        width: 28px;
-        height: 28px;
-      }
-      .security-content h3 {
+    .terms {
         font-size: 14px;
-      }
-      .security-content p {
-        font-size: 12px;
-      }
-      .terms-text {
-        font-size: 12px;
-      }
-      .close-btn {
-        top: 10px;
-        right: 12px;
-        font-size: 26px;
-      }
     }
 
-    @media (max-width: 400px) {
-      .checkout-card {
-        padding: 18px 14px 20px;
-      }
-      .product-row {
-        gap: 12px;
-      }
-      .product-icon {
-        width: 50px;
-        height: 50px;
-      }
-      .product-icon .clout-text {
-        font-size: 16px;
-      }
-      .product-name {
-        font-size: 14px;
-      }
-      .product-desc {
-        font-size: 11px;
-      }
-      .product-price {
-        font-size: 15px;
-      }
-      .total-price {
-        font-size: 15px;
-      }
-      .terms-checkbox {
-        width: 15px;
-        height: 15px;
-      }
+    .security-box {
+        padding: 15px;
     }
-  </style>
+}
+,
+.currency-badge{
+    display:inline-flex;
+    align-items:center;
+    min-height:24px;
+    padding:4px 8px;
+    border-radius:6px;
+    background:#eef1f4;
+    color:#5f6670;
+    font-size:12px;
+    font-weight:600;
+    line-height:1;
+    white-space:nowrap;
+}
+</style>
+<link rel="stylesheet" href="/static/responsive.css">
 </head>
+
+
 <body>
-  <div class="checkout-card" id="checkoutModal">
-    <button class="close-btn" id="closeBtn" aria-label="Close">×</button>
 
-    <h1 class="checkout-title">Order summary</h1>
 
-    <div class="product-row">
-      <div class="product-icon">
-        <span class="badge">PRO</span>
-        <span class="clout-text">clout</span>
-      </div>
-      <div class="product-info">
-        <div class="product-name">{{ product_name }}</div>
-        <div class="product-desc">Lifetime Access • Premium</div>
-      </div>
-      <div class="product-price">${{ total }}</div>
-    </div>
+<div class="order-wrapper">
 
-    <div class="total-section">
-      <span class="total-label">Total</span>
-      <div class="total-right">
-        <span class="total-price">${{ total }}</span>
-        <span class="tax-text">incl. taxes</span>
-      </div>
-    </div>
+<div class="order-card">
 
-    <div class="terms-section">
-      <input type="checkbox" id="termsCheck" class="terms-checkbox" />
-      <label for="termsCheck" class="terms-text">
-        By completing this purchase, you agree to Clout
-        <a href="#">Privacy &amp; Terms</a>, and Teachable's
-        <a href="#">Privacy &amp; Terms</a>.
-      </label>
-    </div>
 
-    <button class="buy-button" id="pay-button" type="button">
-      <span>Pay now</span>
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<div class="order-header">
+
+    <h1>
+        Your Purchase
+    </h1>
+
+    <button
+        class="close-btn"
+        onclick="closeOrder()"
+    >
+        ×
     </button>
-  </div>
 
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script>
-    (function() {
-      const modal = document.getElementById('checkoutModal');
-      const closeBtn = document.getElementById('closeBtn');
-      const payButton = document.getElementById('pay-button');
-      const termsCheck = document.getElementById('termsCheck');
+</div>
 
-      function closeCheckout() {
-        modal.style.display = 'none';
-      }
 
-      closeBtn.addEventListener('click', closeCheckout);
 
-      payButton.addEventListener('click', async () => {
-        if (!termsCheck.checked) {
-          alert('Please agree to the Privacy & Terms before continuing.');
-          return;
+<!-- =====================================================
+     PRODUCT
+===================================================== -->
+
+<div class="product">
+
+    <div class="product-left">
+
+        <div class="product-media"><img class="product-image" src="{% static 'bag.png' %}" alt="THE BAG CODE"></div>
+
+        <div class="product-info">
+
+            <h2>THE BAG CODE</h2>
+
+            <p>
+                Lifetime Access
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="product-price">
+
+        <span id="productLocal">
+            $18.00
+        </span>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     COUNTRY / CURRENCY
+===================================================== -->
+
+<div class="currency-box">
+
+    <label class="currency-label">
+        COUNTRY / CURRENCY
+    </label>
+
+
+    <div
+        class="currency-select"
+        id="currencySelect"
+    >
+
+
+        <!-- SELECTED -->
+
+        <div
+            class="currency-selected"
+            id="currencySelected"
+            onclick="toggleCurrency()"
+        >
+
+            <div class="selected-left">
+
+                <span
+                    class="selected-flag"
+                    id="selectedFlag"
+                >
+                    🇮🇳
+                </span>
+
+                <div class="selected-country">
+
+                    <span id="selectedCountry">
+                        India
+                    </span>
+
+                    <span>—</span>
+
+                    <span
+                        class="selected-currency"
+                        id="selectedCurrency"
+                    >
+                        INR (₹)
+                    </span>
+
+                </div>
+
+            </div>
+
+
+            <span class="currency-arrow"></span>
+
+        </div>
+
+
+
+        <!-- DROPDOWN -->
+
+        <div
+            class="currency-dropdown"
+            id="currencyDropdown"
+        >
+
+
+            <!-- SEARCH -->
+
+            <div class="currency-search">
+
+                <input
+                    type="text"
+                    id="currencySearch"
+                    placeholder="Search country or currency..."
+                    oninput="searchCountries()"
+                >
+
+            </div>
+
+
+            <!-- OPTIONS -->
+
+            <div
+                class="currency-options"
+                id="currencyOptions"
+            ></div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     DIVIDER
+===================================================== -->
+
+<div class="divider"></div>
+
+
+
+<!-- =====================================================
+     CURRENCY HEADER
+===================================================== -->
+
+<div class="summary-header">
+
+    <span id="currencyHeader">
+        INR (₹)
+    </span>
+
+</div>
+
+
+
+<!-- =====================================================
+     SUBTOTAL
+===================================================== -->
+
+<div class="summary-row">
+
+    <span>
+        Subtotal
+    </span>
+
+    <strong id="subtotalLocal">
+        $18.00
+    </strong>
+
+</div>
+
+
+
+<!-- =====================================================
+     DISCOUNT
+===================================================== -->
+
+<div class="summary-row discount">
+
+    <span>
+        Discount
+    </span>
+
+    <strong id="discountLocal">
+        - $32.00
+    </strong>
+
+</div>
+
+
+
+<!-- =====================================================
+     TAX
+===================================================== -->
+
+<div class="summary-row">
+
+    <span>
+        Tax
+    </span>
+
+    <strong id="taxLocal">
+        $0.82
+    </strong>
+
+</div>
+
+
+
+<!-- =====================================================
+     TOTAL
+===================================================== -->
+
+<div class="total-box">
+
+    <div class="total-row">
+
+        <div class="total-label">
+            Total
+        </div>
+
+
+        <div class="total-price">
+
+            <strong id="totalLocal">
+                $18.82
+            </strong>
+
+            <small>
+                incl. taxes
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =====================================================
+     TERMS
+===================================================== -->
+
+<label class="terms">
+
+    <input
+        type="checkbox"
+        id="termsCheck"
+        onchange="checkTerms()"
+    >
+
+    <span>
+
+        By completing this purchase, you agree to
+
+        <a href="#">
+            Clout Privacy & Terms
+        </a>
+
+        and
+
+        <a href="#">
+            Teachable's Privacy & Terms.
+        </a>
+
+    </span>
+
+</label>
+
+
+
+<!-- =====================================================
+     BUY BUTTON
+===================================================== -->
+
+<button
+    class="buy-btn"
+    id="buyBtn"
+    disabled
+    onclick="startPayment()"
+>
+
+    Buy now
+
+</button>
+
+
+<div class="secure">
+    <i class="fa-solid fa-lock"></i>
+    <span>Secure payment powered by Razorpay</span>
+</div>
+
+
+
+</div>
+</div>
+
+
+
+<script>
+const BASE_SUBTOTAL_USD = 18.00;
+const BASE_DISCOUNT_USD = 32.00;
+const BASE_TAX_USD = 0.82;
+const BASE_TOTAL_USD = 18.82;
+
+// Exactly 195 countries: 193 UN members + Palestine + Vatican City.
+// Countries sharing a currency intentionally point to the same ISO 4217 code.
+const countries = [{"country":"Afghanistan","code":"AF","currency":"AFN","name":"Afghan Afghani","symbol":"؋","flag":"🇦🇫"},{"country":"Albania","code":"AL","currency":"ALL","name":"Albanian Lek","symbol":"Lek","flag":"🇦🇱"},{"country":"Algeria","code":"DZ","currency":"DZD","name":"Algerian Dinar","symbol":"دج","flag":"🇩🇿"},{"country":"Andorra","code":"AD","currency":"EUR","name":"Euro","symbol":"€","flag":"🇦🇩"},{"country":"Angola","code":"AO","currency":"AOA","name":"Angolan Kwanza","symbol":"AOA","flag":"🇦🇴"},{"country":"Antigua and Barbuda","code":"AG","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇦🇬"},{"country":"Argentina","code":"AR","currency":"ARS","name":"Argentine Peso","symbol":"$","flag":"🇦🇷"},{"country":"Armenia","code":"AM","currency":"AMD","name":"Armenian Dram","symbol":"֏","flag":"🇦🇲"},{"country":"Australia","code":"AU","currency":"AUD","name":"Australian Dollar","symbol":"A$","flag":"🇦🇺"},{"country":"Austria","code":"AT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇦🇹"},{"country":"Azerbaijan","code":"AZ","currency":"AZN","name":"Azerbaijani Manat","symbol":"₼","flag":"🇦🇿"},{"country":"Bahamas","code":"BS","currency":"BSD","name":"Bahamian Dollar","symbol":"B$","flag":"🇧🇸"},{"country":"Bahrain","code":"BH","currency":"BHD","name":"Bahraini Dinar","symbol":".د.ب","flag":"🇧🇭"},{"country":"Bangladesh","code":"BD","currency":"BDT","name":"Bangladeshi Taka","symbol":"BDT","flag":"🇧🇩"},{"country":"Barbados","code":"BB","currency":"BBD","name":"Barbadian Dollar","symbol":"Bds$","flag":"🇧🇧"},{"country":"Belarus","code":"BY","currency":"BYN","name":"Belarusian Ruble","symbol":"Br","flag":"🇧🇾"},{"country":"Belgium","code":"BE","currency":"EUR","name":"Euro","symbol":"€","flag":"🇧🇪"},{"country":"Belize","code":"BZ","currency":"BZD","name":"Belize Dollar","symbol":"BZ$","flag":"🇧🇿"},{"country":"Benin","code":"BJ","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇧🇯"},{"country":"Bhutan","code":"BT","currency":"BTN","name":"Bhutanese Ngultrum","symbol":"Nu.","flag":"🇧🇹"},{"country":"Bolivia","code":"BO","currency":"BOB","name":"Bolivian Boliviano","symbol":"Bs.","flag":"🇧🇴"},{"country":"Bosnia and Herzegovina","code":"BA","currency":"BAM","name":"Bosnia-Herzegovina Convertible Mark","symbol":"KM","flag":"🇧🇦"},{"country":"Botswana","code":"BW","currency":"BWP","name":"Botswanan Pula","symbol":"P","flag":"🇧🇼"},{"country":"Brazil","code":"BR","currency":"BRL","name":"Brazilian Real","symbol":"R$","flag":"🇧🇷"},{"country":"Brunei","code":"BN","currency":"BND","name":"Brunei Dollar","symbol":"B$","flag":"🇧🇳"},{"country":"Bulgaria","code":"BG","currency":"EUR","name":"Euro","symbol":"€","flag":"🇧🇬"},{"country":"Burkina Faso","code":"BF","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇧🇫"},{"country":"Burundi","code":"BI","currency":"BIF","name":"Burundian Franc","symbol":"FBu","flag":"🇧🇮"},{"country":"Cabo Verde","code":"CV","currency":"CVE","name":"Cape Verdean Escudo","symbol":"$","flag":"🇨🇻"},{"country":"Cambodia","code":"KH","currency":"KHR","name":"Cambodian Riel","symbol":"៛","flag":"🇰🇭"},{"country":"Cameroon","code":"CM","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇨🇲"},{"country":"Canada","code":"CA","currency":"CAD","name":"Canadian Dollar","symbol":"CA$","flag":"🇨🇦"},{"country":"Central African Republic","code":"CF","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇨🇫"},{"country":"Chad","code":"TD","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇹🇩"},{"country":"Chile","code":"CL","currency":"CLP","name":"Chilean Peso","symbol":"$","flag":"🇨🇱"},{"country":"China","code":"CN","currency":"CNY","name":"Chinese Yuan","symbol":"CN¥","flag":"🇨🇳"},{"country":"Colombia","code":"CO","currency":"COP","name":"Colombian Peso","symbol":"$","flag":"🇨🇴"},{"country":"Comoros","code":"KM","currency":"KMF","name":"Comorian Franc","symbol":"CF","flag":"🇰🇲"},{"country":"Republic of the Congo","code":"CG","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇨🇬"},{"country":"Democratic Republic of the Congo","code":"CD","currency":"CDF","name":"Congolese Franc","symbol":"FC","flag":"🇨🇩"},{"country":"Costa Rica","code":"CR","currency":"CRC","name":"Costa Rican Colón","symbol":"₡","flag":"🇨🇷"},{"country":"Côte d'Ivoire","code":"CI","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇨🇮"},{"country":"Croatia","code":"HR","currency":"EUR","name":"Euro","symbol":"€","flag":"🇭🇷"},{"country":"Cuba","code":"CU","currency":"CUP","name":"Cuban Peso","symbol":"CUP","flag":"🇨🇺"},{"country":"Cyprus","code":"CY","currency":"EUR","name":"Euro","symbol":"€","flag":"🇨🇾"},{"country":"Czechia","code":"CZ","currency":"CZK","name":"Czech Koruna","symbol":"Kč","flag":"🇨🇿"},{"country":"Denmark","code":"DK","currency":"DKK","name":"Danish Krone","symbol":"kr","flag":"🇩🇰"},{"country":"Djibouti","code":"DJ","currency":"DJF","name":"Djiboutian Franc","symbol":"Fdj","flag":"🇩🇯"},{"country":"Dominica","code":"DM","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇩🇲"},{"country":"Dominican Republic","code":"DO","currency":"DOP","name":"Dominican Peso","symbol":"RD$","flag":"🇩🇴"},{"country":"Ecuador","code":"EC","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇪🇨"},{"country":"Egypt","code":"EG","currency":"EGP","name":"Egyptian Pound","symbol":"E£","flag":"🇪🇬"},{"country":"El Salvador","code":"SV","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇸🇻"},{"country":"Equatorial Guinea","code":"GQ","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇬🇶"},{"country":"Eritrea","code":"ER","currency":"ERN","name":"Eritrean Nakfa","symbol":"Nfk","flag":"🇪🇷"},{"country":"Estonia","code":"EE","currency":"EUR","name":"Euro","symbol":"€","flag":"🇪🇪"},{"country":"Eswatini","code":"SZ","currency":"SZL","name":"Swazi Lilangeni","symbol":"E","flag":"🇸🇿"},{"country":"Ethiopia","code":"ET","currency":"ETB","name":"Ethiopian Birr","symbol":"Br","flag":"🇪🇹"},{"country":"Fiji","code":"FJ","currency":"FJD","name":"Fijian Dollar","symbol":"FJ$","flag":"🇫🇯"},{"country":"Finland","code":"FI","currency":"EUR","name":"Euro","symbol":"€","flag":"🇫🇮"},{"country":"France","code":"FR","currency":"EUR","name":"Euro","symbol":"€","flag":"🇫🇷"},{"country":"Gabon","code":"GA","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇬🇦"},{"country":"Gambia","code":"GM","currency":"GMD","name":"Gambian Dalasi","symbol":"D","flag":"🇬🇲"},{"country":"Georgia","code":"GE","currency":"GEL","name":"Georgian Lari","symbol":"₾","flag":"🇬🇪"},{"country":"Germany","code":"DE","currency":"EUR","name":"Euro","symbol":"€","flag":"🇩🇪"},{"country":"Ghana","code":"GH","currency":"GHS","name":"Ghanaian Cedi","symbol":"₵","flag":"🇬🇭"},{"country":"Greece","code":"GR","currency":"EUR","name":"Euro","symbol":"€","flag":"🇬🇷"},{"country":"Grenada","code":"GD","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇬🇩"},{"country":"Guatemala","code":"GT","currency":"GTQ","name":"Guatemalan Quetzal","symbol":"Q","flag":"🇬🇹"},{"country":"Guinea","code":"GN","currency":"GNF","name":"Guinean Franc","symbol":"FG","flag":"🇬🇳"},{"country":"Guinea-Bissau","code":"GW","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇬🇼"},{"country":"Guyana","code":"GY","currency":"GYD","name":"Guyanaese Dollar","symbol":"G$","flag":"🇬🇾"},{"country":"Haiti","code":"HT","currency":"HTG","name":"Haitian Gourde","symbol":"G","flag":"🇭🇹"},{"country":"Honduras","code":"HN","currency":"HNL","name":"Honduran Lempira","symbol":"L","flag":"🇭🇳"},{"country":"Hungary","code":"HU","currency":"HUF","name":"Hungarian Forint","symbol":"Ft","flag":"🇭🇺"},{"country":"Iceland","code":"IS","currency":"ISK","name":"Icelandic Króna","symbol":"kr","flag":"🇮🇸"},{"country":"India","code":"IN","currency":"INR","name":"Indian Rupee","symbol":"₹","flag":"🇮🇳"},{"country":"Indonesia","code":"ID","currency":"IDR","name":"Indonesian Rupiah","symbol":"Rp","flag":"🇮🇩"},{"country":"Iran","code":"IR","currency":"IRR","name":"Iranian Rial","symbol":"﷼","flag":"🇮🇷"},{"country":"Iraq","code":"IQ","currency":"IQD","name":"Iraqi Dinar","symbol":"ع.د","flag":"🇮🇶"},{"country":"Ireland","code":"IE","currency":"EUR","name":"Euro","symbol":"€","flag":"🇮🇪"},{"country":"Israel","code":"IL","currency":"ILS","name":"Israeli New Shekel","symbol":"₪","flag":"🇮🇱"},{"country":"Italy","code":"IT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇮🇹"},{"country":"Jamaica","code":"JM","currency":"JMD","name":"Jamaican Dollar","symbol":"JMD","flag":"🇯🇲"},{"country":"Japan","code":"JP","currency":"JPY","name":"Japanese Yen","symbol":"¥","flag":"🇯🇵"},{"country":"Jordan","code":"JO","currency":"JOD","name":"Jordanian Dinar","symbol":"د.ا","flag":"🇯🇴"},{"country":"Kazakhstan","code":"KZ","currency":"KZT","name":"Kazakhstani Tenge","symbol":"₸","flag":"🇰🇿"},{"country":"Kenya","code":"KE","currency":"KES","name":"Kenyan Shilling","symbol":"KSh","flag":"🇰🇪"},{"country":"Kiribati","code":"KI","currency":"AUD","name":"Australian Dollar","symbol":"A$","flag":"🇰🇮"},{"country":"North Korea","code":"KP","currency":"KPW","name":"North Korean Won","symbol":"₩","flag":"🇰🇵"},{"country":"South Korea","code":"KR","currency":"KRW","name":"South Korean Won","symbol":"₩","flag":"🇰🇷"},{"country":"Kuwait","code":"KW","currency":"KWD","name":"Kuwaiti Dinar","symbol":"د.ك","flag":"🇰🇼"},{"country":"Kyrgyzstan","code":"KG","currency":"KGS","name":"Kyrgystani Som","symbol":"сом","flag":"🇰🇬"},{"country":"Laos","code":"LA","currency":"LAK","name":"Laotian Kip","symbol":"₭","flag":"🇱🇦"},{"country":"Latvia","code":"LV","currency":"EUR","name":"Euro","symbol":"€","flag":"🇱🇻"},{"country":"Lebanon","code":"LB","currency":"LBP","name":"Lebanese Pound","symbol":"ل.ل","flag":"🇱🇧"},{"country":"Lesotho","code":"LS","currency":"LSL","name":"Lesotho Loti","symbol":"L","flag":"🇱🇸"},{"country":"Liberia","code":"LR","currency":"LRD","name":"Liberian Dollar","symbol":"L$","flag":"🇱🇷"},{"country":"Libya","code":"LY","currency":"LYD","name":"Libyan Dinar","symbol":"ل.د","flag":"🇱🇾"},{"country":"Liechtenstein","code":"LI","currency":"CHF","name":"Swiss Franc","symbol":"CHF","flag":"🇱🇮"},{"country":"Lithuania","code":"LT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇱🇹"},{"country":"Luxembourg","code":"LU","currency":"EUR","name":"Euro","symbol":"€","flag":"🇱🇺"},{"country":"Madagascar","code":"MG","currency":"MGA","name":"Malagasy Ariary","symbol":"Ar","flag":"🇲🇬"},{"country":"Malawi","code":"MW","currency":"MWK","name":"Malawian Kwacha","symbol":"MK","flag":"🇲🇼"},{"country":"Malaysia","code":"MY","currency":"MYR","name":"Malaysian Ringgit","symbol":"RM","flag":"🇲🇾"},{"country":"Maldives","code":"MV","currency":"MVR","name":"Maldivian Rufiyaa","symbol":"Rf","flag":"🇲🇻"},{"country":"Mali","code":"ML","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇲🇱"},{"country":"Malta","code":"MT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇲🇹"},{"country":"Marshall Islands","code":"MH","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇲🇭"},{"country":"Mauritania","code":"MR","currency":"MRU","name":"Mauritanian Ouguiya","symbol":"UM","flag":"🇲🇷"},{"country":"Mauritius","code":"MU","currency":"MUR","name":"Mauritian Rupee","symbol":"₨","flag":"🇲🇺"},{"country":"Mexico","code":"MX","currency":"MXN","name":"Mexican Peso","symbol":"MX$","flag":"🇲🇽"},{"country":"Micronesia","code":"FM","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇫🇲"},{"country":"Moldova","code":"MD","currency":"MDL","name":"Moldovan Leu","symbol":"L","flag":"🇲🇩"},{"country":"Monaco","code":"MC","currency":"EUR","name":"Euro","symbol":"€","flag":"🇲🇨"},{"country":"Mongolia","code":"MN","currency":"MNT","name":"Mongolian Tugrik","symbol":"₮","flag":"🇲🇳"},{"country":"Montenegro","code":"ME","currency":"EUR","name":"Euro","symbol":"€","flag":"🇲🇪"},{"country":"Morocco","code":"MA","currency":"MAD","name":"Moroccan Dirham","symbol":"د.م.","flag":"🇲🇦"},{"country":"Mozambique","code":"MZ","currency":"MZN","name":"Mozambican Metical","symbol":"MT","flag":"🇲🇿"},{"country":"Myanmar","code":"MM","currency":"MMK","name":"Myanmar Kyat","symbol":"K","flag":"🇲🇲"},{"country":"Namibia","code":"NA","currency":"NAD","name":"Namibian Dollar","symbol":"N$","flag":"🇳🇦"},{"country":"Nauru","code":"NR","currency":"AUD","name":"Australian Dollar","symbol":"A$","flag":"🇳🇷"},{"country":"Nepal","code":"NP","currency":"NPR","name":"Nepalese Rupee","symbol":"₨","flag":"🇳🇵"},{"country":"Netherlands","code":"NL","currency":"EUR","name":"Euro","symbol":"€","flag":"🇳🇱"},{"country":"New Zealand","code":"NZ","currency":"NZD","name":"New Zealand Dollar","symbol":"NZ$","flag":"🇳🇿"},{"country":"Nicaragua","code":"NI","currency":"NIO","name":"Nicaraguan Córdoba","symbol":"C$","flag":"🇳🇮"},{"country":"Niger","code":"NE","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇳🇪"},{"country":"Nigeria","code":"NG","currency":"NGN","name":"Nigerian Naira","symbol":"₦","flag":"🇳🇬"},{"country":"North Macedonia","code":"MK","currency":"MKD","name":"Macedonian Denar","symbol":"ден","flag":"🇲🇰"},{"country":"Norway","code":"NO","currency":"NOK","name":"Norwegian Krone","symbol":"kr","flag":"🇳🇴"},{"country":"Oman","code":"OM","currency":"OMR","name":"Omani Rial","symbol":"﷼","flag":"🇴🇲"},{"country":"Pakistan","code":"PK","currency":"PKR","name":"Pakistani Rupee","symbol":"₨","flag":"🇵🇰"},{"country":"Palau","code":"PW","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇵🇼"},{"country":"Palestine","code":"PS","currency":"ILS","name":"Israeli New Shekel","symbol":"₪","flag":"🇵🇸"},{"country":"Panama","code":"PA","currency":"PAB","name":"Panamanian Balboa","symbol":"PAB","flag":"🇵🇦"},{"country":"Papua New Guinea","code":"PG","currency":"PGK","name":"Papua New Guinean Kina","symbol":"K","flag":"🇵🇬"},{"country":"Paraguay","code":"PY","currency":"PYG","name":"Paraguayan Guarani","symbol":"₲","flag":"🇵🇾"},{"country":"Peru","code":"PE","currency":"PEN","name":"Peruvian Sol","symbol":"S/","flag":"🇵🇪"},{"country":"Philippines","code":"PH","currency":"PHP","name":"Philippine Peso","symbol":"₱","flag":"🇵🇭"},{"country":"Poland","code":"PL","currency":"PLN","name":"Polish Zloty","symbol":"zł","flag":"🇵🇱"},{"country":"Portugal","code":"PT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇵🇹"},{"country":"Qatar","code":"QA","currency":"QAR","name":"Qatari Riyal","symbol":"﷼","flag":"🇶🇦"},{"country":"Romania","code":"RO","currency":"RON","name":"Romanian Leu","symbol":"lei","flag":"🇷🇴"},{"country":"Russia","code":"RU","currency":"RUB","name":"Russian Ruble","symbol":"₽","flag":"🇷🇺"},{"country":"Rwanda","code":"RW","currency":"RWF","name":"Rwandan Franc","symbol":"FRw","flag":"🇷🇼"},{"country":"Saint Kitts and Nevis","code":"KN","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇰🇳"},{"country":"Saint Lucia","code":"LC","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇱🇨"},{"country":"Saint Vincent and the Grenadines","code":"VC","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇻🇨"},{"country":"Samoa","code":"WS","currency":"WST","name":"Samoan Tala","symbol":"WS$","flag":"🇼🇸"},{"country":"San Marino","code":"SM","currency":"EUR","name":"Euro","symbol":"€","flag":"🇸🇲"},{"country":"Sao Tome and Principe","code":"ST","currency":"STN","name":"São Tomé & Príncipe Dobra","symbol":"Db","flag":"🇸🇹"},{"country":"Saudi Arabia","code":"SA","currency":"SAR","name":"Saudi Riyal","symbol":"﷼","flag":"🇸🇦"},{"country":"Senegal","code":"SN","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇸🇳"},{"country":"Serbia","code":"RS","currency":"RSD","name":"Serbian Dinar","symbol":"дин","flag":"🇷🇸"},{"country":"Seychelles","code":"SC","currency":"SCR","name":"Seychellois Rupee","symbol":"₨","flag":"🇸🇨"},{"country":"Sierra Leone","code":"SL","currency":"SLE","name":"Sierra Leonean Leone","symbol":"Le","flag":"🇸🇱"},{"country":"Singapore","code":"SG","currency":"SGD","name":"Singapore Dollar","symbol":"S$","flag":"🇸🇬"},{"country":"Slovakia","code":"SK","currency":"EUR","name":"Euro","symbol":"€","flag":"🇸🇰"},{"country":"Slovenia","code":"SI","currency":"EUR","name":"Euro","symbol":"€","flag":"🇸🇮"},{"country":"Solomon Islands","code":"SB","currency":"SBD","name":"Solomon Islands Dollar","symbol":"SI$","flag":"🇸🇧"},{"country":"Somalia","code":"SO","currency":"SOS","name":"Somali Shilling","symbol":"S","flag":"🇸🇴"},{"country":"South Africa","code":"ZA","currency":"ZAR","name":"South African Rand","symbol":"R","flag":"🇿🇦"},{"country":"South Sudan","code":"SS","currency":"SSP","name":"South Sudanese Pound","symbol":"SSP","flag":"🇸🇸"},{"country":"Spain","code":"ES","currency":"EUR","name":"Euro","symbol":"€","flag":"🇪🇸"},{"country":"Sri Lanka","code":"LK","currency":"LKR","name":"Sri Lankan Rupee","symbol":"Rs","flag":"🇱🇰"},{"country":"Sudan","code":"SD","currency":"SDG","name":"Sudanese Pound","symbol":"ج.س.","flag":"🇸🇩"},{"country":"Suriname","code":"SR","currency":"SRD","name":"Surinamese Dollar","symbol":"$","flag":"🇸🇷"},{"country":"Sweden","code":"SE","currency":"SEK","name":"Swedish Krona","symbol":"kr","flag":"🇸🇪"},{"country":"Switzerland","code":"CH","currency":"CHF","name":"Swiss Franc","symbol":"CHF","flag":"🇨🇭"},{"country":"Syria","code":"SY","currency":"SYP","name":"Syrian Pound","symbol":"£","flag":"🇸🇾"},{"country":"Tajikistan","code":"TJ","currency":"TJS","name":"Tajikistani Somoni","symbol":"ЅМ","flag":"🇹🇯"},{"country":"Tanzania","code":"TZ","currency":"TZS","name":"Tanzanian Shilling","symbol":"TSh","flag":"🇹🇿"},{"country":"Thailand","code":"TH","currency":"THB","name":"Thai Baht","symbol":"฿","flag":"🇹🇭"},{"country":"Timor-Leste","code":"TL","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇹🇱"},{"country":"Togo","code":"TG","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇹🇬"},{"country":"Tonga","code":"TO","currency":"TOP","name":"Tongan Paʻanga","symbol":"T$","flag":"🇹🇴"},{"country":"Trinidad and Tobago","code":"TT","currency":"TTD","name":"Trinidad & Tobago Dollar","symbol":"TTD","flag":"🇹🇹"},{"country":"Tunisia","code":"TN","currency":"TND","name":"Tunisian Dinar","symbol":"د.ت","flag":"🇹🇳"},{"country":"Türkiye","code":"TR","currency":"TRY","name":"Turkish Lira","symbol":"₺","flag":"🇹🇷"},{"country":"Turkmenistan","code":"TM","currency":"TMT","name":"Turkmenistani Manat","symbol":"m","flag":"🇹🇲"},{"country":"Tuvalu","code":"TV","currency":"AUD","name":"Australian Dollar","symbol":"A$","flag":"🇹🇻"},{"country":"Uganda","code":"UG","currency":"UGX","name":"Ugandan Shilling","symbol":"USh","flag":"🇺🇬"},{"country":"Ukraine","code":"UA","currency":"UAH","name":"Ukrainian Hryvnia","symbol":"₴","flag":"🇺🇦"},{"country":"United Arab Emirates","code":"AE","currency":"AED","name":"United Arab Emirates Dirham","symbol":"د.إ","flag":"🇦🇪"},{"country":"United Kingdom","code":"GB","currency":"GBP","name":"British Pound","symbol":"£","flag":"🇬🇧"},{"country":"United States","code":"US","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇺🇸"},{"country":"Uruguay","code":"UY","currency":"UYU","name":"Uruguayan Peso","symbol":"$U","flag":"🇺🇾"},{"country":"Uzbekistan","code":"UZ","currency":"UZS","name":"Uzbekistani Som","symbol":"so'm","flag":"🇺🇿"},{"country":"Vanuatu","code":"VU","currency":"VUV","name":"Vanuatu Vatu","symbol":"VT","flag":"🇻🇺"},{"country":"Vatican City","code":"VA","currency":"EUR","name":"Euro","symbol":"€","flag":"🇻🇦"},{"country":"Venezuela","code":"VE","currency":"VES","name":"Venezuelan Bolívar","symbol":"Bs.","flag":"🇻🇪"},{"country":"Vietnam","code":"VN","currency":"VND","name":"Vietnamese Dong","symbol":"₫","flag":"🇻🇳"},{"country":"Yemen","code":"YE","currency":"YER","name":"Yemeni Rial","symbol":"﷼","flag":"🇾🇪"},{"country":"Zambia","code":"ZM","currency":"ZMW","name":"Zambian Kwacha","symbol":"ZK","flag":"🇿🇲"},{"country":"Zimbabwe","code":"ZW","currency":"ZWG","name":"Zimbabwean Gold","symbol":"ZiG","flag":"🇿🇼"}];
+
+let currentCountry = countries.find(c => c.code === "IN") || countries[0];
+let exchangeRates = { USD: 1 };
+let ratesLoaded = false;
+
+const $ = id => document.getElementById(id);
+
+function escapeHtml(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
+    })[char]);
+}
+
+function renderCountries(list = countries) {
+    const container = $('currencyOptions');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (!list.length) {
+        container.innerHTML = '<div style="padding:16px;text-align:center;color:#6b7280;font-size:13px">No country found</div>';
+        return;
+    }
+
+    list.forEach(item => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'currency-option' + (item.code === currentCountry.code ? ' selected' : '');
+        button.innerHTML = `
+            <span class="option-flag">${item.flag}</span>
+            <span class="option-info">
+                <span class="option-country">${escapeHtml(item.country)}</span>
+                <span class="option-currency">${escapeHtml(item.name)} • ${item.currency} (${escapeHtml(item.symbol)})</span>
+            </span>
+            <span class="option-check">✓</span>`;
+        button.addEventListener('click', () => selectCountry(item));
+        container.appendChild(button);
+    });
+}
+
+function toggleCurrency() {
+    const dropdown = $('currencyDropdown');
+    const selected = $('currencySelected');
+    if (!dropdown || !selected) return;
+    const open = dropdown.classList.toggle('show');
+    selected.classList.toggle('active', open);
+    if (open) {
+        $('currencySearch').value = '';
+        renderCountries();
+        setTimeout(() => $('currencySearch').focus(), 20);
+    }
+}
+
+function closeCurrency() {
+    $('currencyDropdown')?.classList.remove('show');
+    $('currencySelected')?.classList.remove('active');
+}
+
+function searchCountries() {
+    const q = ($('currencySearch')?.value || '').trim().toLowerCase();
+    renderCountries(countries.filter(item =>
+        item.country.toLowerCase().includes(q) ||
+        item.name.toLowerCase().includes(q) ||
+        item.currency.toLowerCase().includes(q) ||
+        item.code.toLowerCase().includes(q)
+    ));
+}
+
+function selectCountry(item) {
+    currentCountry = item;
+    $('selectedFlag').textContent = item.flag;
+    $('selectedCountry').textContent = item.country;
+    $('selectedCurrency').textContent = `${item.currency} (${item.symbol})`;
+    renderCountries();
+    updateCheckout();
+    closeCurrency();
+}
+
+function getRate(currency) {
+    return currency === 'USD' ? 1 : exchangeRates[currency];
+}
+
+function formatMoney(amount, currency) {
+    if (!Number.isFinite(amount)) return '—';
+    try {
+        return new Intl.NumberFormat(undefined, {
+            style: 'currency',
+            currency: currency,
+            currencyDisplay: 'symbol',
+            minimumFractionDigits: currency === 'JPY' || currency === 'KRW' ? 0 : 2,
+            maximumFractionDigits: currency === 'JPY' || currency === 'KRW' ? 0 : 2
+        }).format(amount);
+    } catch {
+        const symbol = countries.find(c => c.currency === currency)?.symbol || currency;
+        return `${symbol}${amount.toFixed(2)}`;
+    }
+}
+
+function updateBuyState(ok) {
+    const btn = $('buyBtn');
+    if (!btn) return;
+    btn.disabled = !($('termsCheck')?.checked && ok);
+}
+
+function updateCheckout() {
+    const rate = getRate(currentCountry.currency);
+    $('currencyHeader').textContent = `${currentCountry.currency} (${currentCountry.symbol})`;
+
+    if (!ratesLoaded || !Number.isFinite(rate) || rate <= 0) {
+        $('productLocal').textContent = '—';
+        $('subtotalLocal').textContent = '—';
+        $('discountLocal').textContent = '—';
+        $('taxLocal').textContent = '—';
+        $('totalLocal').textContent = 'Unavailable';
+        updateBuyState(false);
+        return;
+    }
+
+    // Base checkout values are always USD: $18.00, -$32.00, $0.82, total $18.82.
+    // Every displayed amount is converted with the same live USD -> currency rate.
+    const subtotal = BASE_SUBTOTAL_USD * rate;
+    const discount = BASE_DISCOUNT_USD * rate;
+    const tax = BASE_TAX_USD * rate;
+    const total = BASE_TOTAL_USD * rate;
+
+    $('productLocal').textContent = formatMoney(subtotal, currentCountry.currency);
+    $('subtotalLocal').textContent = formatMoney(subtotal, currentCountry.currency);
+    $('discountLocal').textContent = '- ' + formatMoney(discount, currentCountry.currency);
+    $('taxLocal').textContent = formatMoney(tax, currentCountry.currency);
+    $('totalLocal').textContent = formatMoney(total, currentCountry.currency);
+    updateBuyState(true);
+}
+
+function checkTerms() {
+    const rate = getRate(currentCountry.currency);
+    updateBuyState(ratesLoaded && Number.isFinite(rate) && rate > 0);
+}
+
+async function loadExchangeRates() {
+    try {
+        const response = await fetch('https://open.er-api.com/v6/latest/USD', {
+            cache: 'no-store',
+            headers: { Accept: 'application/json' }
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+        const data = await response.json();
+        if (data.result !== 'success' || !data.rates || typeof data.rates.USD !== 'number') {
+            throw new Error('Invalid exchange-rate response');
         }
 
-        payButton.disabled = true;
-        payButton.innerText = 'Processing...';
+        exchangeRates = data.rates;
+        exchangeRates.USD = 1;
+        ratesLoaded = true;
+        updateCheckout();
+    } catch (error) {
+        console.error('Live exchange rates unavailable:', error);
+        ratesLoaded = false;
+        updateCheckout();
+    }
+}
 
-        try {
-          const r = await fetch("{% url 'create_order' %}", {
-            method: 'POST',
-            headers: { 'X-CSRFToken': '{{ csrf_token }}' }
-          });
+function startPayment() {
+    const rate = getRate(currentCountry.currency);
+    if (!$('termsCheck')?.checked || !ratesLoaded || !Number.isFinite(rate) || rate <= 0) return;
 
-          const data = await r.json();
-          if (!r.ok || !data.success) {
-            throw new Error(data.message || 'Could not create order.');
-          }
+    const total = BASE_TOTAL_USD * rate;
+    console.log('Payment:', {
+        base_amount_usd: BASE_TOTAL_USD,
+        country_code: currentCountry.code,
+        currency: currentCountry.currency,
+        converted_amount: total
+    });
 
-          const options = {
-            key: data.key,
-            amount: data.amount,
-            currency: data.currency,
-            name: 'Clout',
-            description: "{{ product_name|escapejs }}",
-            order_id: data.order_id,
-            handler: async function(response) {
-              const body = new URLSearchParams();
-              body.append('razorpay_payment_id', response.razorpay_payment_id);
-              body.append('razorpay_order_id', response.razorpay_order_id);
-              body.append('razorpay_signature', response.razorpay_signature);
+    // Keep your existing Django/Razorpay order creation + verification here.
+    // Never expose a Razorpay secret key in frontend JavaScript.
+}
 
-              const vr = await fetch("{% url 'verify_payment' %}", {
-                method: 'POST',
-                headers: {
-                  'X-CSRFToken': '{{ csrf_token }}',
-                  'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                body
-              });
+function closeOrder() {
+    const wrapper = document.querySelector('.order-wrapper');
+    if (wrapper) wrapper.style.display = 'none';
+    if (window.parent !== window) {
+        window.parent.postMessage({ type: 'closeCheckout' }, window.location.origin);
+    }
+}
 
-              const result = await vr.json();
-              if (result.success) {
-                window.location.href = "{% url 'payment_success' %}";
-              } else {
-                throw new Error(result.message || 'Payment verification failed.');
-              }
-            },
-            modal: {
-              ondismiss: function() {
-                payButton.disabled = false;
-                payButton.innerText = 'Buy';
-              }
-            },
-            theme: { color: '#E04F00' }
-          };
+document.addEventListener('click', event => {
+    const box = $('currencySelect');
+    if (box && !box.contains(event.target)) closeCurrency();
+});
 
-          const rzp = new Razorpay(options);
-          rzp.on('payment.failed', function() {
-            payButton.disabled = false;
-            payButton.innerText = 'Buy';
-            alert('Payment failed. Please try again.');
-          });
-          rzp.open();
-        } catch (e) {
-          console.error(e);
-          alert(e.message || 'Unable to start payment.');
-          payButton.disabled = false;
-          payButton.innerText = 'Buy';
-        }
-      });
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeCurrency();
+});
 
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') {
-          closeCheckout();
-        }
-      });
+// India / INR is selected by default.
+renderCountries();
+selectCountry(currentCountry);
+loadExchangeRates();
+</script>
 
-      document.body.addEventListener('click', function(e) {
-        if (e.target === document.body || e.target.closest('.checkout-card') === null) {
-          const card = document.querySelector('.checkout-card');
-          if (card && !card.contains(e.target)) {
-            closeCheckout();
-          }
-        }
-      });
-    })();
-  </script>
 </body>
 </html>

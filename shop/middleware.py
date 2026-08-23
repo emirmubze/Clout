@@ -1,6 +1,8 @@
 from django.contrib.auth import logout
 from django.shortcuts import redirect
 
+from .models import CustomUser
+
 
 class SingleDeviceSessionMiddleware:
     def __init__(self, get_response):
@@ -9,14 +11,12 @@ class SingleDeviceSessionMiddleware:
     def __call__(self, request):
         if request.user.is_authenticated:
             current_session_key = request.session.session_key
-            expected_session_key = request.session.get("single_device_session_key")
+            active_session_key = CustomUser.objects.values_list(
+                "active_session_key",
+                flat=True,
+            ).get(pk=request.user.pk)
 
-            if expected_session_key is None:
-                request.session["single_device_session_key"] = current_session_key
-                request.session.modified = True
-                return self.get_response(request)
-
-            if expected_session_key != current_session_key:
+            if active_session_key and active_session_key != current_session_key:
                 request.session.flush()
                 logout(request)
                 return redirect("login")

@@ -69,9 +69,21 @@
         }
 
         .back {
-            color: white;
+            color: #fff;
+            border: 1px solid var(--orange);
+            border-radius: 5px;
+            padding: 7px 14px;
+            background: transparent;
+            font-family: "DM Sans", sans-serif;
             text-decoration: none;
             font-size: 13px;
+            font-weight: 600;
+            transition: background 0.18s ease, color 0.18s ease;
+        }
+
+        .back:hover {
+            background: var(--orange);
+            color: #fff;
         }
 
         .page {
@@ -423,6 +435,7 @@
 
     </style>
 
+<link rel="stylesheet" href="/static/responsive.css">
 </head>
 
 

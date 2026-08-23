@@ -14,6 +14,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     profile_image = models.ImageField(upload_to="profiles/", null=True, blank=True)
     course_access_approved = models.BooleanField(default=False)
+    active_session_key = models.CharField(max_length=40, blank=True, default="")
 
     @property
     def has_paid(self):

@@ -289,7 +289,8 @@
     }
 
     .course-button i {
-      font-size: 12px;
+      font-size: 14px;
+      font-weight: 700;
       line-height: 1;
       display: inline-block;
       transition: transform 0.3s ease;
@@ -312,11 +313,36 @@
     }
 
     .nav-login-btn svg,
-    .nav-logout-btn svg {
-      width: 14px;
-      height: 14px;
-      fill: currentColor;
+    .nav-logout-btn svg,
+    .ai-icon-button svg,
+    .ai-notification-button svg,
+    .ai-chat-button svg,
+    .ai-main-button svg,
+    .ai-send-button svg {
+      width: 18px;
+      height: 18px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
       display: block;
+      flex-shrink: 0;
+    }
+
+    .fa-solid,
+    .fa-regular,
+    .fa-brands,
+    .course-button i,
+    .profile-link .profile-icon,
+    .ai-icon-button i,
+    .ai-send-button i,
+    .ai-notification-button i,
+    .ai-chat-button i,
+    .ai-main-button i {
+      font-size: 1.15em;
+      font-weight: 700 !important;
+      line-height: 1;
     }
 
     .nav-login-btn:hover,
@@ -325,6 +351,12 @@
       transform: none;
       box-shadow: 0 4px 14px rgba(255, 153, 68, 0.30);
       color: white;
+    }
+
+    .nav-login-btn svg,
+    .nav-logout-btn svg {
+      fill: currentColor;
+      stroke: none;
     }
 
     .nav-login-btn:active,
@@ -374,7 +406,8 @@
       object-fit: cover;
     }
     .profile-link .profile-icon {
-      font-size: 16px;
+      font-size: 18px;
+      font-weight: 700;
       line-height: 1;
       color: white;
     }
@@ -555,11 +588,13 @@
     }
     .btn-primary {
       background: var(--orange);
-      color: white;
+      color: #ffffff;
       width: 223px;
-      border: 1px solid var(--orange);
+      border: none;
     }
     .btn-primary:hover {
+      background: #f05a00;
+      color: #ffffff;
       transform: translateY(-3px);
       box-shadow: 0 13px 30px rgba(224,79,0,.25);
     }
@@ -1258,7 +1293,7 @@
     .ai-chat-header p { margin-top: 4px; color: white; font-size: 14px; line-height: 1.1; }
      .ai-chat-actions { display: flex; gap: 6px; }
      .ai-icon-button, .ai-send-button, .ai-main-button { border: 0; cursor: pointer; font-family: inherit; }
-    .ai-icon-button { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 4px; background: transparent; color: white; }
+    .ai-icon-button { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 4px; background: transparent; color: white; font-size: 20px; font-weight: 700; }
     .ai-icon-button:hover { background: rgba(0,0,0,.12); }
      .ai-chat-messages { flex: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; padding: 16px; background: #fffaf7; }
      .ai-message { max-width: 86%; padding: 11px 13px; border-radius: 12px; font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
@@ -1270,19 +1305,19 @@
      .ai-chat-form { display: flex; gap: 8px; padding: 12px; border-top: 1px solid #eee1da; background: white; }
      .ai-chat-input { min-width: 0; flex: 1; border: 1px solid #dfd7d2; border-radius: 20px; outline: none; padding: 10px 14px; color: var(--black); font: 13px var(--body); }
      .ai-chat-input:focus { border-color: var(--orange); }
-     .ai-send-button { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; background: var(--orange); color: white; font-size: 18px; }
+    .ai-send-button { width: 40px; height: 40px; flex: 0 0 40px; border-radius: 50%; background: var(--orange); color: white; font-size: 22px; font-weight: 700; }
      .ai-send-button:disabled { cursor: wait; opacity: .5; }
     .ai-action-row { display: flex; flex-direction: column; align-items: center; gap: 12px; }
     .ai-secondary-button { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(12px) scale(.9); transition: opacity .2s ease, transform .2s ease, visibility .2s ease; }
     .ai-assistant.actions-open .ai-secondary-button { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0) scale(1); }
     .ai-assistant.chat-open .ai-secondary-button { opacity: 0; visibility: hidden; pointer-events: none; transform: translateY(12px) scale(.9); }
-    .ai-notification-button, .ai-chat-button { position: relative; width: 48px; height: 48px; display: grid; place-items: center; border: 0; border-radius: 50%; color: white; box-shadow: 0 10px 25px rgba(0,0,0,.18); cursor: pointer; font-size: 20px; transition: transform .2s ease, color .2s ease; }
+    .ai-notification-button, .ai-chat-button { position: relative; width: 48px; height: 48px; display: grid; place-items: center; border: 0; border-radius: 50%; color: white; box-shadow: 0 10px 25px rgba(0,0,0,.18); cursor: pointer; font-size: 22px; font-weight: 700; transition: transform .2s ease, color .2s ease; }
     .ai-notification-button { background: var(--black); }
-    .ai-chat-button { background: #ff5a1f; }
+    .ai-chat-button { background: #ff5a1f; color: white; }
     .ai-notification-button:hover, .ai-chat-button:hover { transform: translateY(-3px) scale(1.04); }
     .ai-notification-badge { position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; display: grid; place-items: center; padding: 0 4px; border: 2px solid var(--off-white); border-radius: 20px; background: #e53935; color: white; font-size: 10px; font-weight: 700; }
-    .ai-main-button { width: 58px; height: 58px; display: grid; place-items: center; border-radius: 50%; background: var(--black); color: white; box-shadow: 0 12px 30px rgba(0,0,0,.24); font-size: 25px; transition: transform .25s ease, background .25s ease; }
-    .ai-main-button:hover { background: #1d1d1d; transform: translateY(-3px); }
+    .ai-main-button { width: 58px; height: 58px; display: grid; place-items: center; border-radius: 50%; background: var(--ai-button-background, var(--black)); color: var(--ai-button-foreground, #fff); box-shadow: 0 12px 30px rgba(0,0,0,.24); font-size: 28px; font-weight: 700; transition: transform .25s ease, background .25s ease, color .25s ease; }
+    .ai-main-button:hover { filter: brightness(.9); transform: translateY(-3px); }
     .ai-assistant.actions-open .ai-main-button { transform: rotate(45deg); }
     @media (max-width: 600px) { .ai-assistant { right: 16px; bottom: max(16px, env(safe-area-inset-bottom)); } .ai-chat-panel { right: -4px; width: calc(100vw - 24px); height: min(600px, calc(100dvh - 100px)); } .ai-main-button { width: 54px; height: 54px; } }
 
@@ -1895,6 +1930,7 @@
 }
 
 </style>
+<link rel="stylesheet" href="/static/responsive.css">
 </head>
 <body>
 
@@ -1905,7 +1941,6 @@
     </div>
     <a href="{% url 'course_detail' %}" class="buy-button">
         Buy the Course
-        <span>→</span>
     </a>
 </div>
 
@@ -2030,7 +2065,7 @@
         <li><span class="check">✓</span> Lifetime access</li>
         <li><span class="check">✓</span> Future updates included</li>
       </ul>
-      <button class="price-button" onclick="window.location.href='{% url 'course_detail' %}'">Buy Now →</button>
+      <button class="price-button" onclick="window.location.href='{% url 'course_detail' %}'">Buy Now</button>
       <div class="card-note">ONE-TIME PAYMENT · NO SUBSCRIPTION</div>
     </div>
   </div>
@@ -2381,6 +2416,74 @@
   const aiTyping = document.getElementById("aiTyping");
   const aiMainButton = document.getElementById("aiMainButton");
   const aiCsrfToken = document.querySelector("#aiChatForm input[name=csrfmiddlewaretoken]").value;
+
+  function updateAssistantButtonColors() {
+    const buttonBounds = aiMainButton.getBoundingClientRect();
+    const previousPointerEvents = aiMainButton.style.pointerEvents;
+    aiMainButton.style.pointerEvents = "none";
+    const elementBehindButton = document.elementFromPoint(
+      buttonBounds.left + buttonBounds.width / 2,
+      buttonBounds.top + buttonBounds.height / 2
+    );
+    aiMainButton.style.pointerEvents = previousPointerEvents;
+
+    let currentElement = elementBehindButton;
+    let backgroundColor = "rgb(251, 248, 244)";
+    while (currentElement && currentElement !== document.body) {
+      const computedBackground = getComputedStyle(currentElement).backgroundColor;
+      if (computedBackground && computedBackground !== "rgba(0, 0, 0, 0)") {
+        backgroundColor = computedBackground;
+        break;
+      }
+      currentElement = currentElement.parentElement;
+    }
+
+    const colorValues = backgroundColor.match(/\d+/g)?.map(Number) || [251, 248, 244];
+    const [red, green, blue] = colorValues;
+
+    // Compare distance to canonical colors (white, black, orange) and pick nearest.
+    const targetWhite = [255, 255, 255];
+    const targetBlack = [0, 0, 0];
+    const targetOrange = [224, 79, 0]; // matches --orange (#E04F00)
+
+    function dist(a, b) {
+      return Math.sqrt((a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2);
+    }
+
+    const src = [red, green, blue];
+    const dWhite = dist(src, targetWhite);
+    const dBlack = dist(src, targetBlack);
+    const dOrange = dist(src, targetOrange);
+
+    const min = Math.min(dWhite, dBlack, dOrange);
+
+    if (min === dWhite) {
+      // White section → button should be ORANGE (with dark foreground)
+      aiMainButton.style.setProperty("--ai-button-background", "var(--orange)");
+      aiMainButton.style.setProperty("--ai-button-foreground", "#FFFFFF");
+    } else if (min === dBlack) {
+      // Black section → button should be WHITE (with dark foreground)
+      aiMainButton.style.setProperty("--ai-button-background", "#FFFFFF");
+      aiMainButton.style.setProperty("--ai-button-foreground", "#020202");
+    } else {
+      // Orange section → button should be BLACK (with light foreground)
+      aiMainButton.style.setProperty("--ai-button-background", "#020202");
+      aiMainButton.style.setProperty("--ai-button-foreground", "#FFFFFF");
+    }
+  }
+
+  let buttonColorUpdateFrame = null;
+  function scheduleAssistantButtonColors() {
+    if (buttonColorUpdateFrame !== null) return;
+    buttonColorUpdateFrame = requestAnimationFrame(() => {
+      buttonColorUpdateFrame = null;
+      updateAssistantButtonColors();
+    });
+  }
+
+  window.addEventListener("scroll", scheduleAssistantButtonColors, { passive: true });
+  window.addEventListener("resize", scheduleAssistantButtonColors);
+  updateAssistantButtonColors();
 
   aiMainButton.addEventListener("click", () => {
     const isOpen = aiAssistant.classList.toggle("actions-open");

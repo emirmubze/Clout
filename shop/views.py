@@ -90,11 +90,8 @@ class SingleDeviceLoginView(LoginView):
                 current_session_key
             )
 
-            self.request.session[
-                "single_device_session_key"
-            ] = current_session_key
-
-            self.request.session.modified = True
+            user.active_session_key = current_session_key
+            user.save(update_fields=["active_session_key"])
 
         return response
 
@@ -1147,16 +1144,13 @@ def register_view(request):
                 user
             )
 
+            request.user.active_session_key = request.session.session_key
+            request.user.save(update_fields=["active_session_key"])
+
             revoke_user_sessions(
                 user,
                 request.session.session_key
             )
-
-            request.session[
-                "single_device_session_key"
-            ] = request.session.session_key
-
-            request.session.modified = True
 
             next_url = request.POST.get(
                 "next"
@@ -1719,10 +1713,22 @@ def reset_password(request, uidb64, token):
             "password2"
         )
 
-        if password1 and password1 == password2:
+        if password1 and password1 == password2 and len(password1) >= 8:
             user.set_password(password1)
             user.save(update_fields=["password"])
             return redirect("password_reset_success")
+
+        password_error = (
+            "Password must be at least 8 characters."
+            if password1 and len(password1) < 8
+            else "Passwords do not match."
+        )
+
+        return render(
+            request,
+            "shop/reset-password.html",
+            {"password_error": password_error},
+        )
 
     return render(
         request,

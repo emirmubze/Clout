@@ -32,7 +32,7 @@
             --dark: #0E0E0E;
             --dark-gray: #383838;
             --white: #FFFFFF;
-            --off-white: #FBF8F4;
+            --off-white: #FFF7ED;
 
             --heading: "Acme", sans-serif;
             --body: "DM Sans", sans-serif;
@@ -147,13 +147,20 @@
 
             font-weight: 600;
 
-            text-align: center;
+            text-align: left;
 
             font-family: var(--heading);
 
             margin-bottom: 28px;
 
             letter-spacing: -0.2px;
+        }
+
+
+        .card-subtitle {
+            margin: -18px 0 28px;
+            color: #6B7280;
+            font-size: 14px;
         }
 
 
@@ -202,11 +209,50 @@
         }
 
 
+        .field-icon-wrap {
+            position: relative;
+        }
+
+
+        .field-icon-wrap .form-input {
+            padding-left: 48px;
+        }
+
+
+        .input-wrap .password-input {
+            padding-left: 48px;
+        }
+
+
+        .field-icon {
+            position: absolute;
+            top: 50%;
+            left: 15px;
+            width: 18px;
+            height: 18px;
+            color: #8D939B;
+            transform: translateY(-50%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+
+        .field-icon path,
+        .field-icon circle,
+        .field-icon rect {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.7;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+
         .form-input:focus {
-            border-color: #e04f00;
+            border-color: var(--orange);
 
             box-shadow:
-                0 0 0 3px rgba(224,79,0,0.06);
+                0 0 0 3px rgba(249,115,22,0.12);
         }
 
 
@@ -223,25 +269,33 @@
 
         .phone-input {
             display: flex;
-
             width: 100%;
+            height: 40px;
+            overflow: hidden;
+            border: 1px solid #d8dce2;
+            border-radius: 6px;
+            background: #fff;
+            transition: border 0.15s, box-shadow 0.15s;
+        }
 
-            gap: 8px;
+
+        .phone-input:focus-within {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(224,79,0,0.12);
         }
 
 
         .country-code {
             height: 40px;
 
-            width: 145px;
+            width: 100px;
 
             flex-shrink: 0;
 
-            padding: 0 8px;
-
-            border: 1px solid #d8dce2;
-
-            border-radius: 6px;
+            padding: 0 24px 0 10px;
+            border: 0;
+            border-right: 1px solid #d8dce2;
+            border-radius: 0;
 
             background: #fff;
 
@@ -258,17 +312,21 @@
 
 
         .country-code:focus {
-            border-color: #e04f00;
-
-            box-shadow:
-                0 0 0 3px rgba(224,79,0,0.06);
+            outline: none;
         }
 
 
         .phone-number {
             flex: 1;
-
             min-width: 0;
+            border: 0;
+            border-radius: 0;
+            padding-left: 14px;
+        }
+
+
+        .phone-number:focus {
+            box-shadow: none;
         }
 
 
@@ -344,7 +402,7 @@
 
             height: 48px;
 
-            background: #e04f00;
+            background: var(--orange);
 
             border: none;
 
@@ -371,11 +429,38 @@
         }
 
 
-        .signup-btn:hover {
-            background: #d34800;
+        .terms-group {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            margin-top: 2px;
+            color: #202020;
+            font-size: 13px;
+            line-height: 1.55;
+        }
 
-            box-shadow:
-                0 3px 10px rgba(224,79,0,0.2);
+
+        .terms-checkbox {
+            width: 12px;
+            height: 12px;
+            flex: 0 0 12px;
+            margin-top: 3px;
+            accent-color: var(--orange);
+        }
+
+
+        .terms-link {
+            color: var(--orange);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+
+        .signup-btn:hover {
+            background: #EA580C;
+
+                box-shadow:
+                0 3px 10px rgba(249,115,22,0.24);
         }
 
 
@@ -400,7 +485,7 @@
 
 
         .login-link {
-            color: #e04f00;
+            color: var(--orange);
 
             text-decoration: none;
 
@@ -409,7 +494,7 @@
 
 
         .login-link:hover {
-            color: #c04400;
+            color: #C2410C;
         }
 
 
@@ -505,7 +590,7 @@
 
 
             .country-code {
-                width: 125px;
+                width: 96px;
 
                 height: 38px;
 
@@ -541,6 +626,7 @@
 
     </style>
 
+<link rel="stylesheet" href="/static/responsive.css">
 </head>
 
 
@@ -579,6 +665,10 @@
                 Sign Up
             </h1>
 
+            <p class="card-subtitle">
+                Create your account to get started.
+            </p>
+
 
             <form
                 id="signupForm"
@@ -596,6 +686,33 @@
                 ></div>
 
 
+                <!-- FULL NAME -->
+
+                <div class="form-group">
+
+                    <label
+                        class="form-label"
+                        for="name"
+                    >
+                        Name
+                    </label>
+
+
+                    <div class="field-icon-wrap">
+                        <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="8" r="3.5" />
+                            <path d="M5 20c.7-3.1 3.1-5 7-5s6.3 1.9 7 5" />
+                        </svg>
+                        <input class="form-input" type="text" id="name" name="name" placeholder="Enter your name" autocomplete="name" required>
+                    </div>
+
+                    {% for error in form.name.errors %}
+                        <div style="margin-top:6px; color:#c62828; font-size:13px;">{{ error }}</div>
+                    {% endfor %}
+
+                </div>
+
+
                 <!-- USERNAME -->
 
                 <div class="form-group">
@@ -608,46 +725,15 @@
                     </label>
 
 
-                    <input
-                        class="form-input"
-                        type="text"
-                        id="username"
-                        name="username"
-                        placeholder="Choose a username"
-                        autocomplete="username"
-                        required
-                    >
+                    <div class="field-icon-wrap">
+                        <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <circle cx="12" cy="8" r="3.5" />
+                            <path d="M5 20c.7-3.1 3.1-5 7-5s6.3 1.9 7 5" />
+                        </svg>
+                        <input class="form-input" type="text" id="username" name="username" placeholder="Choose a username" autocomplete="username" required>
+                    </div>
 
                     {% for error in form.username.errors %}
-                        <div style="margin-top:6px; color:#c62828; font-size:13px;">{{ error }}</div>
-                    {% endfor %}
-
-                </div>
-
-
-                <!-- FULL NAME -->
-
-                <div class="form-group">
-
-                    <label
-                        class="form-label"
-                        for="name"
-                    >
-                         Name
-                    </label>
-
-
-                    <input
-                        class="form-input"
-                        type="text"
-                        id="name"
-                        name="name"
-                        placeholder="Enter your name"
-                        autocomplete="name"
-                        required
-                    >
-
-                    {% for error in form.name.errors %}
                         <div style="margin-top:6px; color:#c62828; font-size:13px;">{{ error }}</div>
                     {% endfor %}
 
@@ -666,15 +752,13 @@
                     </label>
 
 
-                    <input
-                        class="form-input"
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="your@email.com"
-                        autocomplete="email"
-                        required
-                    >
+                    <div class="field-icon-wrap">
+                        <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="3" y="5" width="18" height="14" rx="2" />
+                            <path d="m4 7 8 6 8-6" />
+                        </svg>
+                        <input class="form-input" type="email" id="email" name="email" placeholder="your@email.com" autocomplete="email" required>
+                    </div>
 
                     {% for error in form.email.errors %}
                         <div style="margin-top:6px; color:#c62828; font-size:13px;">{{ error }}</div>
@@ -705,7 +789,7 @@
                         >
 
                             <option value="+91" selected>
-                                🇮🇳 +91 India
+                                🇮🇳 +91
                             </option>
 
                             <option value="+93">
@@ -1463,17 +1547,7 @@
                         </select>
 
 
-                        <input
-                            class="form-input phone-number"
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            placeholder="9876543210"
-                            autocomplete="tel"
-                            inputmode="numeric"
-                            maxlength="15"
-                            required
-                        >
+                        <input class="form-input phone-number" type="tel" id="phone" name="phone" placeholder="Enter your phone number" autocomplete="tel" inputmode="numeric" maxlength="15" required>
 
                     </div>
 
@@ -1498,6 +1572,11 @@
 
                     <div class="input-wrap">
 
+                        <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="5" y="10" width="14" height="10" rx="2" />
+                            <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                        </svg>
+
                         <input
                             class="form-input password-input"
                             type="password"
@@ -1506,6 +1585,7 @@
                             placeholder="Create a password"
                             autocomplete="new-password"
                             required
+                            minlength="8"
                         >
 
 
@@ -1559,6 +1639,11 @@
 
                     <div class="input-wrap">
 
+                        <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+                            <rect x="5" y="10" width="14" height="10" rx="2" />
+                            <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+                        </svg>
+
                         <input
                             class="form-input password-input"
                             type="password"
@@ -1567,6 +1652,7 @@
                             placeholder="Confirm your password"
                             autocomplete="new-password"
                             required
+                            minlength="8"
                         >
 
 
@@ -1607,6 +1693,25 @@
 
 
                 <!-- SIGN UP -->
+
+                <label class="terms-group" for="terms">
+
+                    <input
+                        class="terms-checkbox"
+                        type="checkbox"
+                        id="terms"
+                        name="terms"
+                        required
+                    >
+
+                    <span>
+                        By completing this sign up, you agree to Clout
+                        <a class="terms-link" href="#terms">Privacy &amp; Terms</a>,
+                        and Teachable's
+                        <a class="terms-link" href="#terms">Privacy &amp; Terms</a>.
+                    </span>
+
+                </label>
 
                 <button
                     class="signup-btn"
@@ -1736,6 +1841,59 @@
            PHONE INPUT
         ========================= */
 
+        const countryCode =
+            document.getElementById("countryCode");
+
+        const countryOptions =
+            countryCode.querySelectorAll("option");
+
+        countryOptions.forEach(
+            function (option) {
+                const fullLabel = option.textContent.trim();
+                const optionParts = fullLabel.match(
+                    /^(\S+)\s+(\+\d+)/
+                );
+
+                if (optionParts) {
+                    option.dataset.fullLabel = fullLabel;
+                    option.dataset.shortLabel =
+                        optionParts[1] + " " + optionParts[2];
+                    option.textContent = option.dataset.shortLabel;
+                }
+            }
+        );
+
+        function setCountryLabels(showNames) {
+            countryOptions.forEach(
+                function (option) {
+                    option.textContent = showNames
+                        ? option.dataset.fullLabel
+                        : option.dataset.shortLabel;
+                }
+            );
+        }
+
+        countryCode.addEventListener(
+            "focus",
+            function () {
+                setCountryLabels(true);
+            }
+        );
+
+        countryCode.addEventListener(
+            "blur",
+            function () {
+                setCountryLabels(false);
+            }
+        );
+
+        countryCode.addEventListener(
+            "change",
+            function () {
+                setCountryLabels(false);
+            }
+        );
+
         const phoneInput =
             document.getElementById("phone");
 
@@ -1815,6 +1973,14 @@
 
                 const confirmPassword =
                     confirmPasswordInput.value;
+
+                if (password.length < 8) {
+                    showClientError(
+                        "Password must be at least 8 characters.",
+                        passwordInput
+                    );
+                    return;
+                }
 
 
                 if (password !== confirmPassword) {

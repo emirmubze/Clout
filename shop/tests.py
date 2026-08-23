@@ -114,6 +114,44 @@ class UserAuthAndDashboardTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Please enter a correct username and password")
 
+    def test_latest_login_invalidates_previous_device_session(self):
+        user = CustomUser.objects.create_user(
+            username="multiuser",
+            email="multi@example.com",
+            password="VeryStrongPass123!",
+        )
+        device_one = Client()
+        device_two = Client()
+
+        first_login = device_one.post(
+            reverse("login"),
+            {
+                "username": "multiuser",
+                "password": "VeryStrongPass123!",
+            },
+        )
+        self.assertEqual(first_login.status_code, 302)
+        first_session_key = device_one.session.session_key
+
+        second_login = device_two.post(
+            reverse("login"),
+            {
+                "username": "multiuser",
+                "password": "VeryStrongPass123!",
+            },
+        )
+        self.assertEqual(second_login.status_code, 302)
+        self.assertNotEqual(first_session_key, device_two.session.session_key)
+
+        response = device_one.get(reverse("index"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(response.wsgi_request.user.is_authenticated)
+        self.assertEqual(
+            device_two.get(reverse("index")).wsgi_request.user,
+            user,
+        )
+
     def test_contact_messages_are_saved_and_visible_in_admin_dashboard(self):
         customer = CustomUser.objects.create_user(
             username="customeruser",
@@ -265,6 +303,17 @@ class UserAuthAndDashboardTests(TestCase):
         self.client.force_login(user)
         course_response = self.client.get(reverse("course_detail"))
         self.assertEqual(course_response.status_code, 200)
+
+    def test_course_detail_excludes_removed_intro_and_purchase_card(self):
+        response = self.client.get(reverse("course_detail"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotContains(response, 'class="course-intro"')
+        self.assertNotContains(response, "This beginner-friendly program")
+        self.assertNotContains(response, 'class="card-buy"')
+        self.assertContains(response, "6 sections | 22 modules")
+        self.assertContains(response, "Module 1:")
+        self.assertContains(response, "AI Income Foundations The Landscape")
 
     def test_index_course_cta_uses_paid_or_admin_approved_access(self):
         from .models import Order as OrderModel

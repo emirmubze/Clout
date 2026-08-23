@@ -1,1222 +1,1482 @@
-﻿{% load static %}
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zero to Dangerous · Clout</title>
-  <!-- Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Acme&display=swap" rel="stylesheet">
-  <style>
-    /* =========================================================
-       RESET
-    ========================================================= */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    html {
-      scroll-behavior: smooth;
-    }
-    body {
-      font-family: 'Helvetica', 'Arial', sans-serif;
-      color: #212121;
-      background: #FFFFFF;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-    button,
-    input {
-      font-family: inherit;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Clout Checkout</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Acme&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "DM Sans", sans-serif;
+    background: #fafafa;
+    color: #111;
+    overflow-x: hidden;
+}
+
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+
+.navbar {
+    height: 62px;
+    background: #020202;
+    border-top: 1px solid #E04F00;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+    display: flex;
+    align-items: center;
+}
+
+.nav-container {
+    width: min(1380px, calc(100% - 50px));
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    color: #E04F00;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: bold;
+    font-family: "Acme", sans-serif;
+    letter-spacing: 1.5px;
+}
+
+.back-home {
+    color: #fff;
+    border: 1px solid #E04F00;
+    border-radius: 5px;
+    padding: 7px 14px;
+    background: transparent;
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background .18s ease, color .18s ease;
+}
+
+.back-home:hover {
+    background: #c84300;
+    color: #fff;
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+.checkout-layout {
+    width: calc(100% - 48px);
+    max-width: 1200px;
+
+    margin: 22px auto 32px;
+
+    display: grid;
+    grid-template-columns: 1.48fr 1fr;
+    gap: 28px;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.course-content,
+.order-panel {
+    background: #fff;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+
+    box-shadow:
+        0 2px 8px rgba(0,0,0,.025),
+        0 10px 25px rgba(0,0,0,.025);
+}
+
+
+/* =========================================================
+   COURSE CONTENT
+========================================================= */
+
+.course-content {
+    padding: 26px 24px 20px;
+}
+
+.content-header h2 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -1.3px;
+}
+
+.course-meta {
+    margin-top: 13px;
+    margin-bottom: 22px;
+
+    color: #647087;
+    font-size: 16px;
+}
+
+
+/* =========================================================
+   MODULE
+========================================================= */
+
+.course-section {
+    width: 100%;
+    height: 64px;
+    margin-bottom: 11px;
+}
+
+.section-title {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+
+    gap: 18px;
+
+    padding: 0 12px;
+
+    background: #fff;
+
+    border: 1px solid #e1e5e9;
+    border-radius: 8px;
+
+    font-size: 15px;
+
+    transition: .18s ease;
+}
+
+.section-title:hover {
+    border-color: #E04F00;
+    box-shadow: 0 3px 12px rgba(224,79,0,.12);
+}
+
+
+/* =========================================================
+   ALL ICONS — SAME SIZE + SAME WEIGHT
+========================================================= */
+
+.module-icon {
+    width: 36px;
+    height: 36px;
+
+    flex: 0 0 36px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.module-icon svg {
+    width: 32px !important;
+    height: 32px !important;
+
+    fill: none;
+
+    stroke: #111;
+
+    /* SAME WEIGHT FOR EVERY ICON */
+    stroke-width: 2.2;
+
+    stroke-linecap: round;
+    stroke-linejoin: round;
+
+    display: block;
+}
+
+
+/* =========================================================
+   MODULE TEXT
+========================================================= */
+
+.module-text {
+    flex: 1;
+}
+
+.module-text strong {
+    font-weight: 700;
+}
+
+
+/* =========================================================
+   ORDER DETAILS
+========================================================= */
+
+.order-panel {
+    padding: 26px 28px 28px;
+}
+
+.order-panel h2 {
+    margin-bottom: 30px;
+
+    font-size: 26px;
+    font-weight: 700;
+
+    letter-spacing: -1.3px;
+}
+
+
+/* =========================================================
+   COUPON
+========================================================= */
+
+.coupon-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding-bottom: 24px;
+
+    border-bottom: 1px solid #e1e4e7;
+
+    font-size: 16px;
+    cursor: pointer;
+    transition: color .18s ease;
+}
+
+.coupon-row:hover {
+    color: #E04F00;
+}
+
+.coupon-arrow {
+    font-size: 30px;
+    font-weight: 300;
+}
+
+.checkout-overlay,
+.coupon-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(20, 20, 20, .42);
+}
+
+.checkout-overlay.is-open,
+.coupon-overlay.is-open {
+    display: flex;
+}
+
+.checkout-overlay {
+    background: rgba(0, 0, 0, .55);
+}
+
+.checkout-popup {
+    position: relative;
+    width: min(1180px, calc(100% - 24px));
+    height: min(760px, calc(100vh - 24px));
+    background: transparent !important;
+    border-radius: 28px;
+    box-shadow: none !important;
+    padding: 0 !important;
+    overflow: hidden;
+}
+
+.checkout-popup iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+}
+
+.checkout-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+
+.checkout-header h2 {
+    margin: 0;
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -1px;
+}
+
+.checkout-product {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding-bottom: 14px;
+}
+
+.checkout-product-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    flex: 1;
+}
+
+.checkout-thumb {
+    width: 96px;
+    height: 96px;
+    border-radius: 14px;
+    background: #f2f3f5;
+}
+
+.checkout-product h3 {
+    margin: 0 0 8px;
+    font-size: 22px;
+}
+
+.checkout-product p {
+    margin: 0;
+    color: #4b5563;
+    font-size: 15px;
+}
+
+.checkout-price {
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.checkout-country {
+    margin: 10px 0 12px;
+    border: 1px solid #e3e5e8;
+    border-radius: 16px;
+    background: #fafbfc;
+    padding: 15px 16px;
+    font-size: 16px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.checkout-summary {
+    border-top: 1px solid #e5e7eb;
+    margin-top: 14px;
+    padding-top: 14px;
+}
+
+.checkout-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 18px;
+    margin: 10px 0;
+    font-size: 16px;
+}
+
+.checkout-row.discount {
+    color: #e11d2e;
+}
+
+.checkout-total {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 18px;
+    align-items: center;
+    margin-top: 18px;
+    padding-top: 14px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.checkout-total strong {
+    font-size: 38px;
+    font-weight: 800;
+}
+
+.checkout-total small {
+    display: block;
+    text-align: right;
+    color: #6b7280;
+    font-size: 15px;
+    margin-top: 2px;
+}
+
+.checkout-terms {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-top: 16px;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.checkout-terms input {
+    width: 20px;
+    height: 20px;
+    margin-top: 4px;
+}
+
+.checkout-terms a {
+    color: #e11d2e;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.checkout-button {
+    width: 100%;
+    height: 60px;
+    margin-top: 16px;
+    border: 0;
+    border-radius: 12px;
+    background: linear-gradient(180deg, #d96d3a 0%, #c75a2c 100%);
+    color: #fff;
+    font-size: 22px;
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.checkout-button:disabled {
+    opacity: .5;
+    cursor: not-allowed;
+}
+
+.checkout-secure {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+    font-size: 15px;
+    color: #5c6672;
+}
+
+.checkout-overlay .coupon-overlay {
+    display: none;
+}
+
+.coupon-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: transparent;
+    pointer-events: none;
+}
+
+.coupon-overlay.is-open {
+    display: flex;
+}
+
+.coupon-modal {
+    pointer-events: auto;
+    position: relative;
+    width: min(390px, 100%);
+    padding: 28px 22px 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .2);
+    text-align: center;
+}
+
+.coupon-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 14px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: #fff0e8;
+    color: #E04F00;
+}
+
+.coupon-icon svg {
+    width: 30px;
+    height: 30px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.coupon-modal h3 {
+    margin-bottom: 5px;
+    font-family: "Acme", sans-serif;
+    font-size: 21px;
+}
+
+.coupon-modal p {
+    margin-bottom: 18px;
+    color: #737986;
+    font-size: 13px;
+}
+
+.coupon-close {
+    position: absolute;
+    top: 12px;
+    right: 14px;
+    border: 0;
+    background: transparent;
+    color: #737373;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.coupon-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid #dfe2e6;
+    border-radius: 6px;
+    outline: none;
+    font: 14px "DM Sans", sans-serif;
+    text-transform: uppercase;
+}
+
+.coupon-input:focus {
+    border-color: #E04F00;
+    box-shadow: 0 0 0 3px rgba(224, 79, 0, .1);
+}
+
+.coupon-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 16px;
+}
+
+.coupon-action {
+    height: 44px;
+    border: 1px solid #dfe2e6;
+    border-radius: 6px;
+    background: #fff;
+    color: #222;
+    font: 600 14px "DM Sans", sans-serif;
+    cursor: pointer;
+}
+
+.coupon-action.apply {
+    border-color: #E04F00;
+    background: #E04F00;
+    color: #fff;
+}
+
+.coupon-action.apply:hover {
+    background: #c84300;
+}
+
+.coupon-message {
+    min-height: 18px;
+    margin-top: 10px;
+    color: #168344;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   PRICE
+========================================================= */
+
+.order-lines {
+    padding: 24px 0;
+
+    border-bottom: 1px solid #e1e4e7;
+}
+
+.order-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    margin-bottom: 20px;
+
+    font-size: 16px;
+}
+
+.order-line:last-child {
+    margin-bottom: 0;
+}
+
+.discount {
+    color: #ff0000;
+}
+
+
+/* =========================================================
+   PAYMENT
+========================================================= */
+
+.payment-status {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    padding: 24px 0;
+
+    border-bottom: 1px solid #e1e4e7;
+
+    color: #168344;
+
+    font-size: 14px;
+}
+
+.payment-status::before {
+    content: "";
+
+    width: 10px;
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: #199447;
+}
+
+
+/* =========================================================
+   TOTAL
+========================================================= */
+
+.order-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 26px 0 28px;
+
+    font-size: 25px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   CONTINUE
+========================================================= */
+
+.continue-btn {
+    width: 100%;
+    height: 56px;
+
+    border: 0;
+    border-radius: 7px;
+
+    background: #E04F00;
+
+    color: #fff;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 17px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    cursor: pointer;
+
+    transition: .18s ease;
+}
+
+.continue-btn:hover {
+    background: #c84300;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.footer {
+    min-height: 80px;
+    height: auto;
+
+    display: flex;
+    align-items: center;
+
+    background: #FBF8F4;
+
+    border-top: 1px solid #E3E3E3;
+    padding: 0 24px;
+}
+
+.footer-container {
+    width: min(950px, calc(100% - 48px));
+    margin: auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 80px;
+}
+
+.copyright {
+    font-size: 18px;
+    font-family: sans-serif;
+    color: #020202;
+    font-weight: 400;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media (max-width: 900px) {
+
+    .checkout-layout {
+        width: calc(100% - 30px);
+
+        grid-template-columns: 1fr;
+
+        gap: 25px;
     }
 
-    /* =========================================================
-       NAVBAR
-    ========================================================= */
     .navbar {
-      height: 62px;
-      background: #000000;
-      border-top: 1px solid #E04F00;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      display: flex;
-      align-items: center;
-      top: 0;
-      z-index: 1000;
+        height: 62px;
     }
-    .nav-container {
-      width: min(1380px, calc(100% - 50px));
-      margin: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
+
     .logo {
-      color: #E04F00;
-      font-size: 15px;
-      font-weight: bold;
-      text-decoration: none;
-      font-family: 'Acme', 'Helvetica', sans-serif;
-      letter-spacing: 1.5px;
-    }
-    .mobile-menu {
-      display: none;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 25px;
-      cursor: pointer;
-    }
-
-    /* =========================================================
-       COURSE INTRO
-    ========================================================= */
-    .course-intro {
-      background: #fcede5;
-      height: auto;
-      padding: 20px 0 55px;
-    }
-    .intro-container {
-      width: min(950px, calc(100% - 48px));
-      margin: auto;
-      position: relative;
-      display: flex;
-      justify-content: space-between;
-      gap: 30px;
-    }
-
-    /* =========================================================
-       INTRO CONTENT
-    ========================================================= */
-    .intro-content {
-      flex: 1;
-      padding: 33px 0 28px;
-      max-width: 590px;
-    }
-    .intro-content h1 {
-      font-family: 'Acme', 'Helvetica', sans-serif;
-      font-size: 24px;
-      font-weight: 400;
-      line-height: 1.3;
-      color: #212121;
-      margin-bottom: 16px;
-      letter-spacing: 0.3px;
-    }
-    .intro-content p {
-      font-family: 'Helvetica', 'Arial', sans-serif;
-      font-size: 17.5px;
-      line-height: 1.6;
-      color: #212121;
-      font-weight: 400;
-    }
-
-    /* =========================================================
-       READ MORE
-    ========================================================= */
-    .read-more {
-      display: inline-block;
-      color: #212121;
-      font-family: 'Helvetica', 'Arial', sans-serif;
-      font-size: 15.8px;
-      font-weight: 450;
-      text-decoration: underline;
-      cursor: pointer;
-      background: transparent;
-      border: none;
-      padding: 0;
-      margin-top: 4px;
-      transition: color 0.2s;
-    }
-
-    /* =========================================================
-       EXTRA CONTENT
-    ========================================================= */
-    .extra-content {
-      display: none;
-      margin-top: 12px;
-    }
-    .extra-content.show {
-      display: block;
-    }
-    .extra-content p {
-      font-size: 17.5px;
-      line-height: 1.6;
-      color: #212121;
-      margin-bottom: 10px;
-    }
-
-    /* =========================================================
-       PURCHASE CARD WRAPPER
-       DESKTOP: STICKY
-    ========================================================= */
-    .card-buy {
-      display: flex;
-      position: sticky;
-      top: 80px;
-      margin-left: 950px;
-      margin-top: -320px;
-      z-index: 10;
-      align-self: flex-start;
-    }
-
-    /* =========================================================
-       PURCHASE CARD
-    ========================================================= */
-    .purchase-card {
-      width: 390.39px;
-      background: #FFFFFF;
-      padding: 0 0 9px 0;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-      border: 1px solid #E3E3E3;
-      height: fit-content;
-      flex-shrink: 0;
-      overflow: hidden;
-      align-self: flex-start;
-    }
-
-    /* =========================================================
-       CARD IMAGE
-    ========================================================= */
-    .card-image img {
-      display: block;
-      width: 100%;
-      height: auto;
-    }
-
-    /* =========================================================
-       CARD BODY
-    ========================================================= */
-    .card-body {
-      padding: 18px 8px 9px 8px;
-    }
-
-    /* =========================================================
-       PRICE
-    ========================================================= */
-    .price-box {
-      width: 100%;
-      height: 51.6px;
-      border: 1px solid #000000;
-      border-radius: 4px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 11px;
-      font-size: 17px;
-      color: #212121;
-      font-weight: 550;
-      background: #FFFFFF;
-      transition: background 0.2s ease, border-color 0.2s ease;
-    }
-    .price-box:hover {
-      background: #6a728210;
-    }
-    .price-box span {
-      margin-left: 6px;
-      font-weight: 400;
-      color: #212121;
-      font-size: 16px;
-    }
-
-    /* =========================================================
-       BUY BUTTON
-    ========================================================= */
-    .buy-btn {
-      display: inline-block;
-      width: 100%;
-      height: 43px;
-      margin-top: 12px;
-      border: none;
-      border-radius: 4px;
-      background: #E04F00;
-      color: #FFFFFF;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-      letter-spacing: 0.3px;
-      text-align: center;
-      line-height: 43px;
-      text-decoration: none;
-      box-sizing: border-box;
-    }
-    .buy-btn:hover {
-      background: #c24400;
-    }
-
-    /* =========================================================
-       CHECKOUT MODAL OVERLAY
-    ========================================================= */
-    .checkout-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(11, 12, 15, 0.62);
-      backdrop-filter: blur(3px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 20px;
-      z-index: 2000;
-    }
-    .checkout-overlay.show {
-      display: flex;
-    }
-
-    .checkout-card {
-      width: min(480px, 100%);
-      background: #ffffff;
-      border-radius: 24px;
-      padding: 28px 30px 30px;
-      box-shadow: 0 25px 70px rgba(0, 0, 0, 0.35);
-      position: relative;
-      animation: popup 0.22s ease-out;
-    }
-
-    @keyframes popup {
-      from {
-        opacity: 0;
-        transform: scale(0.97) translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 12px;
-      right: 16px;
-      background: transparent;
-      border: none;
-      font-size: 28px;
-      font-weight: 300;
-      color: #1e1e1e;
-      cursor: pointer;
-      line-height: 1;
-      width: 36px;
-      height: 36px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      transition: background 0.15s;
-    }
-    .close-btn:hover {
-      background: #f0f0f0;
-    }
-
-    .checkout-title {
-      font-family: 'Acme', 'Helvetica', sans-serif;
-      font-size: 26px;
-      font-weight: 700;
-      color: #0c0c0c;
-      letter-spacing: -0.3px;
-      margin-bottom: 22px;
-      padding-right: 40px;
-    }
-
-    .product-row {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding-bottom: 18px;
-      border-bottom: 1px solid #eaeef2;
-    }
-
-    .product-icon {
-      width: 60px;
-      height: 60px;
-      background: linear-gradient(145deg, #fff0e7, #ffd5bd);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      position: relative;
-      font-weight: 700;
-      font-size: 14px;
-      color: #1c1c1c;
-    }
-    .product-icon .badge {
-      position: absolute;
-      top: 6px;
-      left: 6px;
-      background: #111;
-      color: #fff;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 7px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-    .product-icon .clout-text {
-      font-family: 'Acme', 'Helvetica', sans-serif;
-      font-size: 20px;
-      color: #E04F00;
-      font-style: italic;
-      letter-spacing: -0.5px;
-      margin-top: 6px;
-    }
-
-    .product-info {
-      flex: 1;
-    }
-    .product-name {
-      font-weight: 600;
-      font-size: 17px;
-      color: #0f0f0f;
-      margin-bottom: 2px;
-    }
-    .product-desc {
-      font-size: 13px;
-      color: #6b7887;
-      font-weight: 450;
-    }
-    .product-price {
-      font-weight: 700;
-      font-size: 18px;
-      color: #0c0c0c;
-      white-space: nowrap;
-    }
-
-    .total-section {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      padding: 18px 0 16px;
-      border-bottom: 1px solid #eaeef2;
-    }
-    .total-label {
-      font-weight: 500;
-      font-size: 17px;
-      color: #111;
-    }
-    .total-right {
-      text-align: right;
-    }
-    .total-price {
-      display: block;
-      font-weight: 700;
-      font-size: 18px;
-      color: #0b0b0b;
-    }
-    .tax-text {
-      font-size: 11px;
-      color: #7d8895;
-    }
-
-    .terms-section {
-      display: flex;
-      align-items: flex-start;
-      gap: 14px;
-      padding: 20px 0 22px;
-    }
-    .terms-checkbox {
-      width: 13px;
-      height: 13px;
-      flex-shrink: 0;
-      appearance: none;
-      -webkit-appearance: none;
-      background: #fff;
-      border: 1px solid #9aa3b0;
-      cursor: pointer;
-      position: relative;
-      margin-top: 1px;
-      transition: 0.12s;
-    }
-    .terms-checkbox:checked {
-      background: #E04F00;
-      border-color: #E04F00;
-    }
-    .terms-checkbox:checked::after {
-      content: "✓";
-      position: absolute;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 700;
-      left: 2px;
-      top: -1px;
-    }
-    .terms-checkbox:focus-visible {
-      outline: 2px solid #E04F00;
-      outline-offset: 2px;
-    }
-    .terms-text {
-      margin-top: -3px;
-      margin-left: -2px;
-      font-size: 13px;
-      line-height: 1.5;
-      color: #1d1f24;
-    }
-    .terms-text a {
-      color: #E04F00;
-      text-decoration: none;
-      font-weight: 500;
-    }
-    .terms-text a:hover {
-      text-decoration: underline;
-    }
-
-    .payment-methods {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 10px;
-      margin: 8px 0 18px;
-    }
-    .payment-option {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      width: 100%;
-      border: 1px solid #e5e7eb;
-      background: #f9fafb;
-      border-radius: 12px;
-      padding: 12px 14px;
-      color: #1f2937;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .payment-option.active {
-      border-color: #E04F00;
-      background: #fff5f0;
-      box-shadow: 0 0 0 2px rgba(224, 79, 0, 0.08);
-    }
-    .payment-option i {
-      color: #E04F00;
-      font-size: 16px;
-      width: 18px;
-      text-align: center;
-    }
-
-    .buy-modal-btn {
-      width: 100%;
-      height: 54px;
-      border: none;
-      background: #E04F00;
-      color: #fff;
-      border-radius: 5px;
-      font-size: 20px;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      transition: 0.2s;
-      box-shadow: 0 8px 18px rgba(224, 79, 0, 0.2);
-      letter-spacing: 0.2px;
-    }
-    .buy-modal-btn:hover {
-      transform: scale(1.01);
-      box-shadow: 0 12px 24px rgba(224, 79, 0, 0.3);
-    }
-    .buy-modal-btn:active {
-      transform: scale(0.98);
-    }
-
-    .payment-powered {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      margin-top: 14px;
-      color: #8f99a8;
-      font-size: 13px;
-      font-weight: 450;
-    }
-    .small-lock {
-      font-size: 11px;
-    }
-
-    .security-card {
-      margin-top: 20px;
-      border: 1px solid #e2e6ec;
-      border-radius: 16px;
-      padding: 14px 18px 14px 14px;
-      display: flex;
-      align-items: center;
-      gap: 18px;
-      background: #fcfcfd;
-    }
-    .security-icon {
-      width: 48px;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .security-icon svg {
-      width: 44px;
-      height: 44px;
-      stroke: #0f0f0f;
-      stroke-width: 2;
-      fill: none;
-      stroke-linecap: round;
-      stroke-linejoin: round;
-    }
-    .security-content h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #0f0f0f;
-      margin-bottom: 2px;
-      letter-spacing: -0.2px;
-    }
-    .security-content p {
-      font-size: 13px;
-      line-height: 1.4;
-      color: #68717d;
-    }
-
-    @media (max-width: 500px) {
-      .checkout-card {
-        padding: 24px 18px 26px;
-        border-radius: 20px;
-      }
-      .checkout-title {
-        font-size: 22px;
-        margin-bottom: 18px;
-      }
-      .product-name {
         font-size: 15px;
-      }
-      .product-desc {
-        font-size: 12px;
-      }
-      .product-price {
-        font-size: 16px;
-      }
-      .total-price {
-        font-size: 16px;
-      }
-      .buy-modal-btn {
-        height: 48px;
-        font-size: 17px;
+    }
+}
+
+
+@media (max-width: 550px) {
+
+    .checkout-layout {
+        width: calc(100% - 18px);
+    }
+
+    .course-content,
+    .order-panel {
+        padding: 20px 16px;
         border-radius: 12px;
-      }
-      .security-card {
-        padding: 12px 14px;
-        gap: 12px;
-      }
-      .security-icon svg {
-        width: 28px;
-        height: 28px;
-      }
-      .security-content h3 {
-        font-size: 14px;
-      }
-      .security-content p {
-        font-size: 12px;
-      }
-      .terms-text {
-        font-size: 12px;
-      }
-      .close-btn {
-        top: 10px;
-        right: 12px;
+    }
+
+    .content-header h2,
+    .order-panel h2 {
         font-size: 26px;
-      }
     }
 
-    @media (max-width: 400px) {
-      .checkout-card {
-        padding: 18px 14px 20px;
-      }
-      .product-row {
-        gap: 12px;
-      }
-      .product-icon {
-        width: 50px;
-        height: 50px;
-      }
-      .product-icon .clout-text {
-        font-size: 16px;
-      }
-      .product-name {
-        font-size: 14px;
-      }
-      .product-desc {
-        font-size: 11px;
-      }
-      .product-price {
-        font-size: 15px;
-      }
-      .total-price {
-        font-size: 15px;
-      }
-      .terms-checkbox {
-        width: 15px;
-        height: 15px;
-      }
-    }
-
-    /* =========================================================
-       COURSE CONTENT
-    ========================================================= */
-    .course-content {
-      background: #FFFFFF;
-      min-height: 456px;
-    }
-    .content-container {
-      width: min(590px, calc(100% - 48px));
-      margin-left: calc((100% - min(980px, calc(100% - 48px))) / 2 + 15px);
-    }
-
-    /* =========================================================
-       CONTENT HEADER
-    ========================================================= */
-    .content-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 13px;
-    }
-    .content-header h2 {
-      font-family: 'Acme', 'Helvetica', sans-serif;
-      font-size: 24px;
-      font-weight: 600;
-      color: #212121;
-    }
-
-    /* =========================================================
-       COURSE META
-    ========================================================= */
     .course-meta {
-      font-size: 11px;
-      color: #6A7282;
-      margin-bottom: 13px;
-      font-weight: 400;
-    }
-
-    /* =========================================================
-       COURSE SECTION
-    ========================================================= */
-    .course-section {
-      width: 520.33px;
-      height: 50.6px;
-      border: 1.3px solid #E3E3E3;
-      border-radius: 4px;
-      margin-bottom: 6px;
-      background: #FFFFFF;
-      transition: background 0.2s ease, border-color 0.2s ease;
-    }
-    .course-section:hover {
-      border-color: #212121;
-    }
-
-    /* =========================================================
-       SECTION TITLE
-    ========================================================= */
-    .section-title {
-      width: 100%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 9px;
-      font-family: 'Acme', 'Helvetica', sans-serif;
-      font-size: 16px;
-      color: #212121;
-      font-weight: 500;
-    }
-
-    /* =========================================================
-       FOOTER
-    ========================================================= */
-    .footer {
-      height: 95px;
-      background: #FBF8F4;
-      border-top: 1px solid #E3E3E3;
-    }
-    .footer-container {
-      width: min(950px, calc(100% - 48px));
-      height: 100%;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .copyright {
-      font-size: 18px;
-      font-family: sans-serif;
-      color: #020202;
-      font-weight: 400;
-    }
-
-    /* =========================================================
-       EXPANDED STATE (optional, kept for consistency)
-    ========================================================= */
-    .course-section.expanded {
-      background: #FBF8F4;
-      border-color: #212121;
-      height: auto;
-      min-height: 32px;
-      padding: 4px 0;
-    }
-    .course-section.expanded .section-title {
-      flex-wrap: wrap;
-      gap: 4px;
-    }
-
-    /* =========================================================
-       TABLET <= 900px
-    ========================================================= */
-    @media (max-width: 900px) {
-      .purchase-card {
-        width: 280px;
-      }
-    }
-
-    /* =========================================================
-       MOBILE / TABLET <= 800px
-    ========================================================= */
-    @media (max-width: 800px) {
-      .intro-container {
-        width: calc(100% - 32px);
-        flex-direction: column;
-      }
-      .intro-content {
-        width: 100%;
-        max-width: 100%;
-        padding-bottom: 20px;
-      }
-      .card-buy {
-        position: relative;
-        top: auto;
-        margin-top: -35px;
-        margin-left: 16px;
-        margin-right: 16px;
-        display: flex;
-        z-index: 5;
-      }
-      .purchase-card {
-        position: relative;
-        width: 100%;
-        max-width: 390px;
-        margin: 0 auto 20px;
-        align-self: center;
-      }
-      .content-container {
-        width: calc(100% - 32px);
-        margin-left: auto;
-        margin-right: auto;
-      }
-      .footer-container {
-        width: calc(100% - 32px);
-      }
-      .course-section {
-        width: 100%;
-        max-width: 520px;
-      }
-    }
-
-    /* =========================================================
-       SMALL MOBILE <= 600px
-    ========================================================= */
-    @media (max-width: 600px) {
-      .intro-container {
-        width: calc(100% - 24px);
-      }
-      .course-intro {
-        min-height: auto;
-        height: auto;
-        padding-bottom: 35px;
-      }
-      .content-container {
-        width: calc(100% - 24px);
-      }
-      .content-header {
-        align-items: flex-start;
-        gap: 10px;
-      }
-      .footer {
-        height: auto;
-        padding: 25px 0;
-      }
-      .footer-container {
-        width: calc(100% - 24px);
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 20px;
-      }
-      .card-buy {
-        position: relative;
-        top: auto;
-        margin-top: -20px;
-        margin-left: 12px;
-        margin-right: 12px;
-      }
-      .purchase-card {
-        position: relative;
-        width: 100%;
-        max-width: 100%;
+        font-size: 16px;
         margin-bottom: 20px;
-      }
-      .price-box {
-        height: 54px;
-        font-size: 18px;
-      }
-      .price-box span {
-        font-size: 14px;
-      }
-      .buy-btn {
-        height: 44px;
-        font-size: 15px;
-      }
-      .course-section {
-        width: 100%;
-        height: auto;
-        min-height: 50.6px;
-      }
-      .section-title {
-        font-size: 15px;
-        padding: 8px 9px;
-        height: auto;
-        min-height: 50.6px;
-      }
     }
-  </style>
+
+    .course-section {
+        height: 58px;
+        margin-bottom: 10px;
+    }
+
+    .section-title {
+        gap: 13px;
+        padding: 0 12px;
+        font-size: 15px;
+    }
+
+    /* Keep icons same size */
+    .module-icon {
+        width: 36px;
+        height: 36px;
+        flex: 0 0 36px;
+    }
+
+    .module-icon svg {
+        width: 32px !important;
+        height: 32px !important;
+    }
+
+    .coupon-row,
+    .order-line {
+        font-size: 17px;
+    }
+
+    .order-total {
+        font-size: 28px;
+    }
+
+    .continue-btn {
+        height: 60px;
+        font-size: 20px;
+    }
+
+    .checkout-overlay,
+    .coupon-overlay {
+        padding: 8px;
+    }
+
+    .checkout-popup {
+        width: 100%;
+        height: calc(100vh - 16px);
+        border-radius: 12px;
+    }
+}
+
+</style>
+<link rel="stylesheet" href="/static/responsive.css">
 </head>
+
+
 <body>
 
-  <!-- =========================================================
-       NAVBAR
-  ========================================================= -->
-  <nav class="navbar">
+
+<!-- =========================================================
+     NAVBAR
+========================================================= -->
+
+<nav class="navbar">
+
     <div class="nav-container">
-      <a href="{% url "index" %}" class="logo">CLOUT</a>
-    </div>
-  </nav>
 
-  <!-- =========================================================
-       COURSE INTRO
-  ========================================================= -->
-  <section class="course-intro">
-    <div class="intro-container">
-      <div class="intro-content">
-        <h1>The AI Income Playbook</h1>
-        <!-- MAIN TEXT -->
-        <p>
-This beginner-friendly program teaches you how to use Claude AI to discover profitable ideas and create digital products, PDFs, apps, websites, and AI-powered businesses.
-Through practical tutorials and real-world workflows, you'll learn how to use AI for research, planning, content creation, product development, marketing, and launching products faster.Whether you want to make your first money online,start
-        </p>
-        <!-- EXTRA TEXT -->
-        <div class="extra-content" id="extraContent">
-          <p>
-a side hustle, or build a scalable digital business, you'll gain the practical skills and confidence to turn ideas into products people can buy.
-          </p>
-          <p>
-            Whether you're a complete beginner or have some experience,
-            this course will give you the confidence to build and sell
-            digital products using AI.
-          </p>
-        </div>
-        <!-- READ MORE BUTTON -->
-        <button class="read-more" id="readMoreBtn" type="button">Read more</button>
-      </div>
-    </div>
-  </section>
+        <a href="{% url 'index' %}" class="logo">CLOUT</a>
+        <a href="{% url 'index' %}" class="back-home">Home</a>
 
-  <!-- =========================================================
-       PURCHASE CARD (DESKTOP STICKY, MOBILE NORMAL)
-  ========================================================= -->
-  <section class="card-buy">
-    <div class="purchase-card">
-      <div class="card-image">
-        <img src="{% static 'buy.png' %}" alt="AI Income Playbook cover">
-      </div>
-      <div class="card-body">
-        <div class="price-box">
-          $18
-          <span>one-time purchase</span>
-        </div>
-        {% if user.is_authenticated %}
-          <button class="buy-btn" id="openCheckoutBtn" type="button">Buy now</button>
-        {% else %}
-          <a class="buy-btn" href="{% url 'login' %}">Buy now</a>
-        {% endif %}
-      </div>
     </div>
-  </section>
 
-  <!-- =========================================================
-       COURSE CONTENT
-  ========================================================= -->
-  <main class="course-content">
-    <div class="content-container">
-      <div class="content-header">
-        <h2>Course content</h2>
-      </div>
-      <div class="course-meta">
-        <span>6 sections | 22 lessons</span>
-      </div>
-      <!-- SECTION 1 -->
-      <div class="course-section">
-        <div class="section-title">
-          <span>Lesson 1: AI Income Foundations The Landscape</span>
+</nav>
+
+
+
+<!-- =========================================================
+     CHECKOUT
+========================================================= -->
+
+<div class="checkout-layout">
+
+
+    <!-- =====================================================
+         COURSE CONTENT
+    ====================================================== -->
+
+    <div class="course-content">
+
+        <div class="content-header">
+            <h2>Course content</h2>
         </div>
-      </div>
-      <!-- SECTION 2 -->
-      <div class="course-section">
-        <div class="section-title">
-          <span>Lesson 2: Digital Products & PDFs</span>
+
+        <div class="course-meta">
+            6 sections | 22 modules
         </div>
-      </div>
-      <!-- SECTION 3 -->
-      <div class="course-section">
-        <div class="section-title">
-          <span>Lesson 3: AI Apps & Websites</span>
+
+
+        <!-- =================================================
+             MODULE 1 — BOOK
+        ================================================== -->
+
+        <div class="course-section">
+
+            <div class="section-title">
+
+                <div class="module-icon">
+
+                    <svg viewBox="0 0 42 42">
+
+                        <path d="
+                            M21 35
+                            V11
+                        "/>
+
+                        <path d="
+                            M21 11
+                            C16 7
+                            11 7
+                            5 9
+                            V32
+                            C11 30
+                            16 30
+                            21 34
+                        "/>
+
+                        <path d="
+                            M21 11
+                            C26 7
+                            31 7
+                            37 9
+                            V32
+                            C31 30
+                            26 30
+                            21 34
+                        "/>
+
+                    </svg>
+
+                </div>
+
+                <div class="module-text">
+                    <strong>Module 1:</strong>
+                    AI Income Foundations The Landscape
+                </div>
+
+            </div>
+
         </div>
-      </div>
-      <!-- SECTION 4 -->
-      <div class="course-section">
-        <div class="section-title">
-          <span>Lesson 4: AI Games & Automation</span>
+
+
+
+        <!-- =================================================
+             MODULE 2 — FILE
+        ================================================== -->
+
+        <div class="course-section">
+
+            <div class="section-title">
+
+                <div class="module-icon">
+
+                    <svg viewBox="0 0 42 42">
+
+                        <path d="
+                            M8 4
+                            H25
+                            L34 13
+                            V38
+                            H8
+                            Z
+                        "/>
+
+                        <path d="
+                            M25 4
+                            V13
+                            H34
+                        "/>
+
+                        <path d="
+                            M14 21
+                            H27
+                        "/>
+
+                        <path d="
+                            M14 27
+                            H27
+                        "/>
+
+                        <path d="
+                            M14 33
+                            H23
+                        "/>
+
+                    </svg>
+
+                </div>
+
+                <div class="module-text">
+                    <strong>Module 2:</strong>
+                    Digital Products &amp; PDFs
+                </div>
+
+            </div>
+
         </div>
-      </div>
-      <!-- SECTION 5 -->
-      <div class="course-section">
-        <div class="section-title">
-          <span>Lesson 5: AI E-commerce Systems</span>
+
+
+
+        <!-- =================================================
+             MODULE 3 — MONITOR
+        ================================================== -->
+
+        <div class="course-section">
+
+            <div class="section-title">
+
+                <div class="module-icon">
+
+                    <svg viewBox="0 0 42 42">
+
+                        <rect
+                            x="5"
+                            y="7"
+                            width="32"
+                            height="23"
+                            rx="1"
+                        />
+
+                        <path d="
+                            M13 36
+                            H29
+                        "/>
+
+                        <path d="
+                            M21 30
+                            V36
+                        "/>
+
+                    </svg>
+
+                </div>
+
+                <div class="module-text">
+                    <strong>Module 3:</strong>
+                    AI Apps &amp; Websites
+                </div>
+
+            </div>
+
         </div>
-      </div>
-      <!-- SECTION 6 -->
-      <div class="course-section">
-        <div class="section-title">
-          <span>Lesson 6: Scale to $10K+/Month</span>
+
+
+
+        <!-- =================================================
+             MODULE 4 — GAMEPAD
+        ================================================== -->
+
+        <div class="course-section">
+
+            <div class="section-title">
+
+                <div class="module-icon">
+
+                    <svg viewBox="0 0 42 42">
+
+                        <path d="
+                            M12 12
+                            H30
+                            C35 12
+                            38 16
+                            39 22
+                            L40 30
+                            C41 35
+                            36 38
+                            33 35
+                            L28 31
+                            H14
+                            L9 35
+                            C6 38
+                            1 35
+                            2 30
+                            L3 22
+                            C4 16
+                            7 12
+                            12 12
+                        "/>
+
+                        <path d="
+                            M10 19
+                            V27
+                        "/>
+
+                        <path d="
+                            M6 23
+                            H14
+                        "/>
+
+                        <circle
+                            cx="29"
+                            cy="20"
+                            r="1"
+                        />
+
+                        <circle
+                            cx="33"
+                            cy="24"
+                            r="1"
+                        />
+
+                    </svg>
+
+                </div>
+
+                <div class="module-text">
+                    <strong>Module 4:</strong>
+                    AI Games &amp; Automation
+                </div>
+
+            </div>
+
         </div>
-      </div>
+
+
+
+        <!-- =================================================
+             MODULE 5 — CART
+        ================================================== -->
+
+        <div class="course-section">
+
+            <div class="section-title">
+
+                <div class="module-icon">
+
+                    <svg viewBox="0 0 42 42">
+
+                        <path d="
+                            M4 8
+                            H9
+                            L13 29
+                            H34
+                            L39 14
+                            H10
+                        "/>
+
+                        <circle
+                            cx="17"
+                            cy="35"
+                            r="2"
+                        />
+
+                        <circle
+                            cx="31"
+                            cy="35"
+                            r="2"
+                        />
+
+                    </svg>
+
+                </div>
+
+                <div class="module-text">
+                    <strong>Module 5:</strong>
+                    AI E-commerce Systems
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- =================================================
+             MODULE 6 — CHART
+        ================================================== -->
+
+        <div class="course-section">
+
+            <div class="section-title">
+
+                <div class="module-icon">
+
+                    <svg viewBox="0 0 42 42">
+
+                        <path d="
+                            M6 36
+                            V7
+                        "/>
+
+                        <path d="
+                            M6 36
+                            H37
+                        "/>
+
+                        <path d="
+                            M12 31
+                            V24
+                        "/>
+
+                        <path d="
+                            M19 31
+                            V19
+                        "/>
+
+                        <path d="
+                            M26 31
+                            V14
+                        "/>
+
+                        <path d="
+                            M33 31
+                            V9
+                        "/>
+
+                    </svg>
+
+                </div>
+
+                <div class="module-text">
+                    <strong>Module 6:</strong>
+                    Scale to $10K+/Month
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
-  </main>
 
-  <!-- =========================================================
-       FOOTER
-  ========================================================= -->
-  <footer class="footer">
+
+
+    <!-- =====================================================
+         ORDER DETAILS
+    ====================================================== -->
+
+    <div class="order-panel">
+
+        <h2>
+            Order Details
+        </h2>
+
+
+        <!-- COUPON -->
+
+        <div class="coupon-row">
+
+            <span>
+                Coupon Code
+            </span>
+
+            <span class="coupon-arrow">
+                ›
+            </span>
+
+        </div>
+
+
+        <!-- PRICE DETAILS -->
+
+        <div class="order-lines">
+
+            <div class="order-line">
+
+                <span>
+                    Subtotal
+                </span>
+
+                <span>
+                    $18.00
+                </span>
+
+            </div>
+
+
+            <div class="order-line discount">
+
+                <span>
+                    Discount
+                </span>
+
+                <span>
+                    - $32.00
+                </span>
+
+            </div>
+
+
+            <div class="order-line">
+
+                <span>
+                    Tax
+                </span>
+
+                <span>
+                    $0.82
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <!-- PAYMENT -->
+
+        <div class="payment-status">
+            UPI-payment available
+        </div>
+
+
+        <!-- TOTAL -->
+
+        <div class="order-total">
+
+            <span>
+                Total
+            </span>
+
+            <span>
+                $18.82
+            </span>
+
+        </div>
+
+
+        <!-- CONTINUE -->
+
+        <button
+            class="continue-btn"
+            id="continueBtn"
+            type="button">
+
+            Continue
+
+        </button>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     FOOTER
+========================================================= -->
+
+<footer class="footer">
+
     <div class="footer-container">
-      <div class="copyright">© 2026 Coult</div>
+        <div class="copyright">© 2026 Clout</div>
     </div>
-  </footer>
 
-  <div class="checkout-overlay" id="checkoutOverlay" aria-hidden="true">
-    <div class="checkout-card" id="checkoutModal">
-      <button class="close-btn" id="closeCheckoutBtn" aria-label="Close">×</button>
+</footer>
 
-      <h1 class="checkout-title">Order summary</h1>
-
-      <div class="product-row">
-        <div class="product-icon">
-          <span class="badge">PRO</span>
-          <span class="clout-text">clout</span>
-        </div>
-        <div class="product-info">
-          <div class="product-name">The AI Income Playbook</div>
-          <div class="product-desc">Lifetime Access • Premium</div>
-        </div>
-        <div class="product-price">$18</div>
-      </div>
-
-      <div class="total-section">
-        <span class="total-label">Total</span>
-        <div class="total-right">
-          <span class="total-price">$18.82</span>
-          <span class="tax-text">incl. taxes</span>
-        </div>
-      </div>
-
-      <div class="terms-section">
-        <input type="checkbox" id="termsCheck" class="terms-checkbox" />
-        <label for="termsCheck" class="terms-text">
-          By completing this purchase, you agree to Clout
-          <a href="#">Privacy &amp; Terms</a>, and Teachable's
-          <a href="#">Privacy &amp; Terms</a>.
-        </label>
-      </div>
-
-      <div class="payment-methods" aria-label="Payment methods">
-        <div class="payment-option active" data-method="upi" role="button" tabindex="0">
-          <i class="fas fa-mobile-alt"></i>
-          <span>UPI / QR Pay</span>
-        </div>
-      </div>
-
-      <button class="buy-modal-btn" id="payButton" type="button">
-        <span>Buy now</span>
-      </button>
-
-      <div class="payment-powered">
-        <i class="fas fa-lock small-lock"></i>
-        <span>Secure payment powered by Razorpay</span>
-      </div>
-
-      <div class="security-card">
-        <div class="security-icon">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 22C12 22 20 18 20 12V5L12 2L4 5V12C4 18 12 22 12 22Z" />
-            <path d="M9 12L11 14L15 10" />
-          </svg>
-        </div>
-        <div class="security-content">
-          <h3>100% Secure Payment</h3>
-          <p>Your payment information is encrypted and safe with Razorpay.</p>
-        </div>
-      </div>
+<div class="checkout-overlay" id="checkoutOverlay" aria-hidden="true">
+    <div class="checkout-popup" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle">
+        <iframe src="{% url 'checkout' %}" title="Checkout" id="checkoutFrame"></iframe>
     </div>
-  </div>
+</div>
 
-  <!-- =========================================================
-       JAVASCRIPT - READ MORE / READ LESS ONLY
-  ========================================================= -->
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script>
-    (function() {
-      const readMoreBtn = document.getElementById('readMoreBtn');
-      const extraContent = document.getElementById('extraContent');
-      const overlay = document.getElementById('checkoutOverlay');
-      const openCheckoutBtn = document.getElementById('openCheckoutBtn');
-      const closeCheckoutBtn = document.getElementById('closeCheckoutBtn');
-      const payButton = document.getElementById('payButton');
-      const termsCheck = document.getElementById('termsCheck');
+<div class="coupon-overlay" id="couponOverlay" aria-hidden="true">
+    <div class="coupon-modal" role="dialog" aria-modal="true" aria-labelledby="couponTitle">
+        <button class="coupon-close" id="couponClose" type="button" aria-label="Close coupon dialog">&times;</button>
+        <div class="coupon-icon" aria-hidden="true">
+            <svg width="42" height="42" viewBox="0 0 42 42" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M7 10 H35 V16 C32.5 16 31 17.8 31 21 C31 24.2 32.5 26 35 26 V32 H7 V26 C9.5 26 11 24.2 11 21 C11 17.8 9.5 16 7 16 V10 Z" stroke="#E04F00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M20 14V28" stroke="#E04F00" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="2 2"/>
+            </svg>
+        </div>
+        <h3 id="couponTitle">Apply Coupon Code</h3>
+        <p>Enter your coupon code to get discount</p>
+        <form id="couponForm">
+            <input class="coupon-input" id="couponInput" type="text" placeholder="Enter coupon code" autocomplete="off">
+            <div class="coupon-actions">
+                <button class="coupon-action" id="couponCancel" type="button">Cancel</button>
+                <button class="coupon-action apply" type="submit">Apply</button>
+            </div>
+            <div class="coupon-message" id="couponMessage" aria-live="polite"></div>
+        </form>
+    </div>
+</div>
 
-      function openCheckoutModal() {
-        if (overlay) {
-          overlay.classList.add('show');
-          overlay.setAttribute('aria-hidden', 'false');
+<script>
+    (function () {
+        const couponRow = document.querySelector('.coupon-row');
+        const couponOverlay = document.getElementById('couponOverlay');
+        const couponClose = document.getElementById('couponClose');
+        const couponCancel = document.getElementById('couponCancel');
+        const couponForm = document.getElementById('couponForm');
+        const couponInput = document.getElementById('couponInput');
+        const couponMessage = document.getElementById('couponMessage');
+        const checkoutOverlay = document.getElementById('checkoutOverlay');
+        const continueBtn = document.getElementById('continueBtn');
+        const checkoutTerms = document.getElementById('checkoutTerms');
+        const checkoutButton = document.getElementById('checkoutButton');
+
+        function closeCoupon() {
+            couponOverlay.classList.remove('is-open');
+            couponOverlay.setAttribute('aria-hidden', 'true');
+            couponOverlay.style.display = 'none';
+            couponOverlay.style.pointerEvents = 'none';
         }
-      }
 
-      function closeCheckoutModal() {
-        if (overlay) {
-          overlay.classList.remove('show');
-          overlay.setAttribute('aria-hidden', 'true');
+        function openCoupon() {
+            couponOverlay.classList.add('is-open');
+            couponOverlay.setAttribute('aria-hidden', 'false');
+            couponOverlay.style.display = 'flex';
+            couponOverlay.style.pointerEvents = 'auto';
+            couponMessage.textContent = '';
+            couponInput.focus();
         }
-      }
 
-      if (readMoreBtn && extraContent) {
-        readMoreBtn.addEventListener('click', function(e) {
-          e.preventDefault();
-          if (!extraContent.classList.contains('show')) {
-            extraContent.classList.add('show');
-            readMoreBtn.textContent = 'Read less';
-          } else {
-            extraContent.classList.remove('show');
-            readMoreBtn.textContent = 'Read more';
-          }
-        });
-      }
-
-      if (openCheckoutBtn) {
-        openCheckoutBtn.addEventListener('click', openCheckoutModal);
-      }
-
-      if (closeCheckoutBtn) {
-        closeCheckoutBtn.addEventListener('click', closeCheckoutModal);
-      }
-
-      if (overlay) {
-        overlay.addEventListener('click', function(e) {
-          if (e.target === overlay) {
-            closeCheckoutModal();
-          }
-        });
-      }
-
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape' && overlay && overlay.classList.contains('show')) {
-          closeCheckoutModal();
+        function closeCheckout() {
+            checkoutOverlay.classList.remove('is-open');
+            checkoutOverlay.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
         }
-      });
 
-      if (payButton && termsCheck) {
-        payButton.addEventListener('click', async () => {
-          if (!termsCheck.checked) {
-            alert('Please agree to the Privacy & Terms before continuing.');
-            return;
-          }
+        function openCheckout() {
+            closeCoupon();
+            checkoutOverlay.classList.add('is-open');
+            checkoutOverlay.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
 
-          payButton.disabled = true;
-          payButton.innerText = 'Processing...';
-
-          try {
-            const response = await fetch("{% url 'create_order' %}", {
-              method: 'POST',
-              headers: { 'X-CSRFToken': '{{ csrf_token }}' }
+        if (continueBtn) {
+            continueBtn.addEventListener('click', function (event) {
+                event.preventDefault();
+                closeCoupon();
+                openCheckout();
             });
+        }
 
-            const data = await response.json();
-            if (!response.ok || !data.success) {
-              throw new Error(data.message || 'Could not create order.');
+        document.addEventListener('click', function (event) {
+            if (!couponOverlay.classList.contains('is-open') || !continueBtn) return;
+
+            const continueBounds = continueBtn.getBoundingClientRect();
+            const clickedContinue = event.clientX >= continueBounds.left &&
+                event.clientX <= continueBounds.right &&
+                event.clientY >= continueBounds.top &&
+                event.clientY <= continueBounds.bottom;
+
+            if (clickedContinue) {
+                closeCoupon();
+                openCheckout();
+            }
+        }, true);
+
+        if (checkoutTerms) {
+            checkoutTerms.addEventListener('change', function () {
+                checkoutButton.disabled = !checkoutTerms.checked;
+            });
+        }
+
+        checkoutOverlay.addEventListener('click', function (event) {
+            if (event.target === checkoutOverlay) closeCheckout();
+        });
+
+        window.addEventListener('message', function (event) {
+            if (event.origin === window.location.origin && event.data?.type === 'closeCheckout') {
+                closeCheckout();
+            }
+        });
+
+        couponRow.addEventListener('click', openCoupon);
+        couponClose.addEventListener('click', closeCoupon);
+        couponCancel.addEventListener('click', closeCoupon);
+        couponOverlay.addEventListener('click', function (event) {
+            if (event.target === couponOverlay) closeCoupon();
+        });
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                if (couponOverlay.classList.contains('is-open')) closeCoupon();
+                if (checkoutOverlay.classList.contains('is-open')) closeCheckout();
+            }
+        });
+        couponForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            const typedCode = couponInput.value.trim();
+
+            if (!typedCode) {
+                couponInput.focus();
+                couponMessage.textContent = 'Please enter a coupon code.';
+                couponMessage.style.color = '#d32f2f';
+                return;
             }
 
-            const options = {
-              key: data.key,
-              amount: 1882,
-              currency: 'INR',
-              name: 'Clout',
-              description: 'Course Purchase',
-              order_id: data.order_id,
-              method: {
-                upi: true,
-                card: false,
-                netbanking: false,
-                wallet: false
-              },
-              theme: {
-                color: '#E04F00'
-              },
-              handler: async function(paymentResponse) {
-                const body = new URLSearchParams();
-                body.append('razorpay_payment_id', paymentResponse.razorpay_payment_id);
-                body.append('razorpay_order_id', paymentResponse.razorpay_order_id);
-                body.append('razorpay_signature', paymentResponse.razorpay_signature);
+            const normalizedCode = typedCode.toUpperCase();
+            couponInput.value = normalizedCode;
 
-                const verifyResponse = await fetch("{% url 'verify_payment' %}", {
-                  method: 'POST',
-                  headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                  },
-                  body
-                });
+            if (normalizedCode !== 'ALWXZ') {
+                couponMessage.textContent = 'Invalid coupon code.';
+                couponMessage.style.color = '#d32f2f';
+                return;
+            }
 
-                const result = await verifyResponse.json();
-                if (result.success) {
-                  window.location.href = "{% url 'payment_success' %}";
-                } else {
-                  throw new Error(result.message || 'Payment verification failed.');
-                }
-              },
-              modal: {
-                ondismiss: function() {
-                  payButton.disabled = false;
-                  payButton.innerText = 'Buy';
-                }
-              },
-              theme: { color: '#E04F00' }
-            };
-
-            const rzp = new Razorpay(options);
-            rzp.on('payment.failed', function() {
-              payButton.disabled = false;
-              payButton.innerText = 'Buy';
-              alert('Payment failed. Please try again.');
-            });
-            rzp.open();
-          } catch (error) {
-            console.error(error);
-            alert(error.message || 'Unable to start payment.');
-            payButton.disabled = false;
-            payButton.innerText = 'Buy';
-          }
+            couponMessage.textContent = 'Coupon code applied.';
+            couponMessage.style.color = '#168344';
+            closeCoupon();
         });
-      }
-    })();
-  </script>
+    }());
+</script>
+
+
 </body>
 </html>
