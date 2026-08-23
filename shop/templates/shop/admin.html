@@ -628,6 +628,44 @@
             height: 100% !important;
         }
 
+        .buyer-growth-card {
+            padding: 28px 36px 24px;
+        }
+
+        .buyer-growth-heading {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 20px;
+            margin-bottom: 12px;
+        }
+
+        .buyer-growth-heading h3 {
+            margin: 0 0 8px;
+            font-size: 24px;
+        }
+
+        .buyer-growth-heading p {
+            margin: 0;
+            color: #667085;
+            font-size: 14px;
+        }
+
+        .buyer-growth-range {
+            min-width: 156px;
+            padding: 12px 14px;
+            border: 1px solid #D0D5DD;
+            border-radius: 10px;
+            background: #fff;
+            color: #344054;
+            font: 14px var(--body);
+        }
+
+        .buyer-growth-graph {
+            height: 500px;
+            margin-top: 14px;
+        }
+
 
         /* =====================================================
            CONTACT CHAT
@@ -1080,6 +1118,176 @@
 
         }
 
+        .module-manager {
+            background: #fff;
+            border: 1px solid #E5E7EB;
+        }
+
+        #course-management {
+            border-radius: 0;
+        }
+
+        .module-editor {
+            margin-bottom: 18px;
+            overflow: hidden;
+            border: 1px solid #DEDFE2;
+            border-radius: 13px;
+        }
+
+        .module-editor-header {
+            min-height: 66px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #FAFAFA;
+            border-bottom: 1px solid #E7E7E7;
+        }
+
+        .module-editor-left, .module-editor-actions, .editor-video-row {
+            display: flex;
+            align-items: center;
+        }
+
+        .module-editor-left { gap: 12px; min-width: 0; }
+        .module-editor-number {
+            min-width: 72px;
+            padding: 7px 10px;
+            border-radius: 6px;
+            background: #FFF1E8;
+            color: #EA580C;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .module-title-input {
+            width: 320px;
+            border: 0;
+            outline: 0;
+            background: transparent;
+            font: 700 16px "DM Sans", sans-serif;
+        }
+
+        .module-editor-actions { gap: 8px; }
+        .editor-icon-btn {
+            width: 34px;
+            height: 34px;
+            border: 1px solid #DEDEDE;
+            border-radius: 7px;
+            background: #fff;
+            color: #6B7280;
+            cursor: pointer;
+        }
+
+        .editor-delete, .editor-lesson-delete { color: #DC2626; }
+        .module-editor-body { padding: 18px; }
+        .editor-lesson {
+            margin-bottom: 13px;
+            overflow: hidden;
+            border: 1px solid #E3E4E6;
+            border-radius: 11px;
+        }
+
+        .editor-lesson-header {
+            min-height: 45px;
+            padding: 10px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #FCFCFC;
+            border-bottom: 1px solid #EEE;
+        }
+
+        .editor-lesson-content {
+            padding: 16px;
+            display: grid;
+            grid-template-columns: 190px 1fr;
+            gap: 20px;
+        }
+
+        .editor-thumbnail-box {
+            width: 190px;
+            height: 115px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px dashed #CFD2D6;
+            border-radius: 9px;
+            background: #FAFAFA;
+            color: #9CA3AF;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .editor-thumbnail-box img { width: 100%; height: 100%; object-fit: cover; }
+        .editor-thumbnail-input, .editor-video-input { display: none; }
+        .editor-form-row { display: grid; gap: 13px; }
+        .editor-form-group label { display: block; margin-bottom: 6px; color: #374151; font-size: 12px; font-weight: 600; }
+        .editor-form-group input, .editor-form-group textarea {
+            width: 100%;
+            padding: 10px 11px;
+            border: 1px solid #D6D9DD;
+            border-radius: 7px;
+            font: 13px "DM Sans", sans-serif;
+        }
+
+        .editor-form-group textarea { min-height: 65px; resize: vertical; }
+        .editor-video-row { gap: 10px; min-width: 0; }
+        .editor-video-button, .editor-add-lesson, .editor-add-module, .editor-save, .editor-cancel {
+            border-radius: 8px;
+            font-family: inherit;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .editor-video-button { padding: 9px 13px; border: 1px solid #D5D7DA; background: #fff; font-size: 12px; }
+        .editor-video-name { overflow: hidden; color: #6B7280; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+        .editor-add-lesson, .editor-add-module { width: 100%; padding: 14px; border: 1px dashed #D2D4D7; background: #FAFAFA; color: #EA580C; }
+        .editor-add-lesson { margin-top: 15px; }
+        .editor-add-module { font-size: 14px; }
+        .editor-save { padding: 11px 22px; border: 0; background: #EA580C; color: #fff; }
+        .editor-cancel { padding: 11px 20px; border: 1px solid #D5D7DA; background: #fff; }
+
+        .module-manager .add-module {
+            width: 100%;
+            height: 58px;
+            margin-top: 5px;
+            border: 1.5px dashed #D2D4D7;
+            border-radius: 11px;
+            background: #FAFAFA;
+            color: #EA580C;
+            font: 700 14px var(--body);
+            cursor: pointer;
+        }
+
+        .module-manager .cancel-btn,
+        .module-manager .save-btn {
+            padding: 11px 20px;
+            border-radius: 8px;
+            font-family: var(--body);
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .module-manager .cancel-btn {
+            border: 1px solid #D5D7DA;
+            background: #fff;
+        }
+
+        .module-manager .save-btn {
+            padding-inline: 22px;
+            border: 0;
+            background: #EA580C;
+            color: #fff;
+            box-shadow: 0 3px 8px rgba(234, 88, 12, .18);
+        }
+        @media (max-width: 700px) {
+            .module-title-input { width: 180px; }
+            .editor-lesson-content { grid-template-columns: 1fr; }
+            .editor-thumbnail-box { width: 100%; height: 170px; }
+        }
     </style>
 
 <link rel="stylesheet" href="/static/responsive.css">
@@ -1611,61 +1819,24 @@
 
 
             <div class="panel-header">
-
-                <h2 class="panel-title">
-                    Courses
-                </h2>
-
-
-                <span class="manage-link">
-                    Buyer Growth
-                </span>
-
+                <h2 class="panel-title">Buyer Growth</h2>
             </div>
 
-
-            <div class="course-container">
-
-
-                <!-- COURSE INFO -->
-
-                <div class="course-info">
-
-
-                    <div class="course-name">
-                        The AI Income Playbook
+            <div class="buyer-growth-card">
+                <div class="buyer-growth-heading">
+                    <div>
+                        <h3>Buyer Growth</h3>
+                        <p>Course buyer growth over time</p>
                     </div>
-
-
-                    <div class="buyers-label">
-                        Total Buyers
-                    </div>
-
-
-                    <div class="buyers-number">
-                        {{ course_buyers|default:"0" }}
-                    </div>
-
-
-                    <div class="buyers-text">
-                        Paid customers
-                    </div>
-
-
+                    <select class="buyer-growth-range" id="buyerGrowthRange" aria-label="Buyer growth period">
+                        <option>Last 7 days</option>
+                        <option>Last 30 days</option>
+                        <option>Last 12 months</option>
+                    </select>
                 </div>
-
-
-                <!-- SMOOTH GRAPH -->
-
-                <div class="graph-container">
-
-                    <canvas
-                        id="buyerChart"
-                    ></canvas>
-
+                <div class="buyer-growth-graph">
+                    <canvas id="buyerChart"></canvas>
                 </div>
-
-
             </div>
 
         </section>
@@ -1675,168 +1846,23 @@
              COURSE MANAGEMENT
         ================================================== -->
 
-        <section
-            class="panel"
-            id="course-management"
-        >
-
+        <section class="panel" id="course-management">
             <div class="panel-header">
-
-                <h2 class="panel-title">
-                    Course Management
-                </h2>
-
-                <span class="manage-link" id="course-count">
-                    {{ course_count|default:"0" }} Active Course(s)
-                </span>
-
+                <h2 class="panel-title">Course Module Management</h2>
+                <span class="manage-link"><span id="moduleCount">0</span> Modules</span>
             </div>
-
-            <div id="course-management-list"
-                 data-delete-url-template="{% url 'admin_course_delete' 0 %}"
-                 style="display:flex; flex-direction:column; gap:18px; padding: 8px 0 4px;">
-
-                <div style="padding:18px; border:1px solid #E5E7EB; border-radius:14px; background:#F9FAFB;">
-                    <div style="display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; flex-wrap:wrap;">
-                        <h3 style="margin:0; font-size:18px; color:#111827;">
-                            {% if editing_course %}Edit Course{% else %}Add New Course{% endif %}
-                        </h3>
-                        {% if editing_course %}
-                            <a href="{% url 'admin_dashboard' %}#course-management" style="color:#E04F00; font-weight:700; text-decoration:none;">Cancel</a>
-                        {% endif %}
-                    </div>
-
-                    <form method="POST"
-                          id="course-form"
-                          class="ajax-course-form"
-                          data-mode="{% if editing_course %}edit{% else %}add{% endif %}"
-                          data-course-id="{% if editing_course %}{{ editing_course.id }}{% endif %}"
-                          action="{% if editing_course %}{% url 'admin_course_edit' editing_course.id %}{% else %}{% url 'admin_course_add' %}{% endif %}"
-                          enctype="multipart/form-data"
-                          style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px;">
-                        {% csrf_token %}
-
-                        <div style="display:flex; flex-direction:column; gap:8px;">
-                            <label for="id_title" style="font-weight:700; color:#344054;">Title</label>
-                            {{ course_form.title }}
-                        </div>
-
-                        <div style="display:flex; flex-direction:column; gap:8px; grid-column:1 / -1;">
-                            <label for="id_description" style="font-weight:700; color:#344054;">Description</label>
-                            {{ course_form.description }}
-                        </div>
-
-                        <div style="display:flex; flex-direction:column; gap:8px;">
-                            <label for="id_instructor" style="font-weight:700; color:#344054;">Instructor</label>
-                            {{ course_form.instructor }}
-                        </div>
-
-                        <div style="display:flex; flex-direction:column; gap:8px;">
-                            <label for="id_duration" style="font-weight:700; color:#344054;">Duration</label>
-                            {{ course_form.duration }}
-                        </div>
-
-                        <div style="display:flex; flex-direction:column; gap:8px;">
-                            <label for="id_level" style="font-weight:700; color:#344054;">Level</label>
-                            {{ course_form.level }}
-                        </div>
-
-                        <div style="display:flex; flex-direction:column; gap:8px;">
-                            <label for="id_thumbnail" style="font-weight:700; color:#344054;">Thumbnail</label>
-                            {{ course_form.thumbnail }}
-                        </div>
-
-                        <div style="display:flex; flex-direction:column; gap:8px;">
-                            <label for="id_video" style="font-weight:700; color:#344054;">Video</label>
-                            {{ course_form.video }}
-                        </div>
-
-                        <div style="display:flex; align-items:center; gap:10px; grid-column:1 / -1; color:#344054; font-weight:600;">
-                            {{ course_form.is_active }}
-                            <label for="id_is_active">Active course</label>
-                        </div>
-
-                        <div style="grid-column:1 / -1; display:flex; justify-content:flex-end;">
-                            <button type="submit" style="background:#E04F00; color:#fff; border:none; border-radius:10px; padding:12px 18px; font-weight:700; cursor:pointer;">
-                                {% if editing_course %}Update Course{% else %}Add Course{% endif %}
-                            </button>
-                        </div>
-                    </form>
+            <div class="module-manager" style="padding:24px;">
+                <div style="margin-bottom:22px;">
+                    <h3 style="margin:0 0 5px; font-size:20px;">Course Modules</h3>
+                    <p style="margin:0; color:#6B7280; font-size:14px;">Organize your modules and add video lessons to each module.</p>
                 </div>
-
-                {% for course in courses %}
-
-                <div class="course-card"
-                     data-course-id="{{ course.id }}"
-                     style="display:flex; gap:18px; padding:18px; border:1px solid #E5E7EB; border-radius:14px; background:#F9FAFB; align-items:flex-start;">
-
-                    <div style="width:180px; min-width:180px; height:120px; border-radius:10px; overflow:hidden; background:#E5E5E5; display:flex; align-items:center; justify-content:center;">
-                        {% if course.thumbnail %}
-                            <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" style="width:100%; height:100%; object-fit:cover;">
-                        {% else %}
-                            <span style="color:#667085; font-size:14px;">No Image</span>
-                        {% endif %}
-                    </div>
-
-                    <div style="flex:1; min-width:0;">
-                        <div style="display:flex; justify-content:space-between; gap:12px; align-items:center; margin-bottom:8px; flex-wrap:wrap;">
-                            <h3 class="course-card-title" style="margin:0; font-size:20px; color:#111827;">{{ course.title }}</h3>
-                            <span class="course-card-price" style="background:#E8F5E9; color:#1F7A3D; border-radius:999px; padding:6px 12px; font-size:12px; font-weight:700;">
-                                ${{ course.price }}
-                            </span>
-                        </div>
-
-                        <p class="course-card-description" style="margin:0 0 12px; color:#475467; line-height:1.6;">
-                            {{ course.description|default:"No description available."|truncatechars:180 }}
-                        </p>
-
-                        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; font-size:12px; color:#344054;">
-                            <span class="course-card-instructor" style="padding:6px 10px; border-radius:999px; background:#EEF2FF;">Instructor: {{ course.instructor|default:"N/A" }}</span>
-                            <span class="course-card-duration" style="padding:6px 10px; border-radius:999px; background:#F2F4F7;">Duration: {{ course.duration|default:"N/A" }}</span>
-                            <span class="course-card-level" style="padding:6px 10px; border-radius:999px; background:#F2F4F7;">Level: {{ course.level|default:"Beginner" }}</span>
-                        </div>
-
-                        {% if course.video %}
-                            <video controls preload="metadata" style="width:100%; max-height:200px; border-radius:10px; background:#000;">
-                                <source src="{{ course.video.url }}" type="video/mp4">
-                                Your browser does not support the video tag.
-                            </video>
-                        {% else %}
-                            <div style="padding:12px 14px; border:1px dashed #D0D5DD; border-radius:10px; background:#FFF; color:#667085; font-size:13px;">
-                                No course video uploaded yet.
-                            </div>
-                        {% endif %}
-
-                        <div style="margin-top:16px; display:flex; justify-content:flex-end; gap:10px; flex-wrap:wrap;">
-                            <a href="{% url 'admin_dashboard' %}?edit_course_id={{ course.id }}#course-management" style="background:#111827; color:#fff; border-radius:10px; padding:10px 14px; text-decoration:none; font-weight:700;">
-                                Edit Course
-                            </a>
-                            <form method="POST"
-                                  action="{% url 'admin_course_delete' course.id %}"
-                                  class="ajax-course-delete"
-                                  data-course-id="{{ course.id }}"
-                                  onsubmit="return false;"
-                                  style="display:inline;">
-                                {% csrf_token %}
-                                <button type="submit" style="background:#D92D20; color:#fff; border:none; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer;">
-                                    Delete Course
-                                </button>
-                            </form>
-                        </div>
-                    </div>
-
+                <div id="modules"></div>
+                <button type="button" class="add-module" onclick="addModule()">+ Add New Module</button>
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:22px; padding-top:20px; border-top:1px solid #EEEEEE;">
+                    <button type="button" class="cancel-btn" onclick="window.location.hash='course-management'">Cancel</button>
+                    <button type="button" class="save-btn" onclick="saveCourse()">Save Course</button>
                 </div>
-
-                {% empty %}
-
-                <div style="padding:18px; border:1px dashed #D0D5DD; border-radius:12px; color:#667085; background:#F9FAFB; text-align:center;">
-                    No active course available.
-                </div>
-
-                {% endfor %}
-
             </div>
-
         </section>
 
 
@@ -2154,7 +2180,11 @@
                             onmouseup="this.style.transform='translateY(-2px)';"
                             title="Upload Image"
                         >
-                            🖼
+                            <svg viewBox="0 0 24 24" aria-hidden="true" style="width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;">
+                                <rect x="3" y="4" width="18" height="16" rx="2"></rect>
+                                <circle cx="8.5" cy="9" r="1.5"></circle>
+                                <path d="m21 15-4.5-4.5L8 19"></path>
+                            </svg>
                         </button>
 
                         <input 
@@ -2190,7 +2220,10 @@
                             onmouseup="this.style.transform='translateY(-2px)';"
                             title="Upload Video"
                         >
-                            🎥
+                            <svg viewBox="0 0 24 24" aria-hidden="true" style="width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round;">
+                                <rect x="3" y="6" width="12" height="12" rx="2"></rect>
+                                <path d="m15 10 6-3v10l-6-3z"></path>
+                            </svg>
                         </button>
 
                         <input 
@@ -2290,6 +2323,64 @@
 
 
 <script>
+    let moduleLessonCounts = {};
+
+    function addModule() {
+        const module = document.createElement("div");
+        module.className = "module-editor";
+        module.innerHTML = `
+            <div class="module-editor-header">
+                <div class="module-editor-left"><div class="module-editor-number">MODULE 00</div><input class="module-title-input" type="text" placeholder="Module title"></div>
+                <div class="module-editor-actions"><button class="editor-icon-btn" type="button" onclick="toggleEditorModule(this)">-</button><button class="editor-icon-btn editor-delete" type="button" onclick="deleteEditorModule(this)">x</button></div>
+            </div>
+            <div class="module-editor-body"><div class="editor-lessons"></div><button class="editor-add-lesson" type="button" onclick="addEditorLesson(this)">+ Add Lesson / Video</button></div>`;
+        document.getElementById("modules").appendChild(module);
+        renumberEditorModules();
+        addEditorLesson(module.querySelector(".editor-add-lesson"));
+        updateModuleCount();
+    }
+
+    function deleteEditorModule(button) { button.closest(".module-editor").remove(); renumberEditorModules(); updateModuleCount(); }
+
+    function renumberEditorModules() {
+        document.querySelectorAll(".module-editor").forEach((module, index) => {
+            const number = index + 1;
+            module.querySelector(".module-editor-number").textContent = "MODULE " + String(number).padStart(2, "0");
+            module.dataset.moduleNumber = number;
+            moduleLessonCounts[number] = module.querySelectorAll(".editor-lesson").length;
+        });
+    }
+
+    function updateModuleCount() { document.getElementById("moduleCount").textContent = document.querySelectorAll(".module-editor").length; }
+
+    function addEditorLesson(button) {
+        const module = button.closest(".module-editor");
+        const moduleNumber = module.dataset.moduleNumber || "1";
+        moduleLessonCounts[moduleNumber] = (moduleLessonCounts[moduleNumber] || 0) + 1;
+        const number = moduleLessonCounts[moduleNumber];
+        const lesson = document.createElement("div");
+        lesson.className = "editor-lesson";
+        lesson.innerHTML = `
+            <div class="editor-lesson-header"><strong><span class="editor-lesson-number">${String(number).padStart(2, "0")}</span> Lesson</strong><button class="editor-lesson-delete" type="button" onclick="deleteEditorLesson(this)">Delete</button></div>
+            <div class="editor-lesson-content"><div><div class="editor-thumbnail-box" onclick="this.nextElementSibling.click()"><span>+<br>Add Thumbnail</span></div><input class="editor-thumbnail-input" type="file" accept="image/*" onchange="previewEditorThumbnail(this)"><small>Recommended: 16:9 image</small></div><div class="editor-form-row"><div class="editor-form-group"><label>Course ${number} Video</label><div class="editor-video-row"><label class="editor-video-button">&#9654; Choose Video<input class="editor-video-input" type="file" accept="video/*" onchange="showEditorVideoName(this)"></label><span class="editor-video-name">No video selected</span></div></div><div class="editor-form-group"><label>Lesson Title</label><input type="text" placeholder="e.g. Introduction to the Course"></div><div class="editor-form-group"><label>Description</label><textarea placeholder="Describe what students will learn in this video..."></textarea></div></div></div>`;
+        module.querySelector(".editor-lessons").appendChild(lesson);
+    }
+
+    function deleteEditorLesson(button) { const module = button.closest(".module-editor"); button.closest(".editor-lesson").remove(); renumberEditorLessons(module); }
+
+    function renumberEditorLessons(module) {
+        module.querySelectorAll(".editor-lesson").forEach((lesson, index) => { lesson.querySelector(".editor-lesson-number").textContent = String(index + 1).padStart(2, "0"); });
+        moduleLessonCounts[module.dataset.moduleNumber] = module.querySelectorAll(".editor-lesson").length;
+    }
+
+    function toggleEditorModule(button) { const body = button.closest(".module-editor").querySelector(".module-editor-body"); const collapsed = body.hidden; body.hidden = !collapsed; button.textContent = collapsed ? "-" : "+"; }
+    function previewEditorThumbnail(input) { const box = input.previousElementSibling; const image = document.createElement("img"); image.src = URL.createObjectURL(input.files[0]); box.replaceChildren(image); }
+    function showEditorVideoName(input) { input.closest(".editor-video-row").querySelector(".editor-video-name").textContent = input.files[0]?.name || "No video selected"; }
+    function saveCourse() { alert("Course structure saved successfully!"); }
+    updateModuleCount();
+</script>
+
+<script>
 
     const canvas =
         document.getElementById("buyerChart");
@@ -2317,13 +2408,13 @@
 
         gradient.addColorStop(
             0,
-            "rgba(224, 79, 0, 0.14)"
+            "rgba(249, 199, 165, 0.65)"
         );
 
 
         gradient.addColorStop(
             1,
-            "rgba(224, 79, 0, 0.01)"
+            "rgba(249, 199, 165, 0)"
         );
 
 
@@ -2356,12 +2447,20 @@
 
         ];
 
+        const graphLabels = labels.length
+            ? labels
+            : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+        const graphBuyers = buyers.length
+            ? buyers
+            : [0, 0, 0, 0, 0, 0];
+
 
         /* =================================================
            CHART
         ================================================= */
 
-        new Chart(
+        let buyerChart = new Chart(
             ctx,
             {
 
@@ -2369,27 +2468,39 @@
 
                 data: {
 
-                    labels: labels,
+                    labels: graphLabels,
 
                     datasets: [
 
                         {
 
-                            data: buyers,
+                            data: graphBuyers,
 
                             borderColor:
-                                "#E04F00",
+                                "#EA580C",
 
                             backgroundColor:
                                 gradient,
 
-                            borderWidth: 2,
+                            borderWidth: 4,
+
+                            borderCapStyle: "round",
+
+                            borderJoinStyle: "round",
 
                             fill: true,
 
                             tension: 0.45,
 
-                            pointRadius: 0,
+                            pointBackgroundColor:
+                                "#FFFFFF",
+
+                            pointBorderColor:
+                                "#EA580C",
+
+                            pointBorderWidth: 3,
+
+                            pointRadius: 4,
 
                             pointHoverRadius: 5,
 
@@ -2472,7 +2583,7 @@
 
                         x: {
 
-                            display: false,
+                            display: true,
 
                             grid: {
 
@@ -2485,13 +2596,14 @@
 
                         y: {
 
-                            display: false,
+                            display: true,
 
                             beginAtZero: true,
 
                             grid: {
 
-                                display: false
+                                color: "rgba(152, 162, 179, 0.28)",
+                                borderDash: [5, 5]
 
                             }
 
@@ -2512,6 +2624,27 @@
 
             }
         );
+
+        const rangeSelect = document.getElementById("buyerGrowthRange");
+
+        function updateBuyerGrowthRange(range) {
+            const count = range === "Last 30 days" ? 30 : range === "Last 12 months" ? 12 : 7;
+            const labelsForRange = range === "Last 12 months"
+                ? ["Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May"]
+                : range === "Last 30 days"
+                    ? Array.from({ length: 30 }, (_, index) => String(index + 1))
+                    : ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+            const valuesForRange = count === graphBuyers.length
+                ? graphBuyers
+                : Array(count).fill(0);
+            buyerChart.data.labels = labelsForRange;
+            buyerChart.data.datasets[0].data = valuesForRange;
+            buyerChart.update();
+        }
+
+        if (rangeSelect) {
+            rangeSelect.addEventListener("change", () => updateBuyerGrowthRange(rangeSelect.value));
+        }
 
     }
 
