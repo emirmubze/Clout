@@ -1426,6 +1426,28 @@ function startPayment() {
                     name: '{{ request.user.name|escapejs }}',
                     email: '{{ request.user.email|escapejs }}'
                 },
+                theme: {
+                    color: '#E04F00'
+                },
+                config: {
+                    display: {
+                        blocks: {
+                            payment_methods: {
+                                name: 'Payment Methods',
+                                instruments: [
+                                    { method: 'upi' },
+                                    { method: 'card' },
+                                    { method: 'netbanking' },
+                                    { method: 'wallet' }
+                                ]
+                            }
+                        },
+                        sequence: ['block.payment_methods'],
+                        preferences: {
+                            show_default_blocks: false
+                        }
+                    }
+                },
                 handler: payment => verifyPayment(payment),
                 modal: {
                     ondismiss: resetPaymentButton
