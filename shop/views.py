@@ -869,6 +869,46 @@ def admin_course_delete(
     )
 
 
+@login_required(login_url="login")
+@require_POST
+def admin_modules_save(request):
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+
+    try:
+        payload = json.loads(request.body or "{}")
+        module_items = payload.get("modules", [])
+    except (json.JSONDecodeError, AttributeError):
+        return JsonResponse({"success": False, "message": "Invalid module data."}, status=400)
+
+    course = Course.objects.filter(is_active=True).first()
+    if course is None:
+        course = Course.objects.create(
+            title="My Course",
+            description="",
+            is_active=True,
+        )
+
+    course.modules.all().delete()
+    for order, item in enumerate(module_items, start=1):
+        title = str(item.get("title", "")).strip()
+        if not title:
+            title = f"Module {order}"
+        Module.objects.create(
+            course=course,
+            title=title,
+            description=str(item.get("description", "")).strip(),
+            order=order,
+        )
+
+    return JsonResponse({
+        "success": True,
+        "message": "Course modules saved successfully.",
+        "course_id": course.id,
+        "module_count": len(module_items),
+    })
+
+
 # =========================================================
 # TOGGLE COURSE ACCESS
 # ACCEPT / DENY

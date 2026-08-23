@@ -2376,7 +2376,27 @@
     function toggleEditorModule(button) { const body = button.closest(".module-editor").querySelector(".module-editor-body"); const collapsed = body.hidden; body.hidden = !collapsed; button.textContent = collapsed ? "-" : "+"; }
     function previewEditorThumbnail(input) { const box = input.previousElementSibling; const image = document.createElement("img"); image.src = URL.createObjectURL(input.files[0]); box.replaceChildren(image); }
     function showEditorVideoName(input) { input.closest(".editor-video-row").querySelector(".editor-video-name").textContent = input.files[0]?.name || "No video selected"; }
-    function saveCourse() { alert("Course structure saved successfully!"); }
+    async function saveCourse() {
+        const modules = [...document.querySelectorAll("#modules .module-editor")].map(module => ({
+            title: module.querySelector(".module-title-input").value.trim(),
+            description: module.querySelector("textarea")?.value.trim() || ""
+        }));
+        const token = document.querySelector("input[name='csrfmiddlewaretoken']")?.value || "";
+
+        try {
+            const response = await fetch("{% url 'admin_modules_save' %}", {
+                method: "POST",
+                headers: { "Content-Type": "application/json", "X-CSRFToken": token },
+                credentials: "same-origin",
+                body: JSON.stringify({ modules })
+            });
+            const data = await response.json();
+            if (!response.ok || !data.success) throw new Error(data.message || "Could not save modules.");
+            alert(data.message);
+        } catch (error) {
+            alert(error.message);
+        }
+    }
     updateModuleCount();
 </script>
 

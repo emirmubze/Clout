@@ -88,6 +88,12 @@ urlpatterns = [
         name="admin_course_delete"
     ),
 
+    path(
+        "admin-modules-save/",
+        views.admin_modules_save,
+        name="admin_modules_save"
+    ),
+
     # =====================================================
     # LOGIN
     # =====================================================
