@@ -597,6 +597,64 @@ body {
     text-align: right;
 }
 
+.india-payment-methods {
+    display: none;
+    margin-top: 16px;
+}
+
+.india-payment-methods.visible {
+    display: block;
+}
+
+.payment-method-label {
+    display: block;
+    margin-bottom: 9px;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.payment-method-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.payment-method {
+    min-height: 48px;
+    padding: 7px 5px;
+    border: 1px solid #e1e5ea;
+    border-radius: 9px;
+    background: #fff;
+    color: #374151;
+    cursor: pointer;
+    font: 700 11px "DM Sans", sans-serif;
+    transition: border-color .2s ease, box-shadow .2s ease, color .2s ease;
+}
+
+.payment-method:hover,
+.payment-method.selected {
+    border-color: #E04F00;
+    box-shadow: 0 0 0 2px rgba(224, 79, 0, .12);
+    color: #E04F00;
+}
+
+.india-payment-methods.loading .payment-method {
+    cursor: wait;
+    opacity: .65;
+}
+
+.india-payment-methods.loading .payment-method.selected {
+    opacity: 1;
+}
+
+.payment-method-icon {
+    display: block;
+    margin-bottom: 3px;
+    color: #111827;
+    font-size: 13px;
+}
+
 
 /* =====================================================
    INDIA PAYMENT
@@ -1164,6 +1222,30 @@ body {
 
 </div>
 
+<div class="india-payment-methods" id="indiaPaymentMethods">
+    <span class="payment-method-label">Choose a payment app</span>
+    <div class="payment-method-grid">
+        <button class="payment-method selected" type="button" data-payment-app="upi" onclick="selectPaymentApp(this)">
+            <span class="payment-method-icon">UPI</span>Any UPI app
+        </button>
+        <button class="payment-method" type="button" data-payment-app="google_pay" onclick="selectPaymentApp(this)">
+            <span class="payment-method-icon">GPay</span>Google Pay
+        </button>
+        <button class="payment-method" type="button" data-payment-app="phonepe" onclick="selectPaymentApp(this)">
+            <span class="payment-method-icon">पे</span>PhonePe
+        </button>
+        <button class="payment-method" type="button" data-payment-app="paytm" onclick="selectPaymentApp(this)">
+            <span class="payment-method-icon">pay</span>Paytm
+        </button>
+        <button class="payment-method" type="button" data-payment-app="bhim" onclick="selectPaymentApp(this)">
+            <span class="payment-method-icon">BHIM</span>BHIM
+        </button>
+        <button class="payment-method" type="button" data-payment-app="card" onclick="selectPaymentApp(this)">
+            <span class="payment-method-icon">CARD</span>Cards
+        </button>
+    </div>
+</div>
+
 
 
 <!-- =====================================================
@@ -1239,6 +1321,7 @@ const countries = [{"country":"Afghanistan","code":"AF","currency":"AFN","name":
 let currentCountry = countries.find(c => c.code === "IN") || countries[0];
 let exchangeRates = { USD: 1 };
 let ratesLoaded = false;
+let selectedPaymentApp = 'upi';
 
 const $ = id => document.getElementById(id);
 
@@ -1312,6 +1395,13 @@ function selectCountry(item) {
     closeCurrency();
 }
 
+function selectPaymentApp(button) {
+    document.querySelectorAll('.payment-method').forEach(item => item.classList.remove('selected'));
+    button.classList.add('selected');
+    selectedPaymentApp = button.dataset.paymentApp;
+    if ($('termsCheck')?.checked) startPayment();
+}
+
 function getRate(currency) {
     return currency === 'USD' ? 1 : exchangeRates[currency];
 }
@@ -1364,6 +1454,7 @@ function updateCheckout() {
     $('discountLocal').textContent = '- ' + formatMoney(discount, currentCountry.currency);
     $('taxLocal').textContent = formatMoney(tax, currentCountry.currency);
     $('totalLocal').textContent = formatMoney(total, currentCountry.currency);
+    $('indiaPaymentMethods')?.classList.toggle('visible', currentCountry.code === 'IN');
     updateBuyState(true);
 }
 
@@ -1425,8 +1516,10 @@ function startPayment() {
 
     const total = BASE_TOTAL_USD * rate;
     const button = $('buyBtn');
+    const paymentMethods = $('indiaPaymentMethods');
     button.disabled = true;
     button.textContent = 'Loading...';
+    paymentMethods?.classList.add('loading');
 
     fetch('{% url "create_order" %}', {
         method: 'POST',
@@ -1438,7 +1531,8 @@ function startPayment() {
         body: new URLSearchParams({
             currency: currentCountry.currency,
             amount: total.toFixed(2),
-            country_code: currentCountry.code
+            country_code: currentCountry.code,
+            payment_app: currentCountry.code === 'IN' ? selectedPaymentApp : ''
         })
     })
         .then(response => response.json().then(data => ({ ok: response.ok, data })))
@@ -1449,6 +1543,9 @@ function startPayment() {
                 key: data.key,
                 amount: data.amount,
                 currency: data.currency,
+                ...(currentCountry.code === 'IN' ? {
+                    method: selectedPaymentApp === 'card' ? 'card' : 'upi'
+                } : {}),
                 name: 'Clout',
                 description: 'The AI Income Playbook',
                 order_id: data.order_id,
@@ -1506,6 +1603,7 @@ function resetPaymentButton() {
         button.disabled = false;
         button.textContent = 'Buy now';
     }
+    $('indiaPaymentMethods')?.classList.remove('loading');
 }
 
 function verifyPayment(payment) {
