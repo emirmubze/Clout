@@ -8,6 +8,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <title>THE BAG CODE</title>
 
@@ -1399,21 +1400,95 @@ function startPayment() {
     const rate = getRate(currentCountry.currency);
     if (!$('termsCheck')?.checked || !ratesLoaded || !Number.isFinite(rate) || rate <= 0) return;
 
-    const total = BASE_TOTAL_USD * rate;
-    console.log('Payment:', {
-        base_amount_usd: BASE_TOTAL_USD,
-        country_code: currentCountry.code,
-        currency: currentCountry.currency,
-        converted_amount: total
+    const button = $('buyBtn');
+    button.disabled = true;
+    button.textContent = 'Loading...';
+
+    fetch('{% url "create_order" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken') || '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+        .then(response => response.json().then(data => ({ ok: response.ok, data })))
+        .then(({ ok, data }) => {
+            if (!ok || !data.success) throw new Error(data.message || 'Could not create payment order.');
+
+            const razorpay = new Razorpay({
+                key: data.key,
+                amount: data.amount,
+                currency: data.currency,
+                name: 'Clout',
+                description: 'The AI Income Playbook',
+                order_id: data.order_id,
+                prefill: {
+                    name: '{{ request.user.name|escapejs }}',
+                    email: '{{ request.user.email|escapejs }}'
+                },
+                handler: payment => verifyPayment(payment),
+                modal: {
+                    ondismiss: resetPaymentButton
+                }
+            });
+
+            razorpay.on('payment.failed', event => {
+                alert(event.error?.description || 'Payment failed. Please try again.');
+                resetPaymentButton();
+            });
+            razorpay.open();
+        })
+        .catch(error => {
+            alert(error.message || 'Unable to start payment. Please try again.');
+            resetPaymentButton();
+        });
+}
+
+function getCookie(name) {
+    const cookies = document.cookie ? document.cookie.split(';') : [];
+    for (const cookie of cookies) {
+        const [key, ...value] = cookie.trim().split('=');
+        if (key === name) return decodeURIComponent(value.join('='));
+    }
+    return '';
+}
+
+function resetPaymentButton() {
+    const button = $('buyBtn');
+    if (button) {
+        button.disabled = false;
+        button.textContent = 'Buy now';
+    }
+}
+
+function verifyPayment(payment) {
+    const body = new URLSearchParams({
+        razorpay_order_id: payment.razorpay_order_id,
+        razorpay_payment_id: payment.razorpay_payment_id,
+        razorpay_signature: payment.razorpay_signature
     });
 
-    // Keep your existing Django/Razorpay order creation + verification here.
-    // Never expose a Razorpay secret key in frontend JavaScript.
+    fetch('{% url "verify_payment" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken') || '{{ csrf_token }}',
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body
+    })
+        .then(response => response.json().then(data => ({ ok: response.ok, data })))
+        .then(({ ok, data }) => {
+            if (!ok || !data.success) throw new Error(data.message || 'Payment verification failed.');
+            window.top.location.href = data.redirect_url;
+        })
+        .catch(error => {
+            alert(error.message || 'Payment verification failed.');
+            resetPaymentButton();
+        });
 }
 
 function closeOrder() {
-    const wrapper = document.querySelector('.order-wrapper');
-    if (wrapper) wrapper.style.display = 'none';
     if (window.parent !== window) {
         window.parent.postMessage({ type: 'closeCheckout' }, window.location.origin);
     }

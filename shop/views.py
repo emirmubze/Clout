@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import razorpay
+import uuid
 from smtplib import SMTPException
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -1489,7 +1490,7 @@ def create_order(request):
             "amount": 1882,
             "currency": "USD",
             "receipt":
-                f"clout-{request.user.id}",
+                f"clout-{request.user.id}-{uuid.uuid4().hex[:12]}",
             "payment_capture": 1
         }
     )
