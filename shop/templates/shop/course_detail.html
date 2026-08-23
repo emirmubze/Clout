@@ -1368,6 +1368,7 @@ body {
         const continueBtn = document.getElementById('continueBtn');
         const checkoutTerms = document.getElementById('checkoutTerms');
         const checkoutButton = document.getElementById('checkoutButton');
+        const isAuthenticated = {{ request.user.is_authenticated|yesno:"true,false" }};
 
         function closeCoupon() {
             couponOverlay.classList.remove('is-open');
@@ -1398,11 +1399,19 @@ body {
             document.body.style.overflow = 'hidden';
         }
 
+        function continueToCheckout() {
+            if (!isAuthenticated) {
+                window.location.href = '{% url "login" %}?next={{ request.path|urlencode }}';
+                return;
+            }
+            openCheckout();
+        }
+
         if (continueBtn) {
             continueBtn.addEventListener('click', function (event) {
                 event.preventDefault();
                 closeCoupon();
-                openCheckout();
+                continueToCheckout();
             });
         }
 
@@ -1417,7 +1426,7 @@ body {
 
             if (clickedContinue) {
                 closeCoupon();
-                openCheckout();
+                continueToCheckout();
             }
         }, true);
 
