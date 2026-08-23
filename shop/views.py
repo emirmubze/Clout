@@ -1496,8 +1496,6 @@ def create_order(request):
 
     zero_decimal_currency = currency in {"JPY", "KRW"}
     minor_amount = int(amount if zero_decimal_currency else amount * 100)
-    payment_app = request.POST.get("payment_app", "")
-
     client = razorpay.Client(
         auth=(
             settings.RAZORPAY_KEY_ID,
@@ -1511,11 +1509,7 @@ def create_order(request):
             "currency": currency,
             "receipt":
                 f"clout-{request.user.id}-{uuid.uuid4().hex[:12]}",
-            "payment_capture": 1,
-            "notes": {
-                "country_code": request.POST.get("country_code", ""),
-                "payment_app": payment_app,
-            }
+            "payment_capture": 1
         }
     )
 
