@@ -1,5 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ course.title|default:"Course Player" }}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; background: #f6f5f3; color: #111827; font-family: "DM Sans", sans-serif; }
+.header { height: 70px; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid #e5e5e5; }
+.logo { font-size: 19px; font-weight: 700; }
+.course-progress { display: flex; align-items: center; gap: 10px; color: #6b7280; font-size: 13px; }
+.progress-bar { width: 110px; height: 6px; overflow: hidden; border-radius: 20px; background: #eee; }
+.progress-fill { width: 0; height: 100%; background: #ea580c; transition: width .2s ease; }
+.page { max-width: 1250px; margin: 25px auto; padding: 0 18px; display: grid; grid-template-columns: 1fr 350px; gap: 22px; }
+.video-card { overflow: hidden; border-radius: 13px; background: #111; }
+.video-container { width: 100%; aspect-ratio: 16 / 9; display: flex; align-items: center; justify-content: center; background: #181818; }
+.video-container video { width: 100%; height: 100%; object-fit: contain; }
+.video-placeholder { color: #777; text-align: center; }
+.video-placeholder .play { width: 55px; height: 55px; margin: auto auto 12px; display: flex; align-items: center; justify-content: center; border-radius: 50%; background: #ea580c; color: #fff; font-size: 20px; }
+.video-placeholder p { margin: 0; font-size: 13px; }
+.lesson-info { margin-top: 14px; padding: 20px; border: 1px solid #e1e1e1; border-radius: 12px; background: #fff; }
+.lesson-info .tag { display: inline-block; padding: 5px 9px; border-radius: 5px; background: #fff1e8; color: #ea580c; font-size: 11px; font-weight: 700; }
+.lesson-info h1 { margin: 10px 0 7px; font-size: 22px; }
+.lesson-info p { margin: 0; color: #6b7280; font-size: 14px; line-height: 1.6; }
+.sidebar { height: calc(100vh - 120px); position: sticky; top: 20px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid #dedede; border-radius: 13px; background: #fff; }
+.sidebar-title { padding: 18px; border-bottom: 1px solid #e8e8e8; }
+.sidebar-title h2 { margin: 0 0 4px; font-size: 16px; }
+.sidebar-title span { color: #6b7280; font-size: 12px; }
+.modules { overflow-y: auto; }
+.module { border-bottom: 1px solid #eee; }
+.module-header { padding: 15px 17px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: #fff; }
+.module-header:hover { background: #fafafa; }
+.module-left { min-width: 0; display: flex; align-items: center; gap: 10px; }
+.module-number { min-width: 32px; height: 27px; display: flex; align-items: center; justify-content: center; border-radius: 5px; background: #fff1e8; color: #ea580c; font-size: 10px; font-weight: 700; }
+.module-name { overflow: hidden; font-size: 13px; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.module-arrow { color: #9ca3af; font-size: 13px; transition: transform .2s; }
+.module.open .module-arrow { transform: rotate(180deg); }
+.lessons { display: none; background: #fafafa; }
+.module.open .lessons { display: block; }
+.lesson { min-height: 68px; padding: 9px 12px; display: flex; align-items: center; gap: 10px; border-top: 1px solid #eee; cursor: pointer; }
+.lesson:hover { background: #f3f3f3; }
+.lesson.active { background: #fff3eb; }
+.lesson-thumb { width: 74px; height: 45px; position: relative; flex-shrink: 0; overflow: hidden; border-radius: 6px; background: #e8e8e8; }
+.lesson-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.lesson-play { position: absolute; left: 50%; top: 50%; width: 23px; height: 23px; transform: translate(-50%, -50%); display: flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(0,0,0,.72); color: #fff; font-size: 9px; }
+.lesson-details { min-width: 0; flex: 1; }
+.lesson-title { overflow: hidden; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; font-size: 12px; font-weight: 600; line-height: 1.35; }
+.lesson-duration { margin-top: 4px; color: #9ca3af; font-size: 10px; }
+.lesson-check { color: #16a34a; font-size: 13px; }
+@media (max-width: 850px) { .header { padding: 0 15px; } .page { grid-template-columns: 1fr; margin-top: 12px; } .sidebar { height: auto; position: static; } }
+@media (max-width: 500px) { .course-progress { display: none; } .page { padding: 0 10px; } .lesson-info { padding: 16px; } .lesson-info h1 { font-size: 19px; } }
+</style>
+</head>
+<body>
+<header class="header">
+    <div class="logo">{{ course.title|default:"MY COURSE" }}</div>
+    <div class="course-progress"><span><span id="completedCount">0</span> of <span id="lessonCount">{{ modules|length }}</span> lessons</span><div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div></div>
+</header>
+<main class="page">
+    <section>
+        <div class="video-card">
+            <div class="video-container" id="videoContainer">
+                <div class="video-placeholder"><div class="play">&#9654;</div><p>Select a lesson to start watching</p></div>
+            </div>
+        </div>
+        <div class="lesson-info">
+            <span class="tag" id="lessonLabel">COURSE CONTENT</span>
+            <h1 id="lessonTitle">{{ course.title|default:"Welcome to your course" }}</h1>
+            <p id="lessonDescription">{{ course.description|default:"Select a lesson from the course content to begin." }}</p>
+        </div>
+    </section>
+    <aside class="sidebar">
+        <div class="sidebar-title"><h2>Course Content</h2><span>{{ modules|length }} Lessons</span></div>
+        <div class="modules">
+            {% for module in modules %}
+            <div class="module{% if forloop.first %} open{% endif %}">
+                <div class="module-header" onclick="toggleModule(this)"><div class="module-left"><div class="module-number">{{ forloop.counter|stringformat:'02d' }}</div><div class="module-name">{{ module.title }}</div></div><div class="module-arrow">&#9660;</div></div>
+                <div class="lessons">
+                    <div class="lesson{% if forloop.parentloop.first and forloop.first %} active{% endif %}" data-title="{{ module.title|escapejs }}" data-description="{{ module.description|default:'Select this lesson to begin learning.'|escapejs }}" data-label="LESSON {{ forloop.counter|stringformat:'02d' }}" data-video="{% if module.video %}{{ module.video.url }}{% endif %}" onclick="selectLesson(this)">
+            <div class="lesson-thumb">{% if course.thumbnail %}<img src="{{ course.thumbnail.url }}" alt="">{% endif %}<div class="lesson-play">&#9654;</div></div>
+            <div class="lesson-details"><div class="lesson-title">{{ module.title }}</div><div class="lesson-duration">Lesson {{ forloop.counter }}</div></div>
+            <div class="lesson-check" aria-label="Completed">&#10003;</div>
+                    </div>
+                </div>
+            </div>
+    {% empty %}
+    <div class="lesson"><div class="lesson-details"><div class="lesson-title">No lessons available yet.</div></div></div>
+    {% endfor %}
+        </div>
+    </aside>
+</main>
+<script>
+function toggleModule(header) { header.closest(".module").classList.toggle("open"); }
+
+function selectLesson(lesson) {
+    document.querySelectorAll(".lesson").forEach(item => item.classList.remove("active"));
+    lesson.classList.add("active");
+    document.getElementById("lessonTitle").textContent = lesson.dataset.title;
+    document.getElementById("lessonDescription").textContent = lesson.dataset.description;
+    document.getElementById("lessonLabel").textContent = lesson.dataset.label;
+    const container = document.getElementById("videoContainer");
+    if (lesson.dataset.video) {
+        container.innerHTML = `<video controls autoplay src="${lesson.dataset.video}"></video>`;
+    } else {
+        container.innerHTML = '<div class="video-placeholder"><div class="play">&#9654;</div><p>Video is not available for this lesson</p></div>';
+    }
+    document.getElementById("completedCount").textContent = [...document.querySelectorAll(".lesson.active")].length;
+    const total = document.querySelectorAll(".lesson[data-title]").length;
+    document.getElementById("progressFill").style.width = total ? (100 / total) + "%" : "0%";
+    if (window.innerWidth <= 850) container.closest(".video-card").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+const firstLesson = document.querySelector(".lesson[data-title]");
+if (firstLesson) selectLesson(firstLesson);
+</script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
 
