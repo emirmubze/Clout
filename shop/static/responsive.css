@@ -37,9 +37,8 @@ a {
 }
 
 table {
-    display: block;
-    max-width: 100%;
-    overflow-x: auto;
+    display: table;
+    max-width: none;
 }
 
 footer {
