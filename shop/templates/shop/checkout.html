@@ -1372,6 +1372,29 @@ function checkTerms() {
     updateBuyState(ratesLoaded && Number.isFinite(rate) && rate > 0);
 }
 
+function getPaymentInstruments(country) {
+    if (country.code === 'IN') {
+        return [
+            { method: 'upi' },
+            { method: 'card' },
+            { method: 'netbanking' },
+            { method: 'wallet' }
+        ];
+    }
+
+    if (country.code === 'US') {
+        return [
+            { method: 'card' },
+            { method: 'wallet' }
+        ];
+    }
+
+    return [
+        { method: 'card' },
+        { method: 'wallet' }
+    ];
+}
+
 async function loadExchangeRates() {
     try {
         const response = await fetch('https://open.er-api.com/v6/latest/USD', {
@@ -1400,6 +1423,7 @@ function startPayment() {
     const rate = getRate(currentCountry.currency);
     if (!$('termsCheck')?.checked || !ratesLoaded || !Number.isFinite(rate) || rate <= 0) return;
 
+    const total = BASE_TOTAL_USD * rate;
     const button = $('buyBtn');
     button.disabled = true;
     button.textContent = 'Loading...';
@@ -1408,8 +1432,14 @@ function startPayment() {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCookie('csrftoken') || '{{ csrf_token }}',
-            'X-Requested-With': 'XMLHttpRequest'
-        }
+            'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+            currency: currentCountry.currency,
+            amount: total.toFixed(2),
+            country_code: currentCountry.code
+        })
     })
         .then(response => response.json().then(data => ({ ok: response.ok, data })))
         .then(({ ok, data }) => {
@@ -1434,12 +1464,7 @@ function startPayment() {
                         blocks: {
                             payment_methods: {
                                 name: 'Payment Methods',
-                                instruments: [
-                                    { method: 'upi' },
-                                    { method: 'card' },
-                                    { method: 'netbanking' },
-                                    { method: 'wallet' }
-                                ]
+                                instruments: getPaymentInstruments(currentCountry)
                             }
                         },
                         sequence: ['block.payment_methods'],

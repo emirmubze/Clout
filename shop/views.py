@@ -3,6 +3,7 @@ import logging
 import os
 import razorpay
 import uuid
+from decimal import Decimal, InvalidOperation
 from smtplib import SMTPException
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
@@ -1478,6 +1479,24 @@ def create_order(request):
             status=500
         )
 
+    currency = request.POST.get("currency", "USD").upper()
+    try:
+        amount = Decimal(request.POST.get("amount", "18.82")).quantize(Decimal("0.01"))
+    except (InvalidOperation, TypeError):
+        return JsonResponse(
+            {"success": False, "message": "Invalid payment amount."},
+            status=400,
+        )
+
+    if len(currency) != 3 or amount <= 0:
+        return JsonResponse(
+            {"success": False, "message": "Invalid payment currency or amount."},
+            status=400,
+        )
+
+    zero_decimal_currency = currency in {"JPY", "KRW"}
+    minor_amount = int(amount if zero_decimal_currency else amount * 100)
+
     client = razorpay.Client(
         auth=(
             settings.RAZORPAY_KEY_ID,
@@ -1487,8 +1506,8 @@ def create_order(request):
 
     rp = client.order.create(
         {
-            "amount": 1882,
-            "currency": "USD",
+            "amount": minor_amount,
+            "currency": currency,
             "receipt":
                 f"clout-{request.user.id}-{uuid.uuid4().hex[:12]}",
             "payment_capture": 1
@@ -1499,8 +1518,8 @@ def create_order(request):
         user=request.user,
         product_name=
             "The AI Income Playbook",
-        amount=18.82,
-        currency="USD",
+        amount=amount,
+        currency=currency,
         razorpay_order_id=
             rp["id"]
     )
@@ -1513,9 +1532,9 @@ def create_order(request):
             "order_id":
                 rp["id"],
             "amount":
-                1882,
+                minor_amount,
             "currency":
-                "USD"
+                currency
         }
     )
 
