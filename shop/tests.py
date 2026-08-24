@@ -97,6 +97,26 @@ class UserAuthAndDashboardTests(TestCase):
         self.assertTrue(response.wsgi_request.user.is_authenticated)
         self.assertEqual(response.wsgi_request.user, user)
 
+    def test_superuser_login_returns_to_admin_dashboard(self):
+        user = CustomUser.objects.create_superuser(
+            username="superuser",
+            email="superuser@example.com",
+            password="VeryStrongPass123!",
+        )
+
+        response = self.client.post(
+            reverse("login"),
+            {"username": "superuser", "password": "VeryStrongPass123!"},
+        )
+
+        self.assertRedirects(response, reverse("admin_dashboard"))
+        self.assertEqual(self.client.get(reverse("admin_dashboard")).status_code, 200)
+
+    def test_admin_login_uses_shared_login_page(self):
+        response = self.client.get("/admin/login/?next=/admin/")
+
+        self.assertRedirects(response, "/login/?next=%2Fadmin%2F")
+
     def test_login_trims_username_input(self):
         user = CustomUser.objects.create_superuser(
             username="adminuser",

@@ -84,6 +84,12 @@ def revoke_user_sessions(user, keep_session_key=None):
 
 class SingleDeviceLoginView(LoginView):
 
+    def get_success_url(self):
+        if self.request.user.is_staff:
+            return reverse("admin_dashboard")
+
+        return super().get_success_url()
+
     def form_valid(self, form):
         response = super().form_valid(form)
 
