@@ -21,10 +21,10 @@ services:
           property: connectionString
 
       - key: ALLOWED_HOSTS
-        value: clout.onrender.com
+        value: clout.onrender.com,clout.courses,www.clout.courses
 
       - key: CSRF_TRUSTED_ORIGINS
-        value: https://clout.onrender.com
+        value: https://clout.onrender.com,https://clout.courses,https://www.clout.courses
 
       - key: ADMIN_USERNAME
         sync: false
