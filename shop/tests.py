@@ -4,7 +4,6 @@ from smtplib import SMTPException
 
 from django.core import mail
 from django.core.management import call_command
-from django.core.management.base import CommandError
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
@@ -21,8 +20,8 @@ class UserAuthAndDashboardTests(TestCase):
         },
     )
     def test_ensure_admin_requires_credentials(self):
-        with self.assertRaisesMessage(CommandError, "ADMIN_USERNAME, ADMIN_EMAIL"):
-            call_command("ensure_admin")
+        call_command("ensure_admin")
+        self.assertFalse(CustomUser.objects.filter(is_superuser=True).exists())
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_forgot_password_sends_reset_email(self):

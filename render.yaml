@@ -3,7 +3,7 @@ services:
     name: clout
     runtime: python
     buildCommand: bash build.sh
-    startCommand: python manage.py ensure_admin && gunicorn clout.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
+    startCommand: gunicorn clout.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
 
     envVars:
       - key: PYTHON_VERSION

@@ -1,7 +1,6 @@
 import os
 
 from django.core.management.base import BaseCommand
-from django.core.management.base import CommandError
 
 from shop.models import CustomUser
 
@@ -15,9 +14,9 @@ class Command(BaseCommand):
         password = os.getenv("ADMIN_PASSWORD", "")
 
         if not username or not email or not password:
-            raise CommandError(
-                "Admin provisioning requires ADMIN_USERNAME, ADMIN_EMAIL, "
-                "and ADMIN_PASSWORD. Set all three environment variables."
+            self.stdout.write(
+                "Skipping admin provisioning: ADMIN_USERNAME, ADMIN_EMAIL, "
+                "and ADMIN_PASSWORD are required."
             )
             return
 
