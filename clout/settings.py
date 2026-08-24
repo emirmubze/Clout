@@ -42,6 +42,10 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+for host in ("clout.onrender.com", "clout.courses", "www.clout.courses"):
+    if host not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(host)
+
 
 # =========================================================
 # CSRF TRUSTED ORIGINS
@@ -55,6 +59,14 @@ CSRF_TRUSTED_ORIGINS = [
     ).split(",")
     if origin.strip()
 ]
+
+for origin in (
+    "https://clout.onrender.com",
+    "https://clout.courses",
+    "https://www.clout.courses",
+):
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
 
 
 # =========================================================
