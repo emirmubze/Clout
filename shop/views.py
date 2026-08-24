@@ -17,7 +17,9 @@ from django.core.mail import send_mail
 from django.contrib.sessions.models import Session
 from django.db import transaction
 from django.db.models import Q
-from django.http import FileResponse, Http404, JsonResponse
+import mimetypes
+
+from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
@@ -1321,14 +1323,33 @@ def serve_inline_video(
             "Video not found."
         )
 
-    file_obj = file_field.open(
-        "rb"
-    )
+    file_path = file_field.path
+    file_size = file_field.size
+    content_type = mimetypes.guess_type(file_path)[0] or "video/mp4"
+    range_header = request.headers.get("Range")
 
-    response = FileResponse(
-        file_obj,
-        content_type="video/mp4"
-    )
+    if range_header and range_header.startswith("bytes="):
+        range_value = range_header.replace("bytes=", "", 1).split(",", 1)[0]
+        start_text, _, end_text = range_value.partition("-")
+        start = int(start_text or 0)
+        end = int(end_text or file_size - 1)
+        end = min(end, file_size - 1)
+
+        if start >= file_size or start > end:
+            return HttpResponse(status=416, headers={"Content-Range": f"bytes */{file_size}"})
+
+        length = end - start + 1
+        file_obj = file_field.open("rb")
+        file_obj.seek(start)
+        response = FileResponse(file_obj, status=206, content_type=content_type)
+        response["Content-Range"] = f"bytes {start}-{end}/{file_size}"
+        response["Content-Length"] = str(length)
+    else:
+        file_obj = file_field.open("rb")
+        response = FileResponse(file_obj, content_type=content_type)
+        response["Content-Length"] = str(file_size)
+
+    response["Accept-Ranges"] = "bytes"
 
     response[
         "Content-Disposition"

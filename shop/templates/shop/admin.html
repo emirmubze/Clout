@@ -2428,7 +2428,10 @@
         try {
             const response = await fetch("{% url 'admin_modules_save' %}", {
                 method: "POST",
-                headers: { "X-CSRFToken": token },
+                headers: {
+                    "X-CSRFToken": token,
+                    "X-Requested-With": "XMLHttpRequest"
+                },
                 credentials: "same-origin",
                 body: formData
             });
@@ -2441,9 +2444,9 @@
                     : "The server returned an invalid response. Try again.");
             }
             if (!response.ok || !data.success) throw new Error(data.message || "Could not save modules.");
-            alert(data.message);
+            alert(data.message || "Modules and lessons saved successfully.");
         } catch (error) {
-            alert(error.message);
+            alert(error.message || "Could not save modules and lessons.");
         }
     }
     updateModuleCount();
