@@ -15,6 +15,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.contrib.sessions.models import Session
+from django.db import transaction
 from django.db.models import Q
 from django.http import FileResponse, Http404, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
@@ -928,38 +929,45 @@ def admin_modules_save(request):
             is_active=True,
         )
 
-    existing_modules = list(course.modules.all())
-    for module in existing_modules:
-        module.lessons.all().delete()
-    course.modules.all().delete()
+    try:
+        with transaction.atomic():
+            existing_modules = list(course.modules.all())
+            for module in existing_modules:
+                module.lessons.all().delete()
+            course.modules.all().delete()
 
-    for order, item in enumerate(module_items, start=1):
-        title = str(item.get("title", "")).strip()
-        if not title:
-            title = f"Module {order}"
+            for order, item in enumerate(module_items, start=1):
+                title = str(item.get("title", "")).strip()
+                if not title:
+                    title = f"Module {order}"
 
-        module_obj = Module.objects.create(
-            course=course,
-            title=title,
-            description=str(item.get("description", "")).strip(),
-            video=item.get("video") if isinstance(item, dict) and item.get("video") else None,
-            order=order,
+                module_obj = Module.objects.create(
+                    course=course,
+                    title=title,
+                    description=str(item.get("description", "")).strip(),
+                    video=item.get("video") if isinstance(item, dict) and item.get("video") else None,
+                    order=order,
+                )
+
+                lessons = item.get("lessons") if isinstance(item, dict) else []
+                for lesson_order, lesson_item in enumerate(lessons, start=1):
+                    lesson_title = str(lesson_item.get("title", "")).strip() if isinstance(lesson_item, dict) else ""
+                    if not lesson_title:
+                        lesson_title = f"Lesson {lesson_order}"
+
+                    Lesson.objects.create(
+                        module=module_obj,
+                        title=lesson_title,
+                        description=str(lesson_item.get("description", "")).strip() if isinstance(lesson_item, dict) else "",
+                        video=lesson_item.get("video") if isinstance(lesson_item, dict) and lesson_item.get("video") else None,
+                        thumbnail=lesson_item.get("thumbnail") if isinstance(lesson_item, dict) and lesson_item.get("thumbnail") else None,
+                        order=lesson_order,
+                    )
+    except (TypeError, ValueError, OSError):
+        return JsonResponse(
+            {"success": False, "message": "Could not save the modules and lessons."},
+            status=400,
         )
-
-        lessons = item.get("lessons") if isinstance(item, dict) else []
-        for lesson_order, lesson_item in enumerate(lessons, start=1):
-            lesson_title = str(lesson_item.get("title", "")).strip() if isinstance(lesson_item, dict) else ""
-            if not lesson_title:
-                lesson_title = f"Lesson {lesson_order}"
-
-            Lesson.objects.create(
-                module=module_obj,
-                title=lesson_title,
-                description=str(lesson_item.get("description", "")).strip() if isinstance(lesson_item, dict) else "",
-                video=lesson_item.get("video") if isinstance(lesson_item, dict) and lesson_item.get("video") else None,
-                thumbnail=lesson_item.get("thumbnail") if isinstance(lesson_item, dict) and lesson_item.get("thumbnail") else None,
-                order=lesson_order,
-            )
 
     return JsonResponse({
         "success": True,
