@@ -2324,8 +2324,28 @@
 ></script>
 
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
     let moduleLessonCounts = {};
+    const supabaseUrl = "{{ supabase_url|escapejs }}";
+    const supabaseAnonKey = "{{ supabase_anon_key|escapejs }}";
+    const supabaseBucket = "{{ supabase_bucket|escapejs }}";
+    const supabaseClient = supabaseUrl && supabaseAnonKey && window.supabase
+        ? window.supabase.createClient(supabaseUrl, supabaseAnonKey)
+        : null;
+
+    async function uploadEditorFile(file, folder) {
+        if (!supabaseClient) {
+            throw new Error("Supabase upload is not configured.");
+        }
+        const extension = file.name.includes(".") ? file.name.split(".").pop() : "bin";
+        const safeName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9-_]/g, "-").toLowerCase();
+        const filePath = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 9)}-${safeName}.${extension}`;
+        const { error } = await supabaseClient.storage.from(supabaseBucket).upload(filePath, file, { cacheControl: "3600", upsert: false });
+        if (error) throw error;
+        return filePath;
+    }
 
     function addModule(moduleData = null) {
         const module = document.createElement("div");
@@ -2415,7 +2435,7 @@
             formData.append(`module_id_${moduleIndex}`, module.dataset.moduleId || "");
             formData.append(`module_title_${moduleIndex}`, moduleTitle || `Module ${moduleIndex + 1}`);
             if (moduleVideoInput && moduleVideoInput.files && moduleVideoInput.files[0]) {
-                formData.append(`module_video_${moduleIndex}`, moduleVideoInput.files[0], moduleVideoInput.files[0].name);
+                module.fileToUpload = moduleVideoInput.files[0];
             }
 
             const lessonEditors = [...module.querySelectorAll(".editor-lesson")];
@@ -2434,17 +2454,26 @@
                 formData.append(`module_${moduleIndex}_lesson_title_${lessonIndex}`, lessonTitle || `Lesson ${lessonIndex + 1}`);
                 formData.append(`module_${moduleIndex}_lesson_description_${lessonIndex}`, lessonDescription || "");
 
-                if (lessonVideoInput && lessonVideoInput.files && lessonVideoInput.files[0]) {
-                    formData.append(`module_${moduleIndex}_lesson_video_${lessonIndex}`, lessonVideoInput.files[0], lessonVideoInput.files[0].name);
-                }
-
-                if (lessonThumbnailInput && lessonThumbnailInput.files && lessonThumbnailInput.files[0]) {
-                    formData.append(`module_${moduleIndex}_lesson_thumbnail_${lessonIndex}`, lessonThumbnailInput.files[0], lessonThumbnailInput.files[0].name);
-                }
+                lesson.fileToUpload = lessonVideoInput?.files?.[0] || null;
+                lesson.thumbnailToUpload = lessonThumbnailInput?.files?.[0] || null;
             });
         });
 
         try {
+            for (const [moduleIndex, module] of moduleEditors.entries()) {
+                if (module.fileToUpload) {
+                    formData.append(`module_video_path_${moduleIndex}`, await uploadEditorFile(module.fileToUpload, "videos"));
+                }
+                const lessons = [...module.querySelectorAll(".editor-lesson")];
+                for (const [lessonIndex, lesson] of lessons.entries()) {
+                    if (lesson.fileToUpload) {
+                        formData.append(`module_${moduleIndex}_lesson_video_path_${lessonIndex}`, await uploadEditorFile(lesson.fileToUpload, "videos"));
+                    }
+                    if (lesson.thumbnailToUpload) {
+                        formData.append(`module_${moduleIndex}_lesson_thumbnail_path_${lessonIndex}`, await uploadEditorFile(lesson.thumbnailToUpload, "thumbnails"));
+                    }
+                }
+            }
             const response = await fetch("{% url 'admin_modules_save' %}", {
                 method: "POST",
                 headers: {

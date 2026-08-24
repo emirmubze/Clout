@@ -642,6 +642,9 @@ def admin_dashboard(request):
             "course_form": course_form,
             "editing_course": editing_course,
             "current_admin": request.user,
+            "supabase_url": settings.SUPABASE_URL,
+            "supabase_anon_key": settings.SUPABASE_ANON_KEY,
+            "supabase_bucket": settings.SUPABASE_STORAGE_BUCKET,
             "chat_users": contact_users,
             "selected_user": selected_user,
             "chat_messages": chat_messages,
@@ -948,7 +951,7 @@ def _admin_modules_save_impl(request):
             module_id = request.POST.get(f"module_id_{index}")
             title = (request.POST.get(f"module_title_{index}") or "").strip() or f"Module {index + 1}"
             description = (request.POST.get(f"module_description_{index}") or "").strip()
-            video_file = request.FILES.get(f"module_video_{index}")
+            video_file = request.FILES.get(f"module_video_{index}") or request.POST.get(f"module_video_path_{index}") or None
             lesson_count = 0
             try:
                 lesson_count = int(request.POST.get(f"module_lesson_count_{index}", "0"))
@@ -960,8 +963,8 @@ def _admin_modules_save_impl(request):
                 lesson_id = request.POST.get(f"module_{index}_lesson_id_{lesson_index}")
                 lesson_title = (request.POST.get(f"module_{index}_lesson_title_{lesson_index}") or "").strip() or f"Lesson {lesson_index + 1}"
                 lesson_description = (request.POST.get(f"module_{index}_lesson_description_{lesson_index}") or "").strip()
-                lesson_video = request.FILES.get(f"module_{index}_lesson_video_{lesson_index}")
-                lesson_thumbnail = request.FILES.get(f"module_{index}_lesson_thumbnail_{lesson_index}")
+                lesson_video = request.FILES.get(f"module_{index}_lesson_video_{lesson_index}") or request.POST.get(f"module_{index}_lesson_video_path_{lesson_index}") or None
+                lesson_thumbnail = request.FILES.get(f"module_{index}_lesson_thumbnail_{lesson_index}") or request.POST.get(f"module_{index}_lesson_thumbnail_path_{lesson_index}") or None
                 lessons.append({
                     "id": lesson_id,
                     "title": lesson_title,
