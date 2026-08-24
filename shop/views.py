@@ -1697,22 +1697,32 @@ def create_order(request):
 
     zero_decimal_currency = currency in {"JPY", "KRW"}
     minor_amount = int(amount if zero_decimal_currency else amount * 100)
-    client = razorpay.Client(
-        auth=(
-            settings.RAZORPAY_KEY_ID,
-            settings.RAZORPAY_KEY_SECRET
+    try:
+        client = razorpay.Client(
+            auth=(
+                settings.RAZORPAY_KEY_ID,
+                settings.RAZORPAY_KEY_SECRET
+            )
         )
-    )
 
-    rp = client.order.create(
-        {
-            "amount": minor_amount,
-            "currency": currency,
-            "receipt":
-                f"clout-{request.user.id}-{uuid.uuid4().hex[:12]}",
-            "payment_capture": 1
-        }
-    )
+        rp = client.order.create(
+            {
+                "amount": minor_amount,
+                "currency": currency,
+                "receipt":
+                    f"clout-{request.user.id}-{uuid.uuid4().hex[:12]}",
+                "payment_capture": 1
+            }
+        )
+    except Exception:
+        logger.exception("Razorpay order creation failed")
+        return JsonResponse(
+            {
+                "success": False,
+                "message": "Razorpay could not create the payment order. Check the live API keys and currency settings."
+            },
+            status=502,
+        )
 
     Order.objects.create(
         user=request.user,
