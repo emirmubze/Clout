@@ -645,6 +645,7 @@ def admin_dashboard(request):
             "supabase_url": settings.SUPABASE_URL,
             "supabase_anon_key": settings.SUPABASE_ANON_KEY,
             "supabase_bucket": settings.SUPABASE_STORAGE_BUCKET,
+            "supabase_storage_bucket": settings.SUPABASE_STORAGE_BUCKET,
             "chat_users": contact_users,
             "selected_user": selected_user,
             "chat_messages": chat_messages,

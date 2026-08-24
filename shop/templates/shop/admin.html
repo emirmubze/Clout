@@ -2330,7 +2330,7 @@
     let moduleLessonCounts = {};
     const supabaseUrl = "{{ supabase_url|escapejs }}";
     const supabaseAnonKey = "{{ supabase_anon_key|escapejs }}";
-    const supabaseBucket = "{{ supabase_bucket|escapejs }}";
+    const supabaseBucket = "{{ supabase_storage_bucket|escapejs }}";
     window.cloutSupabaseClient = supabaseUrl && supabaseAnonKey && window.supabase
         ? window.supabase.createClient(supabaseUrl, supabaseAnonKey)
         : null;
