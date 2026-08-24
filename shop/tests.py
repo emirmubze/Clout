@@ -97,6 +97,23 @@ class UserAuthAndDashboardTests(TestCase):
         self.assertTrue(response.wsgi_request.user.is_authenticated)
         self.assertEqual(response.wsgi_request.user, user)
 
+    def test_login_trims_username_input(self):
+        user = CustomUser.objects.create_superuser(
+            username="adminuser",
+            email="admin@example.com",
+            password="VeryStrongPass123!",
+        )
+
+        response = self.client.post(
+            reverse("login"),
+            {"username": "  adminuser  ", "password": "VeryStrongPass123!"},
+            follow=True,
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.wsgi_request.user.is_authenticated)
+        self.assertEqual(response.wsgi_request.user, user)
+
     def test_login_shows_error_for_invalid_credentials(self):
         CustomUser.objects.create_user(
             username="aliceuser",
