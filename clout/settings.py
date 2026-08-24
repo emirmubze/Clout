@@ -232,31 +232,39 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
 
-MEDIA_ROOT = BASE_DIR / "media"
-
 USE_S3 = os.getenv("USE_S3", "False").lower() == "true"
 
 if USE_S3:
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "")
-    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "")
-    AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME", "")
-    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "") or None
-    AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL", "") or None
-    AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_S3_CUSTOM_DOMAIN", "") or None
-    AWS_QUERYSTRING_AUTH = True
-    AWS_DEFAULT_ACL = None
+    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
+    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "us-east-1")
+    AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
+
     AWS_S3_FILE_OVERWRITE = False
-    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
+    AWS_DEFAULT_ACL = None
+    AWS_QUERYSTRING_AUTH = False
 
     STORAGES = {
         "default": {
             "BACKEND": "storages.backends.s3.S3Storage",
+            "OPTIONS": {
+                "access_key": AWS_ACCESS_KEY_ID,
+                "secret_key": AWS_SECRET_ACCESS_KEY,
+                "bucket_name": AWS_STORAGE_BUCKET_NAME,
+                "endpoint_url": AWS_S3_ENDPOINT_URL,
+                "region_name": AWS_S3_REGION_NAME,
+                "file_overwrite": False,
+                "querystring_auth": False,
+            },
         },
         "staticfiles": {
             "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
 else:
+    MEDIA_ROOT = BASE_DIR / "media"
+
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
