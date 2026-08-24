@@ -1409,7 +1409,7 @@ def serve_media_file(
             file_path,
             "rb"
         ),
-        content_type="application/octet-stream"
+        content_type=mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
     )
 
     response[
