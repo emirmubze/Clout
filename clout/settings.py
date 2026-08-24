@@ -37,7 +37,7 @@ ALLOWED_HOSTS = [
     host.strip()
     for host in os.getenv(
         "ALLOWED_HOSTS",
-        "127.0.0.1,localhost"
+        "127.0.0.1,localhost,clout.onrender.com,clout.courses,www.clout.courses"
     ).split(",")
     if host.strip()
 ]
@@ -55,7 +55,7 @@ CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.getenv(
         "CSRF_TRUSTED_ORIGINS",
-        ""
+        "https://clout.onrender.com,https://clout.courses,https://www.clout.courses"
     ).split(",")
     if origin.strip()
 ]
