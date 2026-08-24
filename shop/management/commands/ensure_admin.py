@@ -1,6 +1,6 @@
 import os
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from shop.models import CustomUser
 
@@ -20,25 +20,31 @@ class Command(BaseCommand):
             )
             return
 
-        user, created = CustomUser.objects.get_or_create(
-            username=username,
-            defaults={"email": email},
-        )
+        user = CustomUser.objects.filter(username=username).first()
+        if user is None:
+            user = CustomUser.objects.filter(email__iexact=email).first()
+
+        created = user is None
+        if created:
+            user = CustomUser(username=username, email=email)
 
         user.email = email
         user.is_active = True
         user.is_staff = True
         user.is_superuser = True
         user.set_password(password)
-        user.save(
-            update_fields=[
-                "email",
-                "is_active",
-                "is_staff",
-                "is_superuser",
-                "password",
-            ]
-        )
+        if created:
+            user.save()
+        else:
+            user.save(
+                update_fields=[
+                    "email",
+                    "is_active",
+                    "is_staff",
+                    "is_superuser",
+                    "password",
+                ]
+            )
 
         action = "Created" if created else "Repaired"
         self.stdout.write(self.style.SUCCESS(f"{action} admin account: {username}"))
