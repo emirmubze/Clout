@@ -21,7 +21,7 @@ class Command(BaseCommand):
             )
             return
 
-        user = CustomUser.objects.filter(username=username).first()
+        user = CustomUser.objects.filter(username__iexact=username).first()
         if user is None:
             user = CustomUser.objects.filter(email__iexact=email).first()
 
@@ -29,6 +29,7 @@ class Command(BaseCommand):
         if created:
             user = CustomUser(username=username, email=email)
 
+        user.username = username
         user.email = email
         user.is_active = True
         user.is_staff = True
@@ -39,6 +40,7 @@ class Command(BaseCommand):
         else:
             user.save(
                 update_fields=[
+                    "username",
                     "email",
                     "is_active",
                     "is_staff",
