@@ -642,6 +642,7 @@
                 method="POST"
             >
                 {% csrf_token %}
+                <input type="hidden" name="next" value="{{ next }}">
 
                 {% if form.non_field_errors %}
                     <div class="form-error" role="alert">
