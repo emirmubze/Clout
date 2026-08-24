@@ -2331,18 +2331,18 @@
     const supabaseUrl = "{{ supabase_url|escapejs }}";
     const supabaseAnonKey = "{{ supabase_anon_key|escapejs }}";
     const supabaseBucket = "{{ supabase_bucket|escapejs }}";
-    const supabaseClient = supabaseUrl && supabaseAnonKey && window.supabase
+    window.cloutSupabaseClient = supabaseUrl && supabaseAnonKey && window.supabase
         ? window.supabase.createClient(supabaseUrl, supabaseAnonKey)
         : null;
 
     async function uploadEditorFile(file, folder) {
-        if (!supabaseClient) {
+        if (!window.cloutSupabaseClient) {
             throw new Error("Supabase upload is not configured.");
         }
         const extension = file.name.includes(".") ? file.name.split(".").pop() : "bin";
         const safeName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9-_]/g, "-").toLowerCase();
         const filePath = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 9)}-${safeName}.${extension}`;
-        const { error } = await supabaseClient.storage.from(supabaseBucket).upload(filePath, file, { cacheControl: "3600", upsert: false });
+        const { error } = await window.cloutSupabaseClient.storage.from(supabaseBucket).upload(filePath, file, { cacheControl: "3600", upsert: false });
         if (error) throw error;
         return filePath;
     }
