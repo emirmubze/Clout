@@ -34,17 +34,12 @@ DEBUG = os.getenv(
 # =========================================================
 
 ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv(
-        "ALLOWED_HOSTS",
-        "127.0.0.1,localhost,clout.onrender.com,clout.courses,www.clout.courses"
-    ).split(",")
-    if host.strip()
+    "clout.courses",
+    "www.clout.courses",
+    ".onrender.com",
+    "localhost",
+    "127.0.0.1",
 ]
-
-for host in ("clout.onrender.com", "clout.courses", "www.clout.courses"):
-    if host not in ALLOWED_HOSTS:
-        ALLOWED_HOSTS.append(host)
 
 
 # =========================================================
@@ -52,21 +47,9 @@ for host in ("clout.onrender.com", "clout.courses", "www.clout.courses"):
 # =========================================================
 
 CSRF_TRUSTED_ORIGINS = [
-    origin.strip()
-    for origin in os.getenv(
-        "CSRF_TRUSTED_ORIGINS",
-        "https://clout.onrender.com,https://clout.courses,https://www.clout.courses"
-    ).split(",")
-    if origin.strip()
-]
-
-for origin in (
-    "https://clout.onrender.com",
     "https://clout.courses",
     "https://www.clout.courses",
-):
-    if origin not in CSRF_TRUSTED_ORIGINS:
-        CSRF_TRUSTED_ORIGINS.append(origin)
+]
 
 
 # =========================================================
