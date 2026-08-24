@@ -94,6 +94,12 @@ urlpatterns = [
         name="admin_modules_save"
     ),
 
+    path(
+        "lesson-video/<int:lesson_id>/",
+        views.serve_lesson_video,
+        name="serve_lesson_video"
+    ),
+
     # =====================================================
     # LOGIN
     # =====================================================

@@ -99,6 +99,23 @@ class Module(models.Model):
         return f"{self.course.title} - {self.title}"
 
 
+class Lesson(models.Model):
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="lessons")
+    title = models.CharField(max_length=200)
+    description = models.TextField(blank=True, default="")
+    video = models.FileField(upload_to="course_videos/", null=True, blank=True)
+    thumbnail = models.ImageField(upload_to="lesson_thumbnails/", null=True, blank=True)
+    order = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["order"]
+
+    def __str__(self):
+        return f"{self.module.course.title} - {self.module.title} - {self.title}"
+
+
 class Order(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     product_name = models.CharField(max_length=200, default="The AI Income Playbook")

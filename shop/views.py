@@ -24,7 +24,7 @@ from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.http import require_POST
 from django.urls import reverse, reverse_lazy
 
-from .models import Order, CustomUser, ContactMessage, Course, Module
+from .models import Order, CustomUser, ContactMessage, Course, Module, Lesson
 from .forms import RegistrationForm, CourseForm
 
 
@@ -284,7 +284,7 @@ def course(request):
         if course_obj:
             modules = Module.objects.filter(
                 course=course_obj
-            ).order_by("order")
+            ).prefetch_related("lessons").order_by("order")
 
         return render(
             request,
@@ -309,7 +309,7 @@ def course(request):
             if course_obj:
                 modules = Module.objects.filter(
                     course=course_obj
-                ).order_by("order")
+                ).prefetch_related("lessons").order_by("order")
 
             return render(
                 request,
@@ -875,11 +875,50 @@ def admin_modules_save(request):
     if not request.user.is_staff:
         return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
 
+    module_items = []
+    module_count = request.POST.get("module_count", "0")
+
     try:
-        payload = json.loads(request.body or "{}")
-        module_items = payload.get("modules", [])
-    except (json.JSONDecodeError, AttributeError):
-        return JsonResponse({"success": False, "message": "Invalid module data."}, status=400)
+        module_count = int(module_count)
+    except (TypeError, ValueError):
+        module_count = 0
+
+    if request.content_type and "multipart/form-data" in request.content_type:
+        for index in range(module_count):
+            title = (request.POST.get(f"module_title_{index}") or "").strip() or f"Module {index + 1}"
+            description = (request.POST.get(f"module_description_{index}") or "").strip()
+            video_file = request.FILES.get(f"module_video_{index}")
+            lesson_count = 0
+            try:
+                lesson_count = int(request.POST.get(f"module_lesson_count_{index}", "0"))
+            except (TypeError, ValueError):
+                lesson_count = 0
+
+            lessons = []
+            for lesson_index in range(lesson_count):
+                lesson_title = (request.POST.get(f"module_{index}_lesson_title_{lesson_index}") or "").strip() or f"Lesson {lesson_index + 1}"
+                lesson_description = (request.POST.get(f"module_{index}_lesson_description_{lesson_index}") or "").strip()
+                lesson_video = request.FILES.get(f"module_{index}_lesson_video_{lesson_index}")
+                lesson_thumbnail = request.FILES.get(f"module_{index}_lesson_thumbnail_{lesson_index}")
+                lessons.append({
+                    "title": lesson_title,
+                    "description": lesson_description,
+                    "video": lesson_video,
+                    "thumbnail": lesson_thumbnail,
+                })
+
+            module_items.append({
+                "title": title,
+                "description": description,
+                "video": video_file,
+                "lessons": lessons,
+            })
+    else:
+        try:
+            payload = json.loads(request.body or "{}")
+            module_items = payload.get("modules", [])
+        except (json.JSONDecodeError, AttributeError):
+            return JsonResponse({"success": False, "message": "Invalid module data."}, status=400)
 
     course = Course.objects.filter(is_active=True).first()
     if course is None:
@@ -889,17 +928,38 @@ def admin_modules_save(request):
             is_active=True,
         )
 
+    existing_modules = list(course.modules.all())
+    for module in existing_modules:
+        module.lessons.all().delete()
     course.modules.all().delete()
+
     for order, item in enumerate(module_items, start=1):
         title = str(item.get("title", "")).strip()
         if not title:
             title = f"Module {order}"
-        Module.objects.create(
+
+        module_obj = Module.objects.create(
             course=course,
             title=title,
             description=str(item.get("description", "")).strip(),
+            video=item.get("video") if isinstance(item, dict) and item.get("video") else None,
             order=order,
         )
+
+        lessons = item.get("lessons") if isinstance(item, dict) else []
+        for lesson_order, lesson_item in enumerate(lessons, start=1):
+            lesson_title = str(lesson_item.get("title", "")).strip() if isinstance(lesson_item, dict) else ""
+            if not lesson_title:
+                lesson_title = f"Lesson {lesson_order}"
+
+            Lesson.objects.create(
+                module=module_obj,
+                title=lesson_title,
+                description=str(lesson_item.get("description", "")).strip() if isinstance(lesson_item, dict) else "",
+                video=lesson_item.get("video") if isinstance(lesson_item, dict) and lesson_item.get("video") else None,
+                thumbnail=lesson_item.get("thumbnail") if isinstance(lesson_item, dict) and lesson_item.get("thumbnail") else None,
+                order=lesson_order,
+            )
 
     return JsonResponse({
         "success": True,
@@ -1386,6 +1446,32 @@ def serve_module_video(
     return serve_inline_video(
         request,
         module.video
+    )
+
+
+# =========================================================
+# LESSON VIDEO
+# =========================================================
+
+@login_required(login_url="login")
+def serve_lesson_video(
+    request,
+    lesson_id
+):
+
+    lesson = get_object_or_404(
+        Lesson,
+        id=lesson_id
+    )
+
+    if not lesson.video:
+        raise Http404(
+            "Lesson video not found."
+        )
+
+    return serve_inline_video(
+        request,
+        lesson.video
     )
 
 

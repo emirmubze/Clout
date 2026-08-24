@@ -67,6 +67,7 @@ class CourseForm(forms.ModelForm):
         fields = [
             "title",
             "description",
+            "price",
             "thumbnail",
             "video",
             "instructor",
@@ -77,6 +78,7 @@ class CourseForm(forms.ModelForm):
         widgets = {
             "title": forms.TextInput(attrs={"placeholder": "Course title"}),
             "description": forms.Textarea(attrs={"rows": 4, "placeholder": "Course description"}),
+            "price": forms.NumberInput(attrs={"step": "0.01", "min": "0", "placeholder": "49.00"}),
             "thumbnail": forms.FileInput(attrs={"accept": "image/*"}),
             "video": forms.FileInput(attrs={"accept": "video/*"}),
             "instructor": forms.TextInput(attrs={"placeholder": "Instructor name"}),

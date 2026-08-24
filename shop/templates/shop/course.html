@@ -3,22 +3,2172 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{ course.title|default:"Course Player" }}</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<title>Course Player</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
 <style>
-.lesson-check{display:none;color:#16a34a;font-size:13px}.lesson.watched .lesson-check{display:block}
-.lesson.watched{background:#fff3eb}
-*{box-sizing:border-box}body{margin:0;background:#f6f5f3;color:#111827;font-family:"DM Sans",sans-serif}.header{height:70px;padding:0 28px;display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid #e5e5e5}.logo{font-size:19px;font-weight:700}.nav{display:flex;gap:18px;color:#6b7280;font-size:13px}.nav a{color:inherit;text-decoration:none}.page{max-width:1250px;margin:25px auto;padding:0 18px;display:grid;grid-template-columns:1fr 350px;gap:22px}.video-card{overflow:hidden;border-radius:13px;background:#181818}.video-container{width:100%;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;color:#777;text-align:center}.video-container video{width:100%;height:100%;object-fit:contain}.play{width:55px;height:55px;margin:auto auto 12px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:#ea580c;color:#fff}.lesson-info{margin-top:14px;padding:20px;border:1px solid #e1e1e1;border-radius:12px;background:#fff}.tag{display:inline-block;padding:5px 9px;border-radius:5px;background:#fff1e8;color:#ea580c;font-size:11px;font-weight:700}.lesson-info h1{margin:10px 0 7px;font-size:22px}.lesson-info p{margin:0;color:#6b7280;font-size:14px;line-height:1.6}.sidebar{height:calc(100vh - 120px);position:sticky;top:20px;overflow:hidden;display:flex;flex-direction:column;border:1px solid #dedede;border-radius:13px;background:#fff}.sidebar-title{padding:18px;border-bottom:1px solid #e8e8e8}.sidebar-title h2{margin:0 0 4px;font-size:16px}.sidebar-title span{color:#6b7280;font-size:12px}.modules{overflow-y:auto}.module{border-bottom:1px solid #eee}.module-header{padding:15px 17px;display:flex;align-items:center;justify-content:space-between;cursor:pointer}.module-header:hover{background:#fafafa}.module-left{min-width:0;display:flex;align-items:center;gap:10px}.module-number{min-width:32px;height:27px;display:flex;align-items:center;justify-content:center;border-radius:5px;background:#fff1e8;color:#ea580c;font-size:10px;font-weight:700}.module-name{overflow:hidden;font-size:13px;font-weight:700;text-overflow:ellipsis;white-space:nowrap}.arrow{color:#9ca3af;transition:transform .2s}.module.open .arrow{transform:rotate(180deg)}.lessons{display:none;background:#fafafa}.module.open .lessons{display:block}.lesson{min-height:68px;padding:12px;display:flex;align-items:center;gap:10px;border-top:1px solid #eee;cursor:pointer}.lesson:hover,.lesson.active{background:#fff3eb}.lesson-details{min-width:0;flex:1}.lesson-title{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;font-size:12px;font-weight:600}.lesson-duration{margin-top:4px;color:#9ca3af;font-size:10px}@media(max-width:850px){.page{grid-template-columns:1fr;margin-top:12px}.sidebar{height:auto;position:static}}@media(max-width:500px){.nav{display:none}.page{padding:0 10px}.lesson-info h1{font-size:19px}}
-.course-progress{display:flex;align-items:center;gap:10px;color:#6b7280;font-size:13px}.progress-bar{width:110px;height:6px;overflow:hidden;border-radius:20px;background:#eee}.progress-fill{width:28%;height:100%;background:#ea580c}.lesson-thumb{width:74px;height:45px;position:relative;flex-shrink:0;overflow:hidden;border-radius:6px;background:#e8e8e8}.lesson-play{position:absolute;left:50%;top:50%;width:23px;height:23px;transform:translate(-50%,-50%);display:flex;align-items:center;justify-content:center;border-radius:50%;background:rgba(0,0,0,.72);color:#fff;font-size:9px}.lesson-check{color:#16a34a;font-size:13px}@media(max-width:500px){.course-progress{display:none}}
+
+/* =========================================================
+   RESET
+========================================================= */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html,
+body {
+    min-height: 100%;
+}
+
+body {
+    background: #f5f4f2;
+    color: #111827;
+    font-family: "DM Sans", sans-serif;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.header {
+    height: 70px;
+    padding: 0 28px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    background: #fff;
+    border-bottom: 1px solid #e7e7e7;
+}
+
+.logo {
+    color: #111;
+    font-size: 19px;
+    font-weight: 800;
+}
+
+.nav {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+
+    color: #6b7280;
+    font-size: 13px;
+}
+
+.nav a {
+    color: inherit;
+    text-decoration: none;
+}
+
+
+/* =========================================================
+   PAGE
+========================================================= */
+
+.page {
+    width: 100%;
+    max-width: 1250px;
+
+    margin: 25px auto;
+    padding: 0 18px;
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 350px;
+
+    gap: 22px;
+}
+
+
+/* =========================================================
+   VIDEO CARD
+========================================================= */
+
+.video-card {
+    position: relative;
+
+    width: 100%;
+
+    margin-top: 18px;
+
+    overflow: hidden;
+
+    border-radius: 14px;
+
+    background: #05070b;
+
+    box-shadow:
+        0 18px 35px rgba(15, 23, 42, .13);
+}
+
+
+/* =========================================================
+   VIDEO CONTAINER
+========================================================= */
+
+.video-container {
+    position: relative;
+
+    width: 100%;
+
+    aspect-ratio: 16 / 9;
+
+    overflow: hidden;
+
+    background: #05070b;
+}
+
+
+/* =========================================================
+   VIDEO
+========================================================= */
+
+.video-container video {
+    position: absolute;
+
+    inset: 0;
+
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+
+    background: #05070b;
+}
+
+
+/* =========================================================
+   DARK OVERLAY
+========================================================= */
+
+.video-dark-overlay {
+    position: absolute;
+
+    inset: 0;
+
+    z-index: 2;
+
+    pointer-events: none;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(0, 0, 0, .03) 0%,
+            rgba(0, 0, 0, 0) 50%,
+            rgba(0, 0, 0, .22) 100%
+        );
+}
+
+
+/* =========================================================
+   VIDEO TITLE
+========================================================= */
+
+
+    text-overflow: ellipsis;
+
+    text-shadow:
+        0 2px 8px rgba(0, 0, 0, .5);
+
+    user-select: none;
+}
+
+
+/* =========================================================
+   SUBTITLE
+========================================================= */
+
+.video-subtitle {
+    position: absolute;
+
+    left: 50%;
+    bottom: 102px;
+
+    z-index: 6;
+
+    transform: translateX(-50%);
+
+    max-width: 85%;
+
+    padding: 2px 8px;
+
+    color: #fff;
+
+    background: rgba(0, 0, 0, .72);
+
+    font-size: clamp(15px, 2vw, 27px);
+
+    line-height: 1.25;
+
+    font-weight: 400;
+
+    white-space: nowrap;
+
+    overflow: hidden;
+
+    text-overflow: ellipsis;
+
+    text-align: center;
+}
+
+
+/* =========================================================
+   PROGRESS BAR
+========================================================= */
+
+.video-progress {
+    position: absolute;
+
+    left: 22px;
+    right: 22px;
+
+    bottom: 76px;
+
+    height: 9px;
+
+    z-index: 9;
+
+    cursor: pointer;
+}
+
+
+/* Background */
+
+.progress-track {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    top: 3px;
+
+    height: 4px;
+
+    border-radius: 20px;
+
+    background: rgba(255, 255, 255, .35);
+}
+
+
+/* Orange progress */
+
+.progress-fill {
+    position: absolute;
+
+    left: 0;
+    top: 3px;
+
+    width: 0%;
+
+    height: 4px;
+
+    border-radius: 20px;
+
+    background: #e04f00;
+}
+
+
+/* Orange progress handle */
+
+.progress-dot {
+    position: absolute;
+
+    left: 0;
+    top: -2px;
+
+    width: 14px;
+    height: 14px;
+
+    transform: translateX(-50%);
+
+    border-radius: 50%;
+
+    background: #e04f00;
+}
+
+
+/* =========================================================
+   CONTROLS
+========================================================= */
+
+.video-controls {
+    position: absolute;
+
+    left: 0;
+    right: 0;
+
+    bottom: 0;
+
+    z-index: 10;
+
+    min-height: 94px;
+
+    padding: 24px 22px 18px;
+
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, .68),
+        rgba(0, 0, 0, .22),
+        transparent
+    );
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    pointer-events: none;
+
+    opacity: 1;
+
+    transition: opacity .25s ease;
+}
+
+.video-progress {
+    transition: opacity .25s ease;
+}
+
+.video-container.controls-hidden .video-controls,
+.video-container.controls-hidden .video-progress {
+    opacity: 0;
+    pointer-events: none;
+}
+
+
+/* =========================================================
+   CONTROL GROUPS
+========================================================= */
+
+.controls-left,
+.controls-right {
+    display: flex;
+    align-items: center;
+
+    gap: 8px;
+    pointer-events: auto;
+}
+
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.volume-range {
+    width: 0;
+    height: 4px;
+
+    padding: 0;
+
+    opacity: 0;
+    pointer-events: none;
+    accent-color: #e04f00;
+
+    transition: width .2s ease, opacity .2s ease;
+}
+
+.volume-control.open .volume-range {
+    width: 82px;
+    opacity: 1;
+    pointer-events: auto;
+}
+
+
+/* =========================================================
+   GENERAL BUTTON
+========================================================= */
+
+.video-btn {
+    width: 44px;
+    height: 44px;
+
+    flex: 0 0 44px;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    line-height: 0;
+
+    color: #fff;
+
+    background: rgba(20, 20, 20, .55);
+
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+
+    cursor: pointer;
+
+    transition:
+        background .18s ease,
+        transform .18s ease;
+}
+
+.video-btn:hover {
+    background: rgba(30, 32, 37, .68);
+
+    transform: scale(1.04);
+}
+
+.video-btn svg {
+    width: 22px;
+    height: 22px;
+
+    display: block;
+
+    fill: currentColor;
+}
+
+.video-btn > svg,
+.video-btn > .volume-icon,
+.video-btn > .pause-icon {
+    margin: 0;
+}
+
+
+/* =========================================================
+   PLAY ICON
+========================================================= */
+
+.play-icon {
+    width: 22px;
+    height: 22px;
+
+    display: block;
+}
+
+
+/* =========================================================
+   PAUSE ICON
+========================================================= */
+
+.pause-icon {
+    display: flex;
+
+    gap: 3px;
+}
+
+.pause-icon::before,
+.pause-icon::after {
+    content: "";
+
+    width: 5px;
+    height: 19px;
+
+    border-radius: 1px;
+
+    background: #fff;
+}
+
+
+/* =========================================================
+   PREVIOUS ICON
+========================================================= */
+
+.previous-icon {
+    position: relative;
+
+    width: 18px;
+    height: 16px;
+}
+
+.previous-icon::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 2px;
+
+    width: 2px;
+    height: 13px;
+
+    border-radius: 1px;
+
+    background: #fff;
+}
+
+.previous-icon::after {
+    content: "";
+
+    position: absolute;
+
+    left: 4px;
+    top: 2px;
+
+    width: 0;
+    height: 0;
+
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+
+    border-right: 11px solid #fff;
+}
+
+
+/* =========================================================
+   NEXT ICON
+========================================================= */
+
+.next-icon {
+    position: relative;
+
+    width: 18px;
+    height: 16px;
+}
+
+.next-icon::before {
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+    top: 2px;
+
+    width: 2px;
+    height: 13px;
+
+    border-radius: 1px;
+
+    background: #fff;
+}
+
+.next-icon::after {
+    content: "";
+
+    position: absolute;
+
+    right: 4px;
+    top: 2px;
+
+    width: 0;
+    height: 0;
+
+    border-top: 7px solid transparent;
+    border-bottom: 7px solid transparent;
+
+    border-left: 11px solid #fff;
+}
+
+
+/* =========================================================
+   VOLUME
+========================================================= */
+
+.volume-icon {
+    position: relative;
+
+    width: 20px;
+    height: 16px;
+
+    display: block;
+}
+
+.volume-icon svg {
+    width: 22px;
+    margin-top: -1px;
+    height: 22px;
+}
+
+.volume-icon.muted svg {
+    opacity: .5;
+}
+
+.volume-icon::before {
+    content: "";
+
+    position: absolute;
+
+    left: 1px;
+    top: 5px;
+
+    width: 7px;
+    height: 7px;
+
+    background: #fff;
+    clip-path: polygon(0 30%, 42% 30%, 100% 0, 100% 100%, 42% 70%, 0 70%);
+
+    display: none;
+}
+
+.volume-icon::after {
+    content: "";
+
+    position: absolute;
+
+    right: 0;
+    top: 3px;
+
+    width: 9px;
+    height: 11px;
+
+    border: 2px solid #fff;
+    border-left: 0;
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    border-radius: 0 50% 50% 0;
+
+    display: none;
+}
+
+.volume-icon.muted::after {
+    display: none;
+}
+
+
+/* =========================================================
+   TIME
+========================================================= */
+
+.video-time {
+    height: 44px;
+
+    padding: 0 15px;
+
+    display: flex;
+    align-items: center;
+
+    border-radius: 25px;
+
+    color: #fff;
+
+    background: rgba(11, 13, 17, .55);
+
+    backdrop-filter: blur(9px);
+    -webkit-backdrop-filter: blur(9px);
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   RIGHT SIDE
+========================================================= */
+
+.controls-right {
+    display: flex;
+    align-items: center;
+
+    gap: 7px;
+}
+
+/* =========================================================
+   FULLSCREEN BUTTON
+========================================================= */
+
+.fullscreen-btn {
+    width: 44px;
+    height: 44px;
+
+    flex: 0 0 44px;
+
+    border: 0;
+
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: #fff;
+
+    background: rgba(10, 12, 16, .55);
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+
+    cursor: pointer;
+}
+
+
+/* =========================================================
+   CLEAN FULLSCREEN ICON
+========================================================= */
+
+.fullscreen-icon {
+    position: relative;
+
+    width: 15px;
+    height: 15px;
+
+    display: block;
+}
+
+.fullscreen-icon::before {
+    content: "";
+
+    display: none;
+
+    position: absolute;
+
+    inset: 0;
+
+    background:
+
+        /* TOP LEFT */
+        linear-gradient(#fff, #fff)
+        left top / 7px 2px no-repeat,
+
+        linear-gradient(#fff, #fff)
+        left top / 2px 7px no-repeat,
+
+
+        /* TOP RIGHT */
+        linear-gradient(#fff, #fff)
+        right top / 7px 2px no-repeat,
+
+        linear-gradient(#fff, #fff)
+        right top / 2px 7px no-repeat,
+
+
+        /* BOTTOM LEFT */
+        linear-gradient(#fff, #fff)
+        left bottom / 7px 2px no-repeat,
+
+        linear-gradient(#fff, #fff)
+        left bottom / 2px 7px no-repeat,
+
+
+        /* BOTTOM RIGHT */
+        linear-gradient(#fff, #fff)
+        right bottom / 7px 2px no-repeat,
+
+        linear-gradient(#fff, #fff)
+        right bottom / 2px 7px no-repeat;
+}
+
+
+/* =========================================================
+   FULLSCREEN HOVER
+========================================================= */
+
+.fullscreen-btn:hover {
+    background: rgba(25, 27, 32, .92);
+
+    transform: scale(1.04);
+}
+
+
+/* =========================================================
+   LESSON INFO
+========================================================= */
+
+.lesson-info {
+    margin-top: 14px;
+
+    padding: 20px;
+
+    border: 1px solid #e1e1e1;
+
+    border-radius: 12px;
+
+    background: #fff;
+}
+
+.tag {
+    display: inline-flex;
+
+    padding: 5px 9px;
+
+    border-radius: 5px;
+
+    color: #ea580c;
+
+    background: #fff1e8;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+.lesson-info h1 {
+    margin: 10px 0 7px;
+
+    color: #111827;
+
+    font-size: 22px;
+
+    line-height: 1.25;
+}
+
+.lesson-info p {
+    color: #6b7280;
+
+    font-size: 14px;
+
+    line-height: 1.6;
+}
+
+
+/* =========================================================
+   SIDEBAR
+========================================================= */
+
+.sidebar {
+    position: sticky;
+
+    top: 20px;
+
+    height: calc(100vh - 120px);
+
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: column;
+
+    border: 1px solid #dedede;
+
+    border-radius: 13px;
+
+    background: #fff;
+}
+
+
+/* =========================================================
+   SIDEBAR TITLE
+========================================================= */
+
+.sidebar-title {
+    padding: 18px;
+
+    border-bottom: 1px solid #e8e8e8;
+}
+
+.sidebar-title h2 {
+    margin-bottom: 4px;
+
+    color: #111827;
+
+    font-size: 16px;
+}
+
+.sidebar-title span {
+    color: #6b7280;
+
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   MODULES
+========================================================= */
+
+.modules {
+    overflow-y: auto;
+}
+
+.module {
+    border-bottom: 1px solid #eeeeee;
+}
+
+
+/* =========================================================
+   MODULE HEADER
+========================================================= */
+
+.module-header {
+    min-height: 57px;
+
+    padding: 14px 17px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    cursor: pointer;
+}
+
+.module-header:hover {
+    background: #fafafa;
+}
+
+.module-left {
+    min-width: 0;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+}
+
+.module-number {
+    min-width: 32px;
+    height: 27px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 5px;
+
+    color: #ea580c;
+
+    background: #fff1e8;
+
+    font-size: 10px;
+
+    font-weight: 700;
+}
+
+.module-name {
+    overflow: hidden;
+
+    color: #111827;
+
+    font-size: 13px;
+
+    font-weight: 700;
+
+    white-space: nowrap;
+
+    text-overflow: ellipsis;
+}
+
+
+/* =========================================================
+   CLEAN CHEVRON
+========================================================= */
+
+.arrow {
+    width: 9px;
+    height: 9px;
+
+    flex-shrink: 0;
+
+    border-right: 2px solid #9ca3af;
+    border-bottom: 2px solid #9ca3af;
+
+    transform: rotate(45deg);
+
+    transition: transform .2s ease;
+}
+
+.module.open .arrow {
+    transform: rotate(225deg);
+}
+
+
+/* =========================================================
+   LESSONS
+========================================================= */
+
+.lessons {
+    display: none;
+
+    background: #fafafa;
+}
+
+.module.open .lessons {
+    display: block;
+}
+
+
+/* =========================================================
+   LESSON
+========================================================= */
+
+.lesson {
+    min-height: 68px;
+
+    padding: 11px 12px;
+
+    display: flex;
+    align-items: center;
+
+    gap: 10px;
+
+    border-top: 1px solid #eeeeee;
+
+    cursor: pointer;
+
+    transition: background .15s ease;
+}
+
+.lesson:hover,
+.lesson.active {
+    background: #fff3eb;
+}
+
+
+/* =========================================================
+   THUMBNAIL
+========================================================= */
+
+.lesson-thumb {
+    width: 74px;
+    height: 45px;
+
+    position: relative;
+
+    flex-shrink: 0;
+
+    overflow: hidden;
+
+    border-radius: 6px;
+
+    background:
+        linear-gradient(
+            135deg,
+            #e9e9e9,
+            #d7d7d7
+        );
+}
+
+.lesson-thumb img {
+    width: 100%;
+    height: 100%;
+
+    display: block;
+
+    object-fit: cover;
+}
+
+/* =========================================================
+   LESSON DETAILS
+========================================================= */
+
+.lesson-details {
+    min-width: 0;
+
+    flex: 1;
+}
+
+.lesson-title {
+    overflow: hidden;
+
+    display: -webkit-box;
+
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+
+    color: #111827;
+
+    font-size: 12px;
+
+    font-weight: 600;
+
+    line-height: 1.4;
+}
+
+.lesson-duration {
+    margin-top: 4px;
+
+    color: #9ca3af;
+
+    font-size: 10px;
+}
+
+
+/* =========================================================
+   WATCHED
+========================================================= */
+
+.lesson-check {
+    display: none;
+
+    color: #16a34a;
+
+    font-size: 13px;
+}
+
+.lesson.watched .lesson-check {
+    display: block;
+}
+
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 850px) {
+
+    .page {
+        grid-template-columns: 1fr;
+
+        margin-top: 14px;
+    }
+
+    .sidebar {
+        position: static;
+
+        height: auto;
+    }
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .header {
+        height: 62px;
+
+        padding: 0 16px;
+    }
+
+    .nav {
+        display: none;
+    }
+
+    .page {
+        padding: 0 10px;
+    }
+
+    .video-title {
+        top: 13px;
+        left: 13px;
+
+        font-size: 30px;
+    }
+
+    .video-subtitle {
+        bottom: 90px;
+
+        font-size: 15px;
+    }
+
+    .video-progress {
+        left: 12px;
+        right: 12px;
+
+        bottom: 59px;
+    }
+
+    .video-controls {
+        left: 6px;
+        right: 6px;
+
+        bottom: 5px;
+    }
+
+    .video-btn {
+        width: 40px;
+        height: 40px;
+
+        flex-basis: 40px;
+    }
+
+    .video-time {
+        height: 40px;
+
+        padding: 0 11px;
+
+        font-size: 12px;
+    }
+
+    .controls-left,
+    .controls-right {
+        gap: 5px;
+    }
+
+    .fullscreen-btn {
+        width: 40px;
+        height: 40px;
+
+        flex-basis: 40px;
+    }
+
+    .fullscreen-icon {
+        width: 16px;
+        height: 16px;
+    }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 500px) {
+
+    .video-title {
+        font-size: 24px;
+    }
+
+    .video-subtitle {
+        bottom: 83px;
+
+        max-width: 80%;
+
+        font-size: 12px;
+    }
+
+    .video-btn {
+        width: 36px;
+        height: 36px;
+
+        flex-basis: 36px;
+    }
+
+    .video-time {
+        height: 36px;
+
+        padding: 0 9px;
+
+        font-size: 10px;
+    }
+
+    .volume-btn {
+        display: none;
+    }
+
+    .fullscreen-btn {
+        width: 36px;
+        height: 36px;
+
+        flex-basis: 36px;
+    }
+
+    .fullscreen-icon {
+        width: 15px;
+        height: 15px;
+    }
+}
+
 </style>
 </head>
+
+
 <body>
-<header class="header"><div class="logo">THE BAG CODE</div></header>
-<main class="page"><section><div class="video-card"><div class="video-container" id="videoContainer"><div><div class="play">&#9654;</div><p>Select a lesson to start watching</p></div></div></div><div class="lesson-info"><span class="tag" id="lessonLabel">COURSE CONTENT</span><h1 id="lessonTitle">{{ course.title|default:"Welcome to your course" }}</h1><p id="lessonDescription">{{ course.description|default:"Select a lesson from the course content to begin." }}</p></div></section><aside class="sidebar"><div class="sidebar-title"><h2>Course Content</h2><span>{{ modules|length }} Lessons</span></div><div class="modules">{% for module in modules %}<div class="module{% if forloop.first %} open{% endif %}"><div class="module-header" onclick="toggleModule(this)"><div class="module-left"><div class="module-number">{{ forloop.counter|stringformat:'02d' }}</div><div class="module-name">{{ module.title }}</div></div><div class="arrow">&#9660;</div></div><div class="lessons"><div class="lesson{% if forloop.first %} active{% endif %}" data-title="{{ module.title|escapejs }}" data-description="{{ module.description|default:'Select this lesson to begin learning.'|escapejs }}" data-label="MODULE {{ forloop.counter|stringformat:'02d' }}" data-video="{% if module.video %}{{ module.video.url }}{% endif %}" onclick="selectLesson(this)"><div class="lesson-details"><div class="lesson-title">{{ module.title }}</div><div class="lesson-duration">Lesson {{ forloop.counter }}</div></div></div></div></div>{% empty %}<div class="lesson"><div class="lesson-details">No lessons available yet.</div></div>{% endfor %}</div></aside></main>
+
+
+<!-- =========================================================
+     HEADER
+========================================================= -->
+
+<header class="header">
+
+    <div class="logo">
+        THE BAG CODE
+    </div>
+
+    <nav class="nav">
+
+        <a href="#">
+            Dashboard
+        </a>
+
+        <a href="#">
+            My Course
+        </a>
+
+    </nav>
+
+</header>
+
+
+<!-- =========================================================
+     PAGE
+========================================================= -->
+
+<main class="page">
+
+
+<section>
+
+
+<!-- =======================================================
+     VIDEO PLAYER
+======================================================= -->
+
+<div class="video-card">
+
+    <div
+        class="video-container"
+        id="videoContainer">
+
+
+        <!-- VIDEO -->
+
+        <video
+            id="courseVideo"
+            playsinline
+            preload="metadata">
+        </video>
+
+
+        <!-- DARK OVERLAY -->
+
+        <div class="video-dark-overlay"></div>
+
+
+        <!-- TITLE -->
+
+        <div
+            class="video-title"
+            id="playerTitle">
+
+            SELECT A LESSON
+
+        </div>
+
+
+        <!-- PROGRESS -->
+
+        <div
+            class="video-progress"
+            id="progressArea">
+
+            <div class="progress-track"></div>
+
+            <div
+                class="progress-fill"
+                id="progressFill">
+            </div>
+
+            <div
+                class="progress-dot"
+                id="progressDot">
+            </div>
+
+        </div>
+
+
+        <!-- CONTROLS -->
+
+        <div class="video-controls">
+
+
+            <!-- LEFT -->
+
+            <div class="controls-left">
+
+
+                <!-- PLAY -->
+
+                <button
+                    class="video-btn"
+                    id="playButton"
+                    type="button"
+                    aria-label="Play">
+
+                    <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M8 5v14l11-7z"></path>
+                    </svg>
+
+                </button>
+
+
+                <!-- NEXT -->
+
+                <button
+                    class="video-btn"
+                    id="previousButton"
+                    type="button"
+                    aria-label="Previous lesson">
+
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M6 5h2v14H6zm4 7 9-7v14z"></path>
+                    </svg>
+
+                </button>
+
+
+                <!-- NEXT -->
+
+                <button
+                    class="video-btn"
+                    id="nextButton"
+                    type="button"
+                    aria-label="Next lesson">
+
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M16 5h2v14h-2zM5 5l9 7-9 7z"></path>
+                    </svg>
+
+                </button>
+
+
+                <!-- VOLUME -->
+
+                <div class="volume-control" id="volumeControl">
+                    <button
+                        class="video-btn volume-btn"
+                        id="volumeButton"
+                        type="button"
+                        aria-label="Adjust volume">
+
+                        <span
+                            class="volume-icon"
+                            id="volumeIcon">
+                            <svg viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M4 9v6h4l5 4V5L8 9H4zm11.5 3a3.5 3.5 0 0 0-2-3.16v6.32a3.5 3.5 0 0 0 2-3.16zm0-7.5v2.06A6 6 0 0 1 15.5 17v2.06a8 8 0 0 0 0-14.12z"></path>
+                            </svg>
+                        </span>
+
+                    </button>
+                    <input class="volume-range" id="volumeRange" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume level">
+                </div>
+
+
+                <!-- TIME -->
+
+                <div
+                    class="video-time"
+                    id="playerTime">
+
+                    0:00 / 0:00
+
+                </div>
+
+
+            </div>
+
+
+            <!-- RIGHT -->
+
+            <div class="controls-right">
+
+                <button
+                    class="video-btn fullscreen-btn"
+                    id="fullscreenButton"
+                    type="button"
+                    aria-label="Fullscreen">
+
+                    <svg class="fullscreen-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zm0-10v3h2V5h-5v2h3z"></path>
+                    </svg>
+
+                </button>
+
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =======================================================
+     LESSON INFO
+======================================================= -->
+
+<div class="lesson-info">
+
+    <span
+        class="tag"
+        id="lessonLabel">
+
+        COURSE CONTENT
+
+    </span>
+
+
+    <h1 id="lessonTitle">
+
+        Welcome to your course
+
+    </h1>
+
+
+    <p id="lessonDescription">
+
+        Select a lesson from the course content to begin.
+
+    </p>
+
+</div>
+
+
+</section>
+
+
+<!-- =========================================================
+     SIDEBAR
+========================================================= -->
+
+<aside class="sidebar">
+
+
+    <div class="sidebar-title">
+
+        <h2>
+            Course Content
+        </h2>
+
+        <span>
+            Modules
+        </span>
+
+    </div>
+
+
+    <div class="modules">
+        {% if modules %}
+            {% for module in modules %}
+                <div class="module {% if forloop.first %}open{% endif %}">
+                    <div class="module-header" onclick="toggleModule(this)">
+                        <div class="module-left">
+                            <div class="module-number">
+                                {{ forloop.counter|stringformat:"02d" }}
+                            </div>
+                            <div class="module-name">
+                                {{ module.title|upper }}
+                            </div>
+                        </div>
+                        <div class="arrow"></div>
+                    </div>
+
+                    <div class="lessons">
+                        {% for lesson in module.lessons.all %}
+                            <div
+                                class="lesson {% if forloop.first and forloop.parentloop.first %}active{% endif %}"
+                                data-title="{{ lesson.title|escapejs }}"
+                                data-description="{{ lesson.description|default:'Select this lesson to begin learning.'|escapejs }}"
+                                data-label="MODULE {{ forloop.parentloop.counter|stringformat:'02d' }}"
+                                data-video="{% if lesson.video %}{% url 'serve_lesson_video' lesson.id %}{% endif %}"
+                                onclick="selectLesson(this)">
+                                <div class="lesson-thumb">
+                                    {% if lesson.thumbnail %}
+                                        <img src="{{ lesson.thumbnail.url }}" alt="{{ lesson.title }} thumbnail">
+                                    {% endif %}
+                                </div>
+                                <div class="lesson-details">
+                                    <div class="lesson-title">{{ lesson.title }}</div>
+                                    <div class="lesson-duration">{% if lesson.video %}Video lesson{% else %}No video{% endif %}</div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="lesson" data-title="{{ module.title|escapejs }}" data-description="This module does not have any lessons yet." data-label="MODULE {{ forloop.counter|stringformat:'02d' }}" data-video="" onclick="selectLesson(this)">
+                                <div class="lesson-thumb">
+                                </div>
+                                <div class="lesson-details">
+                                    <div class="lesson-title">{{ module.title }}</div>
+                                    <div class="lesson-duration">No lessons added</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% else %}
+            <div class="module open">
+                <div class="module-header" onclick="toggleModule(this)">
+                    <div class="module-left">
+                        <div class="module-number">01</div>
+                        <div class="module-name">COURSE NOT READY</div>
+                    </div>
+                    <div class="arrow"></div>
+                </div>
+                <div class="lessons">
+                    <div class="lesson active" data-title="COURSE NOT READY" data-description="No module has been saved from the admin yet." data-label="COURSE" data-video="" onclick="selectLesson(this)">
+                        <div class="lesson-thumb"></div>
+                        <div class="lesson-details">
+                            <div class="lesson-title">Course not ready</div>
+                            <div class="lesson-duration">No lesson data</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+</aside>
+
+
+</main>
+
+
 <script>
-function toggleModule(header){header.closest('.module').classList.toggle('open')}
-function selectLesson(lesson){document.querySelectorAll('.lesson').forEach(item=>item.classList.remove('active'));lesson.classList.add('active');document.getElementById('lessonTitle').textContent=lesson.dataset.title;document.getElementById('lessonDescription').textContent=lesson.dataset.description;document.getElementById('lessonLabel').textContent=lesson.dataset.label;const container=document.getElementById('videoContainer');container.innerHTML=lesson.dataset.video?`<video controls autoplay src="${lesson.dataset.video}"></video>`:'<div><div class="play">&#9654;</div><p>Video is not available for this lesson</p></div>';const video=container.querySelector('video');if(video)video.addEventListener('ended',()=>markWatched(lesson))}
-function markWatched(lesson){lesson.classList.add('watched');localStorage.setItem('watched-'+lesson.dataset.label,'1')}document.querySelectorAll('.lesson[data-title]').forEach(lesson=>{lesson.insertAdjacentHTML('afterbegin','<div class="lesson-thumb"><div class="lesson-play">&#9654;</div></div>');lesson.insertAdjacentHTML('beforeend','<div class="lesson-check">&#10003;</div>');if(localStorage.getItem('watched-'+lesson.dataset.label))lesson.classList.add('watched')});const firstLesson=document.querySelector('.lesson[data-title]');if(firstLesson)selectLesson(firstLesson)
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const video =
+    document.getElementById("courseVideo");
+
+const playButton =
+    document.getElementById("playButton");
+
+const volumeButton =
+    document.getElementById("volumeButton");
+
+const volumeIcon =
+    document.getElementById("volumeIcon");
+
+const volumeControl =
+    document.getElementById("volumeControl");
+
+const volumeRange =
+    document.getElementById("volumeRange");
+
+const progressArea =
+    document.getElementById("progressArea");
+
+const progressFill =
+    document.getElementById("progressFill");
+
+const progressDot =
+    document.getElementById("progressDot");
+
+const playerTime =
+    document.getElementById("playerTime");
+
+const fullscreenButton =
+    document.getElementById("fullscreenButton");
+
+const videoContainer =
+    document.getElementById("videoContainer");
+
+const playerTitle =
+    document.getElementById("playerTitle");
+
+const lessonTitle =
+    document.getElementById("lessonTitle");
+
+const lessonDescription =
+    document.getElementById("lessonDescription");
+
+const lessonLabel =
+    document.getElementById("lessonLabel");
+
+let controlsTimer;
+
+function showControls() {
+    videoContainer.classList.remove("controls-hidden");
+    clearTimeout(controlsTimer);
+
+    if (!video.paused) {
+        controlsTimer = setTimeout(function() {
+            videoContainer.classList.add("controls-hidden");
+        }, 2500);
+    }
+}
+
+videoContainer.addEventListener(
+    "mousemove",
+    showControls
+);
+
+videoContainer.addEventListener(
+    "touchstart",
+    showControls,
+    { passive: true }
+);
+
+
+/* =========================================================
+   MODULE TOGGLE
+========================================================= */
+
+function toggleModule(header) {
+
+    const module =
+        header.closest(".module");
+
+    module.classList.toggle("open");
+}
+
+
+/* =========================================================
+   FORMAT TIME
+========================================================= */
+
+function formatTime(seconds) {
+
+    if (!isFinite(seconds)) {
+        return "0:00";
+    }
+
+    const minutes =
+        Math.floor(seconds / 60);
+
+    const secs =
+        Math.floor(seconds % 60);
+
+    return (
+        minutes +
+        ":" +
+        String(secs).padStart(2, "0")
+    );
+}
+
+
+/* =========================================================
+   PLAY ICON
+========================================================= */
+
+function updatePlayButton() {
+
+    if (video.paused) {
+
+        playButton.innerHTML =
+            '<svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true">' +
+            '<path d="M8 5v14l11-7z"></path></svg>';
+
+    } else {
+
+        playButton.innerHTML =
+            '<span class="pause-icon"></span>';
+
+    }
+}
+
+
+/* =========================================================
+   PLAY / PAUSE
+========================================================= */
+
+playButton.addEventListener(
+    "click",
+    function() {
+
+        if (!video.src) {
+            return;
+        }
+
+        if (video.paused) {
+
+            video.play().catch(function() {});
+
+        } else {
+
+            video.pause();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   VIDEO TIME
+========================================================= */
+
+video.addEventListener(
+    "timeupdate",
+    function() {
+
+        if (!video.duration) {
+            return;
+        }
+
+        const percentage =
+            (video.currentTime /
+            video.duration) * 100;
+
+
+        progressFill.style.width =
+            percentage + "%";
+
+
+        progressDot.style.left =
+            percentage + "%";
+
+
+        playerTime.textContent =
+            formatTime(video.currentTime)
+            + " / "
+            + formatTime(video.duration);
+
+    }
+);
+
+
+/* =========================================================
+   METADATA
+========================================================= */
+
+video.addEventListener(
+    "loadedmetadata",
+    function() {
+
+        playerTime.textContent =
+            "0:00 / " +
+            formatTime(video.duration);
+
+    }
+);
+
+
+/* =========================================================
+   PLAY STATE
+========================================================= */
+
+video.addEventListener(
+    "play",
+    function() {
+        updatePlayButton();
+        showControls();
+    }
+);
+
+video.addEventListener(
+    "pause",
+    function() {
+        updatePlayButton();
+        showControls();
+    }
+);
+
+video.addEventListener(
+    "click",
+    function() {
+        if (!video.src) {
+            return;
+        }
+
+        if (video.paused) {
+            video.play().catch(function() {});
+        } else {
+            video.pause();
+        }
+    }
+);
+
+/* =========================================================
+   PROGRESS CLICK
+========================================================= */
+
+progressArea.addEventListener(
+    "click",
+    function(event) {
+
+        if (!video.duration) {
+            return;
+        }
+
+        const rect =
+            progressArea.getBoundingClientRect();
+
+
+        const percentage =
+            (event.clientX - rect.left)
+            / rect.width;
+
+
+        video.currentTime =
+            Math.max(
+                0,
+                Math.min(
+                    1,
+                    percentage
+                )
+            ) * video.duration;
+
+    }
+);
+
+
+/* =========================================================
+   VOLUME
+========================================================= */
+
+volumeButton.addEventListener(
+    "click",
+    function() {
+        volumeControl.classList.toggle("open");
+        volumeRange.focus();
+    }
+);
+
+volumeRange.addEventListener(
+    "input",
+    function() {
+        video.volume = Number(volumeRange.value);
+        video.muted = video.volume === 0;
+
+        volumeIcon.classList.toggle(
+            "muted",
+            video.muted
+        );
+
+    }
+);
+
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+fullscreenButton.addEventListener(
+    "click",
+    async function() {
+
+        try {
+
+            if (!document.fullscreenElement) {
+
+                await videoContainer.requestFullscreen();
+
+            } else {
+
+                await document.exitFullscreen();
+
+            }
+
+        } catch (error) {
+
+            console.log(
+                "Fullscreen unavailable:",
+                error
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SELECT LESSON
+========================================================= */
+
+function selectLesson(lesson) {
+
+    document
+        .querySelectorAll(".lesson")
+        .forEach(function(item) {
+
+            item.classList.remove("active");
+
+        });
+
+
+    lesson.classList.add("active");
+
+
+    const title =
+        lesson.dataset.title ||
+        "Course Lesson";
+
+
+    const description =
+        lesson.dataset.description ||
+        "Select this lesson to begin learning.";
+
+
+    const label =
+        lesson.dataset.label ||
+        "COURSE CONTENT";
+
+
+    const videoUrl =
+        lesson.dataset.video ||
+        "";
+
+
+    playerTitle.textContent =
+        title.toUpperCase();
+
+
+    lessonTitle.textContent =
+        title;
+
+
+    lessonDescription.textContent =
+        description;
+
+
+    lessonLabel.textContent =
+        label;
+
+
+    progressFill.style.width =
+        "0%";
+
+
+    progressDot.style.left =
+        "0%";
+
+
+    playerTime.textContent =
+        "0:00 / 0:00";
+
+
+    if (videoUrl) {
+
+        video.src =
+            videoUrl;
+
+        video.load();
+
+    } else {
+
+        video.removeAttribute(
+            "src"
+        );
+
+        video.load();
+
+        updatePlayButton();
+
+    }
+
+}
+
+
+/* =========================================================
+   PREVIOUS LESSON
+========================================================= */
+
+document
+    .getElementById("previousButton")
+    .addEventListener(
+        "click",
+        function() {
+
+            const lessons =
+                Array.from(
+                    document.querySelectorAll(
+                        ".lesson"
+                    )
+                );
+
+
+            const current =
+                document.querySelector(
+                    ".lesson.active"
+                );
+
+
+            if (!current) {
+                return;
+            }
+
+
+            const index =
+                lessons.indexOf(current);
+
+
+            if (index > 0) {
+
+                selectLesson(
+                    lessons[index - 1]
+                );
+
+            } else if (video.duration) {
+
+                video.currentTime =
+                    Math.max(0, video.currentTime - 10);
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
+   NEXT LESSON
+========================================================= */
+
+document
+    .getElementById("nextButton")
+    .addEventListener(
+        "click",
+        function() {
+
+            const lessons =
+                Array.from(
+                    document.querySelectorAll(
+                        ".lesson"
+                    )
+                );
+
+
+            const current =
+                document.querySelector(
+                    ".lesson.active"
+                );
+
+
+            if (!current) {
+                return;
+            }
+
+
+            const index =
+                lessons.indexOf(current);
+
+
+            if (index >= 0 && index < lessons.length - 1) {
+
+                selectLesson(
+                    lessons[index + 1]
+                );
+
+            } else if (video.duration) {
+
+                video.currentTime =
+                    Math.min(video.duration, video.currentTime + 10);
+
+            }
+
+        }
+    );
+
+
+/* =========================================================
+   MARK LESSON WATCHED
+========================================================= */
+
+video.addEventListener(
+    "ended",
+    function() {
+
+        const current =
+            document.querySelector(
+                ".lesson.active"
+            );
+
+
+        if (!current) {
+            return;
+        }
+
+
+        current.classList.add(
+            "watched"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   INITIAL STATE
+========================================================= */
+
+const firstLesson =
+    document.querySelector(
+        ".lesson.active"
+    );
+
+
+if (firstLesson) {
+
+    selectLesson(
+        firstLesson
+    );
+
+}
+
 </script>
+
 </body>
 </html>

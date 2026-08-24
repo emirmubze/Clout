@@ -1852,6 +1852,7 @@
                 <span class="manage-link"><span id="moduleCount">0</span> Modules</span>
             </div>
             <div class="module-manager" style="padding:24px;">
+                {% csrf_token %}
                 <div style="margin-bottom:22px;">
                     <h3 style="margin:0 0 5px; font-size:20px;">Course Modules</h3>
                     <p style="margin:0; color:#6B7280; font-size:14px;">Organize your modules and add video lessons to each module.</p>
@@ -2377,20 +2378,68 @@
     function previewEditorThumbnail(input) { const box = input.previousElementSibling; const image = document.createElement("img"); image.src = URL.createObjectURL(input.files[0]); box.replaceChildren(image); }
     function showEditorVideoName(input) { input.closest(".editor-video-row").querySelector(".editor-video-name").textContent = input.files[0]?.name || "No video selected"; }
     async function saveCourse() {
-        const modules = [...document.querySelectorAll("#modules .module-editor")].map(module => ({
-            title: module.querySelector(".module-title-input").value.trim(),
-            description: module.querySelector("textarea")?.value.trim() || ""
-        }));
+        const moduleEditors = [...document.querySelectorAll("#modules .module-editor")];
+        if (!moduleEditors.length) {
+            alert("Add at least one module before saving.");
+            return;
+        }
+
         const token = document.querySelector("input[name='csrfmiddlewaretoken']")?.value || "";
+        const formData = new FormData();
+        formData.append("module_count", String(moduleEditors.length));
+
+        moduleEditors.forEach((module, moduleIndex) => {
+            const moduleTitleInput = module.querySelector(".module-title-input");
+            const moduleTitle = (moduleTitleInput?.value || `Module ${moduleIndex + 1}`).trim();
+            const moduleDescription = (module.querySelector(".module-description")?.value || "").trim();
+            const moduleVideoInput = module.querySelector(".module-video-input");
+
+            formData.append(`module_title_${moduleIndex}`, moduleTitle || `Module ${moduleIndex + 1}`);
+            formData.append(`module_description_${moduleIndex}`, moduleDescription || "");
+            if (moduleVideoInput && moduleVideoInput.files && moduleVideoInput.files[0]) {
+                formData.append(`module_video_${moduleIndex}`, moduleVideoInput.files[0], moduleVideoInput.files[0].name);
+            }
+
+            const lessonEditors = [...module.querySelectorAll(".editor-lesson")];
+            formData.append(`module_lesson_count_${moduleIndex}`, String(lessonEditors.length));
+
+            lessonEditors.forEach((lesson, lessonIndex) => {
+                const lessonTitleInput = lesson.querySelector("input[type='text']");
+                const lessonDescriptionInput = lesson.querySelector("textarea");
+                const lessonVideoInput = lesson.querySelector(".editor-video-input");
+                const lessonThumbnailInput = lesson.querySelector(".editor-thumbnail-input");
+
+                const lessonTitle = (lessonTitleInput?.value || `Lesson ${lessonIndex + 1}`).trim();
+                const lessonDescription = lessonDescriptionInput?.value.trim() || "";
+
+                formData.append(`module_${moduleIndex}_lesson_title_${lessonIndex}`, lessonTitle || `Lesson ${lessonIndex + 1}`);
+                formData.append(`module_${moduleIndex}_lesson_description_${lessonIndex}`, lessonDescription || "");
+
+                if (lessonVideoInput && lessonVideoInput.files && lessonVideoInput.files[0]) {
+                    formData.append(`module_${moduleIndex}_lesson_video_${lessonIndex}`, lessonVideoInput.files[0], lessonVideoInput.files[0].name);
+                }
+
+                if (lessonThumbnailInput && lessonThumbnailInput.files && lessonThumbnailInput.files[0]) {
+                    formData.append(`module_${moduleIndex}_lesson_thumbnail_${lessonIndex}`, lessonThumbnailInput.files[0], lessonThumbnailInput.files[0].name);
+                }
+            });
+        });
 
         try {
             const response = await fetch("{% url 'admin_modules_save' %}", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", "X-CSRFToken": token },
+                headers: { "X-CSRFToken": token },
                 credentials: "same-origin",
-                body: JSON.stringify({ modules })
+                body: formData
             });
-            const data = await response.json();
+            let data;
+            try {
+                data = await response.json();
+            } catch (error) {
+                throw new Error(response.status === 403
+                    ? "Your session or security token has expired. Refresh the page and try again."
+                    : "The server returned an invalid response. Try again.");
+            }
             if (!response.ok || !data.success) throw new Error(data.message || "Could not save modules.");
             alert(data.message);
         } catch (error) {
