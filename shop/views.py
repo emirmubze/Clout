@@ -994,7 +994,8 @@ def admin_modules_save(request):
                     module_obj = Module(course=course)
 
                 module_obj.title = title
-                module_obj.description = str(item.get("description", "")).strip()
+                if "description" in item:
+                    module_obj.description = str(item.get("description", "")).strip()
                 module_obj.order = order
                 if isinstance(item, dict) and item.get("video"):
                     module_obj.video = item["video"]

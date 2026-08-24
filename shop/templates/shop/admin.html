@@ -2336,10 +2336,9 @@
                 <div class="module-editor-left"><div class="module-editor-number">MODULE 00</div><input class="module-title-input" type="text" placeholder="Module title"></div>
                 <div class="module-editor-actions"><button class="editor-icon-btn" type="button" onclick="toggleEditorModule(this)">-</button><button class="editor-icon-btn editor-delete" type="button" onclick="deleteEditorModule(this)">x</button></div>
             </div>
-            <div class="module-editor-body"><div class="editor-form-group"><label>Module Description</label><textarea class="module-description" placeholder="Describe this module..."></textarea></div><div class="editor-lessons"></div><button class="editor-add-lesson" type="button" onclick="addEditorLesson(this)">+ Add Lesson / Video</button></div>`;
+            <div class="module-editor-body"><div class="editor-lessons"></div><button class="editor-add-lesson" type="button" onclick="addEditorLesson(this)">+ Add Lesson / Video</button></div>`;
         document.getElementById("modules").appendChild(module);
         module.querySelector(".module-title-input").value = moduleData?.title || "";
-        module.querySelector(".module-description").value = moduleData?.description || "";
         renumberEditorModules();
         (moduleData?.lessons || []).forEach(lessonData => addEditorLesson(module.querySelector(".editor-add-lesson"), lessonData));
         if (!moduleData) addEditorLesson(module.querySelector(".editor-add-lesson"));
@@ -2405,12 +2404,10 @@
         moduleEditors.forEach((module, moduleIndex) => {
             const moduleTitleInput = module.querySelector(".module-title-input");
             const moduleTitle = (moduleTitleInput?.value || `Module ${moduleIndex + 1}`).trim();
-            const moduleDescription = (module.querySelector(".module-description")?.value || "").trim();
             const moduleVideoInput = module.querySelector(".module-video-input");
 
             formData.append(`module_id_${moduleIndex}`, module.dataset.moduleId || "");
             formData.append(`module_title_${moduleIndex}`, moduleTitle || `Module ${moduleIndex + 1}`);
-            formData.append(`module_description_${moduleIndex}`, moduleDescription || "");
             if (moduleVideoInput && moduleVideoInput.files && moduleVideoInput.files[0]) {
                 formData.append(`module_video_${moduleIndex}`, moduleVideoInput.files[0], moduleVideoInput.files[0].name);
             }
