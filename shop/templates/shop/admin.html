@@ -1861,8 +1861,8 @@
                 {{ course_modules|json_script:"course-modules-data" }}
                 <button type="button" class="add-module" onclick="addModule()">+ Add New Module</button>
                 <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:22px; padding-top:20px; border-top:1px solid #EEEEEE;">
-                    <button type="button" class="cancel-btn" onclick="window.location.hash='course-management'">Cancel</button>
-                    <button type="button" class="save-btn" onclick="saveCourse()">Save Course</button>
+                    <button type="button" class="cancel-btn" onclick="cancelCourse()">Cancel</button>
+                    <button type="button" class="save-btn" id="saveButton" onclick="saveCourse()">Save Course</button>
                 </div>
             </div>
         </section>
@@ -2390,11 +2390,17 @@
     function toggleEditorModule(button) { const body = button.closest(".module-editor").querySelector(".module-editor-body"); const collapsed = body.hidden; body.hidden = !collapsed; button.textContent = collapsed ? "-" : "+"; }
     function previewEditorThumbnail(input) { const box = input.previousElementSibling; const image = document.createElement("img"); image.src = URL.createObjectURL(input.files[0]); box.replaceChildren(image); }
     function showEditorVideoName(input) { input.closest(".editor-video-row").querySelector(".editor-video-name").textContent = input.files[0]?.name || "No video selected"; }
+    function cancelCourse() { window.history.back(); }
     async function saveCourse() {
+        const saveButton = document.getElementById("saveButton");
         const moduleEditors = [...document.querySelectorAll("#modules .module-editor")];
         if (!moduleEditors.length) {
             alert("Add at least one module before saving.");
             return;
+        }
+        if (saveButton) {
+            saveButton.disabled = true;
+            saveButton.textContent = "Saving...";
         }
 
         const token = document.querySelector("input[name='csrfmiddlewaretoken']")?.value || "";
@@ -2460,6 +2466,11 @@
             alert(data.message || "Modules and lessons saved successfully.");
         } catch (error) {
             alert(error.message || "Could not save modules and lessons.");
+        } finally {
+            if (saveButton) {
+                saveButton.disabled = false;
+                saveButton.textContent = "Save Course";
+            }
         }
     }
     const existingCourseModules = JSON.parse(document.getElementById("course-modules-data")?.textContent || "[]");
