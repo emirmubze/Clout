@@ -26,6 +26,15 @@ services:
       - key: CSRF_TRUSTED_ORIGINS
         value: https://clout.onrender.com
 
+      - key: ADMIN_USERNAME
+        sync: false
+
+      - key: ADMIN_EMAIL
+        sync: false
+
+      - key: ADMIN_PASSWORD
+        sync: false
+
       - key: RAZORPAY_KEY_ID
         sync: false
 
