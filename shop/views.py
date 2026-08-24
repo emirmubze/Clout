@@ -921,6 +921,17 @@ def admin_course_delete(
 @login_required(login_url="login")
 @require_POST
 def admin_modules_save(request):
+    try:
+        return _admin_modules_save_impl(request)
+    except Exception:
+        logger.exception("Admin module save request failed")
+        return JsonResponse(
+            {"success": False, "message": "Could not save the modules and lessons."},
+            status=500,
+        )
+
+
+def _admin_modules_save_impl(request):
     if not request.user.is_staff:
         return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
 
