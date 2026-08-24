@@ -1020,7 +1020,8 @@ def admin_modules_save(request):
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail"):
                         lesson_obj.thumbnail = lesson_item["thumbnail"]
                     lesson_obj.save()
-    except (TypeError, ValueError, OSError):
+    except Exception:
+        logger.exception("Admin module save failed")
         return JsonResponse(
             {"success": False, "message": "Could not save the modules and lessons."},
             status=400,
