@@ -5,7 +5,7 @@ from django.core import mail
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from .models import CustomUser, ContactMessage, Course, Module
+from .models import CustomUser, ContactMessage, Course, Module, Lesson, Order
 
 
 class UserAuthAndDashboardTests(TestCase):
@@ -254,8 +254,6 @@ class UserAuthAndDashboardTests(TestCase):
         self.assertEqual(login_response.wsgi_request.user, user)
 
     def test_paid_order_auto_approves_course_access(self):
-        from .models import Order as OrderModel
-
         user = CustomUser.objects.create_user(
             username="paiduser",
             email="paiduser@example.com",
@@ -263,7 +261,7 @@ class UserAuthAndDashboardTests(TestCase):
             name="Paid User",
         )
 
-        OrderModel.objects.create(
+        Order.objects.create(
             user=user,
             amount=18.82,
             currency="USD",
@@ -277,6 +275,52 @@ class UserAuthAndDashboardTests(TestCase):
         self.client.force_login(user)
         course_response = self.client.get(reverse("course_detail"))
         self.assertEqual(course_response.status_code, 200)
+
+    def test_saving_course_modules_preserves_existing_records_and_access(self):
+        admin = CustomUser.objects.create_user(
+            username="contentadmin",
+            email="contentadmin@example.com",
+            password="StrongPass123!",
+            is_staff=True,
+        )
+        user = CustomUser.objects.create_user(
+            username="existingbuyer",
+            email="existingbuyer@example.com",
+            password="StrongPass123!",
+        )
+        Order.objects.create(
+            user=user,
+            amount=18.82,
+            currency="USD",
+            razorpay_order_id="order_existing_123",
+            paid=True,
+        )
+        course = Course.objects.create(title="Existing Course")
+        module = Module.objects.create(course=course, title="Original Module", order=1)
+        lesson = Lesson.objects.create(module=module, title="Original Lesson", order=1)
+
+        self.client.force_login(admin)
+        response = self.client.post(
+            reverse("admin_modules_save"),
+            {
+                "module_count": "1",
+                "module_id_0": str(module.id),
+                "module_title_0": "Updated Module",
+                "module_description_0": "Updated description",
+                "module_lesson_count_0": "1",
+                "module_0_lesson_id_0": str(lesson.id),
+                "module_0_lesson_title_0": "Updated Lesson",
+                "module_0_lesson_description_0": "Updated lesson description",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(Module.objects.get(pk=module.pk).title, "Updated Module")
+        self.assertEqual(Lesson.objects.get(pk=lesson.pk).title, "Updated Lesson")
+        self.assertTrue(Order.objects.get(razorpay_order_id="order_existing_123").paid)
+        user.refresh_from_db()
+        self.assertTrue(user.course_access_approved)
 
     def test_admin_can_toggle_free_course_access(self):
         admin = CustomUser.objects.create_user(

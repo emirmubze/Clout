@@ -1858,6 +1858,7 @@
                     <p style="margin:0; color:#6B7280; font-size:14px;">Organize your modules and add video lessons to each module.</p>
                 </div>
                 <div id="modules"></div>
+                {{ course_modules|json_script:"course-modules-data" }}
                 <button type="button" class="add-module" onclick="addModule()">+ Add New Module</button>
                 <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:22px; padding-top:20px; border-top:1px solid #EEEEEE;">
                     <button type="button" class="cancel-btn" onclick="window.location.hash='course-management'">Cancel</button>
@@ -2326,18 +2327,22 @@
 <script>
     let moduleLessonCounts = {};
 
-    function addModule() {
+    function addModule(moduleData = null) {
         const module = document.createElement("div");
         module.className = "module-editor";
+        if (moduleData?.id) module.dataset.moduleId = moduleData.id;
         module.innerHTML = `
             <div class="module-editor-header">
                 <div class="module-editor-left"><div class="module-editor-number">MODULE 00</div><input class="module-title-input" type="text" placeholder="Module title"></div>
                 <div class="module-editor-actions"><button class="editor-icon-btn" type="button" onclick="toggleEditorModule(this)">-</button><button class="editor-icon-btn editor-delete" type="button" onclick="deleteEditorModule(this)">x</button></div>
             </div>
-            <div class="module-editor-body"><div class="editor-lessons"></div><button class="editor-add-lesson" type="button" onclick="addEditorLesson(this)">+ Add Lesson / Video</button></div>`;
+            <div class="module-editor-body"><div class="editor-form-group"><label>Module Description</label><textarea class="module-description" placeholder="Describe this module..."></textarea></div><div class="editor-lessons"></div><button class="editor-add-lesson" type="button" onclick="addEditorLesson(this)">+ Add Lesson / Video</button></div>`;
         document.getElementById("modules").appendChild(module);
+        module.querySelector(".module-title-input").value = moduleData?.title || "";
+        module.querySelector(".module-description").value = moduleData?.description || "";
         renumberEditorModules();
-        addEditorLesson(module.querySelector(".editor-add-lesson"));
+        (moduleData?.lessons || []).forEach(lessonData => addEditorLesson(module.querySelector(".editor-add-lesson"), lessonData));
+        if (!moduleData) addEditorLesson(module.querySelector(".editor-add-lesson"));
         updateModuleCount();
     }
 
@@ -2354,17 +2359,26 @@
 
     function updateModuleCount() { document.getElementById("moduleCount").textContent = document.querySelectorAll(".module-editor").length; }
 
-    function addEditorLesson(button) {
+    function addEditorLesson(button, lessonData = null) {
         const module = button.closest(".module-editor");
         const moduleNumber = module.dataset.moduleNumber || "1";
         moduleLessonCounts[moduleNumber] = (moduleLessonCounts[moduleNumber] || 0) + 1;
         const number = moduleLessonCounts[moduleNumber];
         const lesson = document.createElement("div");
         lesson.className = "editor-lesson";
+        if (lessonData?.id) lesson.dataset.lessonId = lessonData.id;
         lesson.innerHTML = `
             <div class="editor-lesson-header"><strong><span class="editor-lesson-number">${String(number).padStart(2, "0")}</span> Lesson</strong><button class="editor-lesson-delete" type="button" onclick="deleteEditorLesson(this)">Delete</button></div>
             <div class="editor-lesson-content"><div><div class="editor-thumbnail-box" onclick="this.nextElementSibling.click()"><span>+<br>Add Thumbnail</span></div><input class="editor-thumbnail-input" type="file" accept="image/*" onchange="previewEditorThumbnail(this)"><small>Recommended: 16:9 image</small></div><div class="editor-form-row"><div class="editor-form-group"><label>Course ${number} Video</label><div class="editor-video-row"><label class="editor-video-button">&#9654; Choose Video<input class="editor-video-input" type="file" accept="video/*" onchange="showEditorVideoName(this)"></label><span class="editor-video-name">No video selected</span></div></div><div class="editor-form-group"><label>Lesson Title</label><input type="text" placeholder="e.g. Introduction to the Course"></div><div class="editor-form-group"><label>Description</label><textarea placeholder="Describe what students will learn in this video..."></textarea></div></div></div>`;
         module.querySelector(".editor-lessons").appendChild(lesson);
+        lesson.querySelector("input[type='text']").value = lessonData?.title || "";
+        lesson.querySelector("textarea").value = lessonData?.description || "";
+        if (lessonData?.thumbnail_url) {
+            const image = document.createElement("img");
+            image.src = lessonData.thumbnail_url;
+            lesson.querySelector(".editor-thumbnail-box").replaceChildren(image);
+        }
+        if (lessonData?.video_url) lesson.querySelector(".editor-video-name").textContent = "Existing video";
     }
 
     function deleteEditorLesson(button) { const module = button.closest(".module-editor"); button.closest(".editor-lesson").remove(); renumberEditorLessons(module); }
@@ -2394,6 +2408,7 @@
             const moduleDescription = (module.querySelector(".module-description")?.value || "").trim();
             const moduleVideoInput = module.querySelector(".module-video-input");
 
+            formData.append(`module_id_${moduleIndex}`, module.dataset.moduleId || "");
             formData.append(`module_title_${moduleIndex}`, moduleTitle || `Module ${moduleIndex + 1}`);
             formData.append(`module_description_${moduleIndex}`, moduleDescription || "");
             if (moduleVideoInput && moduleVideoInput.files && moduleVideoInput.files[0]) {
@@ -2412,6 +2427,7 @@
                 const lessonTitle = (lessonTitleInput?.value || `Lesson ${lessonIndex + 1}`).trim();
                 const lessonDescription = lessonDescriptionInput?.value.trim() || "";
 
+                formData.append(`module_${moduleIndex}_lesson_id_${lessonIndex}`, lesson.dataset.lessonId || "");
                 formData.append(`module_${moduleIndex}_lesson_title_${lessonIndex}`, lessonTitle || `Lesson ${lessonIndex + 1}`);
                 formData.append(`module_${moduleIndex}_lesson_description_${lessonIndex}`, lessonDescription || "");
 
@@ -2449,6 +2465,8 @@
             alert(error.message || "Could not save modules and lessons.");
         }
     }
+    const existingCourseModules = JSON.parse(document.getElementById("course-modules-data")?.textContent || "[]");
+    existingCourseModules.forEach(moduleData => addModule(moduleData));
     updateModuleCount();
 </script>
 

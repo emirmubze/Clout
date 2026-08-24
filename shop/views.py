@@ -569,6 +569,29 @@ def admin_dashboard(request):
         "-created_at"
     )
 
+    active_course = courses.first()
+    course_modules = []
+    if active_course:
+        course_modules = [
+            {
+                "id": module.id,
+                "title": module.title,
+                "description": module.description,
+                "video_url": module.video.url if module.video else "",
+                "lessons": [
+                    {
+                        "id": lesson.id,
+                        "title": lesson.title,
+                        "description": lesson.description,
+                        "video_url": lesson.video.url if lesson.video else "",
+                        "thumbnail_url": lesson.thumbnail.url if lesson.thumbnail else "",
+                    }
+                    for lesson in module.lessons.all()
+                ],
+            }
+            for module in active_course.modules.prefetch_related("lessons").all()
+        ]
+
     # =====================================================
     # COURSE EDIT
     # =====================================================
@@ -607,6 +630,7 @@ def admin_dashboard(request):
             "total_payments": total_payments,
             "course_buyers": course_buyers,
             "courses": courses,
+            "course_modules": course_modules,
             "course_count": courses.count(),
             "course_form": course_form,
             "editing_course": editing_course,
@@ -772,7 +796,13 @@ def admin_course_edit(
 
     if form.is_valid():
 
-        course = form.save()
+        course = form.save(commit=False)
+        if (
+            Order.objects.filter(paid=True).exists()
+            or CustomUser.objects.filter(course_access_approved=True).exists()
+        ):
+            course.is_active = True
+        course.save()
 
         # AJAX RESPONSE
         if request.headers.get(
@@ -852,6 +882,15 @@ def admin_course_delete(
         id=course_id
     )
 
+    if (
+        Order.objects.filter(paid=True).exists()
+        or CustomUser.objects.filter(course_access_approved=True).exists()
+    ):
+        message = "This course cannot be deleted while users have course access."
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse({"success": False, "message": message}, status=409)
+        return redirect("admin_dashboard")
+
     course.delete()
 
     # AJAX RESPONSE
@@ -888,6 +927,7 @@ def admin_modules_save(request):
 
     if request.content_type and "multipart/form-data" in request.content_type:
         for index in range(module_count):
+            module_id = request.POST.get(f"module_id_{index}")
             title = (request.POST.get(f"module_title_{index}") or "").strip() or f"Module {index + 1}"
             description = (request.POST.get(f"module_description_{index}") or "").strip()
             video_file = request.FILES.get(f"module_video_{index}")
@@ -899,11 +939,13 @@ def admin_modules_save(request):
 
             lessons = []
             for lesson_index in range(lesson_count):
+                lesson_id = request.POST.get(f"module_{index}_lesson_id_{lesson_index}")
                 lesson_title = (request.POST.get(f"module_{index}_lesson_title_{lesson_index}") or "").strip() or f"Lesson {lesson_index + 1}"
                 lesson_description = (request.POST.get(f"module_{index}_lesson_description_{lesson_index}") or "").strip()
                 lesson_video = request.FILES.get(f"module_{index}_lesson_video_{lesson_index}")
                 lesson_thumbnail = request.FILES.get(f"module_{index}_lesson_thumbnail_{lesson_index}")
                 lessons.append({
+                    "id": lesson_id,
                     "title": lesson_title,
                     "description": lesson_description,
                     "video": lesson_video,
@@ -911,6 +953,7 @@ def admin_modules_save(request):
                 })
 
             module_items.append({
+                "id": module_id,
                 "title": title,
                 "description": description,
                 "video": video_file,
@@ -933,23 +976,22 @@ def admin_modules_save(request):
 
     try:
         with transaction.atomic():
-            existing_modules = list(course.modules.all())
-            for module in existing_modules:
-                module.lessons.all().delete()
-            course.modules.all().delete()
-
             for order, item in enumerate(module_items, start=1):
                 title = str(item.get("title", "")).strip()
                 if not title:
                     title = f"Module {order}"
 
-                module_obj = Module.objects.create(
-                    course=course,
-                    title=title,
-                    description=str(item.get("description", "")).strip(),
-                    video=item.get("video") if isinstance(item, dict) and item.get("video") else None,
-                    order=order,
-                )
+                module_id = item.get("id") if isinstance(item, dict) else None
+                module_obj = course.modules.filter(id=module_id).first() if module_id else None
+                if module_obj is None:
+                    module_obj = Module(course=course)
+
+                module_obj.title = title
+                module_obj.description = str(item.get("description", "")).strip()
+                module_obj.order = order
+                if isinstance(item, dict) and item.get("video"):
+                    module_obj.video = item["video"]
+                module_obj.save()
 
                 lessons = item.get("lessons") if isinstance(item, dict) else []
                 for lesson_order, lesson_item in enumerate(lessons, start=1):
@@ -957,14 +999,19 @@ def admin_modules_save(request):
                     if not lesson_title:
                         lesson_title = f"Lesson {lesson_order}"
 
-                    Lesson.objects.create(
-                        module=module_obj,
-                        title=lesson_title,
-                        description=str(lesson_item.get("description", "")).strip() if isinstance(lesson_item, dict) else "",
-                        video=lesson_item.get("video") if isinstance(lesson_item, dict) and lesson_item.get("video") else None,
-                        thumbnail=lesson_item.get("thumbnail") if isinstance(lesson_item, dict) and lesson_item.get("thumbnail") else None,
-                        order=lesson_order,
-                    )
+                    lesson_id = lesson_item.get("id") if isinstance(lesson_item, dict) else None
+                    lesson_obj = module_obj.lessons.filter(id=lesson_id).first() if lesson_id else None
+                    if lesson_obj is None:
+                        lesson_obj = Lesson(module=module_obj)
+
+                    lesson_obj.title = lesson_title
+                    lesson_obj.description = str(lesson_item.get("description", "")).strip() if isinstance(lesson_item, dict) else ""
+                    lesson_obj.order = lesson_order
+                    if isinstance(lesson_item, dict) and lesson_item.get("video"):
+                        lesson_obj.video = lesson_item["video"]
+                    if isinstance(lesson_item, dict) and lesson_item.get("thumbnail"):
+                        lesson_obj.thumbnail = lesson_item["thumbnail"]
+                    lesson_obj.save()
     except (TypeError, ValueError, OSError):
         return JsonResponse(
             {"success": False, "message": "Could not save the modules and lessons."},
