@@ -214,7 +214,10 @@ USE_I18N = True
 USE_TZ = True
 
 SUPABASE_URL = os.getenv("SUPABASE_URL", "")
-SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "")
+SUPABASE_ANON_KEY = os.getenv(
+    "SUPABASE_ANON_KEY",
+    os.getenv("SUPABASE_PUBLISHABLE_KEY", "")
+)
 SUPABASE_STORAGE_BUCKET = os.getenv("SUPABASE_STORAGE_BUCKET", "media")
 
 

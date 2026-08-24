@@ -50,6 +50,9 @@ services:
       - key: SUPABASE_ANON_KEY
         sync: false
 
+      - key: SUPABASE_PUBLISHABLE_KEY
+        sync: false
+
       - key: SUPABASE_STORAGE_BUCKET
         value: media
 
