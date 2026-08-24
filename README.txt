@@ -9,6 +9,14 @@ Existing hover/CSS/JS from the uploaded index and course detail pages are preser
 
 PRODUCTION STORAGE
 
+ADMIN LOGIN
+
+Set these Render environment variables before deploying. They are used by
+ensure_admin to create or repair the staff superuser:
+ADMIN_USERNAME
+ADMIN_EMAIL
+ADMIN_PASSWORD
+
 Render uses PostgreSQL through DATABASE_URL. The web service also needs an S3-compatible bucket for uploaded course videos, lesson thumbnails, profiles, and contact media because the Render filesystem is not durable across deploys.
 
 Set these Render environment variables before deploying:
