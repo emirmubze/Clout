@@ -35,6 +35,28 @@ services:
       - key: GROQ_API_KEY
         sync: false
 
+      # Durable object storage for uploaded images and videos.
+      - key: USE_S3
+        value: "True"
+
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+
+      - key: AWS_STORAGE_BUCKET_NAME
+        sync: false
+
+      - key: AWS_S3_REGION_NAME
+        sync: false
+
+      - key: AWS_S3_ENDPOINT_URL
+        sync: false
+
+      - key: AWS_S3_CUSTOM_DOMAIN
+        sync: false
+
       - key: EMAIL_HOST
         value: smtp.privateemail.com
 

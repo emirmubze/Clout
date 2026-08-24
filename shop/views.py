@@ -14,6 +14,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
+from django.core.files.storage import default_storage
 from django.contrib.sessions.models import Session
 from django.db import transaction
 from django.db.models import Q
@@ -1370,6 +1371,9 @@ def serve_inline_video(
             "Video not found."
         )
 
+    if settings.USE_S3:
+        return redirect(file_field.storage.url(file_field.name))
+
     file_path = file_field.path
     file_size = file_field.size
     content_type = mimetypes.guess_type(file_path)[0] or "video/mp4"
@@ -1439,31 +1443,26 @@ def serve_media_file(
             "Video files are not available for direct download."
         )
 
-    file_path = (
-        settings.MEDIA_ROOT / path
-    )
+    if settings.USE_S3:
+        if not default_storage.exists(path):
+            raise Http404("File not found.")
+        return redirect(default_storage.url(path))
 
-    if (
-        not file_path.exists()
-        or not file_path.is_file()
-    ):
+    if not default_storage.exists(path):
         raise Http404(
             "File not found."
         )
 
     response = FileResponse(
-        open(
-            file_path,
-            "rb"
-        ),
-        content_type=mimetypes.guess_type(file_path.name)[0] or "application/octet-stream"
+        default_storage.open(path, "rb"),
+        content_type=mimetypes.guess_type(path)[0] or "application/octet-stream"
     )
 
     response[
         "Content-Disposition"
     ] = (
         'inline; filename="{}"'
-        .format(file_path.name)
+        .format(path.rsplit("/", 1)[-1])
     )
 
     response[
