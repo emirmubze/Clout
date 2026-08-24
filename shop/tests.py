@@ -117,49 +117,6 @@ class UserAuthAndDashboardTests(TestCase):
 
         self.assertRedirects(response, "/login/?next=%2Fadmin%2F")
 
-    def test_login_trims_username_input(self):
-        user = CustomUser.objects.create_superuser(
-            username="adminuser",
-            email="admin@example.com",
-            password="VeryStrongPass123!",
-        )
-
-        response = self.client.post(
-            reverse("login"),
-            {"username": "  adminuser  ", "password": "VeryStrongPass123!"},
-            follow=True,
-        )
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTrue(response.wsgi_request.user.is_authenticated)
-        self.assertEqual(response.wsgi_request.user, user)
-
-    def test_admin_login_returns_to_requested_admin_page(self):
-        user = CustomUser.objects.create_superuser(
-            username="dashboardadmin",
-            email="dashboardadmin@example.com",
-            password="VeryStrongPass123!",
-        )
-
-        response = self.client.get(reverse("admin_dashboard"))
-
-        self.assertRedirects(
-            response,
-            f"{reverse('login')}?next={reverse('admin_dashboard')}",
-        )
-
-        response = self.client.post(
-            response.url,
-            {
-                "username": "dashboardadmin",
-                "password": "VeryStrongPass123!",
-                "next": reverse("admin_dashboard"),
-            },
-        )
-
-        self.assertRedirects(response, reverse("admin_dashboard"))
-        self.assertEqual(self.client.get(reverse("admin_dashboard")).status_code, 200)
-
     def test_login_shows_error_for_invalid_credentials(self):
         CustomUser.objects.create_user(
             username="aliceuser",

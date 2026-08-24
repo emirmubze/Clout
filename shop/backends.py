@@ -11,8 +11,6 @@ class EmailOrUsernameModelBackend(ModelBackend):
         if username is None or password is None:
             return None
 
-        username = username.strip()
-
         user_model = get_user_model()
 
         try:
