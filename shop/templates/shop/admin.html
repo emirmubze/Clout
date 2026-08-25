@@ -2328,22 +2328,51 @@
 
 <script>
     let moduleLessonCounts = {};
-    const supabaseUrl = "{{ supabase_url|escapejs }}";
-    const supabaseAnonKey = "{{ supabase_anon_key|escapejs }}";
-    const supabaseBucket = "{{ supabase_storage_bucket|escapejs }}";
-    window.cloutSupabaseClient = supabaseUrl && supabaseAnonKey && window.supabase
-        ? window.supabase.createClient(supabaseUrl, supabaseAnonKey)
+    const supabaseUrl = "{{ supabase_url|escapejs }}".trim().replace(/\/$/, "");
+    const supabaseAnonKey = "{{ supabase_anon_key|escapejs }}".trim();
+    const supabaseBucket = "{{ supabase_storage_bucket|escapejs }}".trim();
+    window.cloutSupabaseClient = supabaseUrl && supabaseAnonKey && supabaseBucket && window.supabase
+        ? window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
+            auth: {
+                persistSession: false,
+                autoRefreshToken: false,
+                detectSessionInUrl: false
+            }
+        })
         : null;
 
     async function uploadEditorFile(file, folder) {
         if (!window.cloutSupabaseClient) {
-            throw new Error("Supabase upload is not configured.");
+            throw new Error("Supabase upload is not configured. Check the storage settings.");
         }
-        const extension = file.name.includes(".") ? file.name.split(".").pop() : "bin";
-        const safeName = file.name.replace(/\.[^/.]+$/, "").replace(/[^a-zA-Z0-9-_]/g, "-").toLowerCase();
+
+        if (!(file instanceof File) || !file.size) {
+            throw new Error("Choose a valid file before saving the course.");
+        }
+
+        const originalName = file.name || "upload";
+        const extension = originalName.includes(".")
+            ? originalName.split(".").pop().toLowerCase()
+            : "bin";
+        const safeName = originalName
+            .replace(/\.[^/.]+$/, "")
+            .replace(/[^a-zA-Z0-9-_]/g, "-")
+            .replace(/-+/g, "-")
+            .replace(/^-|-$/g, "")
+            .toLowerCase() || "upload";
         const filePath = `${folder}/${Date.now()}-${Math.random().toString(36).slice(2, 9)}-${safeName}.${extension}`;
-        const { error } = await window.cloutSupabaseClient.storage.from(supabaseBucket).upload(filePath, file, { cacheControl: "3600", upsert: false });
-        if (error) throw error;
+        const { error } = await window.cloutSupabaseClient.storage
+            .from(supabaseBucket)
+            .upload(filePath, file, {
+                cacheControl: "3600",
+                contentType: file.type || "application/octet-stream",
+                upsert: false
+            });
+
+        if (error) {
+            throw new Error(`Could not upload ${originalName}: ${error.message}`);
+        }
+
         return filePath;
     }
 
