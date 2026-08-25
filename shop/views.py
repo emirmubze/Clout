@@ -1466,6 +1466,14 @@ def serve_media_file(
             "Video files are not available for direct download."
         )
 
+    if settings.USE_S3:
+        public_url = (
+            settings.MEDIA_URL.rstrip("/")
+            + "/"
+            + path.lstrip("/")
+        )
+        return redirect(public_url)
+
     if not default_storage.exists(path):
         raise Http404(
             "File not found."
@@ -1629,11 +1637,18 @@ def profile(request):
 
             if form.is_valid():
 
-                form.save()
-
-                return redirect(
-                    "profile"
-                )
+                try:
+                    form.save()
+                except Exception:
+                    logger.exception("Profile image upload failed")
+                    form.add_error(
+                        "profile_image",
+                        "The profile image could not be uploaded. Please try again.",
+                    )
+                else:
+                    return redirect(
+                        "profile"
+                    )
 
     else:
 
