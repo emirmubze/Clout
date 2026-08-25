@@ -54,7 +54,7 @@ services:
         sync: false
 
       - key: SUPABASE_STORAGE_BUCKET
-        value: media
+        value: clout
 
       # Durable object storage for uploaded images and videos.
       - key: USE_S3
@@ -67,7 +67,7 @@ services:
         sync: false
 
       - key: AWS_STORAGE_BUCKET_NAME
-        sync: false
+        value: clout
 
       - key: AWS_S3_REGION_NAME
         sync: false

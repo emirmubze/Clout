@@ -2535,13 +2535,14 @@
                 credentials: "same-origin",
                 body: formData
             });
+            const responseText = await response.text();
             let data;
             try {
-                data = await response.json();
+                data = JSON.parse(responseText);
             } catch (error) {
                 throw new Error(response.status === 403
                     ? "Your session or security token has expired. Refresh the page and try again."
-                    : "The server returned an invalid response. Try again.");
+                    : `Server error (${response.status}). Check the deployment logs.`);
             }
             if (!response.ok || !data.success) throw new Error(data.message || "Could not save modules.");
             alert(data.message || "Modules and lessons saved successfully.");
