@@ -240,6 +240,8 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 MEDIA_URL = "/media/"
 
+MEDIA_ROOT = BASE_DIR / "media"
+
 USE_S3 = os.getenv("USE_S3", "False").lower() == "true"
 
 if USE_S3:
@@ -278,8 +280,6 @@ if USE_S3:
         },
     }
 else:
-    MEDIA_ROOT = BASE_DIR / "media"
-
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",

@@ -26,4 +26,10 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("media/<path:path>", serve_media_file, name="media_file"),
     path("", include("shop.urls"))
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+]
+
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT,
+    )
