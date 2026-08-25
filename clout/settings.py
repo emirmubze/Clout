@@ -246,6 +246,10 @@ if USE_S3:
     AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME")
     AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
     AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
+    AWS_S3_CUSTOM_DOMAIN = (
+        f"{SUPABASE_URL.rstrip('/').replace('https://', '')}"
+        f"/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
+    )
 
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_S3_ADDRESSING_STYLE = "path"

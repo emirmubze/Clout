@@ -2491,15 +2491,21 @@
         try {
             for (const [moduleIndex, module] of moduleEditors.entries()) {
                 if (module.fileToUpload) {
-                    formData.append(`module_video_path_${moduleIndex}`, await uploadEditorFile(module.fileToUpload, "videos"));
+                    formData.append(`module_video_${moduleIndex}`, module.fileToUpload);
                 }
                 const lessons = [...module.querySelectorAll(".editor-lesson")];
                 for (const [lessonIndex, lesson] of lessons.entries()) {
                     if (lesson.fileToUpload) {
-                        formData.append(`module_${moduleIndex}_lesson_video_path_${lessonIndex}`, await uploadEditorFile(lesson.fileToUpload, "videos"));
+                        formData.append(
+                            `module_${moduleIndex}_lesson_video_${lessonIndex}`,
+                            lesson.fileToUpload
+                        );
                     }
                     if (lesson.thumbnailToUpload) {
-                        formData.append(`module_${moduleIndex}_lesson_thumbnail_path_${lessonIndex}`, await uploadEditorFile(lesson.thumbnailToUpload, "thumbnails"));
+                        formData.append(
+                            `module_${moduleIndex}_lesson_thumbnail_${lessonIndex}`,
+                            lesson.thumbnailToUpload
+                        );
                     }
                 }
             }

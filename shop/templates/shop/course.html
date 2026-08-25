@@ -1462,7 +1462,7 @@ body {
                                 onclick="selectLesson(this)">
                                 <div class="lesson-thumb">
                                     {% if lesson.thumbnail %}
-                                        <img src="{% url 'media_file' path=lesson.thumbnail.name %}" alt="{{ lesson.title }} thumbnail">
+                                        <img src="{{ lesson.thumbnail.url }}" alt="{{ lesson.title }} thumbnail">
                                     {% endif %}
                                 </div>
                                 <div class="lesson-details">

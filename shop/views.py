@@ -591,14 +591,7 @@ def admin_dashboard(request):
                         "title": lesson.title,
                         "description": lesson.description,
                         "video_url": lesson.video.url if lesson.video else "",
-                        "thumbnail_url": (
-                            reverse(
-                                "media_file",
-                                kwargs={"path": lesson.thumbnail.name},
-                            )
-                            if lesson.thumbnail
-                            else ""
-                        ),
+                        "thumbnail_url": lesson.thumbnail.url if lesson.thumbnail else "",
                     }
                     for lesson in module.lessons.all()
                 ],
