@@ -5,10 +5,10 @@ from .models import Order, CustomUser, Course, ContactMessage, Module
 
 class CustomUserAdmin(BaseUserAdmin):
     fieldsets = BaseUserAdmin.fieldsets + (
-        ('Custom Fields', {'fields': ('name', 'age', 'phone_number')}),
+        ('Custom Fields', {'fields': ('name', 'age', 'phone_number', 'profile_image', 'course_access_approved')}),
     )
-    list_display = ('username', 'email', 'name', 'phone_number', 'is_staff')
-    list_filter = BaseUserAdmin.list_filter + ('age',)
+    list_display = ('username', 'email', 'name', 'phone_number', 'profile_image', 'is_staff')
+    list_filter = BaseUserAdmin.list_filter + ('age', 'course_access_approved')
 
 
 admin.site.register(CustomUser, CustomUserAdmin)

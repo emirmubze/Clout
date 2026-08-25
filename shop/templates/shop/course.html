@@ -79,7 +79,7 @@ body {
     width: 100%;
     max-width: 1250px;
 
-    margin: 25px auto;
+    margin: 35px auto;
     padding: 0 18px;
 
     display: grid;
@@ -95,19 +95,13 @@ body {
 
 .video-card {
     position: relative;
-
     width: 100%;
-
-    margin-top: 18px;
-
+    margin-top: 0;
     overflow: hidden;
-
-    border-radius: 14px;
-
-    background: #05070b;
-
-    box-shadow:
-        0 18px 35px rgba(15, 23, 42, .13);
+    border-radius: 12px;
+    background: #000;
+    border: 0;
+    box-shadow: none;
 }
 
 
@@ -117,14 +111,11 @@ body {
 
 .video-container {
     position: relative;
-
     width: 100%;
-
     aspect-ratio: 16 / 9;
-
     overflow: hidden;
-
-    background: #05070b;
+    background: #000;
+    border-radius: 10px;
 }
 
 
@@ -134,17 +125,12 @@ body {
 
 .video-container video {
     position: absolute;
-
     inset: 0;
-
     width: 100%;
     height: 100%;
-
     display: block;
-
     object-fit: cover;
-
-    background: #05070b;
+    background: #000;
 }
 
 
@@ -154,20 +140,10 @@ body {
 
 .video-dark-overlay {
     position: absolute;
-
     inset: 0;
-
     z-index: 2;
-
     pointer-events: none;
-
-    background:
-        linear-gradient(
-            to bottom,
-            rgba(0, 0, 0, .03) 0%,
-            rgba(0, 0, 0, 0) 50%,
-            rgba(0, 0, 0, .22) 100%
-        );
+    background: linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0.18));
 }
 
 
@@ -175,51 +151,92 @@ body {
    VIDEO TITLE
 ========================================================= */
 
-
-    text-overflow: ellipsis;
-
-    text-shadow:
-        0 2px 8px rgba(0, 0, 0, .5);
-
-    user-select: none;
-}
-
-
-/* =========================================================
-   SUBTITLE
-========================================================= */
-
-.video-subtitle {
+.video-title {
     position: absolute;
-
-    left: 50%;
-    bottom: 102px;
-
+    top: 16px;
+    left: 18px;
     z-index: 6;
 
-    transform: translateX(-50%);
+    max-width: 75%;
 
-    max-width: 85%;
-
-    padding: 2px 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
 
     color: #fff;
 
-    background: rgba(0, 0, 0, .72);
+    text-shadow: none;
 
-    font-size: clamp(15px, 2vw, 27px);
+    user-select: none;
+    transition: opacity .25s ease;
+}
 
-    line-height: 1.25;
+/* Module name */
+.video-module-name {
+    display: block;
 
-    font-weight: 400;
+    font-size: 23px;
+    font-weight: 800;
+    line-height: 1.1;
+
+    color: #fff;
 
     white-space: nowrap;
-
     overflow: hidden;
-
     text-overflow: ellipsis;
+}
 
-    text-align: center;
+/* Video / Lesson title */
+.video-lesson-name {
+    display: block;
+
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.25;
+
+    color: rgba(255, 255, 255, 0.82);
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+/* Tablet */
+@media (max-width: 900px) {
+    .video-title {
+        top: 14px;
+        left: 16px;
+        max-width: 78%;
+    }
+
+    .video-module-name {
+        font-size: 20px;
+    }
+
+    .video-lesson-name {
+        font-size: 14px;
+    }
+}
+
+
+/* Mobile */
+@media (max-width: 600px) {
+    .video-title {
+        top: 12px;
+        left: 13px;
+        max-width: 82%;
+        gap: 2px;
+    }
+
+    .video-module-name {
+        font-size: 17px;
+    }
+
+    .video-lesson-name {
+        font-size: 12px;
+    }
 }
 
 
@@ -229,72 +246,47 @@ body {
 
 .video-progress {
     position: absolute;
-
-    left: 22px;
-    right: 22px;
-
-    bottom: 76px;
-
-    height: 9px;
-
+    left: 42px;
+    right: 42px;
+    bottom: 64px;
+    height: 16px;
     z-index: 9;
-
     cursor: pointer;
+    transition: opacity .25s ease;
 }
-
-
-/* Background */
 
 .progress-track {
     position: absolute;
-
     left: 0;
     right: 0;
-
-    top: 3px;
-
+    top: 50%;
+    transform: translateY(-50%);
     height: 4px;
-
     border-radius: 20px;
-
-    background: rgba(255, 255, 255, .35);
+    background: rgba(255, 255, 255, 0.32);
 }
-
-
-/* Orange progress */
 
 .progress-fill {
     position: absolute;
-
     left: 0;
-    top: 3px;
-
+    top: 50%;
+    transform: translateY(-50%);
     width: 0%;
-
     height: 4px;
-
     border-radius: 20px;
-
-    background: #e04f00;
+    background: #E04F00;
 }
-
-
-/* Orange progress handle */
 
 .progress-dot {
     position: absolute;
-
     left: 0;
-    top: -2px;
-
-    width: 14px;
-    height: 14px;
-
-    transform: translateX(-50%);
-
+    top: 50%;
+        width: 12px;
+        height: 12px;
+    transform: translate(-50%, -50%);
     border-radius: 50%;
-
-    background: #e04f00;
+    background: #E04F00;
+    box-shadow: none;
 }
 
 
@@ -304,58 +296,49 @@ body {
 
 .video-controls {
     position: absolute;
-
-    left: 0;
-    right: 0;
-
-    bottom: 0;
-
+    left: 14px;
+    right: 14px;
+    bottom: 10px;
     z-index: 10;
-
-    min-height: 94px;
-
-    padding: 24px 22px 18px;
-
-    background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, .68),
-        rgba(0, 0, 0, .22),
-        transparent
-    );
-
+    min-height: 52px;
+    padding: 0 6px;
     display: flex;
     align-items: center;
     justify-content: space-between;
-
     pointer-events: none;
-
     opacity: 1;
-
-    transition: opacity .25s ease;
-}
-
-.video-progress {
     transition: opacity .25s ease;
 }
 
 .video-container.controls-hidden .video-controls,
-.video-container.controls-hidden .video-progress {
+.video-container.controls-hidden .video-progress,
+.video-container.controls-hidden .video-title {
     opacity: 0;
     pointer-events: none;
 }
-
-
-/* =========================================================
-   CONTROL GROUPS
-========================================================= */
 
 .controls-left,
 .controls-right {
     display: flex;
     align-items: center;
-
-    gap: 8px;
+    gap: 6px;
     pointer-events: auto;
+}
+
+.controls-left {
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+}
+
+.controls-right {
+    padding: 5px 7px;
+    border-radius: 999px;
+    background: transparent;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
 }
 
 .volume-control {
@@ -367,18 +350,40 @@ body {
 .volume-range {
     width: 0;
     height: 4px;
-
     padding: 0;
-
     opacity: 0;
     pointer-events: none;
-    accent-color: #e04f00;
-
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 20px;
+    background: linear-gradient(
+        to right,
+        #E04F00 0 var(--volume-level, 100%),
+        rgba(255, 255, 255, 0.7) var(--volume-level, 100%) 100%
+    );
+    accent-color: #E04F00;
     transition: width .2s ease, opacity .2s ease;
 }
 
+.volume-range::-webkit-slider-thumb {
+    width: 14px;
+    height: 14px;
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 50%;
+    background: #E04F00;
+}
+
+.volume-range::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: #E04F00;
+}
+
 .volume-control.open .volume-range {
-    width: 82px;
+    width: 90px;
     opacity: 1;
     pointer-events: auto;
 }
@@ -389,49 +394,43 @@ body {
 ========================================================= */
 
 .video-btn {
-    width: 44px;
-    height: 44px;
-
-    flex: 0 0 44px;
-
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
     padding: 0;
-
-    border: none;
-
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 50%;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
     line-height: 0;
-
     color: #fff;
-
-    background: rgba(20, 20, 20, .55);
-
-    backdrop-filter: blur(9px);
-    -webkit-backdrop-filter: blur(9px);
-
+    background: rgba(10, 10, 10, 0.88);
+    box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02);
     cursor: pointer;
-
-    transition:
-        background .18s ease,
-        transform .18s ease;
+    transition: background .18s ease, transform .18s ease, border-color .18s ease;
 }
 
 .video-btn:hover {
-    background: rgba(30, 32, 37, .68);
-
+    background: rgba(25, 25, 25, 0.96);
+    border-color: rgba(255, 255, 255, 0.12);
     transform: scale(1.04);
 }
 
+#playButton {
+    background: #ff5a00;
+    border-color: #ff5a00;
+}
+
+#playButton:hover {
+    background: #e94f00;
+    border-color: #e94f00;
+}
+
 .video-btn svg {
-    width: 22px;
-    height: 22px;
-
+    width: 15px;
+    height: 15px;
     display: block;
-
     fill: currentColor;
 }
 
@@ -441,82 +440,103 @@ body {
     margin: 0;
 }
 
-
-/* =========================================================
-   PLAY ICON
-========================================================= */
-
 .play-icon {
-    width: 22px;
-    height: 22px;
-
+    width: 18px;
+    height: 18px;
     display: block;
 }
 
-
-/* =========================================================
-   PAUSE ICON
-========================================================= */
-
 .pause-icon {
     display: flex;
-
     gap: 3px;
 }
 
 .pause-icon::before,
 .pause-icon::after {
     content: "";
-
-    width: 5px;
-    height: 19px;
-
-    border-radius: 1px;
-
+    width: 4px;
+    height: 15px;
+    border-radius: 2px;
     background: #fff;
 }
 
+.video-time {
+    color: #f3f3f3;
+    font-size: 14px;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    min-width: 92px;
+    text-align: center;
+}
 
-/* =========================================================
-   PREVIOUS ICON
-========================================================= */
+.fullscreen-btn {
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.08);
+}
 
-.previous-icon {
-    position: relative;
-
+.fullscreen-btn svg {
     width: 18px;
-    height: 16px;
+    height: 18px;
 }
 
-.previous-icon::before {
-    content: "";
+@media (max-width: 900px) {
+    .video-title {
+        top: 18px;
+        left: 20px;
+        max-width: calc(100% - 70px);
+    }
 
-    position: absolute;
+    .video-progress {
+        left: 20px;
+        right: 20px;
+        bottom: 66px;
+    }
 
-    left: 0;
-    top: 2px;
-
-    width: 2px;
-    height: 13px;
-
-    border-radius: 1px;
-
-    background: #fff;
+    .video-controls {
+        padding-left: 18px;
+        padding-right: 18px;
+    }
 }
 
-.previous-icon::after {
-    content: "";
+@media (max-width: 600px) {
+    .video-card {
+        border-radius: 12px;
+    }
 
-    position: absolute;
+    .video-container {
+        border-radius: 12px;
+    }
 
-    left: 4px;
-    top: 2px;
+    .video-title {
+        top: 14px;
+        left: 16px;
+        font-size: 16px;
+        max-width: calc(100% - 60px);
+    }
 
-    width: 0;
-    height: 0;
+    .video-progress {
+        left: 16px;
+        right: 16px;
+        bottom: 58px;
+    }
 
-    border-top: 7px solid transparent;
-    border-bottom: 7px solid transparent;
+    .video-controls {
+        min-height: 72px;
+        padding: 12px 14px 14px;
+    }
+
+    .video-btn {
+        width: 36px;
+        height: 36px;
+        flex-basis: 36px;
+    }
+
+    .video-time {
+        font-size: 11px;
+        min-width: 72px;
+    }
+}
 
     border-right: 11px solid #fff;
 }
@@ -637,9 +657,9 @@ body {
 ========================================================= */
 
 .video-time {
-    height: 44px;
+    height: 34px;
 
-    padding: 0 15px;
+    padding: 0 10px;
 
     display: flex;
     align-items: center;
@@ -648,12 +668,9 @@ body {
 
     color: #fff;
 
-    background: rgba(11, 13, 17, .55);
+    background: transparent;
 
-    backdrop-filter: blur(9px);
-    -webkit-backdrop-filter: blur(9px);
-
-    font-size: 15px;
+    font-size: 12px;
 
     font-weight: 600;
 
@@ -677,10 +694,10 @@ body {
 ========================================================= */
 
 .fullscreen-btn {
-    width: 44px;
-    height: 44px;
+    width: 34px;
+    height: 34px;
 
-    flex: 0 0 44px;
+    flex: 0 0 34px;
 
     border: 0;
 
@@ -692,10 +709,7 @@ body {
 
     color: #fff;
 
-    background: rgba(10, 12, 16, .55);
-
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    background: rgba(10, 12, 16, .88);
 
     cursor: pointer;
 }
@@ -763,7 +777,7 @@ body {
 ========================================================= */
 
 .fullscreen-btn:hover {
-    background: rgba(25, 27, 32, .92);
+    background: rgba(25, 27, 32, .96);
 
     transform: scale(1.04);
 }
@@ -1295,166 +1309,69 @@ body {
 
 <div class="video-card">
 
-    <div
-        class="video-container"
-        id="videoContainer">
+    <div class="video-container" id="videoContainer">
 
-
-        <!-- VIDEO -->
-
-        <video
-            id="courseVideo"
-            playsinline
-            preload="metadata">
-        </video>
-
-
-        <!-- DARK OVERLAY -->
+        <video id="courseVideo" playsinline preload="metadata"></video>
 
         <div class="video-dark-overlay"></div>
 
-
-        <!-- TITLE -->
-
-        <div
-            class="video-title"
-            id="playerTitle">
-
-            SELECT A LESSON
-
+        <div class="video-title" id="playerTitle">
+            <span class="video-module-name" id="playerModuleName">SELECT A LESSON</span>
+            <span class="video-lesson-name" id="playerLessonName">Choose a lesson</span>
         </div>
 
-
-        <!-- PROGRESS -->
-
-        <div
-            class="video-progress"
-            id="progressArea">
-
+        <div class="video-progress" id="progressArea">
             <div class="progress-track"></div>
-
-            <div
-                class="progress-fill"
-                id="progressFill">
-            </div>
-
-            <div
-                class="progress-dot"
-                id="progressDot">
-            </div>
-
+            <div class="progress-fill" id="progressFill"></div>
+            <div class="progress-dot" id="progressDot"></div>
         </div>
-
-
-        <!-- CONTROLS -->
 
         <div class="video-controls">
 
-
-            <!-- LEFT -->
-
             <div class="controls-left">
 
-
-                <!-- PLAY -->
-
-                <button
-                    class="video-btn"
-                    id="playButton"
-                    type="button"
-                    aria-label="Play">
-
+                <button class="video-btn" id="playButton" type="button" aria-label="Play">
                     <svg class="play-icon" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M8 5v14l11-7z"></path>
                     </svg>
-
                 </button>
 
-
-                <!-- NEXT -->
-
-                <button
-                    class="video-btn"
-                    id="previousButton"
-                    type="button"
-                    aria-label="Previous lesson">
-
+                <button class="video-btn" id="previousButton" type="button" aria-label="Previous lesson">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M6 5h2v14H6zm4 7 9-7v14z"></path>
                     </svg>
-
                 </button>
 
-
-                <!-- NEXT -->
-
-                <button
-                    class="video-btn"
-                    id="nextButton"
-                    type="button"
-                    aria-label="Next lesson">
-
+                <button class="video-btn" id="nextButton" type="button" aria-label="Next lesson">
                     <svg viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M16 5h2v14h-2zM5 5l9 7-9 7z"></path>
                     </svg>
-
                 </button>
 
-
-                <!-- VOLUME -->
-
                 <div class="volume-control" id="volumeControl">
-                    <button
-                        class="video-btn volume-btn"
-                        id="volumeButton"
-                        type="button"
-                        aria-label="Adjust volume">
-
-                        <span
-                            class="volume-icon"
-                            id="volumeIcon">
+                    <button class="video-btn volume-btn" id="volumeButton" type="button" aria-label="Adjust volume">
+                        <span class="volume-icon" id="volumeIcon">
                             <svg viewBox="0 0 24 24" aria-hidden="true">
                                 <path d="M4 9v6h4l5 4V5L8 9H4zm11.5 3a3.5 3.5 0 0 0-2-3.16v6.32a3.5 3.5 0 0 0 2-3.16zm0-7.5v2.06A6 6 0 0 1 15.5 17v2.06a8 8 0 0 0 0-14.12z"></path>
                             </svg>
                         </span>
-
                     </button>
                     <input class="volume-range" id="volumeRange" type="range" min="0" max="1" step="0.01" value="1" aria-label="Volume level">
                 </div>
 
-
-                <!-- TIME -->
-
-                <div
-                    class="video-time"
-                    id="playerTime">
-
-                    0:00 / 0:00
-
-                </div>
-
+                <div class="video-time" id="playerTime">0:00 / 0:00</div>
 
             </div>
-
-
-            <!-- RIGHT -->
 
             <div class="controls-right">
 
-                <button
-                    class="video-btn fullscreen-btn"
-                    id="fullscreenButton"
-                    type="button"
-                    aria-label="Fullscreen">
-
+                <button class="video-btn fullscreen-btn" id="fullscreenButton" type="button" aria-label="Fullscreen">
                     <svg class="fullscreen-icon" viewBox="0 0 24 24" aria-hidden="true">
                         <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zm0-10v3h2V5h-5v2h3z"></path>
                     </svg>
-
                 </button>
 
             </div>
-
 
         </div>
 
@@ -1538,6 +1455,7 @@ body {
                             <div
                                 class="lesson {% if forloop.first and forloop.parentloop.first %}active{% endif %}"
                                 data-title="{{ lesson.title|escapejs }}"
+                                data-module="{{ module.title|escapejs }}"
                                 data-description="{{ lesson.description|default:'Select this lesson to begin learning.'|escapejs }}"
                                 data-label="MODULE {{ forloop.parentloop.counter|stringformat:'02d' }}"
                                 data-video="{% if lesson.video %}{% url 'serve_lesson_video' lesson.id %}{% endif %}"
@@ -1553,7 +1471,7 @@ body {
                                 </div>
                             </div>
                         {% empty %}
-                            <div class="lesson" data-title="{{ module.title|escapejs }}" data-description="This module does not have any lessons yet." data-label="MODULE {{ forloop.counter|stringformat:'02d' }}" data-video="" onclick="selectLesson(this)">
+                            <div class="lesson" data-title="{{ module.title|escapejs }}" data-module="{{ module.title|escapejs }}" data-description="This module does not have any lessons yet." data-label="MODULE {{ forloop.counter|stringformat:'02d' }}" data-video="" onclick="selectLesson(this)">
                                 <div class="lesson-thumb">
                                 </div>
                                 <div class="lesson-details">
@@ -1575,7 +1493,7 @@ body {
                     <div class="arrow"></div>
                 </div>
                 <div class="lessons">
-                    <div class="lesson active" data-title="COURSE NOT READY" data-description="No module has been saved from the admin yet." data-label="COURSE" data-video="" onclick="selectLesson(this)">
+                    <div class="lesson active" data-title="COURSE NOT READY" data-module="COURSE NOT READY" data-description="No module has been saved from the admin yet." data-label="COURSE" data-video="" onclick="selectLesson(this)">
                         <div class="lesson-thumb"></div>
                         <div class="lesson-details">
                             <div class="lesson-title">Course not ready</div>
@@ -1638,6 +1556,12 @@ const videoContainer =
 const playerTitle =
     document.getElementById("playerTitle");
 
+const playerModuleName =
+    document.getElementById("playerModuleName");
+
+const playerLessonName =
+    document.getElementById("playerLessonName");
+
 const lessonTitle =
     document.getElementById("lessonTitle");
 
@@ -1653,11 +1577,9 @@ function showControls() {
     videoContainer.classList.remove("controls-hidden");
     clearTimeout(controlsTimer);
 
-    if (!video.paused) {
-        controlsTimer = setTimeout(function() {
-            videoContainer.classList.add("controls-hidden");
-        }, 2500);
-    }
+    controlsTimer = setTimeout(function() {
+        videoContainer.classList.add("controls-hidden");
+    }, 2500);
 }
 
 videoContainer.addEventListener(
@@ -1892,6 +1814,10 @@ volumeRange.addEventListener(
     function() {
         video.volume = Number(volumeRange.value);
         video.muted = video.volume === 0;
+        volumeRange.style.setProperty(
+            "--volume-level",
+            (video.volume * 100) + "%"
+        );
 
         volumeIcon.classList.toggle(
             "muted",
@@ -1957,6 +1883,9 @@ function selectLesson(lesson) {
         lesson.dataset.title ||
         "Course Lesson";
 
+    const moduleName =
+        lesson.dataset.module ||
+        "Course Content";
 
     const description =
         lesson.dataset.description ||
@@ -1973,9 +1902,11 @@ function selectLesson(lesson) {
         "";
 
 
-    playerTitle.textContent =
-        title.toUpperCase();
+    playerModuleName.textContent =
+        moduleName;
 
+    playerLessonName.textContent =
+        title;
 
     lessonTitle.textContent =
         title;
@@ -2167,6 +2098,8 @@ if (firstLesson) {
     );
 
 }
+
+showControls();
 
 </script>
 
