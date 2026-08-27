@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.conf import settings
 
 
 class CustomUser(AbstractUser):
@@ -101,6 +102,7 @@ class Module(models.Model):
     description = models.TextField(blank=True, default="")
     video = models.FileField(upload_to="course_videos/", null=True, blank=True)
     video_url = models.URLField(blank=True, default="")
+    video_path = models.CharField(max_length=500, blank=True, default="")
     order = models.IntegerField(default=0)  # For ordering modules
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -111,6 +113,12 @@ class Module(models.Model):
     def __str__(self):
         return f"{self.course.title} - {self.title}"
 
+    @property
+    def video_public_url(self):
+        if self.video_path and settings.SUPABASE_URL and settings.SUPABASE_STORAGE_BUCKET:
+            return f"{settings.SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{settings.SUPABASE_STORAGE_BUCKET}/{self.video_path.lstrip('/')}"
+        return self.video_url or (self.video.url if self.video else "")
+
 
 class Lesson(models.Model):
     module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="lessons")
@@ -118,8 +126,10 @@ class Lesson(models.Model):
     description = models.TextField(blank=True, default="")
     video = models.FileField(upload_to="course_videos/", null=True, blank=True)
     video_url = models.URLField(blank=True, default="")
+    video_path = models.CharField(max_length=500, blank=True, default="")
     thumbnail = models.ImageField(upload_to="lesson_thumbnails/", null=True, blank=True)
     thumbnail_url = models.URLField(blank=True, default="")
+    thumbnail_path = models.CharField(max_length=500, blank=True, default="")
     order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -129,6 +139,18 @@ class Lesson(models.Model):
 
     def __str__(self):
         return f"{self.module.course.title} - {self.module.title} - {self.title}"
+
+    @property
+    def video_public_url(self):
+        if self.video_path and settings.SUPABASE_URL and settings.SUPABASE_STORAGE_BUCKET:
+            return f"{settings.SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{settings.SUPABASE_STORAGE_BUCKET}/{self.video_path.lstrip('/')}"
+        return self.video_url or (self.video.url if self.video else "")
+
+    @property
+    def thumbnail_public_url(self):
+        if self.thumbnail_path and settings.SUPABASE_URL and settings.SUPABASE_STORAGE_BUCKET:
+            return f"{settings.SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{settings.SUPABASE_STORAGE_BUCKET}/{self.thumbnail_path.lstrip('/')}"
+        return self.thumbnail_url or (self.thumbnail.url if self.thumbnail else "")
 
 
 class Order(models.Model):

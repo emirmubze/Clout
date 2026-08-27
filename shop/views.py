@@ -587,13 +587,16 @@ def admin_dashboard(request):
                 "id": module.id,
                 "title": module.title,
                 "description": module.description,
+                "video_path": module.video_path,
                 "video_url": module.video_url or (module.video.url if module.video else ""),
                 "lessons": [
                     {
                         "id": lesson.id,
                         "title": lesson.title,
                         "description": lesson.description,
+                        "video_path": lesson.video_path,
                         "video_url": lesson.video_url or (lesson.video.url if lesson.video else ""),
+                        "thumbnail_path": lesson.thumbnail_path,
                         "thumbnail_url": lesson.thumbnail_url or (lesson.thumbnail.url if lesson.thumbnail else ""),
                     }
                     for lesson in module.lessons.all()
@@ -1025,6 +1028,8 @@ def _admin_modules_save_impl(request):
                     module_obj.video = item["video"]
                 if isinstance(item, dict) and item.get("video_url"):
                     module_obj.video_url = str(item["video_url"]).strip()
+                if isinstance(item, dict) and "video_path" in item:
+                    module_obj.video_path = str(item.get("video_path") or "").strip()
                 module_obj.save()
 
                 lessons = item.get("lessons") if isinstance(item, dict) else []
@@ -1045,10 +1050,14 @@ def _admin_modules_save_impl(request):
                         lesson_obj.video = lesson_item["video"]
                     if isinstance(lesson_item, dict) and lesson_item.get("video_url"):
                         lesson_obj.video_url = str(lesson_item["video_url"]).strip()
+                    if isinstance(lesson_item, dict) and "video_path" in lesson_item:
+                        lesson_obj.video_path = str(lesson_item.get("video_path") or "").strip()
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail"):
                         lesson_obj.thumbnail = lesson_item["thumbnail"]
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail_url"):
                         lesson_obj.thumbnail_url = str(lesson_item["thumbnail_url"]).strip()
+                    if isinstance(lesson_item, dict) and "thumbnail_path" in lesson_item:
+                        lesson_obj.thumbnail_path = str(lesson_item.get("thumbnail_path") or "").strip()
                     lesson_obj.save()
     except Exception:
         logger.exception("Admin module save failed")
