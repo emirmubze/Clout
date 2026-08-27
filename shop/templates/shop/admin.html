@@ -2360,10 +2360,14 @@
                 }
             };
             xhr.onload = () => {
-                if (xhr.status >= 200 && xhr.status < 300) resolve(data.object_key);
-                else reject(new Error(`R2 upload failed (${xhr.status}). Check the bucket CORS policy.`));
+                if (xhr.status >= 200 && xhr.status < 300) {
+                    resolve(data.object_key);
+                    return;
+                }
+                const responseBody = xhr.responseText ? ` ${xhr.responseText.slice(0, 240)}` : "";
+                reject(new Error(`R2 upload failed (${xhr.status}).${responseBody} Check R2 CORS and the presigned endpoint.`));
             };
-            xhr.onerror = () => reject(new Error("The browser could not reach R2. Check the bucket CORS policy and public HTTPS endpoint."));
+            xhr.onerror = () => reject(new Error("The browser could not reach R2. Check the R2 bucket CORS policy, endpoint URL, and HTTPS."));
             xhr.send(file);
         });
     };

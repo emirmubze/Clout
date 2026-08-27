@@ -245,9 +245,7 @@ if USE_S3:
         "auto"
     )
 
-    AWS_S3_ENDPOINT_URL = os.getenv(
-        "AWS_S3_ENDPOINT_URL"
-    )
+    AWS_S3_ENDPOINT_URL = (os.getenv("AWS_S3_ENDPOINT_URL") or "").strip().rstrip("/")
 
     AWS_S3_CUSTOM_DOMAIN = os.getenv(
         "AWS_S3_CUSTOM_DOMAIN",
