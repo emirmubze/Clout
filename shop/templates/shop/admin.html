@@ -2328,7 +2328,10 @@
 
 <script>
     let moduleLessonCounts = {};
-    const supabaseUrl = "{{ supabase_url|escapejs }}".trim().replace(/\/$/, "");
+    const configuredSupabaseUrl = "{{ supabase_url|escapejs }}".trim();
+    const supabaseUrl = configuredSupabaseUrl
+        .replace(/\/storage\/v1(?:\/.*)?\/?$/i, "")
+        .replace(/\/$/, "");
     const supabaseAnonKey = "{{ supabase_anon_key|escapejs }}".trim();
     const supabaseBucket = "{{ supabase_storage_bucket|escapejs }}".trim();
     window.cloutSupabaseClient = supabaseUrl && supabaseAnonKey && supabaseBucket && window.supabase
@@ -2350,6 +2353,17 @@
 
         if (!file) {
             throw new Error("No file selected.");
+        }
+
+        let uploadEndpoint;
+        try {
+            const parsedUrl = new URL(supabaseUrl);
+            if (parsedUrl.protocol !== "https:") {
+                throw new Error("SUPABASE_URL must use HTTPS.");
+            }
+            uploadEndpoint = `${supabaseUrl}/storage/v1/object/${supabaseBucket}/${folder}`;
+        } catch (error) {
+            throw new Error(`Invalid SUPABASE_URL: ${configuredSupabaseUrl || "empty"}`);
         }
 
         const extension = file.name.includes(".")
@@ -2389,6 +2403,11 @@
             return filePath;
         } catch (error) {
             console.error("UPLOAD ERROR:", error);
+            if (error instanceof TypeError && error.message.toLowerCase().includes("fetch")) {
+                throw new Error(
+                    `Supabase could not be reached at ${uploadEndpoint}. Check SUPABASE_URL, HTTPS, CORS, and browser network blocking.`
+                );
+            }
             throw error;
         }
     }
