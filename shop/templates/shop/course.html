@@ -1458,16 +1458,18 @@ body {
                                 data-module="{{ module.title|escapejs }}"
                                 data-description="{{ lesson.description|default:'Select this lesson to begin learning.'|escapejs }}"
                                 data-label="MODULE {{ forloop.parentloop.counter|stringformat:'02d' }}"
-                                data-video="{% if lesson.video %}{% url 'serve_lesson_video' lesson.id %}{% endif %}"
+                                data-video="{% if lesson.video_url %}{{ lesson.video_url|escapejs }}{% elif lesson.video %}{% url 'serve_lesson_video' lesson.id %}{% endif %}"
                                 onclick="selectLesson(this)">
                                 <div class="lesson-thumb">
-                                    {% if lesson.thumbnail %}
+                                    {% if lesson.thumbnail_url %}
+                                        <img src="{{ lesson.thumbnail_url }}" alt="{{ lesson.title }} thumbnail">
+                                    {% elif lesson.thumbnail %}
                                         <img src="{{ lesson.thumbnail.url }}" alt="{{ lesson.title }} thumbnail">
                                     {% endif %}
                                 </div>
                                 <div class="lesson-details">
                                     <div class="lesson-title">{{ lesson.title }}</div>
-                                    <div class="lesson-duration">{% if lesson.video %}Video lesson{% else %}No video{% endif %}</div>
+                                    <div class="lesson-duration">{% if lesson.video_url or lesson.video %}Video lesson{% else %}No video{% endif %}</div>
                                 </div>
                             </div>
                         {% empty %}

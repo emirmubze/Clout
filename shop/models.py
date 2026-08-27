@@ -100,6 +100,7 @@ class Module(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, default="")
     video = models.FileField(upload_to="course_videos/", null=True, blank=True)
+    video_url = models.URLField(blank=True, default="")
     order = models.IntegerField(default=0)  # For ordering modules
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -116,7 +117,9 @@ class Lesson(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField(blank=True, default="")
     video = models.FileField(upload_to="course_videos/", null=True, blank=True)
+    video_url = models.URLField(blank=True, default="")
     thumbnail = models.ImageField(upload_to="lesson_thumbnails/", null=True, blank=True)
+    thumbnail_url = models.URLField(blank=True, default="")
     order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

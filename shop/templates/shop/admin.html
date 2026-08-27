@@ -2385,8 +2385,11 @@
                 );
             }
 
-            console.log("Upload successful:", data);
-            return filePath;
+            const publicUrl = window.cloutSupabaseClient.storage
+                .from(supabaseBucket)
+                .getPublicUrl(filePath).data.publicUrl;
+            console.log("Upload successful:", publicUrl);
+            return publicUrl;
         } catch (error) {
             console.error("UPLOAD ERROR:", error);
             throw error;
@@ -2405,6 +2408,7 @@
             <div class="module-editor-body"><div class="editor-lessons"></div><button class="editor-add-lesson" type="button" onclick="addEditorLesson(this)">+ Add Lesson / Video</button></div>`;
         document.getElementById("modules").appendChild(module);
         module.querySelector(".module-title-input").value = moduleData?.title || "";
+        if (moduleData?.video_url) module.dataset.videoUrl = moduleData.video_url;
         renumberEditorModules();
         (moduleData?.lessons || []).forEach(lessonData => addEditorLesson(module.querySelector(".editor-add-lesson"), lessonData));
         if (!moduleData) addEditorLesson(module.querySelector(".editor-add-lesson"));
@@ -2432,6 +2436,8 @@
         const lesson = document.createElement("div");
         lesson.className = "editor-lesson";
         if (lessonData?.id) lesson.dataset.lessonId = lessonData.id;
+        if (lessonData?.video_url) lesson.dataset.videoUrl = lessonData.video_url;
+        if (lessonData?.thumbnail_url) lesson.dataset.thumbnailUrl = lessonData.thumbnail_url;
         lesson.innerHTML = `
             <div class="editor-lesson-header"><strong><span class="editor-lesson-number">${String(number).padStart(2, "0")}</span> Lesson</strong><button class="editor-lesson-delete" type="button" onclick="deleteEditorLesson(this)">Delete</button></div>
             <div class="editor-lesson-content"><div><div class="editor-thumbnail-box" onclick="this.nextElementSibling.click()"><span>+<br>Add Thumbnail</span></div><input class="editor-thumbnail-input" type="file" accept="image/*" onchange="previewEditorThumbnail(this)"><small>Recommended: 16:9 image</small></div><div class="editor-form-row"><div class="editor-form-group"><label>Course ${number} Video</label><div class="editor-video-row"><label class="editor-video-button">&#9654; Choose Video<input class="editor-video-input" type="file" accept="video/*" onchange="showEditorVideoName(this)"></label><span class="editor-video-name">No video selected</span></div></div><div class="editor-form-group"><label>Lesson Title</label><input type="text" placeholder="e.g. Introduction to the Course"></div><div class="editor-form-group"><label>Description</label><textarea placeholder="Describe what students will learn in this video..."></textarea></div></div></div>`;
@@ -2476,13 +2482,9 @@
         moduleEditors.forEach((module, moduleIndex) => {
             const moduleTitleInput = module.querySelector(".module-title-input");
             const moduleTitle = (moduleTitleInput?.value || `Module ${moduleIndex + 1}`).trim();
-            const moduleVideoInput = module.querySelector(".module-video-input");
-
             formData.append(`module_id_${moduleIndex}`, module.dataset.moduleId || "");
             formData.append(`module_title_${moduleIndex}`, moduleTitle || `Module ${moduleIndex + 1}`);
-            if (moduleVideoInput && moduleVideoInput.files && moduleVideoInput.files[0]) {
-                module.fileToUpload = moduleVideoInput.files[0];
-            }
+            formData.append(`module_video_url_${moduleIndex}`, module.dataset.videoUrl || "");
 
             const lessonEditors = [...module.querySelectorAll(".editor-lesson")];
             formData.append(`module_lesson_count_${moduleIndex}`, String(lessonEditors.length));
@@ -2508,21 +2510,15 @@
         try {
             for (const [moduleIndex, module] of moduleEditors.entries()) {
                 if (module.fileToUpload) {
-                    formData.append(`module_video_${moduleIndex}`, module.fileToUpload);
+                    formData.set(`module_video_url_${moduleIndex}`, await uploadEditorFile(module.fileToUpload, "course-videos"));
                 }
                 const lessons = [...module.querySelectorAll(".editor-lesson")];
                 for (const [lessonIndex, lesson] of lessons.entries()) {
                     if (lesson.fileToUpload) {
-                        formData.append(
-                            `module_${moduleIndex}_lesson_video_${lessonIndex}`,
-                            lesson.fileToUpload
-                        );
+                        formData.set(`module_${moduleIndex}_lesson_video_url_${lessonIndex}`, await uploadEditorFile(lesson.fileToUpload, "course-videos"));
                     }
                     if (lesson.thumbnailToUpload) {
-                        formData.append(
-                            `module_${moduleIndex}_lesson_thumbnail_${lessonIndex}`,
-                            lesson.thumbnailToUpload
-                        );
+                        formData.set(`module_${moduleIndex}_lesson_thumbnail_url_${lessonIndex}`, await uploadEditorFile(lesson.thumbnailToUpload, "lesson-thumbnails"));
                     }
                 }
             }
