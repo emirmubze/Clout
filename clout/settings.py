@@ -32,6 +32,10 @@ DEBUG = os.getenv(
 if not DEBUG and SECRET_KEY == "change-me":
     raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set in production.")
 
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "").strip()
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "").strip().lower()
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
+
 
 # =========================================================
 # ALLOWED HOSTS
