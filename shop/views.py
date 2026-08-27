@@ -587,17 +587,14 @@ def admin_dashboard(request):
                 "id": module.id,
                 "title": module.title,
                 "description": module.description,
-                "video_path": module.video_path,
-                "video_url": module.video_url or (module.video.url if module.video else ""),
+                "video_url": module.video_public_url,
                 "lessons": [
                     {
                         "id": lesson.id,
                         "title": lesson.title,
                         "description": lesson.description,
-                        "video_path": lesson.video_path,
-                        "video_url": lesson.video_url or (lesson.video.url if lesson.video else ""),
-                        "thumbnail_path": lesson.thumbnail_path,
-                        "thumbnail_url": lesson.thumbnail_url or (lesson.thumbnail.url if lesson.thumbnail else ""),
+                        "video_url": lesson.video_public_url,
+                        "thumbnail_url": lesson.thumbnail_public_url,
                     }
                     for lesson in module.lessons.all()
                 ],
@@ -648,10 +645,6 @@ def admin_dashboard(request):
             "course_form": course_form,
             "editing_course": editing_course,
             "current_admin": request.user,
-            "supabase_url": settings.SUPABASE_URL,
-            "supabase_anon_key": settings.SUPABASE_ANON_KEY,
-            "supabase_bucket": settings.SUPABASE_STORAGE_BUCKET,
-            "supabase_storage_bucket": settings.SUPABASE_STORAGE_BUCKET,
             "chat_users": contact_users,
             "selected_user": selected_user,
             "chat_messages": chat_messages,
@@ -959,7 +952,7 @@ def _admin_modules_save_impl(request):
             title = (request.POST.get(f"module_title_{index}") or "").strip() or f"Module {index + 1}"
             description = (request.POST.get(f"module_description_{index}") or "").strip()
             video_file = request.FILES.get(f"module_video_{index}") or None
-            video_url = (request.POST.get(f"module_video_url_{index}") or request.POST.get(f"module_video_path_{index}") or "").strip()
+            video_url = (request.POST.get(f"module_video_url_{index}") or "").strip()
             lesson_count = 0
             try:
                 lesson_count = int(request.POST.get(f"module_lesson_count_{index}", "0"))
@@ -972,9 +965,9 @@ def _admin_modules_save_impl(request):
                 lesson_title = (request.POST.get(f"module_{index}_lesson_title_{lesson_index}") or "").strip() or f"Lesson {lesson_index + 1}"
                 lesson_description = (request.POST.get(f"module_{index}_lesson_description_{lesson_index}") or "").strip()
                 lesson_video = request.FILES.get(f"module_{index}_lesson_video_{lesson_index}") or None
-                lesson_video_url = (request.POST.get(f"module_{index}_lesson_video_url_{lesson_index}") or request.POST.get(f"module_{index}_lesson_video_path_{lesson_index}") or "").strip()
+                lesson_video_url = (request.POST.get(f"module_{index}_lesson_video_url_{lesson_index}") or "").strip()
                 lesson_thumbnail = request.FILES.get(f"module_{index}_lesson_thumbnail_{lesson_index}") or None
-                lesson_thumbnail_url = (request.POST.get(f"module_{index}_lesson_thumbnail_url_{lesson_index}") or request.POST.get(f"module_{index}_lesson_thumbnail_path_{lesson_index}") or "").strip()
+                lesson_thumbnail_url = (request.POST.get(f"module_{index}_lesson_thumbnail_url_{lesson_index}") or "").strip()
                 lessons.append({
                     "id": lesson_id,
                     "title": lesson_title,
@@ -1028,8 +1021,6 @@ def _admin_modules_save_impl(request):
                     module_obj.video = item["video"]
                 if isinstance(item, dict) and item.get("video_url"):
                     module_obj.video_url = str(item["video_url"]).strip()
-                if isinstance(item, dict) and "video_path" in item:
-                    module_obj.video_path = str(item.get("video_path") or "").strip()
                 module_obj.save()
 
                 lessons = item.get("lessons") if isinstance(item, dict) else []
@@ -1050,14 +1041,10 @@ def _admin_modules_save_impl(request):
                         lesson_obj.video = lesson_item["video"]
                     if isinstance(lesson_item, dict) and lesson_item.get("video_url"):
                         lesson_obj.video_url = str(lesson_item["video_url"]).strip()
-                    if isinstance(lesson_item, dict) and "video_path" in lesson_item:
-                        lesson_obj.video_path = str(lesson_item.get("video_path") or "").strip()
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail"):
                         lesson_obj.thumbnail = lesson_item["thumbnail"]
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail_url"):
                         lesson_obj.thumbnail_url = str(lesson_item["thumbnail_url"]).strip()
-                    if isinstance(lesson_item, dict) and "thumbnail_path" in lesson_item:
-                        lesson_obj.thumbnail_path = str(lesson_item.get("thumbnail_path") or "").strip()
                     lesson_obj.save()
     except Exception:
         logger.exception("Admin module save failed")

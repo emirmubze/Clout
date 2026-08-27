@@ -44,18 +44,6 @@ services:
       - key: GROQ_API_KEY
         sync: false
 
-      - key: SUPABASE_URL
-        sync: false
-
-      - key: SUPABASE_ANON_KEY
-        sync: false
-
-      - key: SUPABASE_PUBLISHABLE_KEY
-        sync: false
-
-      - key: SUPABASE_STORAGE_BUCKET
-        value: clout
-
       # Durable object storage for uploaded images and videos.
       - key: USE_S3
         value: "True"

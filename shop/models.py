@@ -102,7 +102,6 @@ class Module(models.Model):
     description = models.TextField(blank=True, default="")
     video = models.FileField(upload_to="course_videos/", null=True, blank=True)
     video_url = models.URLField(blank=True, default="")
-    video_path = models.CharField(max_length=500, blank=True, default="")
     order = models.IntegerField(default=0)  # For ordering modules
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -115,8 +114,10 @@ class Module(models.Model):
 
     @property
     def video_public_url(self):
-        if self.video_path and settings.SUPABASE_URL and settings.SUPABASE_STORAGE_BUCKET:
-            return f"{settings.SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{settings.SUPABASE_STORAGE_BUCKET}/{self.video_path.lstrip('/')}"
+        if self.video:
+            domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
+            if domain:
+                return f"https://{domain}/{self.video.name.lstrip('/')}"
         return self.video_url or (self.video.url if self.video else "")
 
 
@@ -126,10 +127,8 @@ class Lesson(models.Model):
     description = models.TextField(blank=True, default="")
     video = models.FileField(upload_to="course_videos/", null=True, blank=True)
     video_url = models.URLField(blank=True, default="")
-    video_path = models.CharField(max_length=500, blank=True, default="")
     thumbnail = models.ImageField(upload_to="lesson_thumbnails/", null=True, blank=True)
     thumbnail_url = models.URLField(blank=True, default="")
-    thumbnail_path = models.CharField(max_length=500, blank=True, default="")
     order = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -142,14 +141,18 @@ class Lesson(models.Model):
 
     @property
     def video_public_url(self):
-        if self.video_path and settings.SUPABASE_URL and settings.SUPABASE_STORAGE_BUCKET:
-            return f"{settings.SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{settings.SUPABASE_STORAGE_BUCKET}/{self.video_path.lstrip('/')}"
+        if self.video:
+            domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
+            if domain:
+                return f"https://{domain}/{self.video.name.lstrip('/')}"
         return self.video_url or (self.video.url if self.video else "")
 
     @property
     def thumbnail_public_url(self):
-        if self.thumbnail_path and settings.SUPABASE_URL and settings.SUPABASE_STORAGE_BUCKET:
-            return f"{settings.SUPABASE_URL.rstrip('/')}/storage/v1/object/public/{settings.SUPABASE_STORAGE_BUCKET}/{self.thumbnail_path.lstrip('/')}"
+        if self.thumbnail:
+            domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
+            if domain:
+                return f"https://{domain}/{self.thumbnail.name.lstrip('/')}"
         return self.thumbnail_url or (self.thumbnail.url if self.thumbnail else "")
 
 

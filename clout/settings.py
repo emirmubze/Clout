@@ -213,14 +213,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-SUPABASE_URL = os.getenv("SUPABASE_URL", "")
-SUPABASE_ANON_KEY = os.getenv(
-    "SUPABASE_ANON_KEY",
-    os.getenv("SUPABASE_PUBLISHABLE_KEY", "")
-)
-SUPABASE_STORAGE_BUCKET = os.getenv("SUPABASE_STORAGE_BUCKET", "clout")
-
-
 # =========================================================
 # STATIC FILES
 # =========================================================
@@ -235,7 +227,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 
 # =========================================================
-# MEDIA FILES
+# MEDIA FILES - CLOUDFLARE R2
 # =========================================================
 
 USE_S3 = os.getenv("USE_S3", "False").lower() == "true"
@@ -245,14 +237,10 @@ if USE_S3:
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
     AWS_STORAGE_BUCKET_NAME = os.getenv(
         "AWS_STORAGE_BUCKET_NAME",
-        SUPABASE_STORAGE_BUCKET,
+        "clout",
     )
-    AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME")
+    AWS_S3_REGION_NAME = "auto"
     AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
-    AWS_S3_CUSTOM_DOMAIN = (
-        f"{SUPABASE_URL.rstrip('/').replace('https://', '')}"
-        f"/storage/v1/object/public/{AWS_STORAGE_BUCKET_NAME}"
-    )
 
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_S3_ADDRESSING_STYLE = "path"
@@ -280,10 +268,8 @@ if USE_S3:
         },
     }
 
-    MEDIA_URL = (
-        f"{SUPABASE_URL}/storage/v1/object/public/"
-        f"{AWS_STORAGE_BUCKET_NAME}/"
-    )
+    AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_S3_CUSTOM_DOMAIN")
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 else:
     STORAGES = {
         "default": {
