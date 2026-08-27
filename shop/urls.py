@@ -105,6 +105,12 @@ urlpatterns = [
     ),
 
     path(
+        "admin-r2-presign/",
+        views.r2_presign_upload,
+        name="r2_presign_upload"
+    ),
+
+    path(
         "lesson-video/<int:lesson_id>/",
         views.serve_lesson_video,
         name="serve_lesson_video"

@@ -1,8 +1,10 @@
 import json
 import logging
 import os
+import re
 import razorpay
 import uuid
+import boto3
 from decimal import Decimal, InvalidOperation
 from smtplib import SMTPException
 from urllib.error import HTTPError, URLError
@@ -27,6 +29,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.http import require_POST
 from django.urls import reverse, reverse_lazy
+from botocore.config import Config
 
 from .models import Order, CustomUser, ContactMessage, Course, Module, Lesson
 from .auth_api import revoke_api_sessions
@@ -700,7 +703,11 @@ def admin_course_add(request):
 
     if form.is_valid():
 
-        course = form.save()
+        course = form.save(commit=False)
+        video_key = (request.POST.get("video_key") or "").strip()
+        if video_key:
+            course.video = video_key
+        course.save()
 
         # AJAX RESPONSE
         if request.headers.get(
@@ -807,6 +814,9 @@ def admin_course_edit(
     if form.is_valid():
 
         course = form.save(commit=False)
+        video_key = (request.POST.get("video_key") or "").strip()
+        if video_key:
+            course.video = video_key
         if (
             Order.objects.filter(paid=True).exists()
             or CustomUser.objects.filter(course_access_approved=True).exists()
@@ -934,6 +944,72 @@ def admin_modules_save(request):
         )
 
 
+@login_required(login_url="login")
+@require_POST
+def r2_presign_upload(request):
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+    if not settings.USE_S3:
+        return JsonResponse({"success": False, "message": "Direct R2 uploads are disabled in local storage mode."}, status=400)
+
+    try:
+        payload = json.loads(request.body or "{}")
+        filename = str(payload.get("filename") or "").strip()
+        content_type = str(payload.get("content_type") or "application/octet-stream").strip()
+        folder = str(payload.get("folder") or "").strip().strip("/")
+    except (json.JSONDecodeError, AttributeError):
+        return JsonResponse({"success": False, "message": "Invalid upload request."}, status=400)
+
+    allowed_folders = {
+        "course_videos",
+        "course_thumbnails",
+        "contact_videos",
+        "contact_images",
+    }
+    if folder not in allowed_folders:
+        return JsonResponse({"success": False, "message": "Invalid upload folder."}, status=400)
+    if not filename:
+        return JsonResponse({"success": False, "message": "A filename is required."}, status=400)
+
+    safe_filename = re.sub(r"[^A-Za-z0-9._-]", "-", filename).strip(".") or "upload"
+    object_key = f"{folder}/{uuid.uuid4().hex}-{safe_filename}"
+
+    try:
+        client = boto3.client(
+            "s3",
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            endpoint_url=settings.AWS_S3_ENDPOINT_URL,
+            region_name=settings.AWS_S3_REGION_NAME,
+            config=Config(
+                signature_version="s3v4",
+                s3={"addressing_style": "path"},
+            ),
+        )
+        upload_url = client.generate_presigned_url(
+            "put_object",
+            Params={
+                "Bucket": settings.AWS_STORAGE_BUCKET_NAME,
+                "Key": object_key,
+                "ContentType": content_type,
+            },
+            ExpiresIn=900,
+            HttpMethod="PUT",
+        )
+    except Exception:
+        logger.exception("Could not create R2 presigned upload URL")
+        return JsonResponse(
+            {"success": False, "message": "Could not prepare the R2 upload."},
+            status=502,
+        )
+
+    return JsonResponse({
+        "success": True,
+        "upload_url": upload_url,
+        "object_key": object_key,
+    })
+
+
 def _admin_modules_save_impl(request):
     if not request.user.is_staff:
         return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
@@ -953,6 +1029,7 @@ def _admin_modules_save_impl(request):
             description = (request.POST.get(f"module_description_{index}") or "").strip()
             video_file = request.FILES.get(f"module_video_{index}") or None
             video_url = (request.POST.get(f"module_video_url_{index}") or "").strip()
+            video_key = (request.POST.get(f"module_video_key_{index}") or "").strip()
             lesson_count = 0
             try:
                 lesson_count = int(request.POST.get(f"module_lesson_count_{index}", "0"))
@@ -966,6 +1043,7 @@ def _admin_modules_save_impl(request):
                 lesson_description = (request.POST.get(f"module_{index}_lesson_description_{lesson_index}") or "").strip()
                 lesson_video = request.FILES.get(f"module_{index}_lesson_video_{lesson_index}") or None
                 lesson_video_url = (request.POST.get(f"module_{index}_lesson_video_url_{lesson_index}") or "").strip()
+                lesson_video_key = (request.POST.get(f"module_{index}_lesson_video_key_{lesson_index}") or "").strip()
                 lesson_thumbnail = request.FILES.get(f"module_{index}_lesson_thumbnail_{lesson_index}") or None
                 lesson_thumbnail_url = (request.POST.get(f"module_{index}_lesson_thumbnail_url_{lesson_index}") or "").strip()
                 lessons.append({
@@ -974,6 +1052,7 @@ def _admin_modules_save_impl(request):
                     "description": lesson_description,
                     "video": lesson_video,
                     "video_url": lesson_video_url,
+                    "video_key": lesson_video_key,
                     "thumbnail": lesson_thumbnail,
                     "thumbnail_url": lesson_thumbnail_url,
                 })
@@ -984,6 +1063,7 @@ def _admin_modules_save_impl(request):
                 "description": description,
                 "video": video_file,
                 "video_url": video_url,
+                "video_key": video_key,
                 "lessons": lessons,
             })
     else:
@@ -1021,6 +1101,8 @@ def _admin_modules_save_impl(request):
                     module_obj.video = item["video"]
                 if isinstance(item, dict) and item.get("video_url"):
                     module_obj.video_url = str(item["video_url"]).strip()
+                if isinstance(item, dict) and item.get("video_key"):
+                    module_obj.video = str(item["video_key"]).strip()
                 module_obj.save()
 
                 lessons = item.get("lessons") if isinstance(item, dict) else []
@@ -1041,6 +1123,8 @@ def _admin_modules_save_impl(request):
                         lesson_obj.video = lesson_item["video"]
                     if isinstance(lesson_item, dict) and lesson_item.get("video_url"):
                         lesson_obj.video_url = str(lesson_item["video_url"]).strip()
+                    if isinstance(lesson_item, dict) and lesson_item.get("video_key"):
+                        lesson_obj.video = str(lesson_item["video_key"]).strip()
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail"):
                         lesson_obj.thumbnail = lesson_item["thumbnail"]
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail_url"):

@@ -2327,6 +2327,47 @@
 <script>
     let moduleLessonCounts = {};
 
+    window.uploadLargeVideo = async function(file, progressCallback) {
+        if (!file) throw new Error("No video selected.");
+
+        const csrfInput = document.querySelector("input[name='csrfmiddlewaretoken']");
+        const response = await fetch("{% url 'r2_presign_upload' %}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": csrfInput ? csrfInput.value : "",
+                "X-Requested-With": "XMLHttpRequest"
+            },
+            credentials: "same-origin",
+            body: JSON.stringify({
+                filename: file.name,
+                content_type: file.type || "video/mp4",
+                folder: "course_videos"
+            })
+        });
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Could not prepare the R2 video upload.");
+        }
+
+        return await new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.open("PUT", data.upload_url, true);
+            xhr.setRequestHeader("Content-Type", file.type || "video/mp4");
+            xhr.upload.onprogress = event => {
+                if (event.lengthComputable && progressCallback) {
+                    progressCallback(Math.round(event.loaded / event.total * 100));
+                }
+            };
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) resolve(data.object_key);
+                else reject(new Error(`R2 upload failed (${xhr.status}). Check the bucket CORS policy.`));
+            };
+            xhr.onerror = () => reject(new Error("The browser could not reach R2. Check the bucket CORS policy and public HTTPS endpoint."));
+            xhr.send(file);
+        });
+    };
+
     function addModule(moduleData = null) {
         const module = document.createElement("div");
         module.className = "module-editor";
@@ -2428,7 +2469,10 @@
                 formData.append(`module_${moduleIndex}_lesson_title_${lessonIndex}`, lessonTitle || `Lesson ${lessonIndex + 1}`);
                 formData.append(`module_${moduleIndex}_lesson_description_${lessonIndex}`, lessonDescription);
                 if (lessonVideoInput?.files?.[0]) {
-                    formData.append(`module_${moduleIndex}_lesson_video_${lessonIndex}`, lessonVideoInput.files[0]);
+                    lesson.pendingVideo = lessonVideoInput.files[0];
+                }
+                if (lessonVideoInput?.files?.[0]) {
+                    formData.append(`module_${moduleIndex}_lesson_video_key_${lessonIndex}`, "");
                 }
                 if (lessonThumbnailInput?.files?.[0]) {
                     formData.append(`module_${moduleIndex}_lesson_thumbnail_${lessonIndex}`, lessonThumbnailInput.files[0]);
@@ -2437,6 +2481,20 @@
         });
 
         try {
+            for (const [moduleIndex, module] of moduleEditors.entries()) {
+                const lessons = [...module.querySelectorAll(".editor-lesson")];
+                for (const [lessonIndex, lesson] of lessons.entries()) {
+                    if (lesson.pendingVideo) {
+                        if (saveButton) saveButton.textContent = "Uploading video...";
+                        formData.set(
+                            `module_${moduleIndex}_lesson_video_key_${lessonIndex}`,
+                            await window.uploadLargeVideo(lesson.pendingVideo, percent => {
+                                if (saveButton) saveButton.textContent = `Uploading ${percent}%...`;
+                            })
+                        );
+                    }
+                }
+            }
             const response = await fetch("{% url 'admin_modules_save' %}", {
                 method: "POST",
                 headers: {
@@ -2771,9 +2829,15 @@
     }
 
     async function postAjax(form) {
+        const formData = new FormData(form);
+        if (form.dataset.videoKey) {
+            formData.delete("video");
+            formData.append("video_key", form.dataset.videoKey);
+        }
+
         const response = await fetch(form.action, {
             method: "POST",
-            body: new FormData(form),
+            body: formData,
             credentials: "same-origin",
             headers: {
                 "X-Requested-With": "XMLHttpRequest",
@@ -3017,6 +3081,14 @@
             );
 
             try {
+                const videoInput = courseForm.querySelector("[name='video']");
+                if (videoInput?.files?.[0]) {
+                    setLoading(button, "Uploading video...", true);
+                    courseForm.dataset.videoKey = await window.uploadLargeVideo(
+                        videoInput.files[0],
+                        percent => setLoading(button, `Uploading ${percent}%...`, true)
+                    );
+                }
                 const data = await postAjax(courseForm);
 
                 if (editing) {
@@ -3027,9 +3099,11 @@
                     showToast(
                         data.message || "Course updated successfully."
                     );
+                    delete courseForm.dataset.videoKey;
                 } else {
                     addCourseCard(data.course || {});
                     courseForm.reset();
+                    delete courseForm.dataset.videoKey;
 
                     showToast(
                         data.message || "Course added successfully."
