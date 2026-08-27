@@ -15,11 +15,6 @@ services:
       - key: DJANGO_SECRET_KEY
         sync: false
 
-      - key: DATABASE_URL
-        fromDatabase:
-          name: clout-db
-          property: connectionString
-
       - key: ALLOWED_HOSTS
         value: clout.onrender.com,clout.courses,www.clout.courses
 
@@ -83,8 +78,3 @@ services:
 
       - key: DEFAULT_FROM_EMAIL
         value: "Clout <admin@clout.courses>"
-
-
-databases:
-  - name: clout-db
-    plan: free

@@ -2,7 +2,6 @@ from pathlib import Path
 import os
 
 from dotenv import load_dotenv
-import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 
 
@@ -149,40 +148,16 @@ WSGI_APPLICATION = "clout.wsgi.application"
 # DATABASE
 # =========================================================
 #
-# Local:
-#     SQLite
-#
-# Render:
-#     PostgreSQL using DATABASE_URL
+# SQLite database
 #
 # =========================================================
 
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-
-if DATABASE_URL:
-
-    DATABASES = {
-        "default": dj_database_url.parse(
-            DATABASE_URL,
-            conn_max_age=600,
-            conn_health_checks=True,
-        )
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
-
-else:
-
-    if not DEBUG:
-        raise ImproperlyConfigured(
-            "DATABASE_URL must be set in production; refusing to use SQLite."
-        )
-
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+}
 
 
 # =========================================================
