@@ -116,17 +116,16 @@ class Module(models.Model):
     def video_public_url(self):
         if self.video_url:
             return self.video_url
-
-        if self.video:
-            video_path = str(self.video).strip()
-            if video_path.startswith(("http://", "https://")):
-                return video_path
-
+        if not self.video:
+            return ""
+        video_path = str(self.video).strip()
+        if video_path.startswith(("http://", "https://")):
+            return video_path
+        try:
+            return self.video.url
+        except (AttributeError, ValueError):
             domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
-            if domain:
-                return f"https://{domain.rstrip('/')}/{video_path.lstrip('/')}"
-
-        return ""
+            return f"https://{domain.rstrip('/')}/{video_path.lstrip('/')}" if domain else ""
 
 
 class Lesson(models.Model):
@@ -151,17 +150,16 @@ class Lesson(models.Model):
     def video_public_url(self):
         if self.video_url:
             return self.video_url
-
-        if self.video:
-            video_path = str(self.video).strip()
-            if video_path.startswith(("http://", "https://")):
-                return video_path
-
+        if not self.video:
+            return ""
+        video_path = str(self.video).strip()
+        if video_path.startswith(("http://", "https://")):
+            return video_path
+        try:
+            return self.video.url
+        except (AttributeError, ValueError):
             domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
-            if domain:
-                return f"https://{domain.rstrip('/')}/{video_path.lstrip('/')}"
-
-        return ""
+            return f"https://{domain.rstrip('/')}/{video_path.lstrip('/')}" if domain else ""
 
     @property
     def thumbnail_public_url(self):

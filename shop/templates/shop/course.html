@@ -1952,6 +1952,7 @@ function selectLesson(lesson) {
     videoPoster.src = posterUrl;
     videoPoster.alt = posterUrl ? `${title} thumbnail` : "";
     videoPoster.classList.remove("hidden");
+    video.poster = posterUrl;
 
 
     progressFill.style.width =
@@ -1970,6 +1971,8 @@ function selectLesson(lesson) {
 
         video.src =
             videoUrl;
+
+        console.info("Loading course video:", videoUrl);
 
         video.load();
 
@@ -1990,7 +1993,12 @@ function selectLesson(lesson) {
 video.addEventListener("error", function() {
     if (video.currentSrc) {
         console.error("Course video could not be loaded:", video.currentSrc, video.error);
+        lessonDescription.textContent = "This video could not be loaded. Check the R2 public domain and video range access.";
     }
+});
+
+video.addEventListener("loadeddata", function() {
+    console.info("Course video ready:", video.currentSrc);
 });
 
 
