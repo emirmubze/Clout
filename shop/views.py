@@ -929,7 +929,7 @@ def admin_modules_save(request):
     except Exception:
         logger.exception("Admin module save request failed")
         return JsonResponse(
-            {"success": False, "message": "Could not save the modules and lessons."},
+            {"success": False, "message": "The server could not process the module upload. Check the R2 credentials, endpoint, bucket, and deployment logs."},
             status=500,
         )
 
@@ -1049,8 +1049,8 @@ def _admin_modules_save_impl(request):
     except Exception:
         logger.exception("Admin module save failed")
         return JsonResponse(
-            {"success": False, "message": "Could not save the modules and lessons."},
-            status=400,
+            {"success": False, "message": "The R2 upload or database save failed. Check the R2 credentials, endpoint, bucket, and deployment logs."},
+            status=502,
         )
 
     return JsonResponse({

@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
-from django.conf import settings
 
 
 class CustomUser(AbstractUser):
@@ -114,10 +113,6 @@ class Module(models.Model):
 
     @property
     def video_public_url(self):
-        if self.video:
-            domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
-            if domain:
-                return f"https://{domain}/{self.video.name.lstrip('/')}"
         return self.video_url or (self.video.url if self.video else "")
 
 
@@ -141,18 +136,10 @@ class Lesson(models.Model):
 
     @property
     def video_public_url(self):
-        if self.video:
-            domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
-            if domain:
-                return f"https://{domain}/{self.video.name.lstrip('/')}"
         return self.video_url or (self.video.url if self.video else "")
 
     @property
     def thumbnail_public_url(self):
-        if self.thumbnail:
-            domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
-            if domain:
-                return f"https://{domain}/{self.thumbnail.name.lstrip('/')}"
         return self.thumbnail_url or (self.thumbnail.url if self.thumbnail else "")
 
 

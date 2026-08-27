@@ -250,8 +250,9 @@ if USE_S3:
     )
 
     AWS_S3_CUSTOM_DOMAIN = os.getenv(
-        "AWS_S3_CUSTOM_DOMAIN"
-    )
+        "AWS_S3_CUSTOM_DOMAIN",
+        "",
+    ).strip().removeprefix("https://").removeprefix("http://").rstrip("/")
 
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_S3_ADDRESSING_STYLE = "path"
@@ -279,7 +280,7 @@ if USE_S3:
         },
     }
 
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/" if AWS_S3_CUSTOM_DOMAIN else "/media/"
 else:
     STORAGES = {
         "default": {
