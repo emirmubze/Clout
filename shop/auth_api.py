@@ -9,6 +9,7 @@ from datetime import timedelta
 from functools import wraps
 
 from django.contrib.auth import authenticate
+from django.contrib.sessions.models import Session
 from django.core.cache import cache
 from django.http import JsonResponse
 from django.utils import timezone
@@ -61,13 +62,37 @@ def _user_data(user):
     return {"id": str(user.pk), "name": user.name, "email": user.email, "role": "admin" if user.is_staff else "user"}
 
 
-def _tokens(user):
+def revoke_api_sessions(user, keep_session_key=None):
+    AuthSession.objects.filter(user=user, revoked_at__isnull=True).update(revoked_at=timezone.now())
+
+    for session in Session.objects.all():
+        try:
+            session_data = session.get_decoded()
+        except Exception:
+            continue
+        if (
+            session_data.get("_auth_user_id") == str(user.pk)
+            and session.session_key != keep_session_key
+        ):
+            session.delete()
+
+    if keep_session_key:
+        user.active_session_key = keep_session_key
+        user.save(update_fields=["active_session_key"])
+    elif user.active_session_key:
+        user.active_session_key = ""
+        user.save(update_fields=["active_session_key"])
+
+
+def _tokens(user, revoke_existing=False):
+    if revoke_existing:
+        revoke_api_sessions(user)
     now = int(time.time())
     access_jti = secrets.token_urlsafe(18)
     refresh_jti = secrets.token_urlsafe(18)
     access_minutes = int(os.getenv("JWT_ACCESS_EXPIRES_MINUTES", "10"))
     refresh_days = int(os.getenv("JWT_REFRESH_EXPIRES_DAYS", "7"))
-    AuthSession.objects.create(user=user, refresh_jti=refresh_jti, expires_at=timezone.now() + timedelta(days=refresh_days))
+    AuthSession.objects.create(user=user, access_jti=access_jti, refresh_jti=refresh_jti, expires_at=timezone.now() + timedelta(days=refresh_days))
     access = _token({"sub": str(user.pk), "role": "admin" if user.is_staff else "user", "jti": access_jti, "type": "access", "exp": now + access_minutes * 60})
     refresh = _token({"sub": str(user.pk), "jti": refresh_jti, "type": "refresh", "exp": now + refresh_days * 86400})
     return access, refresh
@@ -85,8 +110,14 @@ def _auth_user(request):
         payload = _decode(header[7:])
         if payload.get("type") != "access":
             return None
-        return CustomUser.objects.get(pk=payload["sub"])
-    except (ValueError, KeyError, TypeError, json.JSONDecodeError, CustomUser.DoesNotExist):
+        session = AuthSession.objects.get(
+            user_id=payload["sub"],
+            access_jti=payload["jti"],
+            revoked_at__isnull=True,
+            expires_at__gt=timezone.now(),
+        )
+        return session.user
+    except (ValueError, KeyError, TypeError, json.JSONDecodeError, AuthSession.DoesNotExist):
         return None
 
 
@@ -129,7 +160,7 @@ def register(request):
         username = f"{base}{suffix}"
         suffix += 1
     user = CustomUser.objects.create_user(username=username, email=email, name=name, password=password)
-    access, refresh = _tokens(user)
+    access, refresh = _tokens(user, revoke_existing=True)
     response = JsonResponse({"success": True, "message": "User created successfully", "data": {"user": _user_data(user), "accessToken": access}}, status=201)
     _set_refresh(response, refresh)
     return response
@@ -146,7 +177,7 @@ def login(request):
     user = authenticate(request, username=email, password=data.get("password"))
     if not user:
         return JsonResponse({"success": False, "message": "Invalid email or password."}, status=401)
-    access, refresh = _tokens(user)
+    access, refresh = _tokens(user, revoke_existing=True)
     response = JsonResponse({"success": True, "message": "Logged in successfully", "data": {"user": _user_data(user), "accessToken": access}})
     _set_refresh(response, refresh)
     return response

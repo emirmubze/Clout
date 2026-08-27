@@ -27,6 +27,7 @@ class CustomUser(AbstractUser):
 
 class AuthSession(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="auth_sessions")
+    access_jti = models.CharField(max_length=64, unique=True, null=True, blank=True)
     refresh_jti = models.CharField(max_length=64, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()

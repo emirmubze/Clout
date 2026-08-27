@@ -748,13 +748,34 @@ class AuthApiTests(TestCase):
             "email": user.email, "password": "StrongPass123!",
         }, REMOTE_ADDR="192.0.2.11")
         access_token = login_response.json()["data"]["accessToken"]
+        self.client.cookies["refreshToken"] = login_response.cookies["refreshToken"].value
         refresh_response = self.json_request("post", reverse("api_refresh"))
         self.assertEqual(refresh_response.status_code, 200)
         self.assertEqual(user.auth_sessions.filter(revoked_at__isnull=False).count(), 1)
+        access_token = refresh_response.json()["data"]["accessToken"]
 
         response = self.json_request("post", reverse("api_logout_all"), HTTP_AUTHORIZATION=f"Bearer {access_token}")
         self.assertEqual(response.status_code, 200)
         self.assertFalse(user.auth_sessions.filter(revoked_at__isnull=True).exists())
+
+    def test_new_api_login_invalidates_previous_access_token(self):
+        user = CustomUser.objects.create_user(
+            username="deviceapi", email="deviceapi@example.com", password="StrongPass123!",
+        )
+        first = self.json_request("post", reverse("api_login"), {
+            "email": user.email, "password": "StrongPass123!",
+        }, REMOTE_ADDR="192.0.2.13")
+        first_token = first.json()["data"]["accessToken"]
+        second = self.json_request("post", reverse("api_login"), {
+            "email": user.email, "password": "StrongPass123!",
+        }, REMOTE_ADDR="192.0.2.14")
+        self.assertEqual(second.status_code, 200)
+
+        response = self.client.get(
+            reverse("api_me"),
+            HTTP_AUTHORIZATION=f"Bearer {first_token}",
+        )
+        self.assertEqual(response.status_code, 401)
 
     def test_admin_dashboard_requires_staff_user(self):
         user = CustomUser.objects.create_user(

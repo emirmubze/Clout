@@ -29,6 +29,7 @@ from django.views.decorators.http import require_POST
 from django.urls import reverse, reverse_lazy
 
 from .models import Order, CustomUser, ContactMessage, Course, Module, Lesson
+from .auth_api import revoke_api_sessions
 from .forms import RegistrationForm, CourseForm
 
 
@@ -104,6 +105,8 @@ class SingleDeviceLoginView(LoginView):
 
             user.active_session_key = current_session_key
             user.save(update_fields=["active_session_key"])
+
+        revoke_api_sessions(user, keep_session_key=current_session_key)
 
         return response
 
@@ -1331,6 +1334,11 @@ def register_view(request):
             request.user.save(update_fields=["active_session_key"])
 
             revoke_user_sessions(
+                user,
+                request.session.session_key
+            )
+
+            revoke_api_sessions(
                 user,
                 request.session.session_key
             )
