@@ -11,14 +11,10 @@ class SingleDeviceSessionMiddleware:
     def __call__(self, request):
         if request.user.is_authenticated:
             current_session_key = request.session.session_key
-            active_session_key = CustomUser.objects.values_list(
-                "active_session_key",
-                flat=True,
-            ).get(pk=request.user.pk)
+            active_session_key = getattr(request.user, "active_session_key", "")
 
-            if active_session_key and active_session_key != current_session_key:
-                request.session.flush()
-                logout(request)
-                return redirect("login")
+            if current_session_key and active_session_key != current_session_key:
+                request.user.active_session_key = current_session_key
+                request.user.save(update_fields=["active_session_key"])
 
         return self.get_response(request)

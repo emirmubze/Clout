@@ -22,6 +22,20 @@ class CustomUser(AbstractUser):
         from .models import Order
         return Order.objects.filter(user=self, paid=True).exists()
 
+    @property
+    def profile_image_url(self):
+        if not self.profile_image:
+            return ""
+
+        try:
+            return self.profile_image.url
+        except (AttributeError, ValueError):
+            domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
+            if not domain:
+                return ""
+            relative_path = str(self.profile_image).lstrip("/")
+            return f"https://{domain.rstrip('/')}/{relative_path}"
+
     def __str__(self):
         return self.username
 

@@ -368,10 +368,10 @@
             <div class="profile-section">
 
                 <div class="profile-image-container">
-                    {% if user.profile_image %}
-                        <img src="{{ user.profile_image.url }}" alt="Profile">
+                    {% if user.profile_image_url %}
+                        <img src="{{ user.profile_image_url }}" alt="Profile">
                     {% else %}
-                        <span>👤</span>
+                        <span>{{ user.name|default:user.username|slice:':1'|upper }}</span>
                     {% endif %}
                 </div>
 
@@ -414,6 +414,18 @@
                              Upload Profile Picture
                         </label>
                     </div>
+
+                    {% if form.profile_image.errors %}
+                        <div class="form-error" style="margin-top:8px; color:#c62828; font-size:13px;">
+                            {{ form.profile_image.errors|join:', ' }}
+                        </div>
+                    {% endif %}
+
+                    {% if form.non_field_errors %}
+                        <div class="form-error" style="margin-top:8px; color:#c62828; font-size:13px;">
+                            {{ form.non_field_errors|join:', ' }}
+                        </div>
+                    {% endif %}
 
                 </div>
 

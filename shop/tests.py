@@ -5,6 +5,7 @@ from smtplib import SMTPException
 
 from django.core import mail
 from django.core.management import call_command
+from django.middleware.csrf import get_token
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
@@ -94,6 +95,54 @@ class UserAuthAndDashboardTests(TestCase):
         self.assertEqual(user.username, "browseruser")
         self.assertEqual(user.name, "Browser User")
         self.assertEqual(user.phone_number, "+91 9876543210")
+
+    def test_signup_accepts_trusted_render_origin_csrf(self):
+        client = Client(enforce_csrf_checks=True)
+
+        response = client.get(reverse("register"))
+        csrf_token = get_token(response.wsgi_request)
+
+        form_data = {
+            "username": "renderuser",
+            "name": "Render User",
+            "email": "renderuser@example.com",
+            "country_code": "+91",
+            "phone": "9876543210",
+            "password": "VeryStrongPass123!",
+            "confirm_password": "VeryStrongPass123!",
+            "csrfmiddlewaretoken": csrf_token,
+        }
+
+        response = client.post(
+            reverse("register"),
+            form_data,
+            HTTP_ORIGIN="https://clout.onrender.com",
+        )
+
+        self.assertEqual(response.status_code, 302)
+        user = CustomUser.objects.get(email="renderuser@example.com")
+        self.assertEqual(user.username, "renderuser")
+        self.assertEqual(user.phone_number, "+91 9876543210")
+
+    def test_session_mismatch_does_not_logout_logged_in_user(self):
+        user = CustomUser.objects.create_user(
+            username="sessionuser",
+            email="sessionuser@example.com",
+            password="VeryStrongPass123!",
+            name="Session User",
+        )
+
+        client = Client()
+        client.force_login(user)
+
+        user.active_session_key = "stale-session-key"
+        user.save(update_fields=["active_session_key"])
+
+        response = client.get(reverse("index"))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.wsgi_request.user.is_authenticated)
+        self.assertEqual(response.wsgi_request.user, user)
 
     def test_login_accepts_email_and_password(self):
         user = CustomUser.objects.create_user(

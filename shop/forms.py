@@ -60,6 +60,25 @@ class ProfileImageForm(forms.ModelForm):
             "profile_image": forms.FileInput(attrs={"accept": "image/*"}),
         }
 
+    def clean_profile_image(self):
+        image = self.cleaned_data.get("profile_image")
+
+        if not image:
+            return image
+
+        if getattr(image, "content_type", "") and not image.content_type.startswith("image/"):
+            raise forms.ValidationError("Please upload a valid image file.")
+
+        try:
+            from PIL import Image
+            img = Image.open(image)
+            img.verify()
+            image.seek(0)
+        except Exception:
+            raise forms.ValidationError("Please upload a valid image file.")
+
+        return image
+
 
 class CourseForm(forms.ModelForm):
     class Meta:

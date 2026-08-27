@@ -3,6 +3,7 @@ import os
 
 from dotenv import load_dotenv
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 
 # =========================================================
@@ -28,6 +29,9 @@ DEBUG = os.getenv(
     "True"
 ).lower() == "true"
 
+if not DEBUG and SECRET_KEY == "change-me":
+    raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set in production.")
+
 
 # =========================================================
 # ALLOWED HOSTS
@@ -49,6 +53,11 @@ ALLOWED_HOSTS = [
 CSRF_TRUSTED_ORIGINS = [
     "https://clout.courses",
     "https://www.clout.courses",
+    "https://clout.onrender.com",
+    "https://www.clout.onrender.com",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+    "http://localhost",
 ]
 
 
@@ -159,6 +168,11 @@ if DATABASE_URL:
 
 else:
 
+    if not DEBUG:
+        raise ImproperlyConfigured(
+            "DATABASE_URL must be set in production; refusing to use SQLite."
+        )
+
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
@@ -232,6 +246,11 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 USE_S3 = os.getenv("USE_S3", "False").lower() == "true"
 
+if not DEBUG and not USE_S3:
+    raise ImproperlyConfigured(
+        "USE_S3 must be True in production; refusing to use local media storage."
+    )
+
 if USE_S3:
     AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
@@ -251,6 +270,23 @@ if USE_S3:
         "AWS_S3_CUSTOM_DOMAIN",
         "",
     ).strip().removeprefix("https://").removeprefix("http://").rstrip("/")
+
+    if not DEBUG:
+        missing_storage_settings = [
+            name
+            for name, value in {
+                "AWS_ACCESS_KEY_ID": AWS_ACCESS_KEY_ID,
+                "AWS_SECRET_ACCESS_KEY": AWS_SECRET_ACCESS_KEY,
+                "AWS_S3_ENDPOINT_URL": AWS_S3_ENDPOINT_URL,
+                "AWS_S3_CUSTOM_DOMAIN": AWS_S3_CUSTOM_DOMAIN,
+            }.items()
+            if not value
+        ]
+        if missing_storage_settings:
+            raise ImproperlyConfigured(
+                "Missing production object-storage settings: "
+                + ", ".join(missing_storage_settings)
+            )
 
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_S3_ADDRESSING_STYLE = "path"
@@ -318,6 +354,13 @@ LOGIN_URL = "login"
 LOGIN_REDIRECT_URL = "index"
 
 LOGOUT_REDIRECT_URL = "index"
+
+# Keep browser sessions in the durable database across web-service deploys.
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 14
 
 
 # =========================================================
