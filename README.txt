@@ -9,6 +9,23 @@ Existing hover/CSS/JS from the uploaded index and course detail pages are preser
 
 PRODUCTION STORAGE
 
+AUTHFORGE-STYLE JSON API
+
+The project exposes Django-native authentication endpoints under /api/:
+
+POST /api/users/ - register with name, email, and password
+POST /api/sessions/ - log in and receive a bearer access token
+POST /api/token/ - rotate the HttpOnly refresh token cookie
+POST /api/logout/ - revoke the current refresh session
+POST /api/logout/all/ - revoke all refresh sessions for the bearer user
+GET /api/users/me/ - return the authenticated user
+PUT /api/users/me/password/ - change password with currentPassword and newPassword
+GET /api/admin-dashboard/ - staff-only example endpoint
+
+Send access tokens as Authorization: Bearer <accessToken>. Configure
+JWT_ACCESS_SECRET, JWT_ACCESS_EXPIRES_MINUTES, and JWT_REFRESH_EXPIRES_DAYS
+in the environment. Login attempts are limited to five per IP in 15 minutes.
+
 ADMIN LOGIN
 
 Set these Render environment variables before deploying. They are used by

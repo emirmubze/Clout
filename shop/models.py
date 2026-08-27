@@ -25,6 +25,17 @@ class CustomUser(AbstractUser):
         return self.username
 
 
+class AuthSession(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="auth_sessions")
+    refresh_jti = models.CharField(max_length=64, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    revoked_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+
 class ContactMessage(models.Model):
     sender = models.ForeignKey(
         CustomUser,

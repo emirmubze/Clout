@@ -1,3 +1,4 @@
+import json
 import os
 from unittest.mock import patch
 from smtplib import SMTPException
@@ -22,6 +23,7 @@ class UserAuthAndDashboardTests(TestCase):
     def test_ensure_admin_requires_credentials(self):
         call_command("ensure_admin")
         self.assertFalse(CustomUser.objects.filter(is_superuser=True).exists())
+
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_forgot_password_sends_reset_email(self):
@@ -713,3 +715,56 @@ class UserAuthAndDashboardTests(TestCase):
         content_disposition = response.get("Content-Disposition", "")
         self.assertIn("inline", content_disposition.lower())
         self.assertNotIn("attachment", content_disposition.lower())
+
+
+class AuthApiTests(TestCase):
+    def json_request(self, method, url, data=None, **kwargs):
+        return getattr(self.client, method)(
+            url,
+            data=json.dumps(data or {}),
+            content_type="application/json",
+            **kwargs,
+        )
+
+    def test_register_and_login_issue_tokens(self):
+        response = self.json_request("post", reverse("api_register"), {
+            "name": "API User", "email": "api@example.com", "password": "StrongPass123!",
+        })
+        self.assertEqual(response.status_code, 201)
+        self.assertIn("accessToken", response.json()["data"])
+        self.assertIn("refreshToken", response.cookies)
+
+        response = self.json_request("post", reverse("api_login"), {
+            "email": "api@example.com", "password": "StrongPass123!",
+        }, REMOTE_ADDR="192.0.2.10")
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("accessToken", response.json()["data"])
+
+    def test_refresh_rotates_session_and_logout_all_revokes_sessions(self):
+        user = CustomUser.objects.create_user(
+            username="apiuser", email="apiuser@example.com", password="StrongPass123!",
+        )
+        login_response = self.json_request("post", reverse("api_login"), {
+            "email": user.email, "password": "StrongPass123!",
+        }, REMOTE_ADDR="192.0.2.11")
+        access_token = login_response.json()["data"]["accessToken"]
+        refresh_response = self.json_request("post", reverse("api_refresh"))
+        self.assertEqual(refresh_response.status_code, 200)
+        self.assertEqual(user.auth_sessions.filter(revoked_at__isnull=False).count(), 1)
+
+        response = self.json_request("post", reverse("api_logout_all"), HTTP_AUTHORIZATION=f"Bearer {access_token}")
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(user.auth_sessions.filter(revoked_at__isnull=True).exists())
+
+    def test_admin_dashboard_requires_staff_user(self):
+        user = CustomUser.objects.create_user(
+            username="regularapi", email="regularapi@example.com", password="StrongPass123!",
+        )
+        login_response = self.json_request("post", reverse("api_login"), {
+            "email": user.email, "password": "StrongPass123!",
+        }, REMOTE_ADDR="192.0.2.12")
+        response = self.client.get(
+            reverse("api_admin_dashboard"),
+            HTTP_AUTHORIZATION=f"Bearer {login_response.json()['data']['accessToken']}",
+        )
+        self.assertEqual(response.status_code, 403)

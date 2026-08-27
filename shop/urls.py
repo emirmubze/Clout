@@ -2,9 +2,19 @@ from django.urls import path
 from django.contrib.auth import views as auth_views
 
 from . import views
+from . import auth_api
 
 
 urlpatterns = [
+
+    path("api/users/", auth_api.register, name="api_register"),
+    path("api/users/me/", auth_api.me, name="api_me"),
+    path("api/users/me/password/", auth_api.change_password, name="api_change_password"),
+    path("api/sessions/", auth_api.login, name="api_login"),
+    path("api/token/", auth_api.refresh, name="api_refresh"),
+    path("api/logout/", auth_api.logout, name="api_logout"),
+    path("api/logout/all/", auth_api.logout_all, name="api_logout_all"),
+    path("api/admin-dashboard/", auth_api.admin_dashboard, name="api_admin_dashboard"),
 
     # =====================================================
     # HOME
