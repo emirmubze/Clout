@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from urllib.parse import quote
 
 
 class CustomUser(AbstractUser):
@@ -28,7 +29,10 @@ class CustomUser(AbstractUser):
             return ""
 
         try:
-            return self.profile_image.url
+            image_url = self.profile_image.url
+            separator = "&" if "?" in image_url else "?"
+            cache_version = quote(str(self.profile_image), safe="")
+            return f"{image_url}{separator}v={cache_version}"
         except (AttributeError, ValueError):
             domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
             if not domain:

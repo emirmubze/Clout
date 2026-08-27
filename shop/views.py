@@ -1741,9 +1741,7 @@ def profile(request):
 
                 request.user.save()
 
-            return redirect(
-                "profile"
-            )
+            return redirect("index")
 
         else:
 
@@ -1764,9 +1762,7 @@ def profile(request):
                         "The profile image could not be uploaded. Please try again.",
                     )
                 else:
-                    return redirect(
-                        "profile"
-                    )
+                    return redirect("index")
 
     else:
 
