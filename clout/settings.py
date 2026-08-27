@@ -237,10 +237,21 @@ if USE_S3:
     AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
     AWS_STORAGE_BUCKET_NAME = os.getenv(
         "AWS_STORAGE_BUCKET_NAME",
-        "clout",
+        "clout"
     )
-    AWS_S3_REGION_NAME = "auto"
-    AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL")
+
+    AWS_S3_REGION_NAME = os.getenv(
+        "AWS_S3_REGION_NAME",
+        "auto"
+    )
+
+    AWS_S3_ENDPOINT_URL = os.getenv(
+        "AWS_S3_ENDPOINT_URL"
+    )
+
+    AWS_S3_CUSTOM_DOMAIN = os.getenv(
+        "AWS_S3_CUSTOM_DOMAIN"
+    )
 
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_S3_ADDRESSING_STYLE = "path"
@@ -268,7 +279,6 @@ if USE_S3:
         },
     }
 
-    AWS_S3_CUSTOM_DOMAIN = os.getenv("AWS_S3_CUSTOM_DOMAIN")
     MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
 else:
     STORAGES = {
