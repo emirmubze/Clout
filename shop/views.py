@@ -706,6 +706,7 @@ def admin_course_add(request):
         course = form.save(commit=False)
         video_key = (request.POST.get("video_key") or "").strip()
         if video_key:
+            _verify_r2_object(video_key)
             course.video = video_key
         course.save()
 
@@ -816,6 +817,7 @@ def admin_course_edit(
         course = form.save(commit=False)
         video_key = (request.POST.get("video_key") or "").strip()
         if video_key:
+            _verify_r2_object(video_key)
             course.video = video_key
         if (
             Order.objects.filter(paid=True).exists()
@@ -981,10 +983,7 @@ def r2_presign_upload(request):
             aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
             endpoint_url=settings.AWS_S3_ENDPOINT_URL,
             region_name=settings.AWS_S3_REGION_NAME,
-            config=Config(
-                signature_version="s3v4",
-                s3={"addressing_style": "path"},
-            ),
+            config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
         )
         upload_url = client.generate_presigned_url(
             "put_object",
@@ -1008,6 +1007,23 @@ def r2_presign_upload(request):
         "upload_url": upload_url,
         "object_key": object_key,
     })
+
+
+def _verify_r2_object(object_key):
+    if not object_key or object_key.startswith("/") or ".." in object_key:
+        raise ValueError("Invalid R2 object key.")
+    if not object_key.startswith(("course_videos/", "course_thumbnails/", "contact_videos/", "contact_images/")):
+        raise ValueError("Invalid R2 object folder.")
+
+    client = boto3.client(
+        "s3",
+        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+        endpoint_url=settings.AWS_S3_ENDPOINT_URL,
+        region_name=settings.AWS_S3_REGION_NAME,
+        config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
+    )
+    client.head_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=object_key)
 
 
 def _admin_modules_save_impl(request):
@@ -1102,6 +1118,7 @@ def _admin_modules_save_impl(request):
                 if isinstance(item, dict) and item.get("video_url"):
                     module_obj.video_url = str(item["video_url"]).strip()
                 if isinstance(item, dict) and item.get("video_key"):
+                    _verify_r2_object(str(item["video_key"]).strip())
                     module_obj.video = str(item["video_key"]).strip()
                 module_obj.save()
 
@@ -1124,6 +1141,7 @@ def _admin_modules_save_impl(request):
                     if isinstance(lesson_item, dict) and lesson_item.get("video_url"):
                         lesson_obj.video_url = str(lesson_item["video_url"]).strip()
                     if isinstance(lesson_item, dict) and lesson_item.get("video_key"):
+                        _verify_r2_object(str(lesson_item["video_key"]).strip())
                         lesson_obj.video = str(lesson_item["video_key"]).strip()
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail"):
                         lesson_obj.thumbnail = lesson_item["thumbnail"]
