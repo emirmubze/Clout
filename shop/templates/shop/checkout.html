@@ -1418,9 +1418,11 @@ async function loadExchangeRates() {
 
 function startPayment() {
     const rate = getRate(currentCountry.currency);
-    if (!$('termsCheck')?.checked || !ratesLoaded || !Number.isFinite(rate) || rate <= 0) return;
+    const inrRate = getRate('INR');
+    if (!$('termsCheck')?.checked || !ratesLoaded || !Number.isFinite(rate) || rate <= 0 || !Number.isFinite(inrRate) || inrRate <= 0) return;
 
     const total = BASE_TOTAL_USD * rate;
+    const paymentTotalInr = BASE_TOTAL_USD * inrRate;
     const button = $('buyBtn');
     button.disabled = true;
     button.textContent = 'Loading...';
@@ -1433,8 +1435,8 @@ function startPayment() {
             'Content-Type': 'application/x-www-form-urlencoded'
         },
         body: new URLSearchParams({
-            currency: currentCountry.currency,
-            amount: total.toFixed(2),
+            currency: 'INR',
+            amount: paymentTotalInr.toFixed(2),
             country_code: currentCountry.code
         })
     })
