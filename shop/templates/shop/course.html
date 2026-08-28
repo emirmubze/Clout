@@ -189,6 +189,25 @@ body {
     transition: opacity .25s ease;
 }
 
+.resume-button {
+    position: absolute;
+    top: 16px;
+    right: 18px;
+    z-index: 7;
+    display: none;
+    padding: 8px 13px;
+    border: 1px solid rgba(255, 255, 255, .18);
+    border-radius: 5px;
+    color: #fff;
+    background: rgba(10, 10, 10, .86);
+    font: 600 12px "DM Sans", sans-serif;
+    cursor: pointer;
+}
+
+.resume-button.visible {
+    display: block;
+}
+
 /* Module name */
 .video-module-name {
     display: block;
@@ -1330,6 +1349,7 @@ body {
 
         <video id="courseVideo" playsinline preload="metadata"></video>
         <img id="videoPoster" class="video-poster" alt="">
+        <button id="resumeButton" class="resume-button" type="button">Resume</button>
 
         <div class="video-dark-overlay"></div>
 
@@ -1472,6 +1492,7 @@ body {
                         {% for lesson in module.lessons.all %}
                             <div
                                 class="lesson {% if forloop.first and forloop.parentloop.first %}active{% endif %}"
+                                data-lesson-id="{{ lesson.id }}"
                                 data-title="{{ lesson.title|escapejs }}"
                                 data-module="{{ module.title|escapejs }}"
                                 data-description="{{ lesson.description|default:'Select this lesson to begin learning.'|escapejs }}"
@@ -1577,6 +1598,9 @@ const fullscreenButton =
 const videoContainer =
     document.getElementById("videoContainer");
 
+const resumeButton =
+    document.getElementById("resumeButton");
+
 const playerTitle =
     document.getElementById("playerTitle");
 
@@ -1596,6 +1620,24 @@ const lessonLabel =
     document.getElementById("lessonLabel");
 
 let controlsTimer;
+let currentLessonKey = "";
+
+function getSavedTime() {
+    const savedTime = Number(localStorage.getItem(currentLessonKey));
+    return Number.isFinite(savedTime) && savedTime > 1 ? savedTime : 0;
+}
+
+function updateResumeButton() {
+    resumeButton.classList.toggle("visible", Boolean(currentLessonKey && getSavedTime()));
+}
+
+resumeButton.addEventListener("click", function() {
+    const savedTime = getSavedTime();
+    if (!savedTime || !video.src) return;
+    video.currentTime = savedTime;
+    video.play().catch(function() {});
+    resumeButton.classList.remove("visible");
+});
 
 function showControls() {
     videoContainer.classList.remove("controls-hidden");
@@ -1732,6 +1774,11 @@ video.addEventListener(
             + " / "
             + formatTime(video.duration);
 
+        if (currentLessonKey && video.currentTime > 1) {
+            localStorage.setItem(currentLessonKey, String(video.currentTime));
+            updateResumeButton();
+        }
+
     }
 );
 
@@ -1747,6 +1794,14 @@ video.addEventListener(
         playerTime.textContent =
             "0:00 / " +
             formatTime(video.duration);
+
+        const savedTime = getSavedTime();
+        if (savedTime && savedTime < video.duration - 1) {
+            video.currentTime = savedTime;
+        } else if (savedTime) {
+            localStorage.removeItem(currentLessonKey);
+        }
+        updateResumeButton();
 
     }
 );
@@ -1770,6 +1825,7 @@ video.addEventListener(
     function() {
         videoPoster.classList.remove("hidden");
         updatePlayButton();
+        updateResumeButton();
         showControls();
     }
 );
@@ -1931,6 +1987,8 @@ function selectLesson(lesson) {
         lesson.dataset.poster ||
         "";
 
+    currentLessonKey = "course-video-progress-" + (lesson.dataset.lessonId || lesson.dataset.title);
+
 
     playerModuleName.textContent =
         moduleName;
@@ -1953,6 +2011,7 @@ function selectLesson(lesson) {
     videoPoster.alt = posterUrl ? `${title} thumbnail` : "";
     videoPoster.classList.remove("hidden");
     video.poster = posterUrl;
+    updateResumeButton();
 
 
     progressFill.style.width =
@@ -2124,6 +2183,11 @@ video.addEventListener(
         current.classList.add(
             "watched"
         );
+
+        if (currentLessonKey) {
+            localStorage.removeItem(currentLessonKey);
+            updateResumeButton();
+        }
 
     }
 );

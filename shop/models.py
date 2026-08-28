@@ -140,10 +140,13 @@ class Module(models.Model):
         if video_path.startswith(("http://", "https://")):
             return video_path
         try:
-            return self.video.url
+            video_url = self.video.url
         except (AttributeError, ValueError):
-            domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
-            return f"https://{domain.rstrip('/')}/{video_path.lstrip('/')}" if domain else ""
+            video_url = ""
+        if video_url and not video_url.startswith("/"):
+            return video_url
+        media_url = getattr(settings, "MEDIA_URL", "")
+        return f"{media_url.rstrip('/')}/{video_path.lstrip('/')}" if media_url else video_url
 
 
 class Lesson(models.Model):
@@ -174,14 +177,31 @@ class Lesson(models.Model):
         if video_path.startswith(("http://", "https://")):
             return video_path
         try:
-            return self.video.url
+            video_url = self.video.url
         except (AttributeError, ValueError):
-            domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
-            return f"https://{domain.rstrip('/')}/{video_path.lstrip('/')}" if domain else ""
+            video_url = ""
+        if video_url and not video_url.startswith("/"):
+            return video_url
+        media_url = getattr(settings, "MEDIA_URL", "")
+        return f"{media_url.rstrip('/')}/{video_path.lstrip('/')}" if media_url else video_url
 
     @property
     def thumbnail_public_url(self):
-        return self.thumbnail_url or (self.thumbnail.url if self.thumbnail else "")
+        if self.thumbnail_url:
+            return self.thumbnail_url
+        if not self.thumbnail:
+            return ""
+        thumbnail_path = str(self.thumbnail).strip()
+        if thumbnail_path.startswith(("http://", "https://")):
+            return thumbnail_path
+        try:
+            thumbnail_url = self.thumbnail.url
+        except (AttributeError, ValueError):
+            thumbnail_url = ""
+        if thumbnail_url and not thumbnail_url.startswith("/"):
+            return thumbnail_url
+        media_url = getattr(settings, "MEDIA_URL", "")
+        return f"{media_url.rstrip('/')}/{thumbnail_path.lstrip('/')}" if media_url else thumbnail_url
 
 
 class Order(models.Model):
