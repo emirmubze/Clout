@@ -1,17 +1,26 @@
-from pathlib import Path
 import os
 
+from pathlib import Path
+
 from dotenv import load_dotenv
+
 from django.core.exceptions import ImproperlyConfigured
 
 
 # =========================================================
-# BASE
+# BASE DIRECTORY
 # =========================================================
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(BASE_DIR / ".env")
+
+# =========================================================
+# ENVIRONMENT
+# =========================================================
+
+load_dotenv(
+    BASE_DIR / ".env"
+)
 
 
 # =========================================================
@@ -20,61 +29,47 @@ load_dotenv(BASE_DIR / ".env")
 
 SECRET_KEY = os.getenv(
     "DJANGO_SECRET_KEY",
-    "change-me"
+    "django-insecure-change-this-in-production",
 )
 
-DEBUG = os.getenv(
-    "DEBUG",
-    "True"
-).lower() == "true"
 
-if not DEBUG and SECRET_KEY == "change-me":
-    raise ImproperlyConfigured("DJANGO_SECRET_KEY must be set in production.")
+DEBUG = (
+    os.getenv(
+        "DEBUG",
+        "False",
+    ).lower()
+    == "true"
+)
 
-ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "").strip()
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "").strip().lower()
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "")
-
-
-# =========================================================
-# ALLOWED HOSTS
-# =========================================================
 
 ALLOWED_HOSTS = [
-    "clout.courses",
-    "www.clout.courses",
-    ".onrender.com",
-    "localhost",
-    "127.0.0.1",
+    host.strip()
+    for host in os.getenv(
+        "ALLOWED_HOSTS",
+        "localhost,127.0.0.1",
+    ).split(",")
+    if host.strip()
 ]
 
 
 # =========================================================
-# CSRF TRUSTED ORIGINS
-# =========================================================
-
-CSRF_TRUSTED_ORIGINS = [
-    "https://clout.courses",
-    "https://www.clout.courses",
-    "https://clout.onrender.com",
-    "https://www.clout.onrender.com",
-    "http://localhost:8000",
-    "http://127.0.0.1:8000",
-    "http://localhost",
-]
-
-
-# =========================================================
-# INSTALLED APPS
+# APPLICATIONS
 # =========================================================
 
 INSTALLED_APPS = [
+
     "django.contrib.admin",
+
     "django.contrib.auth",
+
     "django.contrib.contenttypes",
+
     "django.contrib.sessions",
+
     "django.contrib.messages",
+
     "django.contrib.staticfiles",
+
     "storages",
 
     "shop",
@@ -86,20 +81,23 @@ INSTALLED_APPS = [
 # =========================================================
 
 MIDDLEWARE = [
+
     "django.middleware.security.SecurityMiddleware",
 
-    # WhiteNoise for Render static files
     "whitenoise.middleware.WhiteNoiseMiddleware",
 
     "django.contrib.sessions.middleware.SessionMiddleware",
+
     "django.middleware.common.CommonMiddleware",
+
     "django.middleware.csrf.CsrfViewMiddleware",
+
     "django.contrib.auth.middleware.AuthenticationMiddleware",
 
-    # Custom single-device login system
     "shop.middleware.SingleDeviceSessionMiddleware",
 
     "django.contrib.messages.middleware.MessageMiddleware",
+
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
@@ -116,6 +114,7 @@ ROOT_URLCONF = "clout.urls"
 # =========================================================
 
 TEMPLATES = [
+
     {
         "BACKEND":
             "django.template.backends.django.DjangoTemplates",
@@ -125,12 +124,15 @@ TEMPLATES = [
         "APP_DIRS": True,
 
         "OPTIONS": {
+
             "context_processors": [
+
                 "django.template.context_processors.request",
 
                 "django.contrib.auth.context_processors.auth",
 
                 "django.contrib.messages.context_processors.messages",
+
             ],
         },
     },
@@ -147,15 +149,16 @@ WSGI_APPLICATION = "clout.wsgi.application"
 # =========================================================
 # DATABASE
 # =========================================================
-#
-# SQLite database
-#
-# =========================================================
 
 DATABASES = {
+
     "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+
+        "ENGINE":
+            "django.db.backends.sqlite3",
+
+        "NAME":
+            BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -165,18 +168,22 @@ DATABASES = {
 # =========================================================
 
 AUTH_PASSWORD_VALIDATORS = [
+
     {
         "NAME":
             "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
+
     {
         "NAME":
             "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
+
     {
         "NAME":
             "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
+
     {
         "NAME":
             "django.contrib.auth.password_validation.NumericPasswordValidator",
@@ -185,11 +192,13 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 # =========================================================
-# AUTHENTICATION BACKENDS
+# AUTHENTICATION
 # =========================================================
 
 AUTHENTICATION_BACKENDS = [
+
     "shop.backends.EmailOrUsernameModelBackend",
+
     "django.contrib.auth.backends.ModelBackend",
 ]
 
@@ -206,6 +215,7 @@ USE_I18N = True
 
 USE_TZ = True
 
+
 # =========================================================
 # STATIC FILES
 # =========================================================
@@ -213,99 +223,269 @@ USE_TZ = True
 STATIC_URL = "/static/"
 
 STATICFILES_DIRS = [
-    BASE_DIR / "shop" / "static"
+
+    BASE_DIR / "shop" / "static",
+
 ]
 
-STATIC_ROOT = BASE_DIR / "staticfiles"
+STATIC_ROOT = (
+    BASE_DIR / "staticfiles"
+)
 
 
 # =========================================================
-# MEDIA FILES - CLOUDFLARE R2
+# CLOUDFLARE R2
 # =========================================================
 
-USE_S3 = os.getenv("USE_S3", "False").lower() == "true"
+USE_S3 = (
+    os.getenv(
+        "USE_S3",
+        "False",
+    ).lower()
+    == "true"
+)
 
+
+# Production MUST use R2.
 if not DEBUG and not USE_S3:
+
     raise ImproperlyConfigured(
-        "USE_S3 must be True in production; refusing to use local media storage."
+        "USE_S3 must be True in production."
     )
+
 
 if USE_S3:
-    AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID")
-    AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY")
+
+    # -----------------------------------------------------
+    # R2 CREDENTIALS
+    # -----------------------------------------------------
+
+    AWS_ACCESS_KEY_ID = os.getenv(
+        "AWS_ACCESS_KEY_ID",
+        "",
+    ).strip()
+
+
+    AWS_SECRET_ACCESS_KEY = os.getenv(
+        "AWS_SECRET_ACCESS_KEY",
+        "",
+    ).strip()
+
+
     AWS_STORAGE_BUCKET_NAME = os.getenv(
         "AWS_STORAGE_BUCKET_NAME",
-        "clout"
-    )
+        "clout",
+    ).strip()
+
+
+    # -----------------------------------------------------
+    # R2 REGION
+    # -----------------------------------------------------
 
     AWS_S3_REGION_NAME = os.getenv(
         "AWS_S3_REGION_NAME",
-        "auto"
+        "auto",
+    ).strip()
+
+
+    # -----------------------------------------------------
+    # R2 S3 API ENDPOINT
+    #
+    # Example:
+    # https://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.r2.cloudflarestorage.com
+    # -----------------------------------------------------
+
+    AWS_S3_ENDPOINT_URL = (
+        os.getenv(
+            "AWS_S3_ENDPOINT_URL",
+            "",
+        )
+        .strip()
+        .rstrip("/")
     )
 
-    AWS_S3_ENDPOINT_URL = (os.getenv("AWS_S3_ENDPOINT_URL") or "").strip().rstrip("/")
 
-    AWS_S3_CUSTOM_DOMAIN = os.getenv(
-        "AWS_S3_CUSTOM_DOMAIN",
-        "",
-    ).strip().removeprefix("https://").removeprefix("http://").rstrip("/")
+    # -----------------------------------------------------
+    # PUBLIC R2 DOMAIN
+    #
+    # Example:
+    # pub-xxxxxxxxxxxxxxxx.r2.dev
+    #
+    # Can also be:
+    # https://pub-xxxxxxxxxxxxxxxx.r2.dev
+    # -----------------------------------------------------
+
+    AWS_S3_CUSTOM_DOMAIN = (
+        os.getenv(
+            "AWS_S3_CUSTOM_DOMAIN",
+            "",
+        )
+        .strip()
+        .removeprefix("https://")
+        .removeprefix("http://")
+        .rstrip("/")
+    )
+
+
+    # -----------------------------------------------------
+    # PRODUCTION CHECK
+    # -----------------------------------------------------
 
     if not DEBUG:
+
         missing_storage_settings = [
+
             name
+
             for name, value in {
-                "AWS_ACCESS_KEY_ID": AWS_ACCESS_KEY_ID,
-                "AWS_SECRET_ACCESS_KEY": AWS_SECRET_ACCESS_KEY,
-                "AWS_S3_ENDPOINT_URL": AWS_S3_ENDPOINT_URL,
-                "AWS_S3_CUSTOM_DOMAIN": AWS_S3_CUSTOM_DOMAIN,
+
+                "AWS_ACCESS_KEY_ID":
+                    AWS_ACCESS_KEY_ID,
+
+                "AWS_SECRET_ACCESS_KEY":
+                    AWS_SECRET_ACCESS_KEY,
+
+                "AWS_STORAGE_BUCKET_NAME":
+                    AWS_STORAGE_BUCKET_NAME,
+
+                "AWS_S3_ENDPOINT_URL":
+                    AWS_S3_ENDPOINT_URL,
+
+                "AWS_S3_CUSTOM_DOMAIN":
+                    AWS_S3_CUSTOM_DOMAIN,
+
             }.items()
+
             if not value
         ]
+
+
         if missing_storage_settings:
+
             raise ImproperlyConfigured(
-                "Missing production object-storage settings: "
-                + ", ".join(missing_storage_settings)
+
+                "Missing production R2 settings: "
+
+                + ", ".join(
+                    missing_storage_settings
+                )
             )
 
+
+    # -----------------------------------------------------
+    # S3 / R2 SETTINGS
+    # -----------------------------------------------------
+
     AWS_S3_SIGNATURE_VERSION = "s3v4"
+
     AWS_S3_ADDRESSING_STYLE = "path"
+
     AWS_S3_FILE_OVERWRITE = False
+
     AWS_DEFAULT_ACL = None
+
+
+    # IMPORTANT:
+    # Don't generate signed URLs for public course videos.
     AWS_QUERYSTRING_AUTH = False
 
+
+    # -----------------------------------------------------
+    # STORAGE
+    # -----------------------------------------------------
+
     STORAGES = {
+
         "default": {
-            "BACKEND": "storages.backends.s3.S3Storage",
+
+            "BACKEND":
+                "storages.backends.s3.S3Storage",
+
             "OPTIONS": {
-                "access_key": AWS_ACCESS_KEY_ID,
-                "secret_key": AWS_SECRET_ACCESS_KEY,
-                "bucket_name": AWS_STORAGE_BUCKET_NAME,
-                "endpoint_url": AWS_S3_ENDPOINT_URL,
-                "region_name": AWS_S3_REGION_NAME,
-                "signature_version": "s3v4",
-                "addressing_style": "path",
-                "file_overwrite": False,
-                "querystring_auth": False,
+
+                "access_key":
+                    AWS_ACCESS_KEY_ID,
+
+                "secret_key":
+                    AWS_SECRET_ACCESS_KEY,
+
+                "bucket_name":
+                    AWS_STORAGE_BUCKET_NAME,
+
+                "endpoint_url":
+                    AWS_S3_ENDPOINT_URL,
+
+                "region_name":
+                    AWS_S3_REGION_NAME,
+
+                "signature_version":
+                    "s3v4",
+
+                "addressing_style":
+                    "path",
+
+                "file_overwrite":
+                    False,
+
+                "querystring_auth":
+                    False,
             },
         },
+
+
         "staticfiles": {
-            "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+
+            "BACKEND":
+                "whitenoise.storage.CompressedManifestStaticFilesStorage",
         },
     }
 
-    MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/" if AWS_S3_CUSTOM_DOMAIN else "/media/"
+
+    # -----------------------------------------------------
+    # PUBLIC MEDIA URL
+    # -----------------------------------------------------
+
+    if AWS_S3_CUSTOM_DOMAIN:
+
+        MEDIA_URL = (
+            "https://"
+            + AWS_S3_CUSTOM_DOMAIN
+            + "/"
+        )
+
+    else:
+
+        MEDIA_URL = "/media/"
+
+
 else:
+
+    # =====================================================
+    # LOCAL DEVELOPMENT STORAGE
+    # =====================================================
+
     STORAGES = {
+
         "default": {
-            "BACKEND": "django.core.files.storage.FileSystemStorage",
+
+            "BACKEND":
+                "django.core.files.storage.FileSystemStorage",
         },
+
+
         "staticfiles": {
-            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+
+            "BACKEND":
+                "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
+
 
     MEDIA_URL = "/media/"
-    MEDIA_ROOT = BASE_DIR / "media"
+
+    MEDIA_ROOT = (
+        BASE_DIR / "media"
+    )
 
 
 # =========================================================
@@ -334,12 +514,26 @@ LOGIN_REDIRECT_URL = "index"
 
 LOGOUT_REDIRECT_URL = "index"
 
-# Keep browser sessions in the durable database across web-service deploys.
-SESSION_ENGINE = "django.contrib.sessions.backends.db"
+
+# =========================================================
+# SESSION
+# =========================================================
+
+SESSION_ENGINE = (
+    "django.contrib.sessions.backends.db"
+)
+
 SESSION_COOKIE_HTTPONLY = True
+
 SESSION_COOKIE_SAMESITE = "Lax"
+
 SESSION_COOKIE_SECURE = not DEBUG
-SESSION_COOKIE_AGE = 60 * 60 * 24 * 14
+
+SESSION_COOKIE_AGE = (
+    60 * 60 * 24 * 14
+)
+
+SESSION_SAVE_EVERY_REQUEST = True
 
 
 # =========================================================
@@ -350,38 +544,45 @@ EMAIL_BACKEND = (
     "django.core.mail.backends.smtp.EmailBackend"
 )
 
+
 EMAIL_HOST = os.getenv(
     "EMAIL_HOST",
-    "smtp.privateemail.com"
+    "smtp.privateemail.com",
 )
+
 
 EMAIL_PORT = int(
     os.getenv(
         "EMAIL_PORT",
-        "587"
+        "587",
     )
 )
+
 
 EMAIL_USE_TLS = (
     os.getenv(
         "EMAIL_USE_TLS",
-        "True"
-    ).lower() == "true"
+        "True",
+    ).lower()
+    == "true"
 )
+
 
 EMAIL_HOST_USER = os.getenv(
     "EMAIL_HOST_USER",
-    "admin@clout.courses"
+    "admin@clout.courses",
 )
+
 
 EMAIL_HOST_PASSWORD = os.getenv(
     "EMAIL_HOST_PASSWORD",
-    ""
+    "",
 )
+
 
 DEFAULT_FROM_EMAIL = os.getenv(
     "DEFAULT_FROM_EMAIL",
-    "Clout <admin@clout.courses>"
+    "Clout <admin@clout.courses>",
 )
 
 
@@ -391,12 +592,12 @@ DEFAULT_FROM_EMAIL = os.getenv(
 
 RAZORPAY_KEY_ID = os.getenv(
     "RAZORPAY_KEY_ID",
-    ""
+    "",
 )
 
 RAZORPAY_KEY_SECRET = os.getenv(
     "RAZORPAY_KEY_SECRET",
-    ""
+    "",
 )
 
 
@@ -406,17 +607,8 @@ RAZORPAY_KEY_SECRET = os.getenv(
 
 GROQ_API_KEY = os.getenv(
     "GROQ_API_KEY",
-    ""
+    "",
 )
-
-
-# =========================================================
-# SESSION SETTINGS
-# =========================================================
-
-SESSION_COOKIE_AGE = 1209600  # 2 weeks
-
-SESSION_SAVE_EVERY_REQUEST = True
 
 
 # =========================================================
@@ -425,35 +617,9 @@ SESSION_SAVE_EVERY_REQUEST = True
 
 if not DEBUG:
 
-    # Render terminates HTTPS before forwarding to Django
     SECURE_PROXY_SSL_HEADER = (
         "HTTP_X_FORWARDED_PROTO",
-        "https"
+        "https",
     )
 
     SESSION_COOKIE_SECURE = True
-
-    CSRF_COOKIE_SECURE = True
-
-    SECURE_SSL_REDIRECT = True
-
-    SECURE_HSTS_SECONDS = 31536000
-
-    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
-
-    SECURE_HSTS_PRELOAD = True
-
-    SECURE_CONTENT_TYPE_NOSNIFF = True
-
-    X_FRAME_OPTIONS = "SAMEORIGIN"
-
-
-# =========================================================
-# LOCAL DEVELOPMENT SECURITY
-# =========================================================
-
-else:
-
-    SECURE_SSL_REDIRECT = False
-
-    X_FRAME_OPTIONS = "SAMEORIGIN"

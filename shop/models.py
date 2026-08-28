@@ -14,14 +14,25 @@ class CustomUser(AbstractUser):
         blank=True,
     )
     email = models.EmailField(unique=True)
-    profile_image = models.ImageField(upload_to="profiles/", null=True, blank=True)
+    profile_image = models.ImageField(
+        upload_to="profiles/",
+        null=True,
+        blank=True,
+    )
     course_access_approved = models.BooleanField(default=False)
-    active_session_key = models.CharField(max_length=40, blank=True, default="")
+    active_session_key = models.CharField(
+        max_length=40,
+        blank=True,
+        default="",
+    )
 
     @property
     def has_paid(self):
         from .models import Order
-        return Order.objects.filter(user=self, paid=True).exists()
+        return Order.objects.filter(
+            user=self,
+            paid=True,
+        ).exists()
 
     @property
     def profile_image_url(self):
@@ -31,26 +42,59 @@ class CustomUser(AbstractUser):
         try:
             image_url = self.profile_image.url
             separator = "&" if "?" in image_url else "?"
-            cache_version = quote(str(self.profile_image), safe="")
+            cache_version = quote(
+                str(self.profile_image),
+                safe="",
+            )
             return f"{image_url}{separator}v={cache_version}"
+
         except (AttributeError, ValueError):
-            domain = getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
+            domain = getattr(
+                settings,
+                "AWS_S3_CUSTOM_DOMAIN",
+                "",
+            )
+
             if not domain:
                 return ""
-            relative_path = str(self.profile_image).lstrip("/")
-            return f"https://{domain.rstrip('/')}/{relative_path}"
+
+            relative_path = str(
+                self.profile_image
+            ).lstrip("/")
+
+            return (
+                f"https://{domain.rstrip('/')}"
+                f"/{relative_path}"
+            )
 
     def __str__(self):
         return self.username
 
 
 class AuthSession(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name="auth_sessions")
-    access_jti = models.CharField(max_length=64, unique=True, null=True, blank=True)
-    refresh_jti = models.CharField(max_length=64, unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        related_name="auth_sessions",
+    )
+    access_jti = models.CharField(
+        max_length=64,
+        unique=True,
+        null=True,
+        blank=True,
+    )
+    refresh_jti = models.CharField(
+        max_length=64,
+        unique=True,
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
     expires_at = models.DateTimeField()
-    revoked_at = models.DateTimeField(null=True, blank=True)
+    revoked_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         ordering = ["-created_at"]
@@ -71,159 +115,340 @@ class ContactMessage(models.Model):
         null=True,
         blank=True,
     )
-    sender_is_admin = models.BooleanField(default=False)
-    message = models.TextField(blank=True, default="")
-    image = models.ImageField(upload_to="contact_images/", null=True, blank=True)
-    video = models.FileField(upload_to="contact_videos/", null=True, blank=True)
-    is_read = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    sender_is_admin = models.BooleanField(
+        default=False,
+    )
+    message = models.TextField(
+        blank=True,
+        default="",
+    )
+    image = models.ImageField(
+        upload_to="contact_images/",
+        null=True,
+        blank=True,
+    )
+    video = models.FileField(
+        upload_to="contact_videos/",
+        null=True,
+        blank=True,
+    )
+    is_read = models.BooleanField(
+        default=False,
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
 
     class Meta:
         ordering = ["created_at"]
 
     def __str__(self):
-        return f"{self.sender or 'Anonymous'}: {self.message[:40]}"
+        return (
+            f"{self.sender or 'Anonymous'}: "
+            f"{self.message[:40]}"
+        )
 
 
 class Course(models.Model):
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True, default="")
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    video = models.FileField(upload_to="course_videos/", null=True, blank=True)
-    video_url = models.URLField(blank=True, default="")
-    thumbnail = models.ImageField(upload_to="course_thumbnails/", null=True, blank=True)
-    instructor = models.CharField(max_length=200, blank=True, default="")
-    duration = models.CharField(max_length=50, blank=True, default="")
+    title = models.CharField(
+        max_length=200,
+    )
+    description = models.TextField(
+        blank=True,
+        default="",
+    )
+    price = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        default=0,
+    )
+    video = models.FileField(
+        upload_to="course_videos/",
+        null=True,
+        blank=True,
+    )
+    video_url = models.URLField(
+        blank=True,
+        default="",
+    )
+    thumbnail = models.ImageField(
+        upload_to="course_thumbnails/",
+        null=True,
+        blank=True,
+    )
+    instructor = models.CharField(
+        max_length=200,
+        blank=True,
+        default="",
+    )
+    duration = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+    )
     level = models.CharField(
         max_length=20,
         choices=[
-            ('Beginner', 'Beginner'),
-            ('Intermediate', 'Intermediate'),
-            ('Advanced', 'Advanced'),
+            ("Beginner", "Beginner"),
+            ("Intermediate", "Intermediate"),
+            ("Advanced", "Advanced"),
         ],
-        default='Beginner'
+        default="Beginner",
     )
-    is_active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    is_active = models.BooleanField(
+        default=True,
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
 
     class Meta:
-        ordering = ['-created_at']
+        ordering = ["-created_at"]
 
     def __str__(self):
         return self.title
 
 
 class Module(models.Model):
-    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="modules")
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True, default="")
-    video = models.FileField(upload_to="course_videos/", null=True, blank=True)
-    video_url = models.URLField(blank=True, default="")
-    order = models.IntegerField(default=0)  # For ordering modules
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="modules",
+    )
+    title = models.CharField(
+        max_length=200,
+    )
+    description = models.TextField(
+        blank=True,
+        default="",
+    )
+    video = models.FileField(
+        upload_to="course_videos/",
+        null=True,
+        blank=True,
+    )
+    video_url = models.URLField(
+        blank=True,
+        default="",
+    )
+    order = models.IntegerField(
+        default=0,
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
 
     class Meta:
         ordering = ["order"]
 
     def __str__(self):
-        return f"{self.course.title} - {self.title}"
+        return (
+            f"{self.course.title} - {self.title}"
+        )
 
     @property
     def video_public_url(self):
+        # Prefer explicit public R2 URL.
         if self.video_url:
-            return self.video_url
-        if not self.video:
-            return ""
-        video_path = str(self.video).strip()
-        if video_path.startswith(("http://", "https://")):
-            return video_path
-        try:
-            video_url = self.video.url
-        except (AttributeError, ValueError):
-            video_url = ""
-        if video_url and not video_url.startswith("/"):
-            return video_url
-        media_url = getattr(settings, "MEDIA_URL", "")
-        return f"{media_url.rstrip('/')}/{video_path.lstrip('/')}" if media_url else video_url
+            url = str(self.video_url).strip()
+
+            if url.startswith(
+                ("http://", "https://")
+            ):
+                return url
+
+        # Otherwise use Django storage URL.
+        if self.video:
+            try:
+                url = self.video.url
+
+                if url:
+                    return str(url)
+
+            except (AttributeError, ValueError):
+                pass
+
+        return ""
 
 
 class Lesson(models.Model):
-    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name="lessons")
-    title = models.CharField(max_length=200)
-    description = models.TextField(blank=True, default="")
-    video = models.FileField(upload_to="course_videos/", null=True, blank=True)
-    video_url = models.URLField(blank=True, default="")
-    thumbnail = models.ImageField(upload_to="lesson_thumbnails/", null=True, blank=True)
-    thumbnail_url = models.URLField(blank=True, default="")
-    order = models.IntegerField(default=0)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
+    module = models.ForeignKey(
+        Module,
+        on_delete=models.CASCADE,
+        related_name="lessons",
+    )
+    title = models.CharField(
+        max_length=200,
+    )
+    description = models.TextField(
+        blank=True,
+        default="",
+    )
+    video = models.FileField(
+        upload_to="course_videos/",
+        null=True,
+        blank=True,
+    )
+    video_url = models.URLField(
+        blank=True,
+        default="",
+    )
+    thumbnail = models.ImageField(
+        upload_to="lesson_thumbnails/",
+        null=True,
+        blank=True,
+    )
+    thumbnail_url = models.URLField(
+        blank=True,
+        default="",
+    )
+    order = models.IntegerField(
+        default=0,
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
 
     class Meta:
         ordering = ["order"]
 
     def __str__(self):
-        return f"{self.module.course.title} - {self.module.title} - {self.title}"
+        return (
+            f"{self.module.course.title} - "
+            f"{self.module.title} - "
+            f"{self.title}"
+        )
 
     @property
     def video_public_url(self):
+        """
+        Return a browser-playable video URL.
+
+        Priority:
+        1. Explicit public R2 URL in video_url
+        2. Django storage URL from video
+        """
+
+        # 1. Explicit public R2 URL
         if self.video_url:
-            return self.video_url
-        if not self.video:
-            return ""
-        video_path = str(self.video).strip()
-        if video_path.startswith(("http://", "https://")):
-            return video_path
-        try:
-            video_url = self.video.url
-        except (AttributeError, ValueError):
-            video_url = ""
-        if video_url and not video_url.startswith("/"):
-            return video_url
-        media_url = getattr(settings, "MEDIA_URL", "")
-        return f"{media_url.rstrip('/')}/{video_path.lstrip('/')}" if media_url else video_url
+            url = str(self.video_url).strip()
+
+            if url.startswith(
+                ("http://", "https://")
+            ):
+                return url
+
+        # 2. Django storage URL
+        if self.video:
+            try:
+                url = self.video.url
+
+                if url:
+                    return str(url)
+
+            except (AttributeError, ValueError):
+                pass
+
+        return ""
 
     @property
     def thumbnail_public_url(self):
         if self.thumbnail_url:
-            return self.thumbnail_url
+            url = str(
+                self.thumbnail_url
+            ).strip()
+
+            if url.startswith(
+                ("http://", "https://")
+            ):
+                return url
+
         if not self.thumbnail:
             return ""
-        thumbnail_path = str(self.thumbnail).strip()
-        if thumbnail_path.startswith(("http://", "https://")):
-            return thumbnail_path
+
         try:
-            thumbnail_url = self.thumbnail.url
+            url = self.thumbnail.url
+
+            if url:
+                return str(url)
+
         except (AttributeError, ValueError):
-            thumbnail_url = ""
-        if thumbnail_url and not thumbnail_url.startswith("/"):
-            return thumbnail_url
-        media_url = getattr(settings, "MEDIA_URL", "")
-        return f"{media_url.rstrip('/')}/{thumbnail_path.lstrip('/')}" if media_url else thumbnail_url
+            pass
+
+        return ""
 
 
 class Order(models.Model):
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
-    product_name = models.CharField(max_length=200, default="The AI Income Playbook")
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    currency = models.CharField(max_length=10, default="USD")
-    razorpay_order_id = models.CharField(max_length=100, unique=True)
-    razorpay_payment_id = models.CharField(max_length=100, blank=True, null=True)
-    razorpay_signature = models.CharField(max_length=255, blank=True, null=True)
-    paid = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
+    user = models.ForeignKey(
+        CustomUser,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
+    product_name = models.CharField(
+        max_length=200,
+        default="The AI Income Playbook",
+    )
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+    )
+    currency = models.CharField(
+        max_length=10,
+        default="USD",
+    )
+    razorpay_order_id = models.CharField(
+        max_length=100,
+        unique=True,
+    )
+    razorpay_payment_id = models.CharField(
+        max_length=100,
+        blank=True,
+        null=True,
+    )
+    razorpay_signature = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+    )
+    paid = models.BooleanField(
+        default=False,
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
 
     def save(self, *args, **kwargs):
         is_paid = bool(self.paid)
+
         super().save(*args, **kwargs)
 
         if is_paid and self.user_id is not None:
             user = self.user
-            if user is not None and not user.course_access_approved:
+
+            if (
+                user is not None
+                and not user.course_access_approved
+            ):
                 user.course_access_approved = True
-                user.save(update_fields=["course_access_approved"])
+
+                user.save(
+                    update_fields=[
+                        "course_access_approved"
+                    ]
+                )
 
     def __str__(self):
-        return f"{self.product_name} - {self.razorpay_order_id}"
+        return (
+            f"{self.product_name} - "
+            f"{self.razorpay_order_id}"
+        )
