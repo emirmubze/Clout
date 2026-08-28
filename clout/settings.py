@@ -547,6 +547,8 @@ SESSION_COOKIE_AGE = (
 
 SESSION_SAVE_EVERY_REQUEST = True
 
+X_FRAME_OPTIONS = "SAMEORIGIN"
+
 
 # =========================================================
 # EMAIL
