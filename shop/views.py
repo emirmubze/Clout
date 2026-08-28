@@ -1529,52 +1529,103 @@ def serve_inline_video(
 ):
 
     if not file_field:
-        raise Http404(
-            "Video not found."
-        )
+        raise Http404("Video not found.")
 
     if settings.USE_S3:
-        return redirect(file_field.storage.url(file_field.name))
+        if not file_field.name:
+            raise Http404("Video not found.")
 
-    file_path = file_field.path
-    file_size = file_field.size
+        try:
+            client = boto3.client(
+                "s3",
+                aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+                aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+                endpoint_url=settings.AWS_S3_ENDPOINT_URL,
+                region_name=settings.AWS_S3_REGION_NAME,
+                config=Config(
+                    signature_version="s3v4",
+                    s3={"addressing_style": "path"},
+                ),
+            )
+            client.head_object(
+                Bucket=settings.AWS_STORAGE_BUCKET_NAME,
+                Key=file_field.name,
+            )
+            video_url = client.generate_presigned_url(
+                "get_object",
+                Params={
+                    "Bucket": settings.AWS_STORAGE_BUCKET_NAME,
+                    "Key": file_field.name,
+                    "ResponseContentType": "video/mp4",
+                    "ResponseContentDisposition": (
+                        f'inline; filename="{file_field.name.rsplit("/", 1)[-1]}"'
+                    ),
+                },
+                ExpiresIn=3600,
+                HttpMethod="GET",
+            )
+            return redirect(video_url)
+        except Exception:
+            logger.exception(
+                "Could not generate R2 video URL for %s",
+                file_field.name,
+            )
+            raise Http404("Video could not be loaded.")
+
+    try:
+        file_path = file_field.path
+        file_size = file_field.size
+    except Exception:
+        raise Http404("Video file not found.")
+
     content_type = mimetypes.guess_type(file_path)[0] or "video/mp4"
-    range_header = request.headers.get("Range")
+    if file_path.lower().endswith(".mp4"):
+        content_type = "video/mp4"
 
+    range_header = request.headers.get("Range")
     if range_header and range_header.startswith("bytes="):
-        range_value = range_header.replace("bytes=", "", 1).split(",", 1)[0]
-        start_text, _, end_text = range_value.partition("-")
-        start = int(start_text or 0)
-        end = int(end_text or file_size - 1)
-        end = min(end, file_size - 1)
+        try:
+            range_value = range_header.replace("bytes=", "", 1).split(",", 1)[0]
+            start_text, _, end_text = range_value.partition("-")
+            start = int(start_text) if start_text else 0
+            end = int(end_text) if end_text else file_size - 1
+            end = min(end, file_size - 1)
+        except (ValueError, TypeError):
+            return HttpResponse(
+                status=416,
+                headers={"Content-Range": f"bytes */{file_size}"},
+            )
 
         if start >= file_size or start > end:
-            return HttpResponse(status=416, headers={"Content-Range": f"bytes */{file_size}"})
+            return HttpResponse(
+                status=416,
+                headers={"Content-Range": f"bytes */{file_size}"},
+            )
 
         length = end - start + 1
         file_obj = file_field.open("rb")
         file_obj.seek(start)
-        response = FileResponse(file_obj, status=206, content_type=content_type)
+        response = FileResponse(
+            file_obj,
+            status=206,
+            content_type=content_type,
+        )
         response["Content-Range"] = f"bytes {start}-{end}/{file_size}"
         response["Content-Length"] = str(length)
     else:
         file_obj = file_field.open("rb")
-        response = FileResponse(file_obj, content_type=content_type)
+        response = FileResponse(
+            file_obj,
+            content_type=content_type,
+        )
         response["Content-Length"] = str(file_size)
 
     response["Accept-Ranges"] = "bytes"
-
-    response[
-        "Content-Disposition"
-    ] = (
-        f'inline; filename="'
-        f'{file_field.name.rsplit("/", 1)[-1]}"'
+    response["Content-Disposition"] = (
+        f'inline; filename="{file_field.name.rsplit("/", 1)[-1]}"'
     )
-
-    response[
-        "X-Content-Type-Options"
-    ] = "nosniff"
-
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Cache-Control"] = "private, max-age=3600"
     return response
 
 
