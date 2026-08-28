@@ -4,6 +4,30 @@ import re
 from .models import CustomUser, ContactMessage, Course
 
 
+DISPOSABLE_EMAIL_DOMAINS = {
+    "mailinator.com",
+    "tempmail.com",
+    "10minutemail.com",
+    "throwawaymail.com",
+    "guerrillamail.com",
+    "guerrillamail.net",
+    "guerrillamail.org",
+    "sharklasers.com",
+    "yopmail.com",
+    "yopmail.fr",
+    "trashmail.com",
+    "trashmail.net",
+    "temp-mail.org",
+    "getnada.com",
+    "fakeinbox.com",
+    "dispostable.com",
+    "mohmal.com",
+    "burnermail.io",
+    "mytemp.email",
+    "tempail.com",
+}
+
+
 class RegistrationForm(UserCreationForm):
     username = forms.CharField(max_length=150, required=True, help_text="Required.")
     name = forms.CharField(max_length=150, required=True, help_text="Required.")
@@ -31,6 +55,16 @@ class RegistrationForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"].strip().lower()
+        if not re.fullmatch(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email):
+            raise forms.ValidationError("Enter a valid email address.")
+
+        domain = email.split("@")[-1].lower()
+        if domain in DISPOSABLE_EMAIL_DOMAINS:
+            raise forms.ValidationError("Temporary or disposable email addresses are not allowed. Please enter a valid email address.")
+
+        if "." not in domain or len(domain.split(".")[-1]) < 2:
+            raise forms.ValidationError("Enter a valid email address.")
+
         if CustomUser.objects.filter(email__iexact=email).exists():
             raise forms.ValidationError("This email address is already in use.")
         return email
@@ -39,6 +73,11 @@ class RegistrationForm(UserCreationForm):
         phone_number = " ".join(self.cleaned_data["phone_number"].split())
         phone_parts = phone_number.split(" ")
         digits = "".join(phone_parts).replace("+", "", 1)
+
+        # Check if digits are repeated dummy e.g. 0000000000 or 1111111111
+        if len(digits) >= 6 and len(set(digits)) <= 1:
+            raise forms.ValidationError("Enter a valid phone number.")
+
         international = (
             len(phone_parts) == 2
             and re.fullmatch(r"\+\d{1,4}", phone_parts[0])

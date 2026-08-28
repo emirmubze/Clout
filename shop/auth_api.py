@@ -159,9 +159,27 @@ def register(request):
         validate_email(email)
     except ValidationError:
         return JsonResponse({"success": False, "message": "Enter a valid email address."}, status=400)
+
+    if not re.fullmatch(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$", email):
+        return JsonResponse({"success": False, "message": "Enter a valid, original email address."}, status=400)
+
+    domain = email.split("@")[-1].lower()
+    disposable_domains = {
+        "mailinator.com", "tempmail.com", "10minutemail.com", "throwawaymail.com",
+        "guerrillamail.com", "guerrillamail.net", "guerrillamail.org", "sharklasers.com",
+        "yopmail.com", "yopmail.fr", "trashmail.com", "trashmail.net", "temp-mail.org",
+        "getnada.com", "fakeinbox.com", "dispostable.com", "mohmal.com", "burnermail.io",
+        "mytemp.email", "tempail.com"
+    }
+    if domain in disposable_domains or "." not in domain or len(domain.split(".")[-1]) < 2:
+        return JsonResponse({"success": False, "message": "Enter a valid, original email address (disposable emails are not allowed)."}, status=400)
+
     if phone_number:
         phone_parts = phone_number.split(" ")
         phone_digits = "".join(phone_parts).replace("+", "", 1)
+        if len(phone_digits) >= 6 and len(set(phone_digits)) <= 1:
+            return JsonResponse({"success": False, "message": "Enter a valid, original phone number."}, status=400)
+
         international = (
             len(phone_parts) == 2
             and re.fullmatch(r"\+\d{1,4}", phone_parts[0])
@@ -174,6 +192,8 @@ def register(request):
             return JsonResponse({"success": False, "message": "Enter a valid phone number."}, status=400)
     if CustomUser.objects.filter(email__iexact=email).exists():
         return JsonResponse({"success": False, "message": "An account with this email already exists."}, status=409)
+    if phone_number and CustomUser.objects.filter(phone_number__iexact=phone_number).exists():
+        return JsonResponse({"success": False, "message": "An account with this phone number already exists."}, status=409)
     username = email.split("@", 1)[0][:140] or "user"
     base = username
     suffix = 1
@@ -200,10 +220,10 @@ def login(request):
     data = _json(request)
     if not data:
         return JsonResponse({"success": False, "message": "A JSON body is required."}, status=400)
-    email = str(data.get("email", "")).strip()
-    user = authenticate(request, username=email, password=data.get("password"))
+    identifier = str(data.get("email", "") or data.get("username", "") or data.get("phone", "") or data.get("phone_number", "")).strip()
+    user = authenticate(request, username=identifier, password=data.get("password"))
     if not user:
-        return JsonResponse({"success": False, "message": "Invalid email or password."}, status=401)
+        return JsonResponse({"success": False, "message": "Invalid email, phone number, or password."}, status=401)
     access, refresh = _tokens(user, revoke_existing=True)
     response = JsonResponse({"success": True, "message": "Logged in successfully", "data": {"user": _user_data(user), "accessToken": access}})
     _set_refresh(response, refresh)
