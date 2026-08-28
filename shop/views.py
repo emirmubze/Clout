@@ -988,6 +988,8 @@ def r2_presign_upload(request):
         return JsonResponse({"success": False, "message": "Invalid upload folder."}, status=400)
     if not filename:
         return JsonResponse({"success": False, "message": "A filename is required."}, status=400)
+    if folder == "course_videos":
+        content_type = "video/mp4"
 
     safe_filename = re.sub(r"[^A-Za-z0-9._-]", "-", filename).strip(".") or "upload"
     object_key = f"{folder}/{uuid.uuid4().hex}-{safe_filename}"

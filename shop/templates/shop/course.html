@@ -953,7 +953,9 @@ body {
             playsinline
             preload="metadata"
             controls
-        ></video>
+        >
+            <source id="courseVideoSource" type="video/mp4">
+        </video>
 
         <img
             id="videoPoster"
@@ -1400,6 +1402,9 @@ const fullscreenButton =
 
 const videoContainer =
     document.getElementById("videoContainer");
+
+const videoSource =
+    document.getElementById("courseVideoSource");
 
 const resumeButton =
     document.getElementById("resumeButton");
@@ -2082,6 +2087,7 @@ function loadVideo(videoUrl, posterUrl) {
      * This is important when switching between R2 videos.
      */
     video.removeAttribute("src");
+    videoSource.removeAttribute("src");
 
     video.load();
 
@@ -2141,7 +2147,7 @@ function loadVideo(videoUrl, posterUrl) {
      * IMPORTANT:
      * Directly use the public R2 URL.
      */
-    video.src =
+    videoSource.src =
         cleanUrl;
 
 
