@@ -3,6 +3,7 @@ import hashlib
 import hmac
 import json
 import os
+import re
 import secrets
 import time
 from datetime import timedelta
@@ -11,6 +12,8 @@ from functools import wraps
 from django.contrib.auth import authenticate
 from django.contrib.sessions.models import Session
 from django.core.cache import cache
+from django.core.exceptions import ValidationError
+from django.core.validators import validate_email
 from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -148,9 +151,27 @@ def register(request):
         return JsonResponse({"success": False, "message": "A JSON body is required."}, status=400)
     name = str(data.get("name", "")).strip()
     email = str(data.get("email", "")).strip().lower()
+    phone_number = " ".join(str(data.get("phone_number", "")).split())
     password = str(data.get("password", ""))
     if not name or not email or len(password) < 8:
         return JsonResponse({"success": False, "message": "Name, email, and a password of at least 8 characters are required."}, status=400)
+    try:
+        validate_email(email)
+    except ValidationError:
+        return JsonResponse({"success": False, "message": "Enter a valid email address."}, status=400)
+    if phone_number:
+        phone_parts = phone_number.split(" ")
+        phone_digits = "".join(phone_parts).replace("+", "", 1)
+        international = (
+            len(phone_parts) == 2
+            and re.fullmatch(r"\+\d{1,4}", phone_parts[0])
+            and re.fullmatch(r"\d{6,14}", phone_parts[1])
+            and phone_digits.isdigit()
+            and 7 <= len(phone_digits) <= 15
+        )
+        local = len(phone_parts) == 1 and re.fullmatch(r"\d{6,15}", phone_number)
+        if not international and not local:
+            return JsonResponse({"success": False, "message": "Enter a valid phone number."}, status=400)
     if CustomUser.objects.filter(email__iexact=email).exists():
         return JsonResponse({"success": False, "message": "An account with this email already exists."}, status=409)
     username = email.split("@", 1)[0][:140] or "user"
@@ -159,7 +180,13 @@ def register(request):
     while CustomUser.objects.filter(username=username).exists():
         username = f"{base}{suffix}"
         suffix += 1
-    user = CustomUser.objects.create_user(username=username, email=email, name=name, password=password)
+    user = CustomUser.objects.create_user(
+        username=username,
+        email=email,
+        name=name,
+        password=password,
+        phone_number=phone_number or None,
+    )
     access, refresh = _tokens(user, revoke_existing=True)
     response = JsonResponse({"success": True, "message": "User created successfully", "data": {"user": _user_data(user), "accessToken": access}}, status=201)
     _set_refresh(response, refresh)

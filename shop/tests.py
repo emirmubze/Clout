@@ -127,6 +127,43 @@ class UserAuthAndDashboardTests(TestCase):
         self.assertEqual(user.username, "aliceuser")
         self.assertEqual(user.name, "Alice Johnson")
 
+    def test_registration_rejects_malformed_email(self):
+        response = self.client.post(
+            reverse("register"),
+            {
+                "username": "invalidemailuser",
+                "name": "Invalid Email",
+                "email": "not-an-email",
+                "phone_number": "9876543210",
+                "age": 24,
+                "password1": "VeryStrongPass123!",
+                "password2": "VeryStrongPass123!",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Enter a valid email address.")
+        self.assertFalse(CustomUser.objects.filter(username="invalidemailuser").exists())
+
+    def test_registration_rejects_malformed_phone_number(self):
+        response = self.client.post(
+            reverse("register"),
+            {
+                "username": "invalidphoneuser",
+                "name": "Invalid Phone",
+                "email": "valid-phone-email@example.com",
+                "country_code": "+91",
+                "phone": "12abc",
+                "age": 24,
+                "password1": "VeryStrongPass123!",
+                "password2": "VeryStrongPass123!",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Enter a valid phone number.")
+        self.assertFalse(CustomUser.objects.filter(username="invalidphoneuser").exists())
+
     def test_signup_browser_field_names_create_user(self):
         form_data = {
             "username": "browseruser",
@@ -908,6 +945,25 @@ class AuthApiTests(TestCase):
         }, REMOTE_ADDR="192.0.2.10")
         self.assertEqual(response.status_code, 200)
         self.assertIn("accessToken", response.json()["data"])
+
+    def test_api_register_rejects_malformed_email(self):
+        response = self.json_request("post", reverse("api_register"), {
+            "name": "Invalid Email", "email": "not-an-email", "password": "StrongPass123!",
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["message"], "Enter a valid email address.")
+        self.assertFalse(CustomUser.objects.filter(email="not-an-email").exists())
+
+    def test_api_register_rejects_malformed_phone_number(self):
+        response = self.json_request("post", reverse("api_register"), {
+            "name": "Invalid Phone", "email": "api-phone@example.com",
+            "phone_number": "+91 abc123", "password": "StrongPass123!",
+        })
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json()["message"], "Enter a valid phone number.")
+        self.assertFalse(CustomUser.objects.filter(email="api-phone@example.com").exists())
 
     def test_refresh_rotates_session_and_logout_all_revokes_sessions(self):
         user = CustomUser.objects.create_user(

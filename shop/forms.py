@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
+import re
 from .models import CustomUser, ContactMessage, Course
 
 
@@ -36,6 +37,18 @@ class RegistrationForm(UserCreationForm):
 
     def clean_phone_number(self):
         phone_number = " ".join(self.cleaned_data["phone_number"].split())
+        phone_parts = phone_number.split(" ")
+        digits = "".join(phone_parts).replace("+", "", 1)
+        international = (
+            len(phone_parts) == 2
+            and re.fullmatch(r"\+\d{1,4}", phone_parts[0])
+            and re.fullmatch(r"\d{6,14}", phone_parts[1])
+            and digits.isdigit()
+            and 7 <= len(digits) <= 15
+        )
+        local = len(phone_parts) == 1 and re.fullmatch(r"\d{6,15}", phone_number)
+        if not international and not local:
+            raise forms.ValidationError("Enter a valid phone number.")
         if CustomUser.objects.filter(phone_number__iexact=phone_number).exists():
             raise forms.ValidationError("This phone number is already in use.")
         return phone_number
