@@ -1505,9 +1505,12 @@ def register_view(request):
 
 def logout_view(request):
 
-    request.session.flush()
-
-    logout(request)
+    try:
+        request.session.flush()
+        logout(request)
+    except Exception:
+        logger.exception("Logout failed for user %s", request.user)
+        return redirect(f"{reverse('login')}?logout_error=1")
 
     return redirect(
         "login"

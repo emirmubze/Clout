@@ -2969,6 +2969,8 @@
 
     const chatForm = document.getElementById("admin-chat-form");
     const messagesBox = document.getElementById("admin-messages");
+    let activeChatLink = document.querySelector("[data-chat-user-id].active");
+    let conversationPollInFlight = false;
 
     function renderAdminMessage(data) {
         const wrapper = document.createElement("div");
@@ -3034,6 +3036,7 @@
         if (headerEmail) headerEmail.textContent = data.user.email;
 
         if (messagesBox) {
+            const wasAtBottom = messagesBox.scrollHeight - messagesBox.scrollTop - messagesBox.clientHeight < 24;
             messagesBox.replaceChildren();
             if (data.messages.length) {
                 data.messages.forEach(message => {
@@ -3046,7 +3049,10 @@
                 empty.textContent = "No messages yet.";
                 messagesBox.appendChild(empty);
             }
-            messagesBox.scrollTop = messagesBox.scrollHeight;
+            if (wasAtBottom || !messagesBox.dataset.hasLoadedConversation) {
+                messagesBox.scrollTop = messagesBox.scrollHeight;
+            }
+            messagesBox.dataset.hasLoadedConversation = "true";
         }
 
         if (chatForm) {
@@ -3054,6 +3060,7 @@
             chatForm.dataset.userId = data.user.id;
         }
 
+        activeChatLink = link;
         window.history.replaceState({}, "", link.href);
     }
 
@@ -3067,6 +3074,21 @@
             }
         });
     });
+
+    async function pollActiveConversation() {
+        if (!activeChatLink || conversationPollInFlight) return;
+        conversationPollInFlight = true;
+        try {
+            await loadAdminConversation(activeChatLink);
+        } catch (error) {
+        } finally {
+            conversationPollInFlight = false;
+        }
+    }
+
+    if (activeChatLink) {
+        window.setInterval(pollActiveConversation, 2000);
+    }
 
     if (chatForm && messagesBox) {
 

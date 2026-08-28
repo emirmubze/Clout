@@ -652,6 +652,20 @@
                     </div>
                 {% endif %}
 
+                {% if messages %}
+                    <div class="form-error" role="alert">
+                        {% for message in messages %}
+                            <p>{{ message }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                {% if request.GET.logout_error %}
+                    <div class="form-error" role="alert">
+                        <p>Unable to log out. Please try again.</p>
+                    </div>
+                {% endif %}
+
                 <!-- USERNAME -->
 
                 <div class="form-group">

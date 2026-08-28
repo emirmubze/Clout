@@ -264,6 +264,22 @@ class UserAuthAndDashboardTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Please enter a correct username and password")
 
+    @patch("shop.views.logout", side_effect=RuntimeError("session unavailable"))
+    def test_logout_failure_redirects_with_only_an_inline_error(self, logout_mock):
+        user = CustomUser.objects.create_user(
+            username="logoutfailure",
+            email="logout-failure@example.com",
+            password="VeryStrongPass123!",
+        )
+        self.client.force_login(user)
+
+        response = self.client.get(reverse("logout"))
+
+        self.assertRedirects(response, f"{reverse('login')}?logout_error=1")
+        login_response = self.client.get(response.url)
+        self.assertContains(login_response, "Unable to log out. Please try again.")
+        self.assertContains(login_response, "Log In")
+
     def test_latest_login_invalidates_previous_device_session(self):
         user = CustomUser.objects.create_user(
             username="multiuser",
