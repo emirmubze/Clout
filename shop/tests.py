@@ -5,9 +5,12 @@ from smtplib import SMTPException
 
 from django.core import mail
 from django.core.management import call_command
+from django.contrib.auth.tokens import default_token_generator
 from django.middleware.csrf import get_token
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
+from django.utils.encoding import force_bytes
+from django.utils.http import urlsafe_base64_encode
 
 from .models import CustomUser, ContactMessage, Course, Module, Lesson, Order
 
@@ -42,6 +45,53 @@ class UserAuthAndDashboardTests(TestCase):
         self.assertRedirects(response, reverse("reset_link_sent"))
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("/reset-password/", mail.outbox[0].body)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_forgot_password_rejects_unknown_email_without_sending_email(self):
+        response = self.client.post(
+            reverse("forgot_password"),
+            {"email": " unknown@example.com "},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "shop/forgot-password.html")
+        self.assertContains(response, "No account found with this email address.")
+        self.assertEqual(len(mail.outbox), 0)
+        self.assertFalse(CustomUser.objects.filter(email="unknown@example.com").exists())
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_forgot_password_matches_registered_email_case_insensitively(self):
+        user = CustomUser.objects.create_user(
+            username="caseuser",
+            email="case@example.com",
+            password="StrongPass123!",
+        )
+
+        response = self.client.post(
+            reverse("forgot_password"),
+            {"email": "  CASE@EXAMPLE.COM  "},
+        )
+
+        self.assertRedirects(response, reverse("reset_link_sent"))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(user.email, mail.outbox[0].to)
+
+    def test_reset_password_rejects_inactive_user_token(self):
+        user = CustomUser.objects.create_user(
+            username="inactiveuser",
+            email="inactive@example.com",
+            password="StrongPass123!",
+            is_active=False,
+        )
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+
+        response = self.client.get(
+            reverse("reset_password", kwargs={"uidb64": uid, "token": token})
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "This reset link is invalid or has expired.")
 
     @patch("shop.views.send_mail", side_effect=SMTPException("SMTP unavailable"))
     def test_forgot_password_does_not_error_when_email_fails(self, send_mail_mock):

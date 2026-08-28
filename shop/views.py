@@ -2027,32 +2027,40 @@ def forgot_password(request):
         email = request.POST.get("email", "").strip()
         user = CustomUser.objects.filter(email__iexact=email).first()
 
-        if user and user.is_active:
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            token = default_token_generator.make_token(user)
-            reset_url = request.build_absolute_uri(
-                reverse(
-                    "reset_password",
-                    kwargs={"uidb64": uid, "token": token},
-                )
+        if not user or not user.is_active:
+            return render(
+                request,
+                "shop/forgot-password.html",
+                {
+                    "email_error": "No account found with this email address.",
+                    "submitted_email": email,
+                },
             )
-            try:
-                send_mail(
-                    "Reset your Clout password",
-                    render_to_string(
-                        "shop/password-reset-email.txt",
-                        {"user": user, "reset_url": reset_url},
-                    ),
-                    None,
-                    [user.email],
-                )
-            except (SMTPException, OSError):
-                logger.exception(
-                    "Password reset email could not be sent to %s",
-                    user.email,
-                )
 
-        # Do not reveal whether the email address exists.
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+        reset_url = request.build_absolute_uri(
+            reverse(
+                "reset_password",
+                kwargs={"uidb64": uid, "token": token},
+            )
+        )
+        try:
+            send_mail(
+                "Reset your Clout password",
+                render_to_string(
+                    "shop/password-reset-email.txt",
+                    {"user": user, "reset_url": reset_url},
+                ),
+                None,
+                [user.email],
+            )
+        except (SMTPException, OSError):
+            logger.exception(
+                "Password reset email could not be sent to %s",
+                user.email,
+            )
+
         return redirect("reset_link_sent")
 
     return render(
@@ -2089,7 +2097,7 @@ def reset_password(request, uidb64, token):
     except (CustomUser.DoesNotExist, ValueError, TypeError, OverflowError):
         user = None
 
-    if not user or not default_token_generator.check_token(user, token):
+    if not user or not user.is_active or not default_token_generator.check_token(user, token):
         return render(
             request,
             "shop/reset-password.html",
