@@ -395,11 +395,6 @@ def contact(request):
                 recipient=request.user,
                 sender_is_admin=True
             )
-            |
-            ContactMessage.objects.filter(
-                recipient__isnull=True,
-                sender_is_admin=True
-            )
         )
 
         ContactMessage.objects.filter(
@@ -541,6 +536,27 @@ def admin_dashboard(request):
     else:
 
         chat_messages = ContactMessage.objects.none()
+
+    if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+        return JsonResponse({
+            "success": True,
+            "user": {
+                "id": selected_user.id if selected_user else None,
+                "name": selected_user.name if selected_user else "Customer Support",
+                "email": selected_user.email if selected_user else "Select a conversation",
+            },
+            "messages": [
+                {
+                    "id": message.id,
+                    "message": message.message or "",
+                    "sender_is_admin": message.sender_is_admin,
+                    "image_url": message.image.url if message.image else "",
+                    "video_url": reverse("message_video", args=[message.id]) if message.video else "",
+                    "created_at": message.created_at.strftime("%H:%M"),
+                }
+                for message in chat_messages
+            ],
+        })
 
     # =====================================================
     # DASHBOARD STATS

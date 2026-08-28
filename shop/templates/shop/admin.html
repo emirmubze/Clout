@@ -1907,6 +1907,7 @@
 
                     <a
                         href="?user_id={{ contact_user.id }}"
+                        data-chat-user-id="{{ contact_user.id }}"
                         class="
                             chat-user
                             {% if selected_user and selected_user.id == contact_user.id %}
@@ -2934,6 +2935,104 @@
 
     const chatForm = document.getElementById("admin-chat-form");
     const messagesBox = document.getElementById("admin-messages");
+
+    function renderAdminMessage(data) {
+        const wrapper = document.createElement("div");
+        wrapper.className = data.sender_is_admin
+            ? "message message-admin"
+            : "message message-user";
+        wrapper.dataset.messageId = data.id;
+
+        if (data.message) {
+            const text = document.createElement("div");
+            text.textContent = data.message;
+            wrapper.appendChild(text);
+        }
+
+        if (data.image_url) {
+            const media = document.createElement("div");
+            media.className = "message-media";
+            const image = document.createElement("img");
+            image.src = data.image_url;
+            image.alt = "Message image";
+            media.appendChild(image);
+            wrapper.appendChild(media);
+        }
+
+        if (data.video_url) {
+            const media = document.createElement("div");
+            media.className = "message-media";
+            const video = document.createElement("video");
+            video.controls = true;
+            const source = document.createElement("source");
+            source.src = data.video_url;
+            source.type = "video/mp4";
+            video.appendChild(source);
+            media.appendChild(video);
+            wrapper.appendChild(media);
+        }
+
+        const time = document.createElement("div");
+        time.className = "message-time";
+        time.textContent = data.created_at || "";
+        wrapper.appendChild(time);
+        return wrapper;
+    }
+
+    async function loadAdminConversation(link) {
+        const response = await fetch(link.href, {
+            headers: { "X-Requested-With": "XMLHttpRequest" },
+            credentials: "same-origin",
+            cache: "no-store",
+        });
+        const data = await response.json();
+        if (!response.ok || !data.success) {
+            throw new Error(data.message || "Conversation could not be loaded.");
+        }
+
+        document.querySelectorAll("[data-chat-user-id]").forEach(item => {
+            item.classList.toggle("active", item === link);
+        });
+
+        const headerName = document.querySelector(".chat-header-name");
+        const headerEmail = document.querySelector(".chat-header-email");
+        if (headerName) headerName.textContent = data.user.name;
+        if (headerEmail) headerEmail.textContent = data.user.email;
+
+        if (messagesBox) {
+            messagesBox.replaceChildren();
+            if (data.messages.length) {
+                data.messages.forEach(message => {
+                    messagesBox.appendChild(renderAdminMessage(message));
+                });
+            } else {
+                const empty = document.createElement("div");
+                empty.dataset.chatEmpty = "";
+                empty.style.cssText = "margin:auto;color:#667085;font-size:13px;";
+                empty.textContent = "No messages yet.";
+                messagesBox.appendChild(empty);
+            }
+            messagesBox.scrollTop = messagesBox.scrollHeight;
+        }
+
+        if (chatForm) {
+            chatForm.action = `/admin-send-message/${data.user.id}/`;
+            chatForm.dataset.userId = data.user.id;
+        }
+
+        window.history.replaceState({}, "", link.href);
+    }
+
+    document.querySelectorAll("[data-chat-user-id]").forEach(link => {
+        link.addEventListener("click", async function (event) {
+            event.preventDefault();
+            try {
+                await loadAdminConversation(link);
+            } catch (error) {
+                showToast(error.message, true);
+            }
+        });
+    });
 
     if (chatForm && messagesBox) {
 

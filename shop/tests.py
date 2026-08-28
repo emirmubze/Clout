@@ -332,6 +332,60 @@ class UserAuthAndDashboardTests(TestCase):
         self.assertEqual(response.json()["messages"][0]["id"], reply.id)
         self.assertEqual(response.json()["messages"][0]["message"], "New support reply")
 
+    def test_contact_messages_are_isolated_between_users(self):
+        user_a = CustomUser.objects.create_user(
+            username="contactusera",
+            email="contacta@example.com",
+            password="StrongPass123!",
+        )
+        user_b = CustomUser.objects.create_user(
+            username="contactuserb",
+            email="contactb@example.com",
+            password="StrongPass123!",
+        )
+        ContactMessage.objects.create(
+            sender=user_a,
+            message="Private message for A",
+        )
+
+        self.client.force_login(user_b)
+        response = self.client.get(reverse("contact"))
+
+        self.assertNotContains(response, "Private message for A")
+        self.assertContains(response, "Start a conversation with CLOUT Support.")
+
+    def test_admin_ajax_conversation_returns_only_selected_user_messages(self):
+        admin = CustomUser.objects.create_user(
+            username="ajaxadmin",
+            email="ajaxadmin@example.com",
+            password="StrongPass123!",
+            is_staff=True,
+        )
+        user_a = CustomUser.objects.create_user(
+            username="ajaxusera",
+            email="ajaxa@example.com",
+            password="StrongPass123!",
+        )
+        user_b = CustomUser.objects.create_user(
+            username="ajaxuserb",
+            email="ajaxb@example.com",
+            password="StrongPass123!",
+        )
+        ContactMessage.objects.create(sender=user_a, message="A message")
+        ContactMessage.objects.create(sender=user_b, message="B message")
+
+        self.client.force_login(admin)
+        response = self.client.get(
+            reverse("admin_dashboard") + f"?user_id={user_a.id}",
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            [message["message"] for message in response.json()["messages"]],
+            ["A message"],
+        )
+
     def test_user_can_log_in_after_logout(self):
         user = CustomUser.objects.create_user(
             username="logoutuser",
