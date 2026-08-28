@@ -947,15 +947,13 @@ body {
 
     <div class="video-container" id="videoContainer">
 
-        <!-- IMPORTANT: no crossorigin -->
         <video
             id="courseVideo"
             playsinline
             preload="metadata"
+            crossorigin="anonymous"
             controls
-        >
-            <source id="courseVideoSource" type="video/mp4">
-        </video>
+        ></video>
 
         <img
             id="videoPoster"
@@ -1198,7 +1196,7 @@ body {
 
                                 data-label="MODULE {{ forloop.parentloop.counter|stringformat:'02d' }}"
 
-                                data-video="{% if lesson.video_public_url %}{{ lesson.video_public_url|escapejs }}{% elif lesson.video %}{% url 'serve_lesson_video' lesson.id %}{% endif %}"
+                                data-video="{% if lesson.video_public_url %}{{ lesson.video_public_url|escapejs }}{% elif lesson.video %}{{ lesson.video.url|escapejs }}{% endif %}"
 
                                 data-poster="{% if lesson.thumbnail_public_url %}{{ lesson.thumbnail_public_url|escapejs }}{% elif lesson.thumbnail %}{{ lesson.thumbnail.url|escapejs }}{% endif %}"
 
@@ -1402,9 +1400,6 @@ const fullscreenButton =
 
 const videoContainer =
     document.getElementById("videoContainer");
-
-const videoSource =
-    document.getElementById("courseVideoSource");
 
 const resumeButton =
     document.getElementById("resumeButton");
@@ -2087,7 +2082,6 @@ function loadVideo(videoUrl, posterUrl) {
      * This is important when switching between R2 videos.
      */
     video.removeAttribute("src");
-    videoSource.removeAttribute("src");
 
     video.load();
 
@@ -2147,7 +2141,7 @@ function loadVideo(videoUrl, posterUrl) {
      * IMPORTANT:
      * Directly use the public R2 URL.
      */
-    videoSource.src =
+    video.src =
         cleanUrl;
 
 
