@@ -42,7 +42,7 @@ DEBUG = (
 )
 
 
-ALLOWED_HOSTS = [
+configured_hosts = [
     host.strip()
     for host in os.getenv(
         "ALLOWED_HOSTS",
@@ -50,6 +50,13 @@ ALLOWED_HOSTS = [
     ).split(",")
     if host.strip()
 ]
+
+render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME", "").strip()
+ALLOWED_HOSTS = configured_hosts + (
+    [render_hostname]
+    if render_hostname and render_hostname not in configured_hosts
+    else []
+)
 
 
 # =========================================================
