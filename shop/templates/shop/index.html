@@ -397,7 +397,7 @@
       text-decoration: none;
       border-color: var(--orange);
       overflow: hidden;
-      margin-top: 3px;
+      margin-top: 2px;
       margin-right: -5px;
     }
     .profile-circle,
@@ -424,6 +424,20 @@
       width: 100%;
       height: 100%;
       font-size: 20px;
+    }
+
+    .profile-link .profile-icon {
+      display: none;
+    }
+
+    .profile-link.no-profile-image .profile-icon,
+    .profile-link.image-failed .profile-icon {
+      display: inline-flex;
+    }
+
+    .profile-link.no-profile-image .profile-circle,
+    .profile-link.image-failed .profile-circle {
+      display: none;
     }
 
     .profile-image {
@@ -2029,12 +2043,11 @@
             {% if user.is_authenticated %}
 
                 <li class="nav-message-item">
-                    <a href="{% url 'profile' %}" class="profile-link" aria-label="Profile">
+                    <a href="{% url 'profile' %}" class="profile-link{% if not request.user.profile_image_url %} no-profile-image{% endif %}" aria-label="Profile">
                         {% if request.user.profile_image_url %}
-                            <img class="profile-circle" src="{{ request.user.profile_image_url }}" alt="{{ request.user.name|default:request.user.username }} profile">
-                        {% else %}
-                            <span class="profile-icon" aria-hidden="true"><i class="fa-solid fa-user"></i></span>
+                        <img class="profile-circle" src="{{ request.user.profile_image_url }}" alt="" onerror="this.parentElement.classList.add('image-failed')">
                         {% endif %}
+                      <span class="profile-icon" aria-hidden="true">👤</span>
                     </a>
                 </li>
 
