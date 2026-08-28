@@ -46,17 +46,22 @@ configured_hosts = [
     host.strip()
     for host in os.getenv(
         "ALLOWED_HOSTS",
-        "localhost,127.0.0.1",
+        "",
     ).split(",")
     if host.strip()
 ]
 
 render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME", "").strip()
-ALLOWED_HOSTS = configured_hosts + (
-    [render_hostname]
-    if render_hostname and render_hostname not in configured_hosts
-    else []
-)
+ALLOWED_HOSTS = list(dict.fromkeys([
+    "localhost",
+    "127.0.0.1",
+    "clout.onrender.com",
+    "clout.courses",
+    "www.clout.courses",
+    *configured_hosts,
+    render_hostname,
+]))
+ALLOWED_HOSTS = [host for host in ALLOWED_HOSTS if host]
 
 
 # =========================================================
