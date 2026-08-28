@@ -1221,6 +1221,29 @@
             text-align: center;
         }
 
+        .editor-thumbnail-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 9px;
+            color: #2F3033;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        .editor-thumbnail-plus {
+            width: 66px;
+            height: 66px;
+            display: grid;
+            place-items: center;
+            border-radius: 50%;
+            background: #F0F0F1;
+            color: #34363A;
+            font-size: 38px;
+            font-weight: 300;
+            line-height: 1;
+        }
+
         .editor-thumbnail-box img { width: 100%; height: 100%; object-fit: cover; }
         .editor-thumbnail-input, .editor-video-input { display: none; }
         .editor-form-row { display: grid; gap: 13px; }
@@ -2414,7 +2437,7 @@
         if (lessonData?.id) lesson.dataset.lessonId = lessonData.id;
         lesson.innerHTML = `
             <div class="editor-lesson-header"><strong><span class="editor-lesson-number">${String(number).padStart(2, "0")}</span> Lesson</strong><button class="editor-lesson-delete" type="button" onclick="deleteEditorLesson(this)">Delete</button></div>
-            <div class="editor-lesson-content"><div><div class="editor-thumbnail-box" onclick="this.nextElementSibling.click()"><span>+<br>Add Thumbnail</span></div><input class="editor-thumbnail-input" type="file" accept="image/*" onchange="previewEditorThumbnail(this)"><small>Recommended: 16:9 image</small></div><div class="editor-form-row"><div class="editor-form-group"><label>Course ${number} Video</label><div class="editor-video-row"><label class="editor-video-button">&#9654; Choose Video<input class="editor-video-input" type="file" accept="video/*" onchange="showEditorVideoName(this)"></label><span class="editor-video-name">No video selected</span></div></div><div class="editor-form-group"><label>Lesson Title</label><input type="text" placeholder="e.g. Introduction to the Course"></div><div class="editor-form-group"><label>Description</label><textarea placeholder="Describe what students will learn in this video..."></textarea></div></div></div>`;
+            <div class="editor-lesson-content"><div><div class="editor-thumbnail-box" onclick="this.nextElementSibling.click()"><span class="editor-thumbnail-placeholder"><span class="editor-thumbnail-plus">+</span><span>Add</span></span></div><input class="editor-thumbnail-input" type="file" accept="image/*" onchange="previewEditorThumbnail(this)"><small>Recommended: 16:9 image</small></div><div class="editor-form-row"><div class="editor-form-group"><label>Course ${number} Video</label><div class="editor-video-row"><label class="editor-video-button">&#9654; Choose Video<input class="editor-video-input" type="file" accept="video/*" onchange="showEditorVideoName(this)"></label><span class="editor-video-name">No video selected</span></div></div><div class="editor-form-group"><label>Lesson Title</label><input type="text" placeholder="e.g. Introduction to the Course"></div><div class="editor-form-group"><label>Description</label><textarea placeholder="Describe what students will learn in this video..."></textarea></div></div></div>`;
         module.querySelector(".editor-lessons").appendChild(lesson);
         lesson.querySelector("input[type='text']").value = lessonData?.title || "";
         lesson.querySelector("textarea").value = lessonData?.description || "";
