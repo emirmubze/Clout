@@ -4,6 +4,27 @@ from django.conf import settings
 from urllib.parse import quote
 
 
+def _public_file_url(file_field, explicit_url=""):
+    url = str(explicit_url or "").strip()
+    if url.startswith(("http://", "https://")):
+        return url
+
+    if not file_field:
+        return ""
+
+    custom_domain = str(
+        getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
+    ).strip().rstrip("/")
+    file_name = str(getattr(file_field, "name", "")).lstrip("/")
+    if custom_domain and file_name:
+        return f"https://{custom_domain}/{file_name}"
+
+    try:
+        return str(file_field.url or "")
+    except (AttributeError, ValueError):
+        return ""
+
+
 class CustomUser(AbstractUser):
     name = models.CharField(max_length=150, blank=True)
     age = models.PositiveIntegerField(null=True, blank=True)
@@ -254,27 +275,7 @@ class Module(models.Model):
 
     @property
     def video_public_url(self):
-        # Prefer explicit public R2 URL.
-        if self.video_url:
-            url = str(self.video_url).strip()
-
-            if url.startswith(
-                ("http://", "https://")
-            ):
-                return url
-
-        # Otherwise use Django storage URL.
-        if self.video:
-            try:
-                url = self.video.url
-
-                if url:
-                    return str(url)
-
-            except (AttributeError, ValueError):
-                pass
-
-        return ""
+        return _public_file_url(self.video, self.video_url)
 
 
 class Lesson(models.Model):
@@ -338,27 +339,7 @@ class Lesson(models.Model):
         2. Django storage URL from video
         """
 
-        # 1. Explicit public R2 URL
-        if self.video_url:
-            url = str(self.video_url).strip()
-
-            if url.startswith(
-                ("http://", "https://")
-            ):
-                return url
-
-        # 2. Django storage URL
-        if self.video:
-            try:
-                url = self.video.url
-
-                if url:
-                    return str(url)
-
-            except (AttributeError, ValueError):
-                pass
-
-        return ""
+        return _public_file_url(self.video, self.video_url)
 
     @property
     def thumbnail_public_url(self):
