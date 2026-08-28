@@ -2443,6 +2443,8 @@
         lesson.querySelector("textarea").value = lessonData?.description || "";
         if (lessonData?.thumbnail_url) {
             const image = document.createElement("img");
+            image.alt = "Lesson thumbnail";
+            image.onerror = () => resetEditorThumbnailPlaceholder(image.parentElement);
             image.src = lessonData.thumbnail_url;
             lesson.querySelector(".editor-thumbnail-box").replaceChildren(image);
         }
@@ -2457,7 +2459,22 @@
     }
 
     function toggleEditorModule(button) { const body = button.closest(".module-editor").querySelector(".module-editor-body"); const collapsed = body.hidden; body.hidden = !collapsed; button.textContent = collapsed ? "-" : "+"; }
-    function previewEditorThumbnail(input) { const box = input.previousElementSibling; const image = document.createElement("img"); image.src = URL.createObjectURL(input.files[0]); box.replaceChildren(image); }
+    function resetEditorThumbnailPlaceholder(box) {
+        if (!box) return;
+        box.innerHTML = '<span class="editor-thumbnail-placeholder"><span class="editor-thumbnail-plus">+</span><span>Add</span></span>';
+    }
+    function previewEditorThumbnail(input) {
+        const box = input.previousElementSibling;
+        if (!input.files[0]) {
+            resetEditorThumbnailPlaceholder(box);
+            return;
+        }
+        const image = document.createElement("img");
+        image.alt = "Lesson thumbnail";
+        image.onerror = () => resetEditorThumbnailPlaceholder(box);
+        image.src = URL.createObjectURL(input.files[0]);
+        box.replaceChildren(image);
+    }
     function showEditorVideoName(input) { input.closest(".editor-video-row").querySelector(".editor-video-name").textContent = input.files[0]?.name || "No video selected"; }
     function cancelCourse() { window.history.back(); }
     async function saveCourse() {
