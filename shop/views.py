@@ -1637,25 +1637,6 @@ def serve_media_file(
     request,
     path
 ):
-
-    lower_path = path.lower()
-
-    blocked_extensions = (
-        ".mp4",
-        ".webm",
-        ".mov",
-        ".avi",
-        ".mkv",
-        ".m4v"
-    )
-
-    if lower_path.endswith(
-        blocked_extensions
-    ):
-        raise Http404(
-            "Video files are not available for direct download."
-        )
-
     if settings.USE_S3:
         public_url = (
             settings.MEDIA_URL.rstrip("/")
@@ -1664,27 +1645,74 @@ def serve_media_file(
         )
         return redirect(public_url)
 
-    if not default_storage.exists(path):
-        raise Http404(
-            "File not found."
+    file_path = os.path.join(settings.MEDIA_ROOT, path)
+    if not os.path.exists(file_path):
+        if default_storage.exists(path):
+            try:
+                file_path = default_storage.path(path)
+            except Exception:
+                file_path = None
+
+    if not file_path or not os.path.exists(file_path):
+        raise Http404("File not found.")
+
+    try:
+        file_size = os.path.getsize(file_path)
+    except Exception:
+        raise Http404("File could not be read.")
+
+    content_type = mimetypes.guess_type(file_path)[0] or "application/octet-stream"
+    if file_path.lower().endswith(".mp4"):
+        content_type = "video/mp4"
+    elif file_path.lower().endswith(".webm"):
+        content_type = "video/webm"
+    elif file_path.lower().endswith(".mov"):
+        content_type = "video/quicktime"
+
+    range_header = request.headers.get("Range")
+    if range_header and range_header.startswith("bytes="):
+        try:
+            range_value = range_header.replace("bytes=", "", 1).split(",", 1)[0]
+            start_text, _, end_text = range_value.partition("-")
+            start = int(start_text) if start_text else 0
+            end = int(end_text) if end_text else file_size - 1
+            end = min(end, file_size - 1)
+        except (ValueError, TypeError):
+            return HttpResponse(
+                status=416,
+                headers={"Content-Range": f"bytes */{file_size}"},
+            )
+
+        if start >= file_size or start > end:
+            return HttpResponse(
+                status=416,
+                headers={"Content-Range": f"bytes */{file_size}"},
+            )
+
+        length = end - start + 1
+        file_obj = open(file_path, "rb")
+        file_obj.seek(start)
+        response = FileResponse(
+            file_obj,
+            status=206,
+            content_type=content_type,
         )
+        response["Content-Range"] = f"bytes {start}-{end}/{file_size}"
+        response["Content-Length"] = str(length)
+    else:
+        file_obj = open(file_path, "rb")
+        response = FileResponse(
+            file_obj,
+            content_type=content_type,
+        )
+        response["Content-Length"] = str(file_size)
 
-    response = FileResponse(
-        default_storage.open(path, "rb"),
-        content_type=mimetypes.guess_type(path)[0] or "application/octet-stream"
+    response["Accept-Ranges"] = "bytes"
+    response["Content-Disposition"] = (
+        f'inline; filename="{os.path.basename(file_path)}"'
     )
-
-    response[
-        "Content-Disposition"
-    ] = (
-        'inline; filename="{}"'
-        .format(path.rsplit("/", 1)[-1])
-    )
-
-    response[
-        "X-Content-Type-Options"
-    ] = "nosniff"
-
+    response["X-Content-Type-Options"] = "nosniff"
+    response["Cache-Control"] = "public, max-age=3600"
     return response
 
 

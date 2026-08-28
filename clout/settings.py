@@ -63,6 +63,27 @@ ALLOWED_HOSTS = list(dict.fromkeys([
 ]))
 ALLOWED_HOSTS = [host for host in ALLOWED_HOSTS if host]
 
+configured_csrf = [
+    origin.strip()
+    for origin in os.getenv(
+        "CSRF_TRUSTED_ORIGINS",
+        "",
+    ).split(",")
+    if origin.strip()
+]
+
+CSRF_TRUSTED_ORIGINS = list(dict.fromkeys([
+    "https://clout.onrender.com",
+    "https://clout.courses",
+    "https://www.clout.courses",
+    "http://localhost",
+    "http://127.0.0.1",
+    *(f"https://{host}" for host in ALLOWED_HOSTS if host and not host.startswith(("http://", "https://"))),
+    *(f"http://{host}" for host in ALLOWED_HOSTS if host and not host.startswith(("http://", "https://"))),
+    *configured_csrf,
+]))
+CSRF_TRUSTED_ORIGINS = [origin for origin in CSRF_TRUSTED_ORIGINS if origin]
+
 
 # =========================================================
 # APPLICATIONS
