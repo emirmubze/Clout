@@ -825,8 +825,8 @@ button {
    SIDEBAR
 ========================================================= */
 .sidebar {
-    position: sticky;
-    top: 92px;
+    position: relative;
+    top: 0;
     background: var(--surface);
     border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
@@ -834,7 +834,7 @@ button {
     box-shadow: var(--shadow-soft);
     display: flex;
     flex-direction: column;
-    max-height: calc(100vh - 120px);
+    max-height: none;
 }
 
 .sidebar-header {
