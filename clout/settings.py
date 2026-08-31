@@ -267,7 +267,8 @@ STATIC_ROOT = (
 
 
 # =========================================================
-# CLOUDFLARE R2
+# =========================================================
+# CLOUDFLARE R2 / S3 & STATIC STORAGE
 # =========================================================
 
 USE_S3 = (
@@ -278,247 +279,96 @@ USE_S3 = (
     == "true"
 )
 
+AWS_ACCESS_KEY_ID = os.getenv(
+    "AWS_ACCESS_KEY_ID",
+    "",
+).strip()
 
-# Production MUST use R2.
-if not DEBUG and not USE_S3:
+AWS_SECRET_ACCESS_KEY = os.getenv(
+    "AWS_SECRET_ACCESS_KEY",
+    "",
+).strip()
 
-    raise ImproperlyConfigured(
-        "USE_S3 must be True in production."
-    )
+AWS_STORAGE_BUCKET_NAME = os.getenv(
+    "AWS_STORAGE_BUCKET_NAME",
+    "clout",
+).strip()
 
+AWS_S3_REGION_NAME = os.getenv(
+    "AWS_S3_REGION_NAME",
+    "auto",
+).strip()
 
-if USE_S3:
-
-    # -----------------------------------------------------
-    # R2 CREDENTIALS
-    # -----------------------------------------------------
-
-    AWS_ACCESS_KEY_ID = os.getenv(
-        "AWS_ACCESS_KEY_ID",
+AWS_S3_ENDPOINT_URL = (
+    os.getenv(
+        "AWS_S3_ENDPOINT_URL",
         "",
-    ).strip()
+    )
+    .strip()
+    .rstrip("/")
+)
 
-
-    AWS_SECRET_ACCESS_KEY = os.getenv(
-        "AWS_SECRET_ACCESS_KEY",
+AWS_S3_CUSTOM_DOMAIN = (
+    os.getenv(
+        "AWS_S3_CUSTOM_DOMAIN",
         "",
-    ).strip()
-
-
-    AWS_STORAGE_BUCKET_NAME = os.getenv(
-        "AWS_STORAGE_BUCKET_NAME",
-        "clout",
-    ).strip()
-
-
-    # -----------------------------------------------------
-    # R2 REGION
-    # -----------------------------------------------------
-
-    AWS_S3_REGION_NAME = os.getenv(
-        "AWS_S3_REGION_NAME",
-        "auto",
-    ).strip()
-
-
-    # -----------------------------------------------------
-    # R2 S3 API ENDPOINT
-    #
-    # Example:
-    # https://xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.r2.cloudflarestorage.com
-    # -----------------------------------------------------
-
-    AWS_S3_ENDPOINT_URL = (
-        os.getenv(
-            "AWS_S3_ENDPOINT_URL",
-            "",
-        )
-        .strip()
-        .rstrip("/")
     )
+    .strip()
+    .removeprefix("https://")
+    .removeprefix("http://")
+    .rstrip("/")
+)
 
+r2_configured = bool(
+    USE_S3
+    and AWS_ACCESS_KEY_ID
+    and AWS_SECRET_ACCESS_KEY
+    and AWS_STORAGE_BUCKET_NAME
+    and AWS_S3_ENDPOINT_URL
+)
 
-    # -----------------------------------------------------
-    # PUBLIC R2 DOMAIN
-    #
-    # Example:
-    # pub-xxxxxxxxxxxxxxxx.r2.dev
-    #
-    # Can also be:
-    # https://pub-xxxxxxxxxxxxxxxx.r2.dev
-    # -----------------------------------------------------
-
-    AWS_S3_CUSTOM_DOMAIN = (
-        os.getenv(
-            "AWS_S3_CUSTOM_DOMAIN",
-            "",
-        )
-        .strip()
-        .removeprefix("https://")
-        .removeprefix("http://")
-        .rstrip("/")
-    )
-
-
-    # -----------------------------------------------------
-    # PRODUCTION CHECK
-    # -----------------------------------------------------
-
-    if not DEBUG:
-
-        missing_storage_settings = [
-
-            name
-
-            for name, value in {
-
-                "AWS_ACCESS_KEY_ID":
-                    AWS_ACCESS_KEY_ID,
-
-                "AWS_SECRET_ACCESS_KEY":
-                    AWS_SECRET_ACCESS_KEY,
-
-                "AWS_STORAGE_BUCKET_NAME":
-                    AWS_STORAGE_BUCKET_NAME,
-
-                "AWS_S3_ENDPOINT_URL":
-                    AWS_S3_ENDPOINT_URL,
-
-                "AWS_S3_CUSTOM_DOMAIN":
-                    AWS_S3_CUSTOM_DOMAIN,
-
-            }.items()
-
-            if not value
-        ]
-
-
-        if missing_storage_settings:
-
-            raise ImproperlyConfigured(
-
-                "Missing production R2 settings: "
-
-                + ", ".join(
-                    missing_storage_settings
-                )
-            )
-
-
-    # -----------------------------------------------------
-    # S3 / R2 SETTINGS
-    # -----------------------------------------------------
-
+if r2_configured:
     AWS_S3_SIGNATURE_VERSION = "s3v4"
-
     AWS_S3_ADDRESSING_STYLE = "path"
-
     AWS_S3_FILE_OVERWRITE = False
-
     AWS_DEFAULT_ACL = None
-
-
-    # IMPORTANT:
-    # Don't generate signed URLs for public course videos.
     AWS_QUERYSTRING_AUTH = False
 
-
-    # -----------------------------------------------------
-    # STORAGE
-    # -----------------------------------------------------
-
     STORAGES = {
-
         "default": {
-
-            "BACKEND":
-                "storages.backends.s3.S3Storage",
-
+            "BACKEND": "storages.backends.s3.S3Storage",
             "OPTIONS": {
-
-                "access_key":
-                    AWS_ACCESS_KEY_ID,
-
-                "secret_key":
-                    AWS_SECRET_ACCESS_KEY,
-
-                "bucket_name":
-                    AWS_STORAGE_BUCKET_NAME,
-
-                "endpoint_url":
-                    AWS_S3_ENDPOINT_URL,
-
-                "region_name":
-                    AWS_S3_REGION_NAME,
-
-                "signature_version":
-                    "s3v4",
-
-                "addressing_style":
-                    "path",
-
-                "file_overwrite":
-                    False,
-
-                "querystring_auth":
-                    False,
+                "access_key": AWS_ACCESS_KEY_ID,
+                "secret_key": AWS_SECRET_ACCESS_KEY,
+                "bucket_name": AWS_STORAGE_BUCKET_NAME,
+                "endpoint_url": AWS_S3_ENDPOINT_URL,
+                "region_name": AWS_S3_REGION_NAME,
+                "signature_version": "s3v4",
+                "addressing_style": "path",
+                "file_overwrite": False,
+                "querystring_auth": False,
             },
         },
-
-
         "staticfiles": {
-
-            "BACKEND":
-                "whitenoise.storage.CompressedManifestStaticFilesStorage",
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
         },
     }
-
-
-    # -----------------------------------------------------
-    # PUBLIC MEDIA URL
-    # -----------------------------------------------------
 
     if AWS_S3_CUSTOM_DOMAIN:
-
-        MEDIA_URL = (
-            "https://"
-            + AWS_S3_CUSTOM_DOMAIN
-            + "/"
-        )
-
+        MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
     else:
-
         MEDIA_URL = "/media/"
-
-
 else:
-
-    # =====================================================
-    # LOCAL DEVELOPMENT STORAGE
-    # =====================================================
-
     STORAGES = {
-
         "default": {
-
-            "BACKEND":
-                "django.core.files.storage.FileSystemStorage",
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
         },
-
-
         "staticfiles": {
-
-            "BACKEND":
-                "django.contrib.staticfiles.storage.StaticFilesStorage",
+            "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage" if not DEBUG else "django.contrib.staticfiles.storage.StaticFilesStorage",
         },
     }
-
-
     MEDIA_URL = "/media/"
-
-    MEDIA_ROOT = (
-        BASE_DIR / "media"
-    )
+    MEDIA_ROOT = BASE_DIR / "media"
 
 
 # =========================================================
