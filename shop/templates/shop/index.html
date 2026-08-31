@@ -37,12 +37,13 @@
     }
     html {
       scroll-behavior: smooth;
+      overflow-x: clip;
     }
     body {
       background: var(--off-white);
       color: var(--black);
       font-family: var(--body);
-      overflow-x: hidden;
+      overflow-x: clip;
       -webkit-font-smoothing: antialiased;
     }
     body.menu-open {
@@ -142,7 +143,8 @@
       justify-content: center;
       position: sticky;
       top: 0;
-      z-index: 999;
+      left: 0;
+      z-index: 10000;
       border-bottom: 1px solid rgba(255,255,255,.08);
       gap: 60px;
     }
