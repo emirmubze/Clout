@@ -2206,16 +2206,18 @@ def forgot_password(request):
 
     if request.method == "POST":
 
-        email = request.POST.get("email", "").strip()
-        user = CustomUser.objects.filter(email__iexact=email).first()
+        identifier = request.POST.get("email", "").strip()
+        user = CustomUser.objects.filter(
+            Q(email__iexact=identifier) | Q(username__iexact=identifier)
+        ).first()
 
-        if not user or not user.is_active:
+        if not user or not user.is_active or not user.email:
             return render(
                 request,
                 "shop/forgot-password.html",
                 {
                     "email_error": "No account found with this email address.",
-                    "submitted_email": email,
+                    "submitted_email": identifier,
                 },
             )
 
@@ -2228,16 +2230,21 @@ def forgot_password(request):
             )
         )
         try:
+            from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "Clout <clout.courses@gmail.com>")
             send_mail(
                 "Reset your Clout password",
                 render_to_string(
                     "shop/password-reset-email.txt",
                     {"user": user, "reset_url": reset_url},
                 ),
-                None,
+                from_email,
                 [user.email],
+                html_message=render_to_string(
+                    "shop/password-reset-email.html",
+                    {"user": user, "reset_url": reset_url},
+                ),
             )
-        except (SMTPException, OSError):
+        except (SMTPException, OSError, Exception):
             logger.exception(
                 "Password reset email could not be sent to %s",
                 user.email,

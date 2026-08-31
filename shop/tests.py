@@ -45,6 +45,25 @@ class UserAuthAndDashboardTests(TestCase):
         self.assertRedirects(response, reverse("reset_link_sent"))
         self.assertEqual(len(mail.outbox), 1)
         self.assertIn("/reset-password/", mail.outbox[0].body)
+        self.assertIn("clout.courses@gmail.com", mail.outbox[0].from_email)
+
+    @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
+    def test_forgot_password_supports_username_lookup(self):
+        user = CustomUser.objects.create_user(
+            username="lookupbyusername",
+            email="lookupbyusername@example.com",
+            password="StrongPass123!",
+        )
+
+        response = self.client.post(
+            reverse("forgot_password"),
+            {"email": "lookupbyusername"},
+        )
+
+        self.assertRedirects(response, reverse("reset_link_sent"))
+        self.assertEqual(len(mail.outbox), 1)
+        self.assertIn(user.email, mail.outbox[0].to)
+        self.assertIn("clout.courses@gmail.com", mail.outbox[0].from_email)
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
     def test_forgot_password_rejects_unknown_email_without_sending_email(self):

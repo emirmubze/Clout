@@ -575,14 +575,15 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 # EMAIL
 # =========================================================
 
-EMAIL_BACKEND = (
-    "django.core.mail.backends.smtp.EmailBackend"
+EMAIL_BACKEND = os.getenv(
+    "EMAIL_BACKEND",
+    "django.core.mail.backends.smtp.EmailBackend",
 )
 
 
 EMAIL_HOST = os.getenv(
     "EMAIL_HOST",
-    "smtp.privateemail.com",
+    "smtp.gmail.com",
 )
 
 
@@ -602,10 +603,18 @@ EMAIL_USE_TLS = (
     == "true"
 )
 
+EMAIL_USE_SSL = (
+    os.getenv(
+        "EMAIL_USE_SSL",
+        "False",
+    ).lower()
+    == "true"
+)
+
 
 EMAIL_HOST_USER = os.getenv(
     "EMAIL_HOST_USER",
-    "admin@clout.courses",
+    "clout.courses@gmail.com",
 )
 
 
@@ -617,7 +626,12 @@ EMAIL_HOST_PASSWORD = os.getenv(
 
 DEFAULT_FROM_EMAIL = os.getenv(
     "DEFAULT_FROM_EMAIL",
-    "Clout <admin@clout.courses>",
+    "Clout <clout.courses@gmail.com>",
+)
+
+SERVER_EMAIL = os.getenv(
+    "SERVER_EMAIL",
+    "clout.courses@gmail.com",
 )
 
 
