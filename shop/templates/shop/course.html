@@ -66,26 +66,32 @@ button {
    HEADER
 ========================================================= */
 .header {
-    height: 74px;
-    padding: 0 24px;
+    height: 62px;
+    background: #020202;
+    border-top: 1px solid var(--brand-orange);
+    border-bottom: 1px solid rgba(255,255,255,.08);
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    background: #050505;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.9);
     position: sticky;
     top: 0;
     z-index: 50;
 }
 
-.logo {
+.header-inner {
+    width: min(1380px, calc(100% - 50px));
+    margin: auto;
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
+}
+
+.logo {
     color: var(--brand-orange);
-    font-size: 20px;
-    font-weight: 800;
-    letter-spacing: -0.5px;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: bold;
+    font-family: "Acme", "DM Sans", sans-serif;
+    letter-spacing: 1.5px;
     line-height: 1;
 }
 
@@ -97,28 +103,25 @@ button {
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    min-width: 150px;
 }
 
 .nav a {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 110px;
-    padding: 10px 18px;
+    color: #fff;
     border: 1px solid var(--brand-orange);
-    border-radius: 4px;
-    color: var(--brand-orange);
+    border-radius: 5px;
+    padding: 7px 14px;
     background: transparent;
-    font-size: 15px;
+    font-family: "DM Sans", sans-serif;
+    font-size: 13px;
     font-weight: 600;
-    transition: all 0.15s ease;
+    text-decoration: none;
+    transition: background .18s ease, color .18s ease;
 }
 
 .nav a:hover,
 .nav a.active {
-    background: rgba(224, 79, 0, 0.08);
-    box-shadow: inset 0 0 0 1px rgba(224, 79, 0, 0.2);
+    background: #c84300;
+    color: #fff;
 }
 
 .nav-user {
@@ -262,11 +265,11 @@ button {
 }
 
 .video-module-name {
-    font-size: 11px;
+    font-size: 16px;
     font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.75);
+    letter-spacing: 0;
+    text-transform: none;
+    color: #ffffff;
 }
 
 .video-lesson-name {
@@ -1159,13 +1162,15 @@ button {
 
 <!-- Header -->
 <header class="header">
-    <a href="{% url 'index' %}" class="logo">
-        <span>CLOUT</span>
-    </a>
+    <div class="header-inner">
+        <a href="{% url 'index' %}" class="logo">
+            <span>CLOUT</span>
+        </a>
 
-    <nav class="nav">
-        <a href="{% url 'index' %}" class="active">Home</a>
-    </nav>
+        <nav class="nav">
+            <a href="{% url 'index' %}" class="active">Home</a>
+        </nav>
+    </div>
 </header>
 
 <!-- Main Layout -->
@@ -1437,9 +1442,6 @@ button {
                     <div class="module {% if forloop.first %}open{% endif %}">
                         <div class="module-header" onclick="toggleModule(this)">
                             <div class="module-left">
-                                <div class="module-badge">
-                                    {{ forloop.counter|stringformat:"02d" }}
-                                </div>
                                 <div class="module-title-wrap">
                                     <div class="module-name">
                                         {{ module.title }}
@@ -1518,7 +1520,6 @@ button {
                 <div class="module open">
                     <div class="module-header">
                         <div class="module-left">
-                            <div class="module-badge">01</div>
                             <div class="module-title-wrap">
                                 <div class="module-name">No Modules Available</div>
                                 <div class="module-lessons-count">0 lessons</div>
