@@ -1259,6 +1259,104 @@ def toggle_course_access(
 
 
 # =========================================================
+# ADMIN USER ADD
+# AJAX = NO PAGE RELOAD
+# =========================================================
+
+@login_required(login_url="login")
+@require_POST
+def admin_user_add(request):
+
+    if not request.user.is_staff:
+        return JsonResponse(
+            {"success": False, "message": "Permission denied."},
+            status=403
+        )
+
+    name = request.POST.get("name", "").strip()
+    username = request.POST.get("username", "").strip().lower()
+    email = request.POST.get("email", "").strip().lower()
+    phone_number = request.POST.get("phone_number", "").strip()
+    password = request.POST.get("password", "").strip()
+    course_access = request.POST.get("course_access_approved") in ("true", "True", "1", "on")
+
+    if not username:
+        return JsonResponse({"success": False, "message": "Username is required."}, status=400)
+
+    if not email:
+        return JsonResponse({"success": False, "message": "Email is required."}, status=400)
+
+    if not password:
+        return JsonResponse({"success": False, "message": "Password is required."}, status=400)
+
+    if CustomUser.objects.filter(username=username).exists():
+        return JsonResponse({"success": False, "message": f"Username @{username} is already taken."}, status=400)
+
+    if CustomUser.objects.filter(email=email).exists():
+        return JsonResponse({"success": False, "message": f"Email {email} is already registered."}, status=400)
+
+    if phone_number and CustomUser.objects.filter(phone_number=phone_number).exists():
+        return JsonResponse({"success": False, "message": f"Phone number {phone_number} is already in use."}, status=400)
+
+    user = CustomUser(
+        username=username,
+        name=name or username,
+        email=email,
+        phone_number=phone_number or None,
+        course_access_approved=course_access,
+    )
+    user.set_password(password)
+    user.save()
+
+    return JsonResponse({
+        "success": True,
+        "message": f"User @{user.username} created successfully.",
+        "user": {
+            "id": user.id,
+            "name": user.name or user.username,
+            "username": user.username,
+            "email": user.email,
+            "phone_number": user.phone_number or "",
+            "has_paid": user.has_paid,
+            "course_access_approved": user.course_access_approved,
+            "profile_image_url": user.profile_image.url if user.profile_image else "",
+        }
+    })
+
+
+# =========================================================
+# ADMIN USER DELETE
+# AJAX = NO PAGE RELOAD
+# =========================================================
+
+@login_required(login_url="login")
+@require_POST
+def admin_user_delete(request, user_id):
+
+    if not request.user.is_staff:
+        return JsonResponse(
+            {"success": False, "message": "Permission denied."},
+            status=403
+        )
+
+    if request.user.id == user_id:
+        return JsonResponse(
+            {"success": False, "message": "You cannot delete your own admin account."},
+            status=400
+        )
+
+    user = get_object_or_404(CustomUser, id=user_id)
+    username = user.username
+    user.delete()
+
+    return JsonResponse({
+        "success": True,
+        "message": f"User @{username} deleted successfully.",
+        "user_id": user_id
+    })
+
+
+# =========================================================
 # ADMIN SEND MESSAGE
 # AJAX = NO PAGE RELOAD
 # =========================================================

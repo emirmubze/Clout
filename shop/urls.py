@@ -70,6 +70,18 @@ urlpatterns = [
         name="toggle_course_access"
     ),
 
+    path(
+        "admin-user-add/",
+        views.admin_user_add,
+        name="admin_user_add"
+    ),
+
+    path(
+        "admin-user-delete/<int:user_id>/",
+        views.admin_user_delete,
+        name="admin_user_delete"
+    ),
+
     # =====================================================
     # ADMIN DASHBOARD
     # =====================================================

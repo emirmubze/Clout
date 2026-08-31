@@ -605,6 +605,55 @@ class UserAuthAndDashboardTests(TestCase):
         course_response = self.client.get(reverse("course_detail"))
         self.assertEqual(course_response.status_code, 200)
 
+    def test_admin_can_add_user_via_ajax(self):
+        admin = CustomUser.objects.create_user(
+            username="adminaddtester",
+            email="adminaddtester@example.com",
+            password="StrongPass123!",
+            is_staff=True,
+        )
+        self.client.force_login(admin)
+        response = self.client.post(
+            reverse("admin_user_add"),
+            {
+                "name": "New Test User",
+                "username": "newtestuser",
+                "email": "newtestuser@example.com",
+                "phone_number": "+91 9988776655",
+                "password": "StrongPass123!",
+                "course_access_approved": "true",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["user"]["username"], "newtestuser")
+        self.assertTrue(data["user"]["course_access_approved"])
+        self.assertTrue(CustomUser.objects.filter(username="newtestuser").exists())
+
+    def test_admin_can_delete_user_via_ajax(self):
+        admin = CustomUser.objects.create_user(
+            username="admindeltester",
+            email="admindeltester@example.com",
+            password="StrongPass123!",
+            is_staff=True,
+        )
+        target = CustomUser.objects.create_user(
+            username="targetdeleteuser",
+            email="targetdelete@example.com",
+            password="StrongPass123!",
+        )
+        self.client.force_login(admin)
+        response = self.client.post(
+            reverse("admin_user_delete", args=[target.id]),
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertFalse(CustomUser.objects.filter(id=target.id).exists())
+
     def test_course_detail_excludes_removed_intro_and_purchase_card(self):
         response = self.client.get(reverse("course_detail"))
 
