@@ -4,6 +4,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
+import dj_database_url
+
 from django.core.exceptions import ImproperlyConfigured
 
 
@@ -29,7 +31,7 @@ load_dotenv(
 
 SECRET_KEY = os.getenv(
     "DJANGO_SECRET_KEY",
-    "django-insecure-change-this-in-production",
+    "django-insecure-clout-production-persistent-session-secret-key-2026-secure",
 )
 
 
@@ -181,20 +183,43 @@ WSGI_APPLICATION = "clout.wsgi.application"
 
 
 # =========================================================
-# DATABASE
+# DATABASE (PERSISTENT STORAGE SUPPORT)
 # =========================================================
 
-DATABASES = {
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 
-    "default": {
-
-        "ENGINE":
-            "django.db.backends.sqlite3",
-
-        "NAME":
-            BASE_DIR / "db.sqlite3",
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=bool(
+                "postgres" in DATABASE_URL
+                and (
+                    "render.com" in os.getenv("RENDER_EXTERNAL_HOSTNAME", "")
+                    or "sslmode=require" in DATABASE_URL
+                    or not DEBUG
+                )
+            ),
+        )
     }
-}
+else:
+    sqlite_path = os.getenv("SQLITE_PATH", "").strip()
+    if sqlite_path:
+        db_path = Path(sqlite_path)
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+    elif Path("/var/data").exists() and Path("/var/data").is_dir():
+        db_path = Path("/var/data/db.sqlite3")
+    else:
+        db_path = BASE_DIR / "db.sqlite3"
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": db_path,
+        }
+    }
 
 
 # =========================================================
@@ -511,6 +536,18 @@ GROQ_API_KEY = os.getenv(
     "GROQ_API_KEY",
     "",
 )
+
+
+# =========================================================
+# SESSIONS & AUTHENTICATION PERSISTENCE
+# =========================================================
+
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_COOKIE_AGE = 1209600  # 14 days
+SESSION_SAVE_EVERY_REQUEST = False
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_HTTPONLY = True
+SESSION_COOKIE_SAMESITE = "Lax"
 
 
 # =========================================================

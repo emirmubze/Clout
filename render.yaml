@@ -1,3 +1,9 @@
+databases:
+  - name: clout-db
+    databaseName: clout_db
+    user: clout
+    plan: free
+
 services:
   - type: web
     name: clout
@@ -13,7 +19,12 @@ services:
         value: "False"
 
       - key: DJANGO_SECRET_KEY
-        sync: false
+        generateValue: true
+
+      - key: DATABASE_URL
+        fromDatabase:
+          name: clout-db
+          property: connectionString
 
       - key: ALLOWED_HOSTS
         value: clout.onrender.com,clout.courses,www.clout.courses
@@ -39,6 +50,12 @@ services:
       - key: GROQ_API_KEY
         sync: false
 
+      - key: RESEND_API_KEY
+        sync: false
+
+      - key: RESEND_FROM_EMAIL
+        value: "Clout <onboarding@resend.dev>"
+
       # Durable object storage for uploaded images and videos.
       - key: USE_S3
         value: "True"
@@ -62,7 +79,7 @@ services:
         sync: false
 
       - key: EMAIL_HOST
-        value: smtp.privateemail.com
+        value: smtp.gmail.com
 
       - key: EMAIL_PORT
         value: "587"
@@ -71,10 +88,10 @@ services:
         value: "True"
 
       - key: EMAIL_HOST_USER
-        value: admin@clout.courses
+        value: clout.courses@gmail.com
 
       - key: EMAIL_HOST_PASSWORD
         sync: false
 
       - key: DEFAULT_FROM_EMAIL
-        value: "Clout <admin@clout.courses>"
+        value: "Clout <clout.courses@gmail.com>"
