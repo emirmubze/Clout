@@ -1172,68 +1172,10 @@ function startPayment() {
                 }
             };
 
-            // Set display_currency so Razorpay Price Summary displays in the selected country's currency
-            if (data.display_currency && data.display_amount) {
+            // Set display_currency only when converting foreign currency to INR
+            if (data.display_currency && data.display_amount && data.display_currency !== data.currency) {
                 razorpayOptions.display_currency = data.display_currency;
                 razorpayOptions.display_amount = data.display_amount;
-            } else if (currentCountry.currency) {
-                razorpayOptions.display_currency = currentCountry.currency;
-                razorpayOptions.display_amount = isZeroDecimal ? Math.round(total).toString() : total.toFixed(2);
-            }
-
-            // Country-tailored payment method configuration
-            if (currentCountry.code === 'IN' || currentCountry.currency === 'INR') {
-                razorpayOptions.config = {
-                    display: {
-                        blocks: {
-                            preferred: {
-                                name: 'Recommended Payments (India)',
-                                instruments: [
-                                    { method: 'upi' },
-                                    { method: 'card' }
-                                ]
-                            },
-                            other: {
-                                name: 'More Payment Options',
-                                instruments: [
-                                    { method: 'netbanking' },
-                                    { method: 'wallet' },
-                                    { method: 'card' }
-                                ]
-                            }
-                        },
-                        sequence: ['block.preferred', 'block.other'],
-                        preferences: {
-                            show_default_blocks: true
-                        }
-                    }
-                };
-            } else {
-                razorpayOptions.config = {
-                    display: {
-                        blocks: {
-                            cards: {
-                                name: 'Pay with Card (Credit / Debit)',
-                                instruments: [
-                                    { method: 'card' }
-                                ]
-                            },
-                            other: {
-                                name: 'Other Payment Methods',
-                                instruments: [
-                                    { method: 'card' },
-                                    { method: 'wallet' },
-                                    { method: 'netbanking' },
-                                    { method: 'upi' }
-                                ]
-                            }
-                        },
-                        sequence: ['block.cards', 'block.other'],
-                        preferences: {
-                            show_default_blocks: true
-                        }
-                    }
-                };
             }
 
             if (window.parent && window.parent !== window) {

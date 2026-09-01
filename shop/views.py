@@ -2124,23 +2124,18 @@ def create_order(request):
             rp["id"]
     )
 
-    return JsonResponse(
-        {
-            "success": True,
-            "key":
-                settings.RAZORPAY_KEY_ID,
-            "order_id":
-                rp["id"],
-            "amount":
-                charge_minor_amount,
-            "currency":
-                charge_currency,
-            "display_currency":
-                currency,
-            "display_amount":
-                str(amount)
-        }
-    )
+    response_data = {
+        "success": True,
+        "key": settings.RAZORPAY_KEY_ID,
+        "order_id": rp["id"],
+        "amount": charge_minor_amount,
+        "currency": charge_currency,
+    }
+    if currency != charge_currency:
+        response_data["display_currency"] = currency
+        response_data["display_amount"] = str(amount)
+
+    return JsonResponse(response_data)
 
 
 # =========================================================
