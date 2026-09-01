@@ -1172,10 +1172,27 @@ function startPayment() {
                 }
             };
 
-            // Set display_currency only when converting foreign currency to INR
-            if (data.display_currency && data.display_amount && data.display_currency !== data.currency) {
-                razorpayOptions.display_currency = data.display_currency;
-                razorpayOptions.display_amount = data.display_amount;
+            // For international countries: display in local currency and focus on Card payment
+            if (currentCountry.code !== 'IN' && currentCountry.currency !== 'INR') {
+                razorpayOptions.display_currency = currentCountry.currency;
+                razorpayOptions.display_amount = isZeroDecimal ? Math.round(total).toString() : total.toFixed(2);
+
+                razorpayOptions.config = {
+                    display: {
+                        blocks: {
+                            cards: {
+                                name: 'Pay with Card (Credit / Debit)',
+                                instruments: [
+                                    { method: 'card' }
+                                ]
+                            }
+                        },
+                        sequence: ['block.cards'],
+                        preferences: {
+                            show_default_blocks: false
+                        }
+                    }
+                };
             }
 
             if (window.parent && window.parent !== window) {
