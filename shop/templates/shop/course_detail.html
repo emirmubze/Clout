@@ -15,24 +15,34 @@
 
 <style>
 :root {
-    --brand: #E04F00;
+    --orange: #E04F00;
+    --black: #020202;
+    --dark: #0E0E0E;
+    --dark-gray: #383838;
+    --white: #FFFFFF;
+    --peach: #FFDECC;
+    --warm-white: #FFDFD8;
+    --off-white: #FBF8F4;
+    --warm-gray: #F0EDE6;
+
+    --brand: var(--orange);
     --brand-hover: #c84300;
-    --brand-light: #fff4ed;
+    --brand-light: var(--peach);
     --brand-glow: rgba(224, 79, 0, 0.22);
-    --dark-bg: #090d16;
-    --dark-surface: #111827;
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #64748b;
-    --card-bg: #ffffff;
-    --border: #e2e8f0;
-    --border-focus: #cbd5e1;
+    --dark-bg: var(--black);
+    --dark-surface: var(--dark);
+    --text-primary: var(--black);
+    --text-secondary: var(--dark-gray);
+    --text-muted: #737373;
+    --card-bg: var(--white);
+    --border: var(--warm-gray);
+    --border-focus: #d6d3cd;
     --radius-xl: 20px;
     --radius-lg: 14px;
     --radius-md: 10px;
     --radius-sm: 8px;
-    --shadow-soft: 0 4px 20px -2px rgba(15, 23, 42, 0.05), 0 2px 6px -1px rgba(15, 23, 42, 0.03);
-    --shadow-hover: 0 12px 28px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.04);
+    --shadow-soft: 0 4px 20px -2px rgba(2, 2, 2, 0.05), 0 2px 6px -1px rgba(2, 2, 2, 0.03);
+    --shadow-hover: 0 12px 28px -4px rgba(2, 2, 2, 0.08), 0 4px 12px -2px rgba(2, 2, 2, 0.04);
 }
 
 * {
@@ -43,7 +53,7 @@
 
 body {
     font-family: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #f8fafc;
+    background: var(--off-white);
     color: var(--text-primary);
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;
@@ -58,7 +68,7 @@ body {
 ========================================================= */
 .navbar {
     height: 64px;
-    background: #090d16;
+    background: var(--dark);
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     position: sticky;
     top: 0;
@@ -652,7 +662,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(15, 23, 42, 0.72);
+    background: rgba(2, 2, 2, 0.78);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     transition: background 0.3s ease, backdrop-filter 0.3s ease;

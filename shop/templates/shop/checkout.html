@@ -14,21 +14,30 @@
 
 <style>
 :root {
-    --brand: #E04F00;
+    --orange: #E04F00;
+    --black: #020202;
+    --dark: #0E0E0E;
+    --dark-gray: #383838;
+    --white: #FFFFFF;
+    --peach: #FFDECC;
+    --warm-white: #FFDFD8;
+    --off-white: #FBF8F4;
+    --warm-gray: #F0EDE6;
+
+    --brand: var(--orange);
     --brand-hover: #c84300;
-    --brand-light: #fff3ec;
+    --brand-light: var(--peach);
     --brand-glow: rgba(224, 79, 0, 0.22);
-    --dark: #0f172a;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --text-muted: #94a3b8;
-    --bg-card: #ffffff;
-    --border-subtle: #e2e8f0;
-    --border-hover: #cbd5e1;
+    --text-primary: var(--black);
+    --text-secondary: var(--dark-gray);
+    --text-muted: #737373;
+    --bg-card: var(--white);
+    --border-subtle: var(--warm-gray);
+    --border-hover: #d6d3cd;
     --radius-lg: 16px;
     --radius-md: 12px;
     --radius-sm: 8px;
-    --shadow-card: 0 10px 30px -5px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.05);
+    --shadow-card: 0 10px 30px -5px rgba(2, 2, 2, 0.08), 0 0 1px 1px rgba(2, 2, 2, 0.05);
 }
 
 * {
@@ -46,7 +55,7 @@ html, body {
 }
 
 body.standalone {
-    background: radial-gradient(circle at 50% 0%, #1e293b 0%, #090d16 100%) !important;
+    background: radial-gradient(circle at 50% 0%, var(--dark) 0%, var(--black) 100%) !important;
     min-height: 100vh;
 }
 
@@ -96,7 +105,7 @@ body.standalone {
     padding: 18px 24px 14px;
     border-bottom: 1px solid var(--border-subtle);
     margin-bottom: 0;
-    background: #fff;
+    background: var(--white);
 }
 
 .order-header-left {
@@ -112,8 +121,8 @@ body.standalone {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: var(--brand-light);
-    color: var(--brand);
+    background: var(--peach);
+    color: var(--orange);
     font-size: 13px;
 }
 
@@ -128,7 +137,7 @@ body.standalone {
     width: 30px;
     height: 30px;
     border: 1px solid var(--border-subtle);
-    background: #f8fafc;
+    background: var(--off-white);
     border-radius: 50%;
     font-size: 18px;
     font-weight: 400;
@@ -142,7 +151,7 @@ body.standalone {
 }
 
 .close-btn:hover {
-    background: #f1f5f9;
+    background: var(--warm-gray);
     color: var(--dark);
     transform: rotate(90deg);
 }
@@ -157,7 +166,7 @@ body.standalone {
     gap: 14px;
     padding: 12px 12px 11px;
     border-radius: var(--radius-md);
-    background: #f8fafc;
+    background: var(--off-white);
     border: 1px solid var(--border-subtle);
     margin: 16px 24px 16px;
 }
@@ -176,10 +185,10 @@ body.standalone {
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    background: #ffffff;
+    background: var(--white);
     border: 1px solid var(--border-subtle);
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    box-shadow: 0 2px 6px rgba(2, 2, 2, 0.04);
 }
 
 .product-image {
@@ -225,7 +234,7 @@ body.standalone {
     padding: 12px 12px 10px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    background: #ffffff;
+    background: var(--white);
 }
 
 .currency-label {
@@ -251,7 +260,7 @@ body.standalone {
     padding: 0 14px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
-    background: #f8fafc;
+    background: var(--off-white);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -261,13 +270,13 @@ body.standalone {
 
 .currency-selected:hover {
     border-color: var(--brand);
-    background: #ffffff;
+    background: var(--white);
 }
 
 .currency-selected.active {
     border-color: var(--brand);
     box-shadow: 0 0 0 3px var(--brand-glow);
-    background: #ffffff;
+    background: var(--white);
 }
 
 .selected-left {
@@ -320,10 +329,10 @@ body.standalone {
     left: 0;
     right: 0;
     top: calc(100% + 6px);
-    background: #ffffff;
+    background: var(--white);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    box-shadow: 0 14px 35px -5px rgba(15, 23, 42, 0.15);
+    box-shadow: 0 14px 35px -5px rgba(2, 2, 2, 0.15);
     z-index: 1000;
     overflow: hidden;
     display: none;
@@ -342,7 +351,7 @@ body.standalone {
 .currency-search {
     padding: 10px 12px;
     border-bottom: 1px solid var(--border-subtle);
-    background: #f8fafc;
+    background: var(--off-white);
 }
 
 .currency-search input {
@@ -354,7 +363,7 @@ body.standalone {
     outline: none;
     font-family: inherit;
     font-size: 13px;
-    background: #ffffff;
+    background: var(--white);
     color: var(--dark);
     transition: border-color 0.15s ease;
 }
@@ -374,7 +383,7 @@ body.standalone {
     width: 5px;
 }
 .currency-options::-webkit-scrollbar-track {
-    background: #f1f5f9;
+    background: var(--warm-gray);
 }
 .currency-options::-webkit-scrollbar-thumb {
     background: #cbd5e1;
@@ -396,11 +405,11 @@ body.standalone {
 }
 
 .currency-option:hover {
-    background: #f1f5f9;
+    background: var(--warm-gray);
 }
 
 .currency-option.selected {
-    background: var(--brand-light);
+    background: var(--peach);
 }
 
 .option-flag {
@@ -447,7 +456,7 @@ body.standalone {
    SUMMARY
 ===================================================== */
 .summary-container {
-    background: #f8fafc;
+    background: var(--off-white);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     padding: 12px 14px 10px;
@@ -477,7 +486,7 @@ body.standalone {
     gap: 4px;
     padding: 3px 8px;
     border-radius: 6px;
-    background: #ffffff;
+    background: var(--white);
     border: 1px solid var(--border-subtle);
     color: var(--brand);
     font-size: 11px;
@@ -572,7 +581,7 @@ body.standalone {
     cursor: pointer;
     flex-shrink: 0;
     margin-top: 2px;
-    background: #ffffff;
+    background: var(--white);
     display: grid;
     place-content: center;
     transition: all 0.15s ease;
@@ -588,7 +597,7 @@ body.standalone {
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
     font-size: 10px;
-    color: #ffffff;
+    color: var(--white);
 }
 
 .terms span {
@@ -615,8 +624,8 @@ body.standalone {
     height: 56px;
     border: 0;
     border-radius: 12px;
-    background: linear-gradient(135deg, #FF6611 0%, #E04F00 100%);
-    color: #ffffff;
+    background: linear-gradient(135deg, #FF6611 0%, var(--orange) 100%);
+    color: var(--white);
     font-family: "DM Sans", sans-serif;
     font-size: 15.5px;
     font-weight: 800;
@@ -1130,8 +1139,8 @@ function startPayment() {
                     access: 'Lifetime Access & Resources'
                 },
                 theme: {
-                    color: '#0F172A',
-                    backdrop_color: 'rgba(15, 23, 42, 0.85)',
+                    color: '#E04F00',
+                    backdrop_color: 'rgba(2, 2, 2, 0.88)',
                     hide_topbar: false
                 },
                 modal: {

@@ -1,312 +1,328 @@
 <!DOCTYPE html>
 <html lang="en">
 {% load static %}
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Payment Successful — CLOUT</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful — CLOUT</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Acme&family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Acme&family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-<style>
-:root {
-    --brand: #E04F00;
-    --brand-hover: #c84300;
-    --brand-light: #fff3ec;
-    --brand-glow: rgba(224, 79, 0, 0.22);
-    --dark: #0f172a;
-    --text-primary: #1e293b;
-    --text-secondary: #64748b;
-    --text-muted: #94a3b8;
-    --bg-card: #ffffff;
-    --border-subtle: #e2e8f0;
-    --radius-xl: 20px;
-    --radius-lg: 14px;
-    --radius-md: 10px;
-    --radius-sm: 8px;
-    --shadow-card: 0 14px 40px -8px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.05);
-}
+    <style>
+        :root {
+            --brand: #E04F00;
+            --brand-hover: #c84300;
+            --brand-light: #fff3ec;
+            --brand-glow: rgba(224, 79, 0, 0.22);
+            --dark: #0f172a;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-muted: #94a3b8;
+            --bg-card: #ffffff;
+            --border-subtle: #e2e8f0;
+            --radius-xl: 20px;
+            --radius-lg: 14px;
+            --radius-md: 10px;
+            --radius-sm: 8px;
+            --shadow-card: 0 14px 40px -8px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.05);
+        }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-body {
-    font-family: "Plus Jakarta Sans", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background: #f8fafc;
-    color: var(--text-primary);
-    -webkit-font-smoothing: antialiased;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
+        body {
+            font-family: "Plus Jakarta Sans", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f8fafc;
+            color: var(--text-primary);
+            -webkit-font-smoothing: antialiased;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
 
-/* =========================================================
+        /* =========================================================
    NAVBAR
 ========================================================= */
-.navbar {
-    height: 64px;
-    background: #090d16;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    position: sticky;
-    top: 0;
-    z-index: 100;
-}
+        .navbar {
+            height: 64px;
+            background: #090d16;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-.nav-container {
-    width: min(1240px, calc(100% - 48px));
-    height: 100%;
-    margin: 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
+        .nav-container {
+            width: min(1240px, calc(100% - 48px));
+            height: 100%;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-.logo {
-    color: var(--brand);
-    text-decoration: none;
-    font-size: 15px;
-    font-weight: 800;
-    font-family: "Acme", sans-serif;
-    letter-spacing: 1.5px;
-    display: inline-flex;
-    align-items: center;
-}
+        .logo {
+            color: var(--brand);
+            text-decoration: none;
+            font-size: 15px;
+            font-weight: 800;
+            font-family: "Acme", sans-serif;
+            letter-spacing: 1.5px;
+            display: inline-flex;
+            align-items: center;
+        }
 
-.back-home {
-    color: #e2e8f0;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: var(--radius-sm);
-    padding: 7px 15px;
-    background: rgba(255, 255, 255, 0.04);
-    font-size: 13px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    transition: all 0.2s ease;
-}
+        .back-home {
+            color: #e2e8f0;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-sm);
+            padding: 7px 15px;
+            background: rgba(255, 255, 255, 0.04);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.2s ease;
+        }
 
-.back-home:hover {
-    background: var(--brand);
-    border-color: var(--brand);
-    color: #ffffff;
-    transform: translateY(-1px);
-}
+        .back-home:hover {
+            background: var(--brand);
+            border-color: var(--brand);
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
 
-/* =========================================================
+        /* =========================================================
    MAIN WRAPPER
 ========================================================= */
-.success-wrapper {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 40px 20px;
-}
+        .success-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
 
-.success-card {
-    width: 100%;
-    max-width: 520px;
-    background: var(--bg-card);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-xl);
-    padding: 44px 36px 36px;
-    box-shadow: var(--shadow-card);
-    text-align: center;
-    animation: cardPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-}
+        .success-card {
+            width: 100%;
+            max-width: 520px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-xl);
+            padding: 44px 36px 36px;
+            box-shadow: var(--shadow-card);
+            text-align: center;
+            animation: cardPop 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-@keyframes cardPop {
-    from {
-        opacity: 0;
-        transform: translateY(16px) scale(0.97);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0) scale(1);
-    }
-}
+        @keyframes cardPop {
+            from {
+                opacity: 0;
+                transform: translateY(16px) scale(0.97);
+            }
 
-.success-icon-wrap {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 24px;
-    border-radius: 50%;
-    background: #ecfdf5;
-    border: 2px solid #a7f3d0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #059669;
-    font-size: 36px;
-    box-shadow: 0 0 24px rgba(16, 185, 129, 0.2);
-    animation: pulseIcon 2s infinite;
-}
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
 
-@keyframes pulseIcon {
-    0%, 100% { transform: scale(1); box-shadow: 0 0 24px rgba(16, 185, 129, 0.2); }
-    50% { transform: scale(1.04); box-shadow: 0 0 32px rgba(16, 185, 129, 0.35); }
-}
+        .success-icon-wrap {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            background: #ecfdf5;
+            border: 2px solid #a7f3d0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #059669;
+            font-size: 36px;
+            box-shadow: 0 0 24px rgba(16, 185, 129, 0.2);
+            animation: pulseIcon 2s infinite;
+        }
 
-.success-title {
-    font-size: 26px;
-    font-weight: 800;
-    color: var(--dark);
-    letter-spacing: -0.4px;
-    margin-bottom: 8px;
-}
+        @keyframes pulseIcon {
 
-.success-subtitle {
-    font-size: 14.5px;
-    color: var(--text-secondary);
-    line-height: 1.5;
-    margin-bottom: 24px;
-}
+            0%,
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 24px rgba(16, 185, 129, 0.2);
+            }
 
-.order-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 18px;
-    background: #f8fafc;
-    border: 1px solid var(--border-subtle);
-    border-radius: 999px;
-    font-size: 13px;
-    font-weight: 700;
-    color: #15803d;
-    margin-bottom: 30px;
-}
+            50% {
+                transform: scale(1.04);
+                box-shadow: 0 0 32px rgba(16, 185, 129, 0.35);
+            }
+        }
 
-.order-badge i {
-    color: #16a34a;
-}
+        .success-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--dark);
+            letter-spacing: -0.4px;
+            margin-bottom: 8px;
+        }
 
-.button-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-bottom: 22px;
-}
+        .success-subtitle {
+            font-size: 14.5px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            margin-bottom: 24px;
+        }
 
-.btn-primary {
-    width: 100%;
-    height: 50px;
-    border-radius: var(--radius-md);
-    background: linear-gradient(135deg, #FF6611 0%, #E04F00 100%);
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 15.5px;
-    font-weight: 700;
-    letter-spacing: 0.2px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    box-shadow: 0 4px 16px var(--brand-glow);
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
+        .order-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 18px;
+            background: #f8fafc;
+            border: 1px solid var(--border-subtle);
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #15803d;
+            margin-bottom: 30px;
+        }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 22px rgba(224, 79, 0, 0.35);
-}
+        .order-badge i {
+            color: #16a34a;
+        }
 
-.btn-secondary {
-    width: 100%;
-    height: 46px;
-    border-radius: var(--radius-md);
-    background: #f8fafc;
-    border: 1px solid var(--border-subtle);
-    color: var(--text-primary);
-    text-decoration: none;
-    font-size: 14px;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
-}
+        .button-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
 
-.btn-secondary:hover {
-    background: #f1f5f9;
-    color: var(--dark);
-}
+        .btn-primary {
+            width: 100%;
+            height: 50px;
+            border-radius: var(--radius-md);
+            background: linear-gradient(135deg, #FF6611 0%, #E04F00 100%);
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 15.5px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 16px var(--brand-glow);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
 
-.secure-note {
-    font-size: 12px;
-    color: var(--text-muted);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-}
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 22px rgba(224, 79, 0, 0.35);
+        }
 
-.secure-note i {
-    color: #16a34a;
-}
+        .btn-secondary {
+            width: 100%;
+            height: 46px;
+            border-radius: var(--radius-md);
+            background: #f8fafc;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s ease;
+        }
 
-@media (max-width: 480px) {
-    .success-card {
-        padding: 32px 22px 28px;
-    }
-    .success-title {
-        font-size: 22px;
-    }
-}
-</style>
-<link rel="stylesheet" href="/static/responsive.css">
+        .btn-secondary:hover {
+            background: #f1f5f9;
+            color: var(--dark);
+        }
+
+        .secure-note {
+            font-size: 12px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .secure-note i {
+            color: #16a34a;
+        }
+
+        @media (max-width: 480px) {
+            .success-card {
+                padding: 32px 22px 28px;
+            }
+
+            .success-title {
+                font-size: 22px;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="/static/responsive.css">
 </head>
 
 <body>
 
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="{% url 'index' %}" class="logo">CLOUT</a>
-        <a href="{% url 'index' %}" class="back-home">
-            <span>Home</span>
-        </a>
-    </div>
-</nav>
-
-<div class="success-wrapper">
-    <div class="success-card">
-        <div class="success-icon-wrap">
-            <i class="fa-solid fa-check"></i>
-        </div>
-
-        <h1 class="success-title">Payment Successful!</h1>
-        <p class="success-subtitle">
-            Thank you for purchasing <strong>The AI Income Playbook</strong>. Your lifetime access has been unlocked and is ready to start.
-        </p>
-
-        <div class="order-badge">
-            <i class="fa-solid fa-circle-check"></i>
-            <span>Full Course Access Activated</span>
-        </div>
-
-        <div class="button-group">
-            <a href="{% url 'course' %}" class="btn-primary">
-                <i class="fa-solid fa-play" style="font-size:13px"></i>
-                <span>Start Learning Now</span>
-            </a>
-            <a href="{% url 'index' %}" class="btn-secondary">
-                <span>Back to Home</span>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{% url 'index' %}" class="logo">CLOUT</a>
+            <a href="{% url 'index' %}" class="back-home">
+                <span>Home</span>
             </a>
         </div>
+    </nav>
 
-        <div class="secure-note">
-            <i class="fa-solid fa-shield-check"></i>
-            <span>Transaction verified &amp; secured by Razorpay</span>
+    <div class="success-wrapper">
+        <div class="success-card">
+            <div class="success-icon-wrap">
+                <i class="fa-solid fa-check"></i>
+            </div>
+
+            <h1 class="success-title">Payment Successful!</h1>
+            <p class="success-subtitle">
+                Thank you for purchasing <strong>The AI Income Playbook</strong>. Your lifetime access has been unlocked
+                and is ready to start.
+            </p>
+
+            <div class="order-badge">
+                <i class="fa-solid fa-circle-check"></i>
+                <span>Full Course Access Activated</span>
+            </div>
+
+            <div class="button-group">
+                <a href="{% url 'course' %}" class="btn-primary">
+                    <i class="fa-solid fa-play" style="font-size:13px"></i>
+                    <span>Start Learning Now</span>
+                </a>
+                <a href="{% url 'index' %}" class="btn-secondary">
+                    <span>Back to Home</span>
+                </a>
+            </div>
+
+            <div class="secure-note">
+                <i class="fa-solid fa-shield-check"></i>
+                <span>Transaction verified &amp; secured by Razorpay</span>
+            </div>
         </div>
     </div>
-</div>
 
 </body>
+
 </html>
