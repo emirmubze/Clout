@@ -511,8 +511,10 @@ GROQ_API_KEY = os.getenv(
 
 
 # =========================================================
-# PRODUCTION / RENDER SECURITY
+# PRODUCTION / SECURITY
 # =========================================================
+
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
 if not DEBUG:
 
@@ -522,3 +524,4 @@ if not DEBUG:
     )
 
     SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
