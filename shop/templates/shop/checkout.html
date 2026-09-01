@@ -45,6 +45,11 @@ html, body {
     overflow-x: hidden;
 }
 
+body.standalone {
+    background: radial-gradient(circle at 50% 0%, #1e293b 0%, #090d16 100%) !important;
+    min-height: 100vh;
+}
+
 .order-wrapper {
     width: 100%;
     min-height: 100vh;
@@ -1105,22 +1110,36 @@ function startPayment() {
         .then(({ ok, data }) => {
             if (!ok || !data.success) throw new Error(data.message || 'Could not create payment order.');
 
+            const logoUrl = window.location.origin + "{% static 'bag.png' %}";
+
             const razorpayOptions = {
                 key: data.key,
                 amount: data.amount,
                 currency: data.currency,
-                name: 'Clout',
-                description: 'The AI Income Playbook',
+                name: 'CLOUT',
+                description: 'The AI Income Playbook • Lifetime Access',
+                image: logoUrl,
                 order_id: data.order_id,
                 prefill: {
                     name: '{{ request.user.name|escapejs }}',
                     email: '{{ request.user.email|escapejs }}'
                 },
-                theme: {
-                    color: '#E04F00'
+                notes: {
+                    product: 'The AI Income Playbook',
+                    platform: 'Clout',
+                    access: 'Lifetime Access & Resources'
                 },
-                handler: payment => verifyPayment(payment),
+                theme: {
+                    color: '#0F172A',
+                    backdrop_color: 'rgba(15, 23, 42, 0.85)',
+                    hide_topbar: false
+                },
                 modal: {
+                    backdropclose: false,
+                    escape: true,
+                    handleback: true,
+                    confirm_close: true,
+                    animation: true,
                     ondismiss: resetPaymentButton
                 }
             };
@@ -1135,26 +1154,46 @@ function startPayment() {
                 razorpayOptions.config = {
                     display: {
                         blocks: {
-                            payment_methods: {
-                                name: 'Payment Methods',
-                                instruments: getPaymentInstruments(currentCountry)
+                            preferred: {
+                                name: 'Recommended Payments',
+                                instruments: [
+                                    { method: 'upi' },
+                                    { method: 'card' }
+                                ]
+                            },
+                            other: {
+                                name: 'More Payment Options',
+                                instruments: [
+                                    { method: 'netbanking' },
+                                    { method: 'wallet' }
+                                ]
                             }
                         },
-                        sequence: ['block.payment_methods'],
+                        sequence: ['block.preferred', 'block.other'],
                         preferences: {
-                            show_default_blocks: false
+                            show_default_blocks: true
                         }
                     }
                 };
             }
 
-            const razorpay = new Razorpay(razorpayOptions);
+            if (window.parent && window.parent !== window) {
+                // Launch on top window to prevent iframe clipping and enable full-screen backdrop dimming
+                window.parent.postMessage({
+                    type: 'openRazorpay',
+                    options: razorpayOptions
+                }, window.location.origin);
+            } else {
+                // Standalone page mode
+                razorpayOptions.handler = payment => verifyPayment(payment);
+                const razorpay = new Razorpay(razorpayOptions);
 
-            razorpay.on('payment.failed', event => {
-                alert(event.error?.description || 'Payment failed. Please try again.');
-                resetPaymentButton();
-            });
-            razorpay.open();
+                razorpay.on('payment.failed', event => {
+                    alert(event.error?.description || 'Payment failed. Please try again.');
+                    resetPaymentButton();
+                });
+                razorpay.open();
+            }
         })
         .catch(error => {
             alert(error.message || 'Unable to start payment. Please try again.');
@@ -1219,6 +1258,16 @@ document.addEventListener('click', event => {
 
 document.addEventListener('keydown', event => {
     if (event.key === 'Escape') closeCurrency();
+});
+
+if (window.parent === window) {
+    document.body.classList.add('standalone');
+}
+
+window.addEventListener('message', function (event) {
+    if (event.origin === window.location.origin && event.data?.type === 'resetPaymentButton') {
+        resetPaymentButton();
+    }
 });
 
 // India / INR is selected by default.

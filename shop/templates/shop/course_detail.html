@@ -11,6 +11,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Acme&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <style>
 :root {
@@ -651,8 +652,10 @@ body {
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: transparent;
-    backdrop-filter: blur(1px);
+    background: rgba(15, 23, 42, 0.72);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: background 0.3s ease, backdrop-filter 0.3s ease;
 }
 
 .checkout-overlay.is-open {
@@ -672,6 +675,13 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: opacity 0.22s ease, transform 0.22s ease;
+}
+
+.checkout-overlay.in-razorpay .checkout-popup {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.96);
 }
 
 .checkout-popup iframe {
@@ -1099,9 +1109,88 @@ body {
             if (event.target === checkoutOverlay) closeCheckout();
         });
 
+        function getCookie(name) {
+            const cookies = document.cookie ? document.cookie.split(';') : [];
+            for (const cookie of cookies) {
+                const [key, ...value] = cookie.trim().split('=');
+                if (key === name) return decodeURIComponent(value.join('='));
+            }
+            return '';
+        }
+
+        function verifyParentPayment(payment) {
+            const body = new URLSearchParams({
+                razorpay_order_id: payment.razorpay_order_id,
+                razorpay_payment_id: payment.razorpay_payment_id,
+                razorpay_signature: payment.razorpay_signature
+            });
+
+            fetch('{% url "verify_payment" %}', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken') || '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body
+            })
+                .then(response => response.json().then(data => ({ ok: response.ok, data })))
+                .then(({ ok, data }) => {
+                    if (!ok || !data.success) throw new Error(data.message || 'Payment verification failed.');
+                    window.location.href = data.redirect_url;
+                })
+                .catch(error => {
+                    alert(error.message || 'Payment verification failed.');
+                    checkoutOverlay.classList.remove('in-razorpay');
+                    const frame = document.getElementById('checkoutFrame');
+                    if (frame && frame.contentWindow) {
+                        frame.contentWindow.postMessage({ type: 'resetPaymentButton' }, window.location.origin);
+                    }
+                });
+        }
+
         window.addEventListener('message', function (event) {
-            if (event.origin === window.location.origin && event.data?.type === 'closeCheckout') {
+            if (event.origin !== window.location.origin) return;
+            if (event.data?.type === 'closeCheckout') {
                 closeCheckout();
+            } else if (event.data?.type === 'openRazorpay') {
+                const rzpOpts = Object.assign({}, event.data.options);
+                checkoutOverlay.classList.add('in-razorpay');
+
+                rzpOpts.handler = function (payment) {
+                    verifyParentPayment(payment);
+                };
+
+                rzpOpts.modal = Object.assign({}, rzpOpts.modal, {
+                    ondismiss: function () {
+                        checkoutOverlay.classList.remove('in-razorpay');
+                        const frame = document.getElementById('checkoutFrame');
+                        if (frame && frame.contentWindow) {
+                            frame.contentWindow.postMessage({ type: 'resetPaymentButton' }, window.location.origin);
+                        }
+                    }
+                });
+
+                try {
+                    const rzp = new Razorpay(rzpOpts);
+                    rzp.on('payment.failed', function (resp) {
+                        alert(resp.error?.description || 'Payment failed. Please try again.');
+                        checkoutOverlay.classList.remove('in-razorpay');
+                        const frame = document.getElementById('checkoutFrame');
+                        if (frame && frame.contentWindow) {
+                            frame.contentWindow.postMessage({ type: 'resetPaymentButton' }, window.location.origin);
+                        }
+                    });
+                    rzp.open();
+                } catch (err) {
+                    console.error('Razorpay initialization error:', err);
+                    alert('Unable to launch Razorpay. Please try again.');
+                    checkoutOverlay.classList.remove('in-razorpay');
+                    const frame = document.getElementById('checkoutFrame');
+                    if (frame && frame.contentWindow) {
+                        frame.contentWindow.postMessage({ type: 'resetPaymentButton' }, window.location.origin);
+                    }
+                }
             }
         });
 
