@@ -6,169 +6,195 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
-<title>THE BAG CODE</title>
+<title>THE BAG CODE — Secure Checkout</title>
 
 <style>
+:root {
+    --brand: #E04F00;
+    --brand-hover: #c84300;
+    --brand-light: #fff3ec;
+    --brand-glow: rgba(224, 79, 0, 0.22);
+    --dark: #0f172a;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --bg-card: #ffffff;
+    --border-subtle: #e2e8f0;
+    --border-hover: #cbd5e1;
+    --radius-lg: 16px;
+    --radius-md: 12px;
+    --radius-sm: 8px;
+    --shadow-card: 0 10px 30px -5px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.05);
+}
+
 * {
+    margin: 0;
+    padding: 0;
     box-sizing: border-box;
 }
 
-html,
-body {
-    margin: 0 !important;
-    padding: 0 !important;
-    font-family:
-        "DM Sans",
-        Inter,
-        -apple-system,
-        BlinkMacSystemFont,
-        "Segoe UI",
-        sans-serif;
-
+html, body {
+    font-family: "Plus Jakarta Sans", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     background: transparent !important;
-    color: #111827;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
 }
 
-
-/* =====================================================
-   MAIN
-===================================================== */
-
 .order-wrapper {
-    width: 100% !important;
-    max-width: none !important;
+    width: 100%;
     min-height: 100vh;
-    margin: 0 !important;
-    padding: 0 !important;
-    background: transparent !important;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 16px;
 }
 
 .order-card {
-    width: 100% !important;
-    max-width: 680px !important;
-    margin: 0 auto !important;
-    background: #ffffff;
-    border-radius: 10px !important;
-    padding: 16px 18px;
-    box-shadow: 0 6px 18px rgba(0,0,0,.10) !important;
+    width: 100%;
+    max-width: 540px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    padding: 24px 24px 20px;
+    box-shadow: var(--shadow-card);
+    position: relative;
+    animation: cardAppear 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+@keyframes cardAppear {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
 
 /* =====================================================
    HEADER
 ===================================================== */
-
 .order-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-subtle);
     margin-bottom: 18px;
 }
 
+.order-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.secure-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--brand-light);
+    color: var(--brand);
+    font-size: 13px;
+}
+
 .order-header h1 {
-    margin: 0;
-    font-size: 19px;
+    font-size: 18px;
     font-weight: 800;
-    letter-spacing: -0.5px;
+    letter-spacing: -0.3px;
+    color: var(--dark);
 }
 
 .close-btn {
-    width: 22px;
-    height: 22px;
-
-    border: none;
-    background: transparent;
-
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--border-subtle);
+    background: #f8fafc;
     border-radius: 50%;
-
     font-size: 18px;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1;
-
     cursor: pointer;
-
     display: flex;
     align-items: center;
     justify-content: center;
-
-    color: #111827;
-
-    transition: .2s ease;
+    color: var(--text-secondary);
+    transition: all 0.2s ease;
 }
 
 .close-btn:hover {
-    background: #f5f5f5;
+    background: #f1f5f9;
+    color: var(--dark);
+    transform: rotate(90deg);
 }
-
 
 /* =====================================================
    PRODUCT
 ===================================================== */
-
 .product {
     display: flex;
     align-items: center;
     justify-content: space-between;
-
-    gap: 12px;
-
-    padding-bottom: 16px;
+    gap: 14px;
+    padding: 12px;
+    border-radius: var(--radius-md);
+    background: #f8fafc;
+    border: 1px solid var(--border-subtle);
+    margin-bottom: 16px;
 }
 
 .product-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
 }
 
 .product-media {
-    width: 62px;
-    height: 62px;
-
+    width: 56px;
+    height: 56px;
+    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-
+    border-radius: 10px;
+    background: #ffffff;
+    border: 1px solid var(--border-subtle);
     overflow: hidden;
-
-    border-radius: 12px;
-
-    background: #f5f5f5;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.04);
 }
 
 .product-image {
     width: 100%;
     height: 100%;
-
-    display: block;
-
-    object-fit: contain;
-    object-position: center;
-
-    background: #f5f5f5;
+    object-fit: cover;
 }
 
 .product-info h2 {
-    margin: 0 0 10px;
-
-    font-size: 18px;
-    font-weight: 700;
+    margin: 0 0 3px;
+    font-size: 15px;
+    font-weight: 800;
+    color: var(--dark);
+    letter-spacing: -0.2px;
 }
 
 .product-info p {
     margin: 0;
-
     font-size: 12px;
-
-    color: #4b5563;
+    font-weight: 600;
+    color: var(--brand);
+    display: flex;
+    align-items: center;
+    gap: 5px;
 }
 
 .product-price {
@@ -176,286 +202,231 @@ body {
 }
 
 .product-price span {
-    font-size: 18px;
-    font-weight: 700;
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--dark);
     font-family: "DM Sans", sans-serif;
 }
-
 
 /* =====================================================
    COUNTRY / CURRENCY BOX
 ===================================================== */
-
 .currency-box {
-    margin: 12px 0 16px;
-
-    padding: 12px;
-
-    border: 1px solid #e1e5ea;
-
-    border-radius: 12px;
-
-    background: #fafbfc;
+    margin-bottom: 16px;
+    padding: 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    background: #ffffff;
 }
 
 .currency-label {
-    display: block;
-
-    margin-bottom: 11px;
-
-    font-size: 14px;
-    font-weight: 700;
-
-    letter-spacing: .2px;
-
-    color: #374151;
-}
-
-
-/* CUSTOM SELECT */
-
-.currency-select {
-    position: relative;
-
-    width: 100%;
-}
-
-
-/* SELECTED */
-
-.currency-selected {
-    width: 100%;
-    min-height: 48px;
-
-    padding: 0 12px;
-
-    border: 1px solid #d4d9df;
-
-    border-radius: 10px;
-
-    background: #ffffff;
-
-    cursor: pointer;
-
     display: flex;
     align-items: center;
     justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
+}
 
-    transition: .2s ease;
+.currency-select {
+    position: relative;
+    width: 100%;
+}
+
+.currency-selected {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    background: #f8fafc;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: all 0.2s ease;
 }
 
 .currency-selected:hover {
-    border-color: #b9c0c8;
+    border-color: var(--brand);
+    background: #ffffff;
 }
 
 .currency-selected.active {
-    border-color: #d4d9df;
-
-    box-shadow: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-glow);
+    background: #ffffff;
 }
-
-
-/* SELECTED LEFT */
 
 .selected-left {
     display: flex;
     align-items: center;
-
-    gap: 8px;
+    gap: 10px;
+    overflow: hidden;
 }
 
 .selected-flag {
-    font-size: 21px;
-
+    font-size: 20px;
     line-height: 1;
+    display: inline-block;
 }
 
 .selected-country {
     display: flex;
     align-items: center;
-
-    gap: 7px;
-
+    gap: 6px;
     font-size: 13px;
     font-weight: 700;
-    font-family: "DM Sans", sans-serif;
-
-    color: #111827;
+    color: var(--dark);
+    white-space: nowrap;
 }
 
 .selected-currency {
-    color: #4b5563;
-
+    color: var(--text-secondary);
     font-weight: 600;
-    font-family: "DM Sans", sans-serif;
+    font-size: 12px;
 }
 
-
-/* ARROW */
-
 .currency-arrow {
-    width: 10px;
-    height: 10px;
-
-    border-right: 2px solid #111827;
-    border-bottom: 2px solid #111827;
-
+    width: 8px;
+    height: 8px;
+    border-right: 2px solid var(--text-secondary);
+    border-bottom: 2px solid var(--text-secondary);
     transform: rotate(45deg);
-
-    margin-right: 5px;
-    margin-top: -5px;
-
-    transition: .2s ease;
+    margin-right: 2px;
+    margin-top: -3px;
+    transition: transform 0.2s ease;
 }
 
 .currency-selected.active .currency-arrow {
     transform: rotate(225deg);
-
-    margin-top: 5px;
+    margin-top: 3px;
 }
-
-
-/* DROPDOWN */
 
 .currency-dropdown {
     position: absolute;
-
     left: 0;
     right: 0;
-
-    top: calc(100% + 8px);
-
+    top: calc(100% + 6px);
     background: #ffffff;
-
-    border: 1px solid #e5e7eb;
-
-    border-radius: 10px;
-
-    box-shadow:
-        0 12px 28px rgba(0,0,0,.08);
-
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: 0 14px 35px -5px rgba(15, 23, 42, 0.15);
     z-index: 1000;
-
     overflow: hidden;
-
     display: none;
+    animation: dropdownOpen 0.18s ease-out;
+}
+
+@keyframes dropdownOpen {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .currency-dropdown.show {
     display: block;
 }
 
-
-/* SEARCH */
-
 .currency-search {
     padding: 10px 12px;
-
-    border-bottom: 1px solid #eeeeee;
-
-    background: #fff;
+    border-bottom: 1px solid var(--border-subtle);
+    background: #f8fafc;
 }
 
 .currency-search input {
     width: 100%;
-
-    height: 34px;
-
+    height: 36px;
     padding: 0 12px;
-
-    border: 1px solid #d4d9df;
-
-    border-radius: 9px;
-
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
     outline: none;
-
-    font-size: 14px;
+    font-family: inherit;
+    font-size: 13px;
+    background: #ffffff;
+    color: var(--dark);
+    transition: border-color 0.15s ease;
 }
 
 .currency-search input:focus {
-    border-color: #d4d9df;
-    box-shadow: none;
+    border-color: var(--brand);
+    box-shadow: 0 0 0 2px var(--brand-glow);
 }
 
-
-/* OPTIONS */
-
 .currency-options {
-    max-height: 230px;
-
+    max-height: 220px;
     overflow-y: auto;
+    padding: 6px;
+}
 
-    padding: 5px;
+.currency-options::-webkit-scrollbar {
+    width: 5px;
+}
+.currency-options::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+.currency-options::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
 }
 
 .currency-option {
     width: 100%;
-
     border: 0;
-
     background: transparent;
-
     padding: 8px 10px;
-
-    border-radius: 9px;
-
+    border-radius: var(--radius-sm);
     cursor: pointer;
-
     display: flex;
     align-items: center;
-
-    gap: 12px;
-
+    gap: 10px;
     text-align: left;
-
-    transition: .15s ease;
+    transition: background 0.15s ease;
 }
 
 .currency-option:hover {
-    background: #f5f6f7;
+    background: #f1f5f9;
 }
 
 .currency-option.selected {
-    background: #fff3ed;
+    background: var(--brand-light);
 }
 
 .option-flag {
-    width: 30px;
-
-    font-size: 13px;
-
+    width: 26px;
+    font-size: 18px;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .option-info {
     flex: 1;
-
     display: flex;
     flex-direction: column;
-
-    gap: 2px;
+    gap: 1px;
+    overflow: hidden;
 }
 
 .option-country {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 700;
-    font-family: "DM Sans", sans-serif;
-
-    color: #111827;
+    color: var(--dark);
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
 }
 
 .option-currency {
-    font-size: 12px;
-    font-family: "DM Sans", sans-serif;
-
-    color: #6b7280;
+    font-size: 11px;
+    color: var(--text-secondary);
 }
 
 .option-check {
-    color: #E04F00;
-
+    color: var(--brand);
     font-size: 13px;
-
+    font-weight: 800;
     display: none;
 }
 
@@ -463,107 +434,88 @@ body {
     display: block;
 }
 
-
-/* =====================================================
-   DIVIDER
-===================================================== */
-
-.divider {
-    height: 1px;
-
-    background: #e5e7eb;
-
-    margin-bottom: 16px;
-}
-
-
 /* =====================================================
    SUMMARY
 ===================================================== */
+.summary-container {
+    background: #f8fafc;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: 14px 16px 12px;
+    margin-bottom: 16px;
+}
 
 .summary-header {
     display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed var(--border-subtle);
+}
 
-    justify-content: flex-end;
-
-    margin-bottom: 16px;
-
-    font-size: 13px;
-
-    font-weight: 600;
-
-    color: #374151;
+.summary-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-secondary);
 }
 
 .summary-header span {
-    display: inline-block;
-
-    padding: 4px 8px;
-
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
     border-radius: 6px;
-
-    background: #f3f4f6;
-
-    color: #374151;
-
+    background: #ffffff;
+    border: 1px solid var(--border-subtle);
+    color: var(--brand);
     font-size: 11px;
     font-weight: 700;
 }
 
 .summary-row {
-    display: grid;
-
-    grid-template-columns: 1fr 110px;
-
+    display: flex;
     align-items: center;
-
-    gap: 12px;
-
-    margin: 10px 0;
-
-    font-size: 12px;
+    justify-content: space-between;
+    margin: 8px 0;
+    font-size: 13px;
     font-weight: 500;
+    color: var(--text-secondary);
 }
 
 .summary-row strong {
-    text-align: right;
-
+    color: var(--dark);
     font-weight: 700;
+    font-family: "DM Sans", sans-serif;
 }
 
-.discount {
-    color: #e11d2e;
+.summary-row.discount {
+    color: #16a34a;
 }
 
-
-/* =====================================================
-   TOTAL
-===================================================== */
+.summary-row.discount strong {
+    color: #16a34a;
+}
 
 .total-box {
-    border-top: 1px solid #e5e7eb;
-
-    margin-top: 14px;
-
-    padding-top: 16px;
+    border-top: 1px solid var(--border-subtle);
+    margin-top: 10px;
+    padding-top: 10px;
 }
 
 .total-row {
-    display: grid;
-
-    grid-template-columns: 1fr auto;
-
-    gap: 12px;
-
-    align-items: end;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
 }
 
 .total-label {
-    font-size: 20px;
-    line-height: 1.1;
-    font-weight: 700;
-    letter-spacing: -0.5px;
-    color: #111827;
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--dark);
+    letter-spacing: -0.3px;
 }
 
 .total-price {
@@ -571,657 +523,323 @@ body {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    justify-content: flex-end;
 }
 
 .total-price strong {
-    display: block;
-
-    font-size: 24px;
-    line-height: 1;
-    font-weight: 700;
-    letter-spacing: -0.7px;
-    color: #111827;
+    font-size: 22px;
+    font-weight: 800;
+    line-height: 1.1;
+    color: var(--dark);
     font-family: "DM Sans", sans-serif;
 }
 
 .total-price small {
-    display: block;
-
     margin-top: 2px;
-
-    color: #6b7280;
-
+    color: var(--text-muted);
     font-size: 10px;
-    font-weight: 500;
-    text-align: right;
+    font-weight: 600;
 }
-
-/* =====================================================
-   INDIA PAYMENT
-===================================================== */
-
-
-/* =====================================================
-   PAYMENT OPTIONS
-===================================================== */
-
 
 /* =====================================================
    TERMS
 ===================================================== */
-
 .terms {
     display: flex;
-
     align-items: flex-start;
-
-    gap: 6px;
-
-    margin-top: 14px;
-
-    font-size: 11px;
-
-    line-height: 1.5;
-
-    color: #111827;
-
+    gap: 10px;
+    margin-bottom: 16px;
     cursor: pointer;
+    user-select: none;
 }
 
-.terms input {
-    width: 13px;
-    height: 13px;
-
-    margin-top: 2px;
-
-    border: 1.5px solid #d1d5db;
-    border-radius: 3px;
-    background: #ffffff;
+.terms input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
+    width: 17px;
+    height: 17px;
+    border: 1.5px solid var(--border-hover);
+    border-radius: 4px;
+    outline: none;
     cursor: pointer;
-    position: relative;
     flex-shrink: 0;
+    margin-top: 2px;
+    background: #ffffff;
+    display: grid;
+    place-content: center;
+    transition: all 0.15s ease;
 }
 
-.terms input:checked {
-    background: #E04F00;
-    border-color: #E04F00;
+.terms input[type="checkbox"]:checked {
+    background: var(--brand);
+    border-color: var(--brand);
 }
 
-.terms input:checked::after {
-    content: "";
-    position: absolute;
-    left: 3px;
-    top: 0px;
-    width: 3px;
-    height: 7px;
-    border: solid #ffffff;
-    border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+.terms input[type="checkbox"]:checked::before {
+    content: "\f00c";
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 10px;
+    color: #ffffff;
+}
+
+.terms span {
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--text-secondary);
 }
 
 .terms a {
-    color: #e11d2e;
-    font-weight: 700;
+    color: var(--brand);
     text-decoration: none;
+    font-weight: 600;
 }
 
+.terms a:hover {
+    text-decoration: underline;
+}
 
 /* =====================================================
    BUY BUTTON
 ===================================================== */
-
 .buy-btn {
     width: 100%;
-
-    height: 42px;
-
+    height: 48px;
     border: 0;
-
-    border-radius: 10px;
-
-    margin-top: 18px;
-
-    background: #E04F00;
-
+    border-radius: var(--radius-sm);
+    background: linear-gradient(135deg, #FF6611 0%, #E04F00 100%);
     color: #ffffff;
-
-    font-size: 12px;
-
-    font-weight: 800;
-
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.2px;
     cursor: pointer;
-
-    transition: .2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px var(--brand-glow);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.buy-btn:hover {
-    background: #c84300;
+.buy-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(224, 79, 0, 0.35);
+}
+
+.buy-btn:active:not(:disabled) {
+    transform: translateY(0);
 }
 
 .buy-btn:disabled {
-    opacity: .5;
-
+    opacity: 0.55;
     cursor: not-allowed;
+    box-shadow: none;
+    background: #94a3b8;
 }
-
-
-/* =====================================================
-   SECURE
-===================================================== */
 
 .secure {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 6px;
+    margin-top: 14px;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: var(--text-muted);
+}
 
-    margin-top: 10px;
-
-    color: #5e6672;
-
+.secure i {
+    color: #16a34a;
     font-size: 12px;
-    font-weight: 500;
 }
 
-
-/* =====================================================
-   SECURITY BOX
-===================================================== */
-
-.security-box {
-    display: flex;
-
-    align-items: center;
-
-    gap: 10px;
-
-    margin-top: 16px;
-
-    padding: 12px;
-
-    border: 1px solid #e2e5e9;
-
-    border-radius: 12px;
-
-    background: #f8f9fb;
-}
-
-.security-icon {
-    font-size: 28px;
-}
-
-.security-box h3 {
-    margin: 0 0 5px;
-
-    font-size: 13px;
-}
-
-.security-box p {
-    margin: 0;
-
-    color: #4b5563;
-
-    line-height: 1.5;
-
-    font-size: 13px;
-}
-
-
-/* =====================================================
-   MOBILE
-===================================================== */
-
-@media(max-width: 700px) {
-
-    .order-wrapper {
-        max-width: 450px;
-        margin: 10px auto;
-        padding: 0 8px;
-        align-items: flex-start;
-    }
-
+@media (max-width: 480px) {
     .order-card {
-        padding: 18px 14px;
-
-        border-radius: 10px;
+        padding: 18px 16px 16px;
     }
-
     .order-header h1 {
-        font-size: 21px;
+        font-size: 16px;
     }
-
-    .close-btn {
-        width: 40px;
-        height: 40px;
-
-        font-size: 21px;
-    }
-
-    .product {
-        align-items: flex-start;
-    }
-
-    .product-left {
-        gap: 8px;
-    }
-
-    .product-image {
-        width: 68px;
-        height: 68px;
-    }
-
     .product-info h2 {
-        font-size: 13px;
-    }
-
-    .product-info p {
-        font-size: 13px;
-    }
-
-    .product-price span {
-        font-size: 13px;
-    }
-
-    .currency-box {
-        padding: 16px;
-
-        border-radius: 15px;
-    }
-
-    .currency-selected {
-        min-height: 42px;
-
-        padding: 0 14px;
-    }
-
-    .selected-country {
-        font-size: 13px;
-    }
-
-    .selected-flag {
-        font-size: 13px;
-    }
-
-    .summary-row {
-        grid-template-columns: 1fr 125px;
-
-        font-size: 13px;
-    }
-
-    .total-row {
-        grid-template-columns: 1fr 135px;
-    }
-
-    .total-label {
-        font-size: 25px;
-    }
-
-    .total-price strong {
-        font-size: 24px;
-    }
-
-    .buy-btn {
-        height: 42px;
-
-        font-size: 13px;
-    }
-
-    .terms {
         font-size: 14px;
     }
-
-    .security-box {
-        padding: 15px;
+    .product-price span {
+        font-size: 15px;
     }
-}
-,
-.currency-badge{
-    display:inline-flex;
-    align-items:center;
-    min-height:24px;
-    padding:4px 8px;
-    border-radius:6px;
-    background:#eef1f4;
-    color:#5f6670;
-    font-size:12px;
-    font-weight:600;
-    line-height:1;
-    white-space:nowrap;
+    .total-price strong {
+        font-size: 20px;
+    }
 }
 </style>
 <link rel="stylesheet" href="/static/responsive.css">
 </head>
 
-
 <body>
 
-
 <div class="order-wrapper">
+    <div class="order-card">
 
-<div class="order-card">
+        <!-- =====================================================
+             HEADER
+        ===================================================== -->
+        <div class="order-header">
+            <div class="order-header-left">
+                <div class="secure-badge">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <h1>Your Purchase</h1>
+            </div>
 
-
-<!-- =====================================================
-     HEADER
-===================================================== -->
-
-<div class="order-header">
-
-    <h1>
-        Your Purchase
-    </h1>
-
-    <button
-        class="close-btn"
-        onclick="closeOrder()"
-    >
-        ×
-    </button>
-
-</div>
-
-
-
-<!-- =====================================================
-     PRODUCT
-===================================================== -->
-
-<div class="product">
-
-    <div class="product-left">
-
-        <div class="product-media"><img class="product-image" src="{% static 'bag.png' %}" alt="THE BAG CODE"></div>
-
-        <div class="product-info">
-
-            <h2>THE BAG CODE</h2>
-
-            <p>
-                Lifetime Access
-            </p>
-
+            <button
+                class="close-btn"
+                onclick="closeOrder()"
+                aria-label="Close checkout"
+                type="button"
+            >
+                &times;
+            </button>
         </div>
 
-    </div>
-
-
-    <div class="product-price">
-
-        <span id="productLocal">
-            $18.00
-        </span>
-
-    </div>
-
-</div>
-
-
-
-<!-- =====================================================
-     COUNTRY / CURRENCY
-===================================================== -->
-
-<div class="currency-box">
-
-    <label class="currency-label">
-        COUNTRY / CURRENCY
-    </label>
-
-
-    <div
-        class="currency-select"
-        id="currencySelect"
-    >
-
-
-        <!-- SELECTED -->
-
-        <div
-            class="currency-selected"
-            id="currencySelected"
-            onclick="toggleCurrency()"
-        >
-
-            <div class="selected-left">
-
-                <span
-                    class="selected-flag"
-                    id="selectedFlag"
-                >
-                    🇮🇳
-                </span>
-
-                <div class="selected-country">
-
-                    <span id="selectedCountry">
-                        India
-                    </span>
-
-                    <span>—</span>
-
-                    <span
-                        class="selected-currency"
-                        id="selectedCurrency"
-                    >
-                        INR (₹)
-                    </span>
-
+        <!-- =====================================================
+             PRODUCT
+        ===================================================== -->
+        <div class="product">
+            <div class="product-left">
+                <div class="product-media">
+                    <img class="product-image" src="{% static 'bag.png' %}" alt="THE BAG CODE">
                 </div>
 
+                <div class="product-info">
+                    <h2>THE BAG CODE</h2>
+                    <p><i class="fa-solid fa-bolt"></i> Lifetime Access</p>
+                </div>
             </div>
 
-
-            <span class="currency-arrow"></span>
-
+            <div class="product-price">
+                <span id="productLocal">$18.00</span>
+            </div>
         </div>
 
+        <!-- =====================================================
+             COUNTRY / CURRENCY
+        ===================================================== -->
+        <div class="currency-box">
+            <label class="currency-label">
+                <span>COUNTRY / CURRENCY</span>
+                <span style="font-size:10px;font-weight:600;color:var(--text-muted)">Live Rates</span>
+            </label>
 
-
-        <!-- DROPDOWN -->
-
-        <div
-            class="currency-dropdown"
-            id="currencyDropdown"
-        >
-
-
-            <!-- SEARCH -->
-
-            <div class="currency-search">
-
-                <input
-                    type="text"
-                    id="currencySearch"
-                    placeholder="Search country or currency..."
-                    oninput="searchCountries()"
+            <div class="currency-select" id="currencySelect">
+                <!-- SELECTED -->
+                <div
+                    class="currency-selected"
+                    id="currencySelected"
+                    onclick="toggleCurrency()"
+                    role="button"
+                    tabindex="0"
                 >
+                    <div class="selected-left">
+                        <span class="selected-flag" id="selectedFlag">🇮🇳</span>
+                        <div class="selected-country">
+                            <span id="selectedCountry">India</span>
+                            <span>—</span>
+                            <span class="selected-currency" id="selectedCurrency">INR (₹)</span>
+                        </div>
+                    </div>
 
+                    <span class="currency-arrow"></span>
+                </div>
+
+                <!-- DROPDOWN -->
+                <div class="currency-dropdown" id="currencyDropdown">
+                    <div class="currency-search">
+                        <input
+                            type="text"
+                            id="currencySearch"
+                            placeholder="Search country or currency..."
+                            oninput="searchCountries()"
+                            autocomplete="off"
+                        >
+                    </div>
+
+                    <div class="currency-options" id="currencyOptions"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- =====================================================
+             SUMMARY
+        ===================================================== -->
+        <div class="summary-container">
+            <div class="summary-header">
+                <span class="summary-title">Summary</span>
+                <span id="currencyHeader">INR (₹)</span>
             </div>
 
+            <div class="summary-row">
+                <span>Subtotal</span>
+                <strong id="subtotalLocal">$18.00</strong>
+            </div>
 
-            <!-- OPTIONS -->
+            <div class="summary-row discount">
+                <span>Discount</span>
+                <strong id="discountLocal">- $32.00</strong>
+            </div>
 
-            <div
-                class="currency-options"
-                id="currencyOptions"
-            ></div>
+            <div class="summary-row">
+                <span>Tax</span>
+                <strong id="taxLocal">$0.82</strong>
+            </div>
 
+            <div class="total-box">
+                <div class="total-row">
+                    <div class="total-label">Total</div>
+                    <div class="total-price">
+                        <strong id="totalLocal">$18.82</strong>
+                        <small>incl. taxes</small>
+                    </div>
+                </div>
+            </div>
+        </div>
 
+        <!-- =====================================================
+             TERMS
+        ===================================================== -->
+        <label class="terms" for="termsCheck">
+            <input
+                type="checkbox"
+                id="termsCheck"
+                onchange="checkTerms()"
+            >
+            <span>
+                By completing this purchase, you agree to
+                <a href="#">Clout Privacy &amp; Terms</a>
+                and
+                <a href="#">Teachable's Privacy &amp; Terms</a>.
+            </span>
+        </label>
+
+        <!-- =====================================================
+             BUY BUTTON
+        ===================================================== -->
+        <button
+            class="buy-btn"
+            id="buyBtn"
+            disabled
+            onclick="startPayment()"
+            type="button"
+        >
+            <i class="fa-solid fa-lock" style="font-size:13px"></i>
+            <span>Buy now</span>
+        </button>
+
+        <div class="secure">
+            <i class="fa-solid fa-shield-check"></i>
+            <span>Secure payment powered by Razorpay</span>
         </div>
 
     </div>
-
 </div>
-
-
-
-<!-- =====================================================
-     DIVIDER
-===================================================== -->
-
-<div class="divider"></div>
-
-
-
-<!-- =====================================================
-     CURRENCY HEADER
-===================================================== -->
-
-<div class="summary-header">
-
-    <span id="currencyHeader">
-        INR (₹)
-    </span>
-
-</div>
-
-
-
-<!-- =====================================================
-     SUBTOTAL
-===================================================== -->
-
-<div class="summary-row">
-
-    <span>
-        Subtotal
-    </span>
-
-    <strong id="subtotalLocal">
-        $18.00
-    </strong>
-
-</div>
-
-
-
-<!-- =====================================================
-     DISCOUNT
-===================================================== -->
-
-<div class="summary-row discount">
-
-    <span>
-        Discount
-    </span>
-
-    <strong id="discountLocal">
-        - $32.00
-    </strong>
-
-</div>
-
-
-
-<!-- =====================================================
-     TAX
-===================================================== -->
-
-<div class="summary-row">
-
-    <span>
-        Tax
-    </span>
-
-    <strong id="taxLocal">
-        $0.82
-    </strong>
-
-</div>
-
-
-
-<!-- =====================================================
-     TOTAL
-===================================================== -->
-
-<div class="total-box">
-
-    <div class="total-row">
-
-        <div class="total-label">
-            Total
-        </div>
-
-
-        <div class="total-price">
-
-            <strong id="totalLocal">
-                $18.82
-            </strong>
-
-            <small>
-                incl. taxes
-            </small>
-
-        </div>
-
-    </div>
-
-</div>
-
-<!-- =====================================================
-     TERMS
-===================================================== -->
-
-<label class="terms">
-
-    <input
-        type="checkbox"
-        id="termsCheck"
-        onchange="checkTerms()"
-    >
-
-    <span>
-
-        By completing this purchase, you agree to
-
-        <a href="#">
-            Clout Privacy & Terms
-        </a>
-
-        and
-
-        <a href="#">
-            Teachable's Privacy & Terms.
-        </a>
-
-    </span>
-
-</label>
-
-
-
-<!-- =====================================================
-     BUY BUTTON
-===================================================== -->
-
-<button
-    class="buy-btn"
-    id="buyBtn"
-    disabled
-    onclick="startPayment()"
->
-
-    Buy now
-
-</button>
-
-
-<div class="secure">
-    <i class="fa-solid fa-lock"></i>
-    <span>Secure payment powered by Razorpay</span>
-</div>
-
-
-
-</div>
-</div>
-
-
 
 <script>
 const BASE_SUBTOTAL_USD = 18.00;
@@ -1275,7 +893,7 @@ function renderCountries(list = countries) {
     container.innerHTML = '';
 
     if (!list.length) {
-        container.innerHTML = '<div style="padding:16px;text-align:center;color:#6b7280;font-size:13px">No country found</div>';
+        container.innerHTML = '<div style="padding:16px;text-align:center;color:#64748b;font-size:13px">No country found</div>';
         return;
     }
 
@@ -1289,7 +907,7 @@ function renderCountries(list = countries) {
                 <span class="option-country">${escapeHtml(item.country)}</span>
                 <span class="option-currency">${escapeHtml(item.name)} • ${item.currency} (${escapeHtml(item.symbol)})</span>
             </span>
-            <span class="option-check">✓</span>`;
+            <span class="option-check"><i class="fa-solid fa-check"></i></span>`;
         button.addEventListener('click', () => selectCountry(item));
         container.appendChild(button);
     });
@@ -1443,7 +1061,7 @@ function startPayment() {
     const paymentAmount = isZeroDecimal ? Math.round(total).toFixed(0) : total.toFixed(2);
     const button = $('buyBtn');
     button.disabled = true;
-    button.textContent = 'Loading...';
+    button.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i><span>Processing...</span>';
 
     fetch('{% url "create_order" %}', {
         method: 'POST',
@@ -1521,7 +1139,7 @@ function resetPaymentButton() {
     const button = $('buyBtn');
     if (button) {
         button.disabled = false;
-        button.textContent = 'Buy now';
+        button.innerHTML = '<i class="fa-solid fa-lock" style="font-size:13px"></i><span>Buy now</span>';
     }
 }
 
