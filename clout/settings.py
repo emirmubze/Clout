@@ -55,6 +55,7 @@ render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME", "").strip()
 ALLOWED_HOSTS = list(dict.fromkeys([
     "localhost",
     "127.0.0.1",
+    "testserver",
     "clout.onrender.com",
     "clout.courses",
     "www.clout.courses",
