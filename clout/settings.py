@@ -483,6 +483,7 @@ SERVER_EMAIL = os.getenv(
 EMAIL_TIMEOUT = 10
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip()
+RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "Clout <onboarding@resend.dev>").strip()
 BREVO_API_KEY = os.getenv("BREVO_API_KEY", "").strip()
 
 

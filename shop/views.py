@@ -2250,11 +2250,12 @@ def dispatch_password_reset_email(user, reset_url):
     html_body = render_to_string("shop/password-reset-email.html", {"user": user, "reset_url": reset_url})
 
     # Method 1: Resend API (HTTP POST - immune to Render/cloud firewall SMTP blocks)
-    resend_key = getattr(settings, "RESEND_API_KEY", "").strip()
+    resend_key = getattr(settings, "RESEND_API_KEY", "").strip() or os.getenv("RESEND_API_KEY", "").strip()
     if resend_key:
         try:
+            resend_from = getattr(settings, "RESEND_FROM_EMAIL", "").strip() or "Clout <onboarding@resend.dev>"
             payload = {
-                "from": from_email,
+                "from": resend_from,
                 "to": [user.email],
                 "subject": subject,
                 "text": text_body,
