@@ -427,9 +427,9 @@ X_FRAME_OPTIONS = "SAMEORIGIN"
 
 EMAIL_BACKEND = os.getenv(
     "EMAIL_BACKEND",
-    "django.core.mail.backends.console.EmailBackend"
-    if DEBUG or not os.getenv("EMAIL_HOST_PASSWORD")
-    else "django.core.mail.backends.smtp.EmailBackend",
+    "django.core.mail.backends.smtp.EmailBackend"
+    if os.getenv("EMAIL_HOST_PASSWORD")
+    else "django.core.mail.backends.console.EmailBackend",
 )
 
 
