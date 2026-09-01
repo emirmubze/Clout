@@ -2366,7 +2366,7 @@ def forgot_password(request):
                 request,
                 "shop/forgot-password.html",
                 {
-                    "email_error": "No active account found with this email, username, or phone number.",
+                    "email_error": "No account found with this email address.",
                     "submitted_email": identifier,
                 },
             )
