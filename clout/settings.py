@@ -486,6 +486,8 @@ SERVER_EMAIL = os.getenv(
     "clout.courses@gmail.com",
 )
 
+EMAIL_TIMEOUT = 10
+
 
 # =========================================================
 # RAZORPAY

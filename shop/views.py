@@ -2251,8 +2251,12 @@ def forgot_password(request):
     if request.method == "POST":
 
         identifier = request.POST.get("email", "").strip()
+        clean_phone = re.sub(r"[^\d+]", "", identifier)
         user = CustomUser.objects.filter(
-            Q(email__iexact=identifier) | Q(username__iexact=identifier)
+            Q(email__iexact=identifier)
+            | Q(username__iexact=identifier)
+            | (Q(phone_number__iexact=identifier) if identifier else Q(pk=None))
+            | (Q(phone_number__iexact=clean_phone) if clean_phone else Q(pk=None))
         ).first()
 
         if not user or not user.is_active or not user.email:
@@ -2260,7 +2264,7 @@ def forgot_password(request):
                 request,
                 "shop/forgot-password.html",
                 {
-                    "email_error": "No account found with this email address.",
+                    "email_error": "No active account found with this email, username, or phone number.",
                     "submitted_email": identifier,
                 },
             )
@@ -2288,11 +2292,22 @@ def forgot_password(request):
                     {"user": user, "reset_url": reset_url},
                 ),
             )
-        except (SMTPException, OSError, Exception):
+        except (SMTPException, OSError, Exception) as exc:
             logger.exception(
-                "Password reset email could not be sent to %s",
+                "Password reset email could not be sent to %s: %s",
                 user.email,
+                exc,
             )
+
+        # Store masked email and debug URL in session
+        if "@" in user.email:
+            parts = user.email.split("@")
+            masked = (parts[0][:2] if len(parts[0]) >= 2 else parts[0][:1]) + "***@" + parts[1]
+        else:
+            masked = user.email
+        request.session["reset_email_masked"] = masked
+        if settings.DEBUG:
+            request.session["dev_reset_url"] = reset_url
 
         return redirect("reset_link_sent")
 
@@ -2307,10 +2322,16 @@ def forgot_password(request):
 # =========================================================
 
 def reset_link_sent(request):
+    masked_email = request.session.get("reset_email_masked", "")
+    dev_reset_url = request.session.get("dev_reset_url", "") if settings.DEBUG else ""
 
     return render(
         request,
-        "shop/reset-link-sent.html"
+        "shop/reset-link-sent.html",
+        {
+            "masked_email": masked_email,
+            "dev_reset_url": dev_reset_url,
+        }
     )
 
 
