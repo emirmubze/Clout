@@ -2243,6 +2243,105 @@ def payment_success(request):
 # FORGOT PASSWORD
 # =========================================================
 
+def dispatch_password_reset_email(user, reset_url):
+    from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "Clout <clout.courses@gmail.com>")
+    subject = "Reset your Clout password"
+    text_body = render_to_string("shop/password-reset-email.txt", {"user": user, "reset_url": reset_url})
+    html_body = render_to_string("shop/password-reset-email.html", {"user": user, "reset_url": reset_url})
+
+    # Method 1: Resend API (HTTP POST - immune to Render/cloud firewall SMTP blocks)
+    resend_key = getattr(settings, "RESEND_API_KEY", "").strip()
+    if resend_key:
+        try:
+            payload = {
+                "from": from_email,
+                "to": [user.email],
+                "subject": subject,
+                "text": text_body,
+                "html": html_body,
+            }
+            req = Request(
+                "https://api.resend.com/emails",
+                data=json.dumps(payload).encode("utf-8"),
+                headers={
+                    "Authorization": f"Bearer {resend_key}",
+                    "Content-Type": "application/json",
+                    "User-Agent": "Clout/1.0",
+                },
+                method="POST",
+            )
+            with urlopen(req, timeout=10) as resp:
+                if resp.status in (200, 201):
+                    logger.info("Password reset email sent via Resend API to %s", user.email)
+                    return True
+        except Exception as exc:
+            logger.warning("Resend API dispatch failed (%s). Falling back to Brevo/SMTP.", exc)
+
+    # Method 2: Brevo API (HTTP POST)
+    brevo_key = getattr(settings, "BREVO_API_KEY", "").strip()
+    if brevo_key:
+        try:
+            sender_email = from_email.split("<")[-1].rstrip(">").strip() if "<" in from_email else from_email
+            payload = {
+                "sender": {"email": sender_email, "name": "Clout"},
+                "to": [{"email": user.email}],
+                "subject": subject,
+                "textContent": text_body,
+                "htmlContent": html_body,
+            }
+            req = Request(
+                "https://api.brevo.com/v3/smtp/email",
+                data=json.dumps(payload).encode("utf-8"),
+                headers={
+                    "api-key": brevo_key,
+                    "Content-Type": "application/json",
+                },
+                method="POST",
+            )
+            with urlopen(req, timeout=10) as resp:
+                if resp.status in (200, 201):
+                    logger.info("Password reset email sent via Brevo API to %s", user.email)
+                    return True
+        except Exception as exc:
+            logger.warning("Brevo API dispatch failed (%s). Falling back to SMTP.", exc)
+
+    # Method 3: Standard Django send_mail (SMTP / Console)
+    try:
+        send_mail(
+            subject,
+            text_body,
+            from_email,
+            [user.email],
+            html_message=html_body,
+            fail_silently=False,
+        )
+        return True
+    except (SMTPException, OSError) as exc:
+        logger.warning("Standard send_mail failed (%s). Trying SSL Port 465 fallback.", exc)
+        # Method 4: SSL Port 465 fallback in case port 587 was blocked by host
+        if getattr(settings, "EMAIL_HOST_PASSWORD", ""):
+            try:
+                from django.core.mail.backends.smtp import EmailBackend
+                from django.core.mail import EmailMultiAlternatives
+                ssl_backend = EmailBackend(
+                    host=getattr(settings, "EMAIL_HOST", "smtp.gmail.com"),
+                    port=465,
+                    username=getattr(settings, "EMAIL_HOST_USER", "clout.courses@gmail.com"),
+                    password=settings.EMAIL_HOST_PASSWORD,
+                    use_tls=False,
+                    use_ssl=True,
+                    timeout=10,
+                )
+                msg = EmailMultiAlternatives(subject, text_body, from_email, [user.email], connection=ssl_backend)
+                msg.attach_alternative(html_body, "text/html")
+                msg.send(fail_silently=False)
+                logger.info("Password reset email sent via SSL Port 465 to %s", user.email)
+                return True
+            except Exception as ssl_exc:
+                logger.exception("SSL fallback email dispatch failed: %s", ssl_exc)
+        raise exc
+
+
 def forgot_password(request):
 
     if request.user.is_authenticated:
@@ -2278,20 +2377,7 @@ def forgot_password(request):
             )
         )
         try:
-            from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "Clout <clout.courses@gmail.com>")
-            send_mail(
-                "Reset your Clout password",
-                render_to_string(
-                    "shop/password-reset-email.txt",
-                    {"user": user, "reset_url": reset_url},
-                ),
-                from_email,
-                [user.email],
-                html_message=render_to_string(
-                    "shop/password-reset-email.html",
-                    {"user": user, "reset_url": reset_url},
-                ),
-            )
+            dispatch_password_reset_email(user, reset_url)
         except (SMTPException, OSError, Exception) as exc:
             logger.exception(
                 "Password reset email could not be sent to %s: %s",

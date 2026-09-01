@@ -482,6 +482,9 @@ SERVER_EMAIL = os.getenv(
 
 EMAIL_TIMEOUT = 10
 
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip()
+BREVO_API_KEY = os.getenv("BREVO_API_KEY", "").strip()
+
 
 # =========================================================
 # RAZORPAY
