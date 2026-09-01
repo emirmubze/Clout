@@ -1172,76 +1172,24 @@ function startPayment() {
                 }
             };
 
+            // Configure payment methods: UPI, Card, NetBanking, Wallet enabled. EMI & PayLater disabled.
             razorpayOptions.method = {
+                upi: true,
+                card: true,
+                netbanking: true,
+                wallet: true,
                 emi: false,
                 paylater: false
             };
 
-            // For international countries: display in local currency, remove EMI, and focus on Card payment
-            if (currentCountry.code !== 'IN' && currentCountry.currency !== 'INR') {
+            // Set local currency and amount for Price Summary in Razorpay popup
+            if (currentCountry.currency && currentCountry.currency !== 'INR') {
                 razorpayOptions.display_currency = currentCountry.currency;
                 razorpayOptions.display_amount = isZeroDecimal ? Math.round(total).toString() : total.toFixed(2);
-                razorpayOptions.description = `${currentCountry.country} Checkout • ${currentCountry.symbol}${paymentAmount}`;
-
-                razorpayOptions.method = {
-                    card: true,
-                    wallet: true,
-                    upi: false,
-                    netbanking: false,
-                    emi: false,
-                    paylater: false
-                };
-
-                razorpayOptions.config = {
-                    display: {
-                        blocks: {
-                            cards: {
-                                name: `Pay with Card (${currentCountry.country})`,
-                                instruments: [
-                                    { method: 'card' }
-                                ]
-                            }
-                        },
-                        sequence: ['block.cards'],
-                        preferences: {
-                            show_default_blocks: false
-                        }
-                    }
-                };
-            } else {
-                razorpayOptions.method = {
-                    upi: true,
-                    card: true,
-                    netbanking: true,
-                    wallet: true,
-                    emi: false,
-                    paylater: false
-                };
-
-                razorpayOptions.config = {
-                    display: {
-                        blocks: {
-                            preferred: {
-                                name: 'Recommended Payments',
-                                instruments: [
-                                    { method: 'upi' },
-                                    { method: 'card' }
-                                ]
-                            },
-                            other: {
-                                name: 'NetBanking & Wallets',
-                                instruments: [
-                                    { method: 'netbanking' },
-                                    { method: 'wallet' }
-                                ]
-                            }
-                        },
-                        sequence: ['block.preferred', 'block.other'],
-                        preferences: {
-                            show_default_blocks: false
-                        }
-                    }
-                };
+                razorpayOptions.description = `${currentCountry.country} (${currentCountry.currency}) • ${currentCountry.symbol}${paymentAmount}`;
+            } else if (data.display_currency && data.display_amount && data.display_currency !== data.currency) {
+                razorpayOptions.display_currency = data.display_currency;
+                razorpayOptions.display_amount = data.display_amount;
             }
 
             if (window.parent && window.parent !== window) {
