@@ -66,19 +66,19 @@ button {
    HEADER
 ========================================================= */
 .header {
-    height: 62px;
-    background: #020202;
-    border-top: 1px solid var(--brand-orange);
+    height: 64px;
+    background: #090d16;
     border-bottom: 1px solid rgba(255,255,255,.08);
     display: flex;
     align-items: center;
-    position: relative;
+    position: sticky;
     top: 0;
-    z-index: 50;
+    z-index: 100;
+    backdrop-filter: blur(12px);
 }
 
 .header-inner {
-    width: min(1380px, calc(100% - 50px));
+    width: min(1380px, calc(100% - 48px));
     margin: auto;
     display: flex;
     align-items: center;
@@ -89,10 +89,11 @@ button {
     color: var(--brand-orange);
     text-decoration: none;
     font-size: 15px;
-    font-weight: bold;
-    font-family: "Acme", "DM Sans", sans-serif;
+    font-weight: 800;
     letter-spacing: 1.5px;
     line-height: 1;
+    display: inline-flex;
+    align-items: center;
 }
 
 .logo-badge {
@@ -106,22 +107,25 @@ button {
 }
 
 .nav a {
-    color: #fff;
-    border: 1px solid #E04F00;
-    border-radius: 5px;
-    padding: 7px 14px;
-    background: transparent;
-    font-family: "DM Sans", sans-serif;
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-sm, 8px);
+    padding: 7px 15px;
+    background: rgba(255, 255, 255, 0.04);
     font-size: 13px;
     font-weight: 600;
     text-decoration: none;
-    transition: background .18s ease, color .18s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s ease;
 }
 
-.nav a:hover,
-.nav a.active {
-    background: transparent;
-    color: #fff;
+.nav a:hover {
+    background: var(--brand-orange);
+    border-color: var(--brand-orange);
+    color: #ffffff;
+    transform: translateY(-1px);
 }
 
 .nav-user {
@@ -1164,12 +1168,13 @@ button {
 <!-- Header -->
 <header class="header">
     <div class="header-inner">
-        <a href="{% url 'index' %}" class="logo">
-            <span>CLOUT</span>
-        </a>
+        <a href="{% url 'index' %}" class="logo">CLOUT</a>
 
         <nav class="nav">
-            <a href="{% url 'index' %}" class="active">Home</a>
+            <a href="{% url 'index' %}">
+                <i class="fa-solid fa-arrow-left" style="font-size:11px"></i>
+                <span>Home</span>
+            </a>
         </nav>
     </div>
 </header>
