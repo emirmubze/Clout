@@ -2043,35 +2043,11 @@
             <div class="nav-left">
                 <a href="{% url 'index' %}" class="logo-wrap">
                     <span class="logo-text">CLOUT</span>
-                    <span class="admin-badge">Admin</span>
                 </a>
             </div>
 
             <div class="nav-right">
-                <div class="nav-status-pill">
-                    <span class="pulse-dot"></span>
-                    <span>Live Portal</span>
-                </div>
-
-                <a href="{% url 'index' %}" class="nav-site-link" target="_blank" title="View live website">
-                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        <polyline points="15 3 21 3 21 9"></polyline>
-                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                    <span>View Site</span>
-                </a>
-
-                <div class="nav-admin-profile">
-                    <div class="nav-admin-avatar">
-                        {% if current_admin.profile_image %}
-                            <img src="{{ current_admin.profile_image.url }}" alt="{{ current_admin.username }}">
-                        {% else %}
-                            {{ current_admin.name|default:current_admin.username|first|upper }}
-                        {% endif %}
-                    </div>
-                    <span class="nav-admin-name">{{ current_admin.name|default:current_admin.username }}</span>
-                </div>
+                <!-- Right-side controls removed to keep only the logo area -->
             </div>
         </div>
     </nav>
