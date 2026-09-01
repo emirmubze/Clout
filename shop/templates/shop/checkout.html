@@ -453,6 +453,61 @@ body.standalone {
 }
 
 /* =====================================================
+   PAYMENT METHODS BOX
+===================================================== */
+.payment-methods-box {
+    margin: 0 24px 12px;
+    padding: 10px 14px;
+    background: var(--off-white);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.payment-methods-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    color: var(--dark-gray);
+}
+
+.payment-methods-header i {
+    color: var(--orange);
+    font-size: 12px;
+}
+
+.payment-methods-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.method-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 4px 8px;
+    background: var(--white);
+    border: 1px solid var(--border-subtle);
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--black);
+}
+
+.method-tag i {
+    color: var(--orange);
+    font-size: 11px;
+}
+
+/* =====================================================
    SUMMARY
 ===================================================== */
 .summary-container {
@@ -804,6 +859,21 @@ body.standalone {
         </div>
 
         <!-- =====================================================
+             PAYMENT METHODS INFO
+        ===================================================== -->
+        <div class="payment-methods-box" id="paymentMethodsBox">
+            <div class="payment-methods-header">
+                <i class="fa-solid fa-credit-card" id="paymentMethodsIcon"></i>
+                <span id="paymentMethodsTitle">Payment Methods</span>
+            </div>
+            <div class="payment-methods-list" id="paymentMethodsList">
+                <span class="method-tag"><i class="fa-solid fa-qrcode"></i> UPI (GPay, PhonePe, Paytm, QR)</span>
+                <span class="method-tag"><i class="fa-solid fa-credit-card"></i> Debit / Credit Card</span>
+                <span class="method-tag"><i class="fa-solid fa-building-columns"></i> NetBanking</span>
+            </div>
+        </div>
+
+        <!-- =====================================================
              SUMMARY
         ===================================================== -->
         <div class="summary-container">
@@ -885,30 +955,39 @@ const BASE_TOTAL_USD = 18.82;
 
 // Exactly 195 countries: 193 UN members + Palestine + Vatican City.
 // Countries sharing a currency intentionally point to the same ISO 4217 code.
-const countries = [{"country":"Afghanistan","code":"AF","currency":"AFN","name":"Afghan Afghani","symbol":"؋","flag":"🇦🇫"},{"country":"Albania","code":"AL","currency":"ALL","name":"Albanian Lek","symbol":"Lek","flag":"🇦🇱"},{"country":"Algeria","code":"DZ","currency":"DZD","name":"Algerian Dinar","symbol":"دج","flag":"🇩🇿"},{"country":"Andorra","code":"AD","currency":"EUR","name":"Euro","symbol":"€","flag":"🇦🇩"},{"country":"Angola","code":"AO","currency":"AOA","name":"Angolan Kwanza","symbol":"AOA","flag":"🇦🇴"},{"country":"Antigua and Barbuda","code":"AG","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇦🇬"},{"country":"Argentina","code":"AR","currency":"ARS","name":"Argentine Peso","symbol":"$","flag":"🇦🇷"},{"country":"Armenia","code":"AM","currency":"AMD","name":"Armenian Dram","symbol":"֏","flag":"🇦🇲"},{"country":"Australia","code":"AU","currency":"AUD","name":"Australian Dollar","symbol":"A$","flag":"🇦🇺"},{"country":"Austria","code":"AT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇦🇹"},{"country":"Azerbaijan","code":"AZ","currency":"AZN","name":"Azerbaijani Manat","symbol":"₼","flag":"🇦🇿"},{"country":"Bahamas","code":"BS","currency":"BSD","name":"Bahamian Dollar","symbol":"B$","flag":"🇧🇸"},{"country":"Bahrain","code":"BH","currency":"BHD","name":"Bahraini Dinar","symbol":".د.ب","flag":"🇧🇭"},{"country":"Bangladesh","code":"BD","currency":"BDT","name":"Bangladeshi Taka","symbol":"BDT","flag":"🇧🇩"},{"country":"Barbados","code":"BB","currency":"BBD","name":"Barbadian Dollar","symbol":"Bds$","flag":"🇧🇧"},{"country":"Belarus","code":"BY","currency":"BYN","name":"Belarusian Ruble","symbol":"Br","flag":"🇧🇾"},{"country":"Belgium","code":"BE","currency":"EUR","name":"Euro","symbol":"€","flag":"🇧🇪"},{"country":"Belize","code":"BZ","currency":"BZD","name":"Belize Dollar","symbol":"BZ$","flag":"🇧🇿"},{"country":"Benin","code":"BJ","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇧🇯"},{"country":"Bhutan","code":"BT","currency":"BTN","name":"Bhutanese Ngultrum","symbol":"Nu.","flag":"🇧🇹"},{"country":"Bolivia","code":"BO","currency":"BOB","name":"Bolivian Boliviano","symbol":"Bs.","flag":"🇧🇴"},{"country":"Bosnia and Herzegovina","code":"BA","currency":"BAM","name":"Bosnia-Herzegovina Convertible Mark","symbol":"KM","flag":"🇧🇦"},{"country":"Botswana","code":"BW","currency":"BWP","name":"Botswanan Pula","symbol":"P","flag":"🇧🇼"},{"country":"Brazil","code":"BR","currency":"BRL","name":"Brazilian Real","symbol":"R$","flag":"🇧🇷"},{"country":"Brunei","code":"BN","currency":"BND","name":"Brunei Dollar","symbol":"B$","flag":"🇧🇳"},{"country":"Bulgaria","code":"BG","currency":"EUR","name":"Euro","symbol":"€","flag":"🇧🇬"},{"country":"Burkina Faso","code":"BF","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇧🇫"},{"country":"Burundi","code":"BI","currency":"BIF","name":"Burundian Franc","symbol":"FBu","flag":"🇧🇮"},{"country":"Cabo Verde","code":"CV","currency":"CVE","name":"Cape Verdean Escudo","symbol":"$","flag":"🇨🇻"},{"country":"Cambodia","code":"KH","currency":"KHR","name":"Cambodian Riel","symbol":"៛","flag":"🇰🇭"},{"country":"Cameroon","code":"CM","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇨🇲"},{"country":"Canada","code":"CA","currency":"CAD","name":"Canadian Dollar","symbol":"CA$","flag":"🇨🇦"},{"country":"Central African Republic","code":"CF","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇨🇫"},{"country":"Chad","code":"TD","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇹🇩"},{"country":"Chile","code":"CL","currency":"CLP","name":"Chilean Peso","symbol":"$","flag":"🇨🇱"},{"country":"China","code":"CN","currency":"CNY","name":"Chinese Yuan","symbol":"CN¥","flag":"🇨🇳"},{"country":"Colombia","code":"CO","currency":"COP","name":"Colombian Peso","symbol":"$","flag":"🇨🇴"},{"country":"Comoros","code":"KM","currency":"KMF","name":"Comorian Franc","symbol":"CF","flag":"🇰🇲"},{"country":"Republic of the Congo","code":"CG","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇨🇬"},{"country":"Democratic Republic of the Congo","code":"CD","currency":"CDF","name":"Congolese Franc","symbol":"FC","flag":"🇨🇩"},{"country":"Costa Rica","code":"CR","currency":"CRC","name":"Costa Rican Colón","symbol":"₡","flag":"🇨🇷"},{"country":"Côte d'Ivoire","code":"CI","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇨🇮"},{"country":"Croatia","code":"HR","currency":"EUR","name":"Euro","symbol":"€","flag":"🇭🇷"},{"country":"Cuba","code":"CU","currency":"CUP","name":"Cuban Peso","symbol":"CUP","flag":"🇨🇺"},{"country":"Cyprus","code":"CY","currency":"EUR","name":"Euro","symbol":"€","flag":"🇨🇾"},{"country":"Czechia","code":"CZ","currency":"CZK","name":"Czech Koruna","symbol":"Kč","flag":"🇨🇿"},{"country":"Denmark","code":"DK","currency":"DKK","name":"Danish Krone","symbol":"kr","flag":"🇩🇰"},{"country":"Djibouti","code":"DJ","currency":"DJF","name":"Djiboutian Franc","symbol":"Fdj","flag":"🇩🇯"},{"country":"Dominica","code":"DM","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇩🇲"},{"country":"Dominican Republic","code":"DO","currency":"DOP","name":"Dominican Peso","symbol":"RD$","flag":"🇩🇴"},{"country":"Ecuador","code":"EC","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇪🇨"},{"country":"Egypt","code":"EG","currency":"EGP","name":"Egyptian Pound","symbol":"E£","flag":"🇪🇬"},{"country":"El Salvador","code":"SV","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇸🇻"},{"country":"Equatorial Guinea","code":"GQ","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇬🇶"},{"country":"Eritrea","code":"ER","currency":"ERN","name":"Eritrean Nakfa","symbol":"Nfk","flag":"🇪🇷"},{"country":"Estonia","code":"EE","currency":"EUR","name":"Euro","symbol":"€","flag":"🇪🇪"},{"country":"Eswatini","code":"SZ","currency":"SZL","name":"Swazi Lilangeni","symbol":"E","flag":"🇸🇿"},{"country":"Ethiopia","code":"ET","currency":"ETB","name":"Ethiopian Birr","symbol":"Br","flag":"🇪🇹"},{"country":"Fiji","code":"FJ","currency":"FJD","name":"Fijian Dollar","symbol":"FJ$","flag":"🇫🇯"},{"country":"Finland","code":"FI","currency":"EUR","name":"Euro","symbol":"€","flag":"🇫🇮"},{"country":"France","code":"FR","currency":"EUR","name":"Euro","symbol":"€","flag":"🇫🇷"},{"country":"Gabon","code":"GA","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇬🇦"},{"country":"Gambia","code":"GM","currency":"GMD","name":"Gambian Dalasi","symbol":"D","flag":"🇬🇲"},{"country":"Georgia","code":"GE","currency":"GEL","name":"Georgian Lari","symbol":"₾","flag":"🇬🇪"},{"country":"Germany","code":"DE","currency":"EUR","name":"Euro","symbol":"€","flag":"🇩🇪"},{"country":"Ghana","code":"GH","currency":"GHS","name":"Ghanaian Cedi","symbol":"₵","flag":"🇬🇭"},{"country":"Greece","code":"GR","currency":"EUR","name":"Euro","symbol":"€","flag":"🇬🇷"},{"country":"Grenada","code":"GD","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇬🇩"},{"country":"Guatemala","code":"GT","currency":"GTQ","name":"Guatemalan Quetzal","symbol":"Q","flag":"🇬🇹"},{"country":"Guinea","code":"GN","currency":"GNF","name":"Guinean Franc","symbol":"FG","flag":"🇬🇳"},{"country":"Guinea-Bissau","code":"GW","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇬🇼"},{"country":"Guyana","code":"GY","currency":"GYD","name":"Guyanaese Dollar","symbol":"G$","flag":"🇬🇾"},{"country":"Haiti","code":"HT","currency":"HTG","name":"Haitian Gourde","symbol":"G","flag":"🇭🇹"},{"country":"Honduras","code":"HN","currency":"HNL","name":"Honduran Lempira","symbol":"L","flag":"🇭🇳"},{"country":"Hungary","code":"HU","currency":"HUF","name":"Hungarian Forint","symbol":"Ft","flag":"🇭🇺"},{"country":"Iceland","code":"IS","currency":"ISK","name":"Icelandic Króna","symbol":"kr","flag":"🇮🇸"},{"country":"India","code":"IN","currency":"INR","name":"Indian Rupee","symbol":"₹","flag":"🇮🇳"},{"country":"Indonesia","code":"ID","currency":"IDR","name":"Indonesian Rupiah","symbol":"Rp","flag":"🇮🇩"},{"country":"Iran","code":"IR","currency":"IRR","name":"Iranian Rial","symbol":"﷼","flag":"🇮🇷"},{"country":"Iraq","code":"IQ","currency":"IQD","name":"Iraqi Dinar","symbol":"ع.د","flag":"🇮🇶"},{"country":"Ireland","code":"IE","currency":"EUR","name":"Euro","symbol":"€","flag":"🇮🇪"},{"country":"Israel","code":"IL","currency":"ILS","name":"Israeli New Shekel","symbol":"₪","flag":"🇮🇱"},{"country":"Italy","code":"IT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇮🇹"},{"country":"Jamaica","code":"JM","currency":"JMD","name":"Jamaican Dollar","symbol":"JMD","flag":"🇯🇲"},{"country":"Japan","code":"JP","currency":"JPY","name":"Japanese Yen","symbol":"¥","flag":"🇯🇵"},{"country":"Jordan","code":"JO","currency":"JOD","name":"Jordanian Dinar","symbol":"د.ا","flag":"🇯🇴"},{"country":"Kazakhstan","code":"KZ","currency":"KZT","name":"Kazakhstani Tenge","symbol":"₸","flag":"🇰🇿"},{"country":"Kenya","code":"KE","currency":"KES","name":"Kenyan Shilling","symbol":"KSh","flag":"🇰🇪"},{"country":"Kiribati","code":"KI","currency":"AUD","name":"Australian Dollar","symbol":"A$","flag":"🇰🇮"},{"country":"North Korea","code":"KP","currency":"KPW","name":"North Korean Won","symbol":"₩","flag":"🇰🇵"},{"country":"South Korea","code":"KR","currency":"KRW","name":"South Korean Won","symbol":"₩","flag":"🇰🇷"},{"country":"Kuwait","code":"KW","currency":"KWD","name":"Kuwaiti Dinar","symbol":"د.ك","flag":"🇰🇼"},{"country":"Kyrgyzstan","code":"KG","currency":"KGS","name":"Kyrgystani Som","symbol":"сом","flag":"🇰🇬"},{"country":"Laos","code":"LA","currency":"LAK","name":"Laotian Kip","symbol":"₭","flag":"🇱🇦"},{"country":"Latvia","code":"LV","currency":"EUR","name":"Euro","symbol":"€","flag":"🇱🇻"},{"country":"Lebanon","code":"LB","currency":"LBP","name":"Lebanese Pound","symbol":"ل.ل","flag":"🇱🇧"},{"country":"Lesotho","code":"LS","currency":"LSL","name":"Lesotho Loti","symbol":"L","flag":"🇱🇸"},{"country":"Liberia","code":"LR","currency":"LRD","name":"Liberian Dollar","symbol":"L$","flag":"🇱🇷"},{"country":"Libya","code":"LY","currency":"LYD","name":"Libyan Dinar","symbol":"ل.د","flag":"🇱🇾"},{"country":"Liechtenstein","code":"LI","currency":"CHF","name":"Swiss Franc","symbol":"CHF","flag":"🇱🇮"},{"country":"Lithuania","code":"LT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇱🇹"},{"country":"Luxembourg","code":"LU","currency":"EUR","name":"Euro","symbol":"€","flag":"🇱🇺"},{"country":"Madagascar","code":"MG","currency":"MGA","name":"Malagasy Ariary","symbol":"Ar","flag":"🇲🇬"},{"country":"Malawi","code":"MW","currency":"MWK","name":"Malawian Kwacha","symbol":"MK","flag":"🇲🇼"},{"country":"Malaysia","code":"MY","currency":"MYR","name":"Malaysian Ringgit","symbol":"RM","flag":"🇲🇾"},{"country":"Maldives","code":"MV","currency":"MVR","name":"Maldivian Rufiyaa","symbol":"Rf","flag":"🇲🇻"},{"country":"Mali","code":"ML","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇲🇱"},{"country":"Malta","code":"MT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇲🇹"},{"country":"Marshall Islands","code":"MH","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇲🇭"},{"country":"Mauritania","code":"MR","currency":"MRU","name":"Mauritanian Ouguiya","symbol":"UM","flag":"🇲🇷"},{"country":"Mauritius","code":"MU","currency":"MUR","name":"Mauritian Rupee","symbol":"₨","flag":"🇲🇺"},{"country":"Mexico","code":"MX","currency":"MXN","name":"Mexican Peso","symbol":"MX$","flag":"🇲🇽"},{"country":"Micronesia","code":"FM","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇫🇲"},{"country":"Moldova","code":"MD","currency":"MDL","name":"Moldovan Leu","symbol":"L","flag":"🇲🇩"},{"country":"Monaco","code":"MC","currency":"EUR","name":"Euro","symbol":"€","flag":"🇲🇨"},{"country":"Mongolia","code":"MN","currency":"MNT","name":"Mongolian Tugrik","symbol":"₮","flag":"🇲🇳"},{"country":"Montenegro","code":"ME","currency":"EUR","name":"Euro","symbol":"€","flag":"🇲🇪"},{"country":"Morocco","code":"MA","currency":"MAD","name":"Moroccan Dirham","symbol":"د.م.","flag":"🇲🇦"},{"country":"Mozambique","code":"MZ","currency":"MZN","name":"Mozambican Metical","symbol":"MT","flag":"🇲🇿"},{"country":"Myanmar","code":"MM","currency":"MMK","name":"Myanmar Kyat","symbol":"K","flag":"🇲🇲"},{"country":"Namibia","code":"NA","currency":"NAD","name":"Namibian Dollar","symbol":"N$","flag":"🇳🇦"},{"country":"Nauru","code":"NR","currency":"AUD","name":"Australian Dollar","symbol":"A$","flag":"🇳🇷"},{"country":"Nepal","code":"NP","currency":"NPR","name":"Nepalese Rupee","symbol":"₨","flag":"🇳🇵"},{"country":"Netherlands","code":"NL","currency":"EUR","name":"Euro","symbol":"€","flag":"🇳🇱"},{"country":"New Zealand","code":"NZ","currency":"NZD","name":"New Zealand Dollar","symbol":"NZ$","flag":"🇳🇿"},{"country":"Nicaragua","code":"NI","currency":"NIO","name":"Nicaraguan Córdoba","symbol":"C$","flag":"🇳🇮"},{"country":"Niger","code":"NE","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇳🇪"},{"country":"Nigeria","code":"NG","currency":"NGN","name":"Nigerian Naira","symbol":"₦","flag":"🇳🇬"},{"country":"North Macedonia","code":"MK","currency":"MKD","name":"Macedonian Denar","symbol":"ден","flag":"🇲🇰"},{"country":"Norway","code":"NO","currency":"NOK","name":"Norwegian Krone","symbol":"kr","flag":"🇳🇴"},{"country":"Oman","code":"OM","currency":"OMR","name":"Omani Rial","symbol":"﷼","flag":"🇴🇲"},{"country":"Pakistan","code":"PK","currency":"PKR","name":"Pakistani Rupee","symbol":"₨","flag":"🇵🇰"},{"country":"Palau","code":"PW","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇵🇼"},{"country":"Palestine","code":"PS","currency":"ILS","name":"Israeli New Shekel","symbol":"₪","flag":"🇵🇸"},{"country":"Panama","code":"PA","currency":"PAB","name":"Panamanian Balboa","symbol":"PAB","flag":"🇵🇦"},{"country":"Papua New Guinea","code":"PG","currency":"PGK","name":"Papua New Guinean Kina","symbol":"K","flag":"🇵🇬"},{"country":"Paraguay","code":"PY","currency":"PYG","name":"Paraguayan Guarani","symbol":"₲","flag":"🇵🇾"},{"country":"Peru","code":"PE","currency":"PEN","name":"Peruvian Sol","symbol":"S/","flag":"🇵🇪"},{"country":"Philippines","code":"PH","currency":"PHP","name":"Philippine Peso","symbol":"₱","flag":"🇵🇭"},{"country":"Poland","code":"PL","currency":"PLN","name":"Polish Zloty","symbol":"zł","flag":"🇵🇱"},{"country":"Portugal","code":"PT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇵🇹"},{"country":"Qatar","code":"QA","currency":"QAR","name":"Qatari Riyal","symbol":"﷼","flag":"🇶🇦"},{"country":"Romania","code":"RO","currency":"RON","name":"Romanian Leu","symbol":"lei","flag":"🇷🇴"},{"country":"Russia","code":"RU","currency":"RUB","name":"Russian Ruble","symbol":"₽","flag":"🇷🇺"},{"country":"Rwanda","code":"RW","currency":"RWF","name":"Rwandan Franc","symbol":"FRw","flag":"🇷🇼"},{"country":"Saint Kitts and Nevis","code":"KN","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇰🇳"},{"country":"Saint Lucia","code":"LC","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇱🇨"},{"country":"Saint Vincent and the Grenadines","code":"VC","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇻🇨"},{"country":"Samoa","code":"WS","currency":"WST","name":"Samoan Tala","symbol":"WS$","flag":"🇼🇸"},{"country":"San Marino","code":"SM","currency":"EUR","name":"Euro","symbol":"€","flag":"🇸🇲"},{"country":"Sao Tome and Principe","code":"ST","currency":"STN","name":"São Tomé & Príncipe Dobra","symbol":"Db","flag":"🇸🇹"},{"country":"Saudi Arabia","code":"SA","currency":"SAR","name":"Saudi Riyal","symbol":"﷼","flag":"🇸🇦"},{"country":"Senegal","code":"SN","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇸🇳"},{"country":"Serbia","code":"RS","currency":"RSD","name":"Serbian Dinar","symbol":"дин","flag":"🇷🇸"},{"country":"Seychelles","code":"SC","currency":"SCR","name":"Seychellois Rupee","symbol":"₨","flag":"🇸🇨"},{"country":"Sierra Leone","code":"SL","currency":"SLE","name":"Sierra Leonean Leone","symbol":"Le","flag":"🇸🇱"},{"country":"Singapore","code":"SG","currency":"SGD","name":"Singapore Dollar","symbol":"S$","flag":"🇸🇬"},{"country":"Slovakia","code":"SK","currency":"EUR","name":"Euro","symbol":"€","flag":"🇸🇰"},{"country":"Slovenia","code":"SI","currency":"EUR","name":"Euro","symbol":"€","flag":"🇸🇮"},{"country":"Solomon Islands","code":"SB","currency":"SBD","name":"Solomon Islands Dollar","symbol":"SI$","flag":"🇸🇧"},{"country":"Somalia","code":"SO","currency":"SOS","name":"Somali Shilling","symbol":"S","flag":"🇸🇴"},{"country":"South Africa","code":"ZA","currency":"ZAR","name":"South African Rand","symbol":"R","flag":"🇿🇦"},{"country":"South Sudan","code":"SS","currency":"SSP","name":"South Sudanese Pound","symbol":"SSP","flag":"🇸🇸"},{"country":"Spain","code":"ES","currency":"EUR","name":"Euro","symbol":"€","flag":"🇪🇸"},{"country":"Sri Lanka","code":"LK","currency":"LKR","name":"Sri Lankan Rupee","symbol":"Rs","flag":"🇱🇰"},{"country":"Sudan","code":"SD","currency":"SDG","name":"Sudanese Pound","symbol":"ج.س.","flag":"🇸🇩"},{"country":"Suriname","code":"SR","currency":"SRD","name":"Surinamese Dollar","symbol":"$","flag":"🇸🇷"},{"country":"Sweden","code":"SE","currency":"SEK","name":"Swedish Krona","symbol":"kr","flag":"🇸🇪"},{"country":"Switzerland","code":"CH","currency":"CHF","name":"Swiss Franc","symbol":"CHF","flag":"🇨🇭"},{"country":"Syria","code":"SY","currency":"SYP","name":"Syrian Pound","symbol":"£","flag":"🇸🇾"},{"country":"Tajikistan","code":"TJ","currency":"TJS","name":"Tajikistani Somoni","symbol":"ЅМ","flag":"🇹🇯"},{"country":"Tanzania","code":"TZ","currency":"TZS","name":"Tanzanian Shilling","symbol":"TSh","flag":"🇹🇿"},{"country":"Thailand","code":"TH","currency":"THB","name":"Thai Baht","symbol":"฿","flag":"🇹🇭"},{"country":"Timor-Leste","code":"TL","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇹🇱"},{"country":"Togo","code":"TG","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇹🇬"},{"country":"Tonga","code":"TO","currency":"TOP","name":"Tongan Paʻanga","symbol":"T$","flag":"🇹🇴"},{"country":"Trinidad and Tobago","code":"TT","currency":"TTD","name":"Trinidad & Tobago Dollar","symbol":"TTD","flag":"🇹🇹"},{"country":"Tunisia","code":"TN","currency":"TND","name":"Tunisian Dinar","symbol":"د.ت","flag":"🇹🇳"},{"country":"Türkiye","code":"TR","currency":"TRY","name":"Turkish Lira","symbol":"₺","flag":"🇹🇷"},{"country":"Turkmenistan","code":"TM","currency":"TMT","name":"Turkmenistani Manat","symbol":"m","flag":"🇹🇲"},{"country":"Tuvalu","code":"TV","currency":"AUD","name":"Australian Dollar","symbol":"A$","flag":"🇹🇻"},{"country":"Uganda","code":"UG","currency":"UGX","name":"Ugandan Shilling","symbol":"USh","flag":"🇺🇬"},{"country":"Ukraine","code":"UA","currency":"UAH","name":"Ukrainian Hryvnia","symbol":"₴","flag":"🇺🇦"},{"country":"United Arab Emirates","code":"AE","currency":"AED","name":"United Arab Emirates Dirham","symbol":"د.إ","flag":"🇦🇪"},{"country":"United Kingdom","code":"GB","currency":"GBP","name":"British Pound","symbol":"£","flag":"🇬🇧"},{"country":"United States","code":"US","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇺🇸"},{"country":"Uruguay","code":"UY","currency":"UYU","name":"Uruguayan Peso","symbol":"$U","flag":"🇺🇾"},{"country":"Uzbekistan","code":"UZ","currency":"UZS","name":"Uzbekistani Som","symbol":"so'm","flag":"🇺🇿"},{"country":"Vanuatu","code":"VU","currency":"VUV","name":"Vanuatu Vatu","symbol":"VT","flag":"🇻🇺"},{"country":"Vatican City","code":"VA","currency":"EUR","name":"Euro","symbol":"€","flag":"🇻🇦"},{"country":"Venezuela","code":"VE","currency":"VES","name":"Venezuelan Bolívar","symbol":"Bs.","flag":"🇻🇪"},{"country":"Vietnam","code":"VN","currency":"VND","name":"Vietnamese Dong","symbol":"₫","flag":"🇻🇳"},{"country":"Yemen","code":"YE","currency":"YER","name":"Yemeni Rial","symbol":"﷼","flag":"🇾🇪"},{"country":"Zambia","code":"ZM","currency":"ZMW","name":"Zambian Kwacha","symbol":"ZK","flag":"🇿🇲"},{"country":"Zimbabwe","code":"ZW","currency":"ZWG","name":"Zimbabwean Gold","symbol":"ZiG","flag":"🇿🇼"}];
+const countries = [{"country":"Afghanistan","code":"AF","currency":"AFN","name":"Afghan Afghani","symbol":"؋","flag":"🇦🇫"},{"country":"Albania","code":"AL","currency":"ALL","name":"Albanian Lek","symbol":"Lek","flag":"🇦🇱"},{"country":"Algeria","code":"DZ","currency":"DZD","name":"Algerian Dinar","symbol":"دج","flag":"🇩🇿"},{"country":"Andorra","code":"AD","currency":"EUR","name":"Euro","symbol":"€","flag":"🇦🇩"},{"country":"Angola","code":"AO","currency":"AOA","name":"Angolan Kwanza","symbol":"AOA","flag":"🇦🇴"},{"country":"Antigua and Barbuda","code":"AG","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇦🇬"},{"country":"Argentina","code":"AR","currency":"ARS","name":"Argentine Peso","symbol":"$","flag":"🇦🇷"},{"country":"Armenia","code":"AM","currency":"AMD","name":"Armenian Dram","symbol":"֏","flag":"🇦🇲"},{"country":"Australia","code":"AU","currency":"AUD","name":"Australian Dollar","symbol":"A$","flag":"🇦🇺"},{"country":"Austria","code":"AT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇦🇹"},{"country":"Azerbaijan","code":"AZ","currency":"AZN","name":"Azerbaijani Manat","symbol":"₼","flag":"🇦🇿"},{"country":"Bahamas","code":"BS","currency":"BSD","name":"Bahamian Dollar","symbol":"B$","flag":"🇧🇸"},{"country":"Bahrain","code":"BH","currency":"BHD","name":"Bahraini Dinar","symbol":".د.ب","flag":"🇧🇭"},{"country":"Bangladesh","code":"BD","currency":"BDT","name":"Bangladeshi Taka","symbol":"BDT","flag":"🇧🇩"},{"country":"Barbados","code":"BB","currency":"BBD","name":"Barbadian Dollar","symbol":"Bds$","flag":"🇧🇧"},{"country":"Belarus","code":"BY","currency":"BYN","name":"Belarusian Ruble","symbol":"Br","flag":"🇧🇾"},{"country":"Belgium","code":"BE","currency":"EUR","name":"Euro","symbol":"€","flag":"🇧🇪"},{"country":"Belize","code":"BZ","currency":"BZD","name":"Belize Dollar","symbol":"BZ$","flag":"🇧🇿"},{"country":"Benin","code":"BJ","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇧🇯"},{"country":"Bhutan","code":"BT","currency":"BTN","name":"Bhutanese Ngultrum","symbol":"Nu.","flag":"🇧🇹"},{"country":"Bolivia","code":"BO","currency":"BOB","name":"Bolivian Boliviano","symbol":"Bs.","flag":"🇧🇴"},{"country":"Bosnia and Herzegovina","code":"BA","currency":"BAM","name":"Bosnia-Herzegovina Convertible Mark","symbol":"KM","flag":"🇧🇦"},{"country":"Botswana","code":"BW","currency":"BWP","name":"Botswanan Pula","symbol":"P","flag":"🇧🇼"},{"country":"Brazil","code":"BR","currency":"BRL","name":"Brazilian Real","symbol":"R$","flag":"🇧🇷"},{"country":"Brunei","code":"BN","currency":"BND","name":"Brunei Dollar","symbol":"B$","flag":"🇧🇳"},{"country":"Bulgaria","code":"BG","currency":"EUR","name":"Euro","symbol":"€","flag":"🇧🇬"},{"country":"Burkina Faso","code":"BF","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇧🇫"},{"country":"Burundi","code":"BI","currency":"BIF","name":"Burundian Franc","symbol":"FBu","flag":"🇧🇮"},{"country":"Cabo Verde","code":"CV","currency":"CVE","name":"Cape Verdean Escudo","symbol":"$","flag":"🇨🇻"},{"country":"Cambodia","code":"KH","currency":"KHR","name":"Cambodian Riel","symbol":"៛","flag":"🇰🇭"},{"country":"Cameroon","code":"CM","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇨🇲"},{"country":"Canada","code":"CA","currency":"CAD","name":"Canadian Dollar","symbol":"CA$","flag":"🇨🇦"},{"country":"Central African Republic","code":"CF","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇨🇫"},{"country":"Chad","code":"TD","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇹🇩"},{"country":"Chile","code":"CL","currency":"CLP","name":"Chilean Peso","symbol":"$","flag":"🇨🇱"},{"country":"China","code":"CN","currency":"CNY","name":"Chinese Yuan","symbol":"CN¥","flag":"🇨🇳"},{"country":"Colombia","code":"CO","currency":"COP","name":"Colombian Peso","symbol":"$","flag":"🇨🇴"},{"country":"Comoros","code":"KM","currency":"KMF","name":"Comorian Franc","symbol":"CF","flag":"🇰🇲"},{"country":"Republic of the Congo","code":"CG","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇨🇬"},{"country":"Democratic Republic of the Congo","code":"CD","currency":"CDF","name":"Congolese Franc","symbol":"FC","flag":"🇨🇩"},{"country":"Costa Rica","code":"CR","currency":"CRC","name":"Costa Rican Colón","symbol":"₡","flag":"🇨🇷"},{"country":"Côte d'Ivoire","code":"CI","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇨🇮"},{"country":"Croatia","code":"HR","currency":"EUR","name":"Euro","symbol":"€","flag":"🇭🇷"},{"country":"Cuba","code":"CU","currency":"CUP","name":"Cuban Peso","symbol":"CUP","flag":"🇨🇺"},{"country":"Cyprus","code":"CY","currency":"EUR","name":"Euro","symbol":"€","flag":"🇨🇾"},{"country":"Czechia","code":"CZ","currency":"CZK","name":"Czech Koruna","symbol":"Kč","flag":"🇨🇿"},{"country":"Denmark","code":"DK","currency":"DKK","name":"Danish Krone","symbol":"kr","flag":"🇩🇰"},{"country":"Djibouti","code":"DJ","currency":"DJF","name":"Djiboutian Franc","symbol":"Fdj","flag":"🇩🇯"},{"country":"Dominica","code":"DM","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇩🇲"},{"country":"Dominican Republic","code":"DO","currency":"DOP","name":"Dominican Peso","symbol":"RD$","flag":"🇩🇴"},{"country":"Ecuador","code":"EC","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇪🇨"},{"country":"Egypt","code":"EG","currency":"EGP","name":"Egyptian Pound","symbol":"E£","flag":"🇪🇬"},{"country":"El Salvador","code":"SV","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇸🇻"},{"country":"Equatorial Guinea","code":"GQ","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇬🇶"},{"country":"Eritrea","code":"ER","currency":"ERN","name":"Eritrean Nakfa","symbol":"Nfk","flag":"🇪🇷"},{"country":"Estonia","code":"EE","currency":"EUR","name":"Euro","symbol":"€","flag":"🇪🇪"},{"country":"Eswatini","code":"SZ","currency":"SZL","name":"Swazi Lilangeni","symbol":"E","flag":"🇸🇿"},{"country":"Ethiopia","code":"ET","currency":"ETB","name":"Ethiopian Birr","symbol":"Br","flag":"🇪🇹"},{"country":"Fiji","code":"FJ","currency":"FJD","name":"Fijian Dollar","symbol":"FJ$","flag":"🇫🇯"},{"country":"Finland","code":"FI","currency":"EUR","name":"Euro","symbol":"€","flag":"🇫🇮"},{"country":"France","code":"FR","currency":"EUR","name":"Euro","symbol":"€","flag":"🇫🇷"},{"country":"Gabon","code":"GA","currency":"XAF","name":"Central African CFA Franc","symbol":"FCFA","flag":"🇬🇦"},{"country":"Gambia","code":"GM","currency":"GMD","name":"Gambian Dalasi","symbol":"D","flag":"🇬🇲"},{"country":"Georgia","code":"GE","currency":"GEL","name":"Georgian Lari","symbol":"₾","flag":"🇬🇪"},{"country":"Germany","code":"DE","currency":"EUR","name":"Euro","symbol":"€","flag":"🇩🇪"},{"country":"Ghana","code":"GH","currency":"GHS","name":"Ghanaian Cedi","symbol":"₵","flag":"🇬🇭"},{"country":"Greece","code":"GR","currency":"EUR","name":"Euro","symbol":"€","flag":"🇬🇷"},{"country":"Grenada","code":"GD","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇬🇩"},{"country":"Guatemala","code":"GT","currency":"GTQ","name":"Guatemalan Quetzal","symbol":"Q","flag":"🇬🇹"},{"country":"Guinea","code":"GN","currency":"GNF","name":"Guinean Franc","symbol":"FG","flag":"🇬🇳"},{"country":"Guinea-Bissau","code":"GW","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇬🇼"},{"country":"Guyana","code":"GY","currency":"GYD","name":"Guyanaese Dollar","symbol":"G$","flag":"🇬🇾"},{"country":"Haiti","code":"HT","currency":"HTG","name":"Haitian Gourde","symbol":"G","flag":"🇭🇹"},{"country":"Honduras","code":"HN","currency":"HNL","name":"Honduran Lempira","symbol":"L","flag":"🇭🇳"},{"country":"Hungary","code":"HU","currency":"HUF","name":"Hungarian Forint","symbol":"Ft","flag":"🇭🇺"},{"country":"Iceland","code":"IS","currency":"ISK","name":"Icelandic Króna","symbol":"kr","flag":"🇮🇸"},{"country":"India","code":"IN","currency":"INR","name":"Indian Rupee","symbol":"₹","flag":"🇮🇳"},{"country":"Indonesia","code":"ID","currency":"IDR","name":"Indonesian Rupiah","symbol":"Rp","flag":"🇮🇩"},{"country":"Iran","code":"IR","currency":"IRR","name":"Iranian Rial","symbol":"﷼","flag":"🇮🇷"},{"country":"Iraq","code":"IQ","currency":"IQD","name":"Iraqi Dinar","symbol":"ع.د","flag":"🇮🇶"},{"country":"Ireland","code":"IE","currency":"EUR","name":"Euro","symbol":"€","flag":"🇮🇪"},{"country":"Israel","code":"IL","currency":"ILS","name":"Israeli New Shekel","symbol":"₪","flag":"🇮🇱"},{"country":"Italy","code":"IT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇮🇹"},{"country":"Jamaica","code":"JM","currency":"JMD","name":"Jamaican Dollar","symbol":"JMD","flag":"🇯🇲"},{"country":"Japan","code":"JP","currency":"JPY","name":"Japanese Yen","symbol":"¥","flag":"🇯🇵"},{"country":"Jordan","code":"JO","currency":"JOD","name":"Jordanian Dinar","symbol":"د.ا","flag":"🇯🇴"},{"country":"Kazakhstan","code":"KZ","currency":"KZT","name":"Kazakhstani Tenge","symbol":"₸","flag":"🇰🇿"},{"country":"Kenya","code":"KE","currency":"KES","name":"Kenyan Shilling","symbol":"KSh","flag":"🇰🇪"},{"country":"Kiribati","code":"KI","currency":"AUD","name":"Australian Dollar","symbol":"A$","flag":"🇰🇮"},{"country":"North Korea","code":"KP","currency":"KPW","name":"North Korean Won","symbol":"₩","flag":"🇰🇵"},{"country":"South Korea","code":"KR","currency":"KRW","name":"South Korean Won","symbol":"₩","flag":"🇰🇷"},{"country":"Kuwait","code":"KW","currency":"KWD","name":"Kuwaiti Dinar","symbol":"د.ك","flag":"🇰🇼"},{"country":"Kyrgyzstan","code":"KG","currency":"KGS","name":"Kyrgystani Som","symbol":"сом","flag":"🇰🇬"},{"country":"Laos","code":"LA","currency":"LAK","name":"Laotian Kip","symbol":"₭","flag":"🇱🇦"},{"country":"Latvia","code":"LV","currency":"EUR","name":"Euro","symbol":"€","flag":"🇱🇻"},{"country":"Lebanon","code":"LB","currency":"LBP","name":"Lebanese Pound","symbol":"ل.ل","flag":"🇱🇧"},{"country":"Lesotho","code":"LS","currency":"LSL","name":"Lesotho Loti","symbol":"L","flag":"🇱🇸"},{"country":"Liberia","code":"LR","currency":"LRD","name":"Liberian Dollar","symbol":"L$","flag":"🇱🇷"},{"country":"Libya","code":"LY","currency":"LYD","name":"Libyan Dinar","symbol":"ل.د","flag":"🇱🇾"},{"country":"Liechtenstein","code":"LI","currency":"CHF","name":"Swiss Franc","symbol":"CHF","flag":"🇱🇮"},{"country":"Lithuania","code":"LT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇱🇹"},{"country":"Luxembourg","code":"LU","currency":"EUR","name":"Euro","symbol":"€","flag":"🇱🇺"},{"country":"Madagascar","code":"MG","currency":"MGA","name":"Malagasy Ariary","symbol":"Ar","flag":"🇲🇬"},{"country":"Malawi","code":"MW","currency":"MWK","name":"Malawian Kwacha","symbol":"MK","flag":"🇲🇼"},{"country":"Malaysia","code":"MY","currency":"MYR","name":"Malaysian Ringgit","symbol":"RM","flag":"🇲🇾"},{"country":"Maldives","code":"MV","currency":"MVR","name":"Maldivian Rufiyaa","symbol":"Rf","flag":"🇲🇻"},{"country":"Mali","code":"ML","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇲🇱"},{"country":"Malta","code":"MT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇲🇹"},{"country":"Marshall Islands","code":"MH","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇲🇭"},{"country":"Mauritania","code":"MR","currency":"MRU","name":"Mauritanian Ouguiya","symbol":"UM","flag":"🇲🇷"},{"country":"Mauritius","code":"MU","currency":"MUR","name":"Mauritian Rupee","symbol":"₨","flag":"🇲🇺"},{"country":"Mexico","code":"MX","currency":"MXN","name":"Mexican Peso","symbol":"MX$","flag":"🇲🇽"},{"country":"Micronesia","code":"FM","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇫🇲"},{"country":"Moldova","code":"MD","currency":"MDL","name":"Moldovan Leu","symbol":"L","flag":"🇲🇩"},{"country":"Monaco","code":"MC","currency":"EUR","name":"Euro","symbol":"€","flag":"🇲🇨"},{"country":"Mongolia","code":"MN","currency":"MNT","name":"Mongolian Tugrik","symbol":"₮","flag":"🇲🇳"},{"country":"Montenegro","code":"ME","currency":"EUR","name":"Euro","symbol":"€","flag":"🇲🇪"},{"country":"Morocco","code":"MA","currency":"MAD","name":"Moroccan Dirham","symbol":"د.م.","flag":"🇲🇦"},{"country":"Mozambique","code":"MZ","currency":"MZN","name":"Mozambican Metical","symbol":"MT","flag":"🇲🇿"},{"country":"Myanmar","code":"MM","currency":"MMK","name":"Myanmar Kyat","symbol":"K","flag":"🇲🇲"},{"country":"Namibia","code":"NA","currency":"NAD","name":"Namibian Dollar","symbol":"N$","flag":"🇳🇦"},{"country":"Nauru","code":"NR","currency":"AUD","name":"Australian Dollar","symbol":"A$","flag":"🇳🇷"},{"country":"Nepal","code":"NP","currency":"NPR","name":"Nepalese Rupee","symbol":"₨","flag":"🇳🇵"},{"country":"Netherlands","code":"NL","currency":"EUR","name":"Euro","symbol":"€","flag":"🇳🇱"},{"country":"New Zealand","code":"NZ","currency":"NZD","name":"New Zealand Dollar","symbol":"NZ$","flag":"🇳🇿"},{"country":"Nicaragua","code":"NI","currency":"NIO","name":"Nicaraguan Córdoba","symbol":"C$","flag":"🇳🇮"},{"country":"Niger","code":"NE","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇳🇪"},{"country":"Nigeria","code":"NG","currency":"NGN","name":"Nigerian Naira","symbol":"₦","flag":"🇳🇬"},{"country":"North Macedonia","code":"MK","currency":"MKD","name":"Macedonian Denar","symbol":"ден","flag":"🇲🇰"},{"country":"Norway","code":"NO","currency":"NOK","name":"Norwegian Krone","symbol":"kr","flag":"🇳🇴"},{"country":"Oman","code":"OM","currency":"OMR","name":"Omani Rial","symbol":"﷼","flag":"🇴🇲"},{"country":"Pakistan","code":"PK","currency":"PKR","name":"Pakistani Rupee","symbol":"₨","flag":"🇵🇰"},{"country":"Palau","code":"PW","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇵🇼"},{"country":"Palestine","code":"PS","currency":"ILS","name":"Israeli New Shekel","symbol":"₪","flag":"🇵🇸"},{"country":"Panama","code":"PA","currency":"PAB","name":"Panamanian Balboa","symbol":"PAB","flag":"🇵🇦"},{"country":"Papua New Guinea","code":"PG","currency":"PGK","name":"Papua New Guinean Kina","symbol":"K","flag":"🇵🇬"},{"country":"Paraguay","code":"PY","currency":"PYG","name":"Paraguayan Guarani","symbol":"₲","flag":"🇵🇾"},{"country":"Peru","code":"PE","currency":"PEN","name":"Peruvian Sol","symbol":"S/","flag":"🇵🇪"},{"country":"Philippines","code":"PH","currency":"PHP","name":"Philippine Peso","symbol":"₱","flag":"🇵🇭"},{"country":"Poland","code":"PL","currency":"PLN","name":"Polish Zloty","symbol":"zł","flag":"🇵🇱"},{"country":"Portugal","code":"PT","currency":"EUR","name":"Euro","symbol":"€","flag":"🇵🇹"},{"country":"Qatar","code":"QA","currency":"QAR","name":"Qatari Riyal","symbol":"﷼","flag":"🇶🇦"},{"country":"Romania","code":"RO","currency":"RON","name":"Romanian Leu","symbol":"lei","flag":"🇷🇴"},{"country":"Russia","code":"RU","currency":"RUB","name":"Russian Ruble","symbol":"₽","flag":"🇷🇺"},{"country":"Rwanda","code":"RW","currency":"RWF","name":"Rwandan Franc","symbol":"FRw","flag":"🇷🇼"},{"country":"Saint Kitts and Nevis","code":"KN","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇰🇳"},{"country":"Saint Lucia","code":"LC","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇱🇨"},{"country":"Saint Vincent and the Grenadines","code":"VC","currency":"XCD","name":"East Caribbean Dollar","symbol":"EC$","flag":"🇻🇨"},{"country":"Samoa","code":"WS","currency":"WST","name":"Samoan Tala","symbol":"WS$","flag":"🇼🇸"},{"country":"San Marino","code":"SM","currency":"EUR","name":"Euro","symbol":"€","flag":"🇸🇲"},{"country":"Sao Tome and Principe","code":"ST","currency":"STN","name":"São Tomé & Príncipe Dobra","symbol":"Db","flag":"🇸🇹"},{"country":"Saudi Arabia","code":"SA","currency":"SAR","name":"Saudi Riyal","symbol":"﷼","flag":"🇸🇦"},{"country":"Senegal","code":"SN","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇸🇳"},{"country":"Serbia","code":"RS","currency":"RSD","name":"Serbian Dinar","symbol":"дин","flag":"🇷🇸"},{"country":"Seychelles","code":"SC","currency":"SCR","name":"Seychellois Rupee","symbol":"₨","flag":"🇸🇨"},{"country":"Sierra Leone","code":"SL","currency":"SLE","name":"Sierra Leonean Leone","symbol":"Le","flag":"🇸🇱"},{"country":"Singapore","code":"SG","currency":"SGD","name":"Singapore Dollar","symbol":"S$","flag":"🇸🇬"},{"country":"Slovakia","code":"SK","currency":"EUR","name":"Euro","symbol":"€","flag":"🇸🇰"},{"country":"Slovenia","code":"SI","currency":"EUR","name":"Euro","symbol":"€","flag":"🇸🇮"},{"country":"Solomon Islands","code":"SB","currency":"SBD","name":"Solomon Islands Dollar","symbol":"SI$","flag":"🇸🇧"},{"country":"Somalia","code":"SO","currency":"SOS","name":"Somali Shilling","symbol":"S","flag":"🇸🇴"},{"country":"South Africa","code":"ZA","currency":"ZAR","name":"South African Rand","symbol":"R","flag":"🇿🇦"},{"country":"South Sudan","code":"SS","currency":"SSP","name":"South Sudanese Pound","symbol":"SSP","flag":"🇸🇸"},{"country":"Spain","code":"ES","currency":"EUR","name":"Euro","symbol":"€","flag":"🇪🇸"},{"country":"Sri Lanka","code":"LK","currency":"LKR","name":"Sri Lankan Rupee","symbol":"Rs","flag":"🇱🇰"},{"country":"Sudan","code":"SD","currency":"SDG","name":"Sudanese Pound","symbol":"ج.س.","flag":"🇸🇩"},{"country":"Suriname","code":"SR","currency":"SRD","name":"Surinamese Dollar","symbol":"$","flag":"🇸🇷"},{"country":"Sweden","code":"SE","currency":"SEK","name":"Swedish Krona","symbol":"kr","flag":"🇸🇪"},{"country":"Switzerland","code":"CH","currency":"CHF","name":"Swiss Franc","symbol":"CHF","flag":"🇱🇮"},{"country":"Syria","code":"SY","currency":"SYP","name":"Syrian Pound","symbol":"£","flag":"🇸🇾"},{"country":"Tajikistan","code":"TJ","currency":"TJS","name":"Tajikistani Somoni","symbol":"ЅМ","flag":"🇹🇯"},{"country":"Tanzania","code":"TZ","currency":"TZS","name":"Tanzanian Shilling","symbol":"TSh","flag":"🇹🇿"},{"country":"Thailand","code":"TH","currency":"THB","name":"Thai Baht","symbol":"฿","flag":"🇹🇭"},{"country":"Timor-Leste","code":"TL","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇹🇱"},{"country":"Togo","code":"TG","currency":"XOF","name":"West African CFA Franc","symbol":"F CFA","flag":"🇹🇬"},{"country":"Tonga","code":"TO","currency":"TOP","name":"Tongan Paʻanga","symbol":"T$","flag":"🇹🇴"},{"country":"Trinidad and Tobago","code":"TT","currency":"TTD","name":"Trinidad & Tobago Dollar","symbol":"TTD","flag":"🇹🇹"},{"country":"Tunisia","code":"TN","currency":"TND","name":"Tunisian Dinar","symbol":"د.ت","flag":"🇹🇳"},{"country":"Türkiye","code":"TR","currency":"TRY","name":"Turkish Lira","symbol":"₺","flag":"🇹🇷"},{"country":"Turkmenistan","code":"TM","currency":"TMT","name":"Turkmenistani Manat","symbol":"m","flag":"🇹🇲"},{"country":"Tuvalu","code":"TV","currency":"AUD","name":"Australian Dollar","symbol":"A$","flag":"🇹🇻"},{"country":"Uganda","code":"UG","currency":"UGX","name":"Ugandan Shilling","symbol":"USh","flag":"🇺🇬"},{"country":"Ukraine","code":"UA","currency":"UAH","name":"Ukrainian Hryvnia","symbol":"₴","flag":"🇺🇦"},{"country":"United Arab Emirates","code":"AE","currency":"AED","name":"United Arab Emirates Dirham","symbol":"د.إ","flag":"🇦🇪"},{"country":"United Kingdom","code":"GB","currency":"GBP","name":"British Pound","symbol":"£","flag":"🇬🇧"},{"country":"United States","code":"US","currency":"USD","name":"US Dollar","symbol":"$","flag":"🇺🇸"},{"country":"Uruguay","code":"UY","currency":"UYU","name":"Uruguayan Peso","symbol":"$U","flag":"🇺🇾"},{"country":"Uzbekistan","code":"UZ","currency":"UZS","name":"Uzbekistani Som","symbol":"so'm","flag":"🇺🇿"},{"country":"Vanuatu","code":"VU","currency":"VUV","name":"Vanuatu Vatu","symbol":"VT","flag":"🇻🇺"},{"country":"Vatican City","code":"VA","currency":"EUR","name":"Euro","symbol":"€","flag":"🇻🇦"},{"country":"Venezuela","code":"VE","currency":"VES","name":"Venezuelan Bolívar","symbol":"Bs.","flag":"🇻🇪"},{"country":"Vietnam","code":"VN","currency":"VND","name":"Vietnamese Dong","symbol":"₫","flag":"🇻🇳"},{"country":"Yemen","code":"YE","currency":"YER","name":"Yemeni Rial","symbol":"﷼","flag":"🇾🇪"},{"country":"Zambia","code":"ZM","currency":"ZMW","name":"Zambian Kwacha","symbol":"ZK","flag":"🇿🇲"},{"country":"Zimbabwe","code":"ZW","currency":"ZWG","name":"Zimbabwean Gold","symbol":"ZiG","flag":"🇿🇼"}];
 
 const ZERO_DECIMAL_CURRENCIES = new Set([
     "BIF", "CLP", "DJF", "GNF", "JPY", "KMF", "KRW",
     "MGA", "PYG", "RWF", "UGX", "VND", "VUV", "XAF", "XOF", "XPF"
 ]);
 
+// Comprehensive world fallback exchange rates against 1 USD
 const FALLBACK_RATES = {
-    USD: 1,
-    INR: 86.50,
-    GBP: 0.79,
-    EUR: 0.92,
-    CAD: 1.38,
-    AUD: 1.55,
-    JPY: 153.0,
-    AED: 3.67,
-    SAR: 3.75,
-    SGD: 1.34,
-    CNY: 7.24,
-    NZD: 1.68,
-    CHF: 0.88,
-    BRL: 5.75,
-    MXN: 20.35,
-    ZAR: 18.20
+    USD: 1, INR: 86.50, EUR: 0.92, GBP: 0.79, CAD: 1.38, AUD: 1.55,
+    JPY: 153.0, AED: 3.67, SAR: 3.75, SGD: 1.34, CNY: 7.24, NZD: 1.68,
+    CHF: 0.88, BRL: 5.75, MXN: 20.35, ZAR: 18.20, NGN: 1540.0, PKR: 278.0,
+    BDT: 120.0, PHP: 58.50, IDR: 15800.0, MYR: 4.45, THB: 34.50, VND: 25400.0,
+    EGP: 49.50, KES: 129.50, GHS: 15.50, COP: 4350.0, CLP: 970.0, TRY: 34.80,
+    ARS: 1020.0, ILS: 3.70, PLN: 4.05, SEK: 10.75, NOK: 11.00, DKK: 6.90,
+    HUF: 375.0, CZK: 23.50, RON: 4.60, BGN: 1.80, BAM: 1.80, KZT: 495.0,
+    QAR: 3.64, KWD: 0.31, OMR: 0.38, BHD: 0.38, JOD: 0.71, MAD: 9.90,
+    DZD: 134.0, TND: 3.10, IQD: 1310.0, LBP: 89500.0, LKR: 290.0, NPR: 138.0,
+    UAH: 41.50, UZS: 12850.0, GEL: 2.75, AZN: 1.70, AMD: 388.0, ISK: 138.0,
+    ALL: 91.0, RSD: 108.0, MKD: 56.50, MDL: 18.0, CRC: 510.0, DOP: 60.0,
+    GTQ: 7.75, HNL: 25.0, NIO: 36.80, PAB: 1.00, PYG: 7800.0, PEN: 3.78,
+    UYU: 42.50, BOB: 6.90, GYD: 209.0, SRD: 35.0, TTD: 6.80, JMD: 158.0,
+    BSD: 1.00, BBD: 2.00, BZD: 2.00, XCD: 2.70, HTG: 131.0, AOA: 915.0,
+    BWP: 13.60, BIF: 2950.0, CVE: 102.0, KMF: 455.0, CDF: 2850.0, DJF: 178.0,
+    ERN: 15.0, ETB: 122.0, SZL: 18.20, GMD: 71.0, GNF: 8650.0, LSL: 18.20,
+    LRD: 198.0, LYD: 4.85, MGA: 4650.0, MWK: 1740.0, MVR: 15.40, MRU: 39.80,
+    MUR: 46.50, MZN: 63.90, NAD: 18.20, RWF: 1370.0, STN: 22.70, SCR: 14.50,
+    SLE: 22.80, SOS: 571.0, SSP: 130.0, SDG: 601.0, TZS: 2600.0, UGX: 3680.0,
+    ZMW: 27.50, ZWG: 26.50, AFN: 68.0, BYN: 3.28, BND: 1.34, KHR: 4050.0,
+    FJD: 2.26, KGS: 86.50, LAK: 21900.0, MNT: 3420.0, MMK: 2100.0, PGK: 3.95,
+    WST: 2.75, SBD: 8.45, TJS: 10.70, TOP: 2.38, TMT: 3.50, VUV: 120.0,
+    XAF: 605.0, XOF: 605.0, XPF: 110.0, VES: 45.0, YER: 250.0, CUP: 24.0,
+    IRR: 42000.0, KPW: 900.0, SYP: 13000.0
 };
 
 let currentCountry = countries.find(c => c.code === "IN") || countries[0];
@@ -988,7 +1067,7 @@ function selectCountry(item) {
 }
 
 function getRate(currency) {
-    return currency === 'USD' ? 1 : (exchangeRates[currency] || FALLBACK_RATES[currency] || null);
+    return currency === 'USD' ? 1 : (exchangeRates[currency] || FALLBACK_RATES[currency] || 1);
 }
 
 function formatMoney(amount, currency) {
@@ -1014,11 +1093,36 @@ function updateBuyState(ok) {
     btn.disabled = !($('termsCheck')?.checked && ok);
 }
 
+function updatePaymentMethodsUI(country) {
+    const title = $('paymentMethodsTitle');
+    const list = $('paymentMethodsList');
+    if (!title || !list) return;
+
+    if (country.code === 'IN' || country.currency === 'INR') {
+        title.textContent = 'Payment Methods (India)';
+        list.innerHTML = `
+            <span class="method-tag"><i class="fa-solid fa-qrcode"></i> UPI (GPay, PhonePe, Paytm, QR)</span>
+            <span class="method-tag"><i class="fa-solid fa-credit-card"></i> Credit / Debit Card</span>
+            <span class="method-tag"><i class="fa-solid fa-building-columns"></i> NetBanking</span>
+            <span class="method-tag"><i class="fa-solid fa-wallet"></i> Wallets</span>
+        `;
+    } else {
+        title.textContent = `Payment Methods (${country.country})`;
+        list.innerHTML = `
+            <span class="method-tag"><i class="fa-solid fa-credit-card"></i> International Credit &amp; Debit Card</span>
+            <span class="method-tag"><i class="fa-brands fa-cc-visa"></i> Visa</span>
+            <span class="method-tag"><i class="fa-brands fa-cc-mastercard"></i> MasterCard</span>
+            <span class="method-tag"><i class="fa-brands fa-cc-amex"></i> Amex</span>
+            <span class="method-tag"><i class="fa-solid fa-globe"></i> Global Checkout</span>
+        `;
+    }
+}
+
 function updateCheckout() {
     const rate = getRate(currentCountry.currency);
     $('currencyHeader').textContent = `${currentCountry.currency} (${currentCountry.symbol})`;
 
-    if (!ratesLoaded || !Number.isFinite(rate) || rate <= 0) {
+    if (!Number.isFinite(rate) || rate <= 0) {
         $('productLocal').textContent = '—';
         $('subtotalLocal').textContent = '—';
         $('discountLocal').textContent = '—';
@@ -1040,58 +1144,69 @@ function updateCheckout() {
     $('discountLocal').textContent = '- ' + formatMoney(discount, currentCountry.currency);
     $('taxLocal').textContent = formatMoney(tax, currentCountry.currency);
     $('totalLocal').textContent = formatMoney(total, currentCountry.currency);
+
+    // Update payment methods display
+    updatePaymentMethodsUI(currentCountry);
+
     updateBuyState(true);
 }
 
 function checkTerms() {
     const rate = getRate(currentCountry.currency);
-    updateBuyState(ratesLoaded && Number.isFinite(rate) && rate > 0);
-}
-
-function getPaymentInstruments(country) {
-    if (country.currency === 'INR' || country.code === 'IN') {
-        return [
-            { method: 'upi' },
-            { method: 'card' },
-            { method: 'netbanking' },
-            { method: 'wallet' }
-        ];
-    }
-
-    return [
-        { method: 'card' },
-        { method: 'wallet' }
-    ];
+    updateBuyState(Number.isFinite(rate) && rate > 0);
 }
 
 async function loadExchangeRates() {
+    // Try primary free live rate endpoint
     try {
         const response = await fetch('https://open.er-api.com/v6/latest/USD', {
             cache: 'no-store',
             headers: { Accept: 'application/json' }
         });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-
-        const data = await response.json();
-        if (data.result !== 'success' || !data.rates || typeof data.rates.USD !== 'number') {
-            throw new Error('Invalid exchange-rate response');
+        if (response.ok) {
+            const data = await response.json();
+            if (data.result === 'success' && data.rates && typeof data.rates.USD === 'number') {
+                exchangeRates = Object.assign({}, FALLBACK_RATES, data.rates);
+                exchangeRates.USD = 1;
+                ratesLoaded = true;
+                updateCheckout();
+                return;
+            }
         }
-
-        exchangeRates = Object.assign({}, FALLBACK_RATES, data.rates);
-        exchangeRates.USD = 1;
-        ratesLoaded = true;
-        updateCheckout();
-    } catch (error) {
-        console.warn('Live exchange rate fetch failed, using cached fallback rates:', error);
-        ratesLoaded = true;
-        updateCheckout();
+    } catch (e) {
+        console.warn('Primary exchange rate endpoint unavailable, trying backup...');
     }
+
+    // Try secondary backup live rate endpoint
+    try {
+        const response2 = await fetch('https://api.exchangerate-api.com/v4/latest/USD', {
+            cache: 'no-store',
+            headers: { Accept: 'application/json' }
+        });
+        if (response2.ok) {
+            const data2 = await response2.json();
+            if (data2 && data2.rates && typeof data2.rates.USD === 'number') {
+                exchangeRates = Object.assign({}, FALLBACK_RATES, data2.rates);
+                exchangeRates.USD = 1;
+                ratesLoaded = true;
+                updateCheckout();
+                return;
+            }
+        }
+    } catch (e) {
+        console.warn('Secondary exchange rate endpoint unavailable, using comprehensive local fallbacks.');
+    }
+
+    // Fallback rates are always loaded and complete
+    exchangeRates = Object.assign({}, FALLBACK_RATES);
+    ratesLoaded = true;
+    updateCheckout();
 }
 
 function startPayment() {
-    const rate = getRate(currentCountry.currency);
+    const rate = getRate(currentCountry.currency) || 1;
     const inrRate = getRate('INR') || 86.50;
-    if (!$('termsCheck')?.checked || !ratesLoaded || !Number.isFinite(rate) || rate <= 0) return;
+    if (!$('termsCheck')?.checked || !Number.isFinite(rate) || rate <= 0) return;
 
     const isZeroDecimal = ZERO_DECIMAL_CURRENCIES.has(currentCountry.currency);
     const total = BASE_TOTAL_USD * rate;
@@ -1136,11 +1251,14 @@ function startPayment() {
                 notes: {
                     product: 'The AI Income Playbook',
                     platform: 'Clout',
-                    access: 'Lifetime Access & Resources'
+                    access: 'Lifetime Access & Resources',
+                    customer_country: currentCountry.country,
+                    customer_country_code: currentCountry.code,
+                    selected_currency: currentCountry.currency
                 },
                 theme: {
                     color: '#E04F00',
-                    backdrop_color: 'rgba(2, 2, 2, 0.88)',
+                    backdrop_color: 'rgba(2, 2, 2, 0.55)',
                     hide_topbar: false
                 },
                 modal: {
@@ -1153,17 +1271,21 @@ function startPayment() {
             };
 
             // Set display_currency so Razorpay Price Summary displays in the selected country's currency
-            if (currentCountry.currency) {
+            if (data.display_currency && data.display_amount) {
+                razorpayOptions.display_currency = data.display_currency;
+                razorpayOptions.display_amount = data.display_amount;
+            } else if (currentCountry.currency) {
                 razorpayOptions.display_currency = currentCountry.currency;
                 razorpayOptions.display_amount = isZeroDecimal ? Math.round(total).toString() : total.toFixed(2);
             }
 
-            if (currentCountry.currency === 'INR' || currentCountry.code === 'IN') {
+            // Country-tailored payment method configuration
+            if (currentCountry.code === 'IN' || currentCountry.currency === 'INR') {
                 razorpayOptions.config = {
                     display: {
                         blocks: {
                             preferred: {
-                                name: 'Recommended Payments',
+                                name: 'Recommended Payments (India)',
                                 instruments: [
                                     { method: 'upi' },
                                     { method: 'card' }
@@ -1173,11 +1295,38 @@ function startPayment() {
                                 name: 'More Payment Options',
                                 instruments: [
                                     { method: 'netbanking' },
-                                    { method: 'wallet' }
+                                    { method: 'wallet' },
+                                    { method: 'card' }
                                 ]
                             }
                         },
                         sequence: ['block.preferred', 'block.other'],
+                        preferences: {
+                            show_default_blocks: true
+                        }
+                    }
+                };
+            } else {
+                razorpayOptions.config = {
+                    display: {
+                        blocks: {
+                            cards: {
+                                name: 'Pay with Card (Credit / Debit)',
+                                instruments: [
+                                    { method: 'card' }
+                                ]
+                            },
+                            other: {
+                                name: 'Other Payment Methods',
+                                instruments: [
+                                    { method: 'card' },
+                                    { method: 'wallet' },
+                                    { method: 'netbanking' },
+                                    { method: 'upi' }
+                                ]
+                            }
+                        },
+                        sequence: ['block.cards', 'block.other'],
                         preferences: {
                             show_default_blocks: true
                         }
@@ -1238,6 +1387,54 @@ function verifyPayment(payment) {
         headers: {
             'X-CSRFToken': getCookie('csrftoken') || '{{ csrf_token }}',
             'X-Requested-With': 'XMLHttpRequest',
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body
+    })
+        .then(response => response.json().then(data => ({ ok: response.ok, data })))
+        .then(({ ok, data }) => {
+            if (!ok || !data.success) throw new Error(data.message || 'Payment verification failed.');
+            window.top.location.href = data.redirect_url;
+        })
+        .catch(error => {
+            alert(error.message || 'Payment verification failed.');
+            resetPaymentButton();
+        });
+}
+
+function closeOrder() {
+    if (window.parent !== window) {
+        window.parent.postMessage({ type: 'closeCheckout' }, window.location.origin);
+    }
+}
+
+document.addEventListener('click', event => {
+    const box = $('currencySelect');
+    if (box && !box.contains(event.target)) closeCurrency();
+});
+
+document.addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeCurrency();
+});
+
+if (window.parent === window) {
+    document.body.classList.add('standalone');
+}
+
+window.addEventListener('message', function (event) {
+    if (event.origin === window.location.origin && event.data?.type === 'resetPaymentButton') {
+        resetPaymentButton();
+    }
+});
+
+// India / INR is selected by default.
+renderCountries();
+selectCountry(currentCountry);
+loadExchangeRates();
+</script>
+
+</body>
+</html>equested-With': 'XMLHttpRequest',
             'Content-Type': 'application/x-www-form-urlencoded'
         },
         body
