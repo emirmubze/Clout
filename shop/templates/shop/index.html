@@ -232,9 +232,9 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      min-width: 120px;
+      min-width: 105px;
       height: 36px;
-      padding: 0 20px;
+      padding: 0 18px;
       border-radius: 999px;
       text-decoration: none;
       font-size: 13px;
@@ -242,7 +242,7 @@
       letter-spacing: 0.5px;
       transition: all 0.2s ease;
       border: none;
-      background: var(--orange);
+      background: linear-gradient(135deg, #FF6611 0%, #E04F00 100%);
       color: white;
       box-shadow: 0 4px 14px rgba(224, 79, 0, 0.25);
       margin-left: 14px;
@@ -349,16 +349,10 @@
 
     .nav-login-btn:hover,
     .nav-logout-btn:hover {
-      background: #FFDECC;
-      transform: none;
-      box-shadow: 0 4px 14px rgba(255, 153, 68, 0.30);
+      background: linear-gradient(135deg, #ff7a2e 0%, #eb5505 100%);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 18px rgba(224, 79, 0, 0.35);
       color: white;
-    }
-
-    .nav-login-btn svg,
-    .nav-logout-btn svg {
-      fill: currentColor;
-      stroke: none;
     }
 
     .nav-login-btn:active,
@@ -2055,10 +2049,8 @@
 
                 <li>
                     <a href="{% url 'logout' %}" class="nav-logout-btn">
-                        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                            <path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/>
-                        </svg>
-                        LOGOUT
+                        <i class="fa-solid fa-arrow-right-from-bracket" style="font-size:12px"></i>
+                        <span>LOGOUT</span>
                     </a>
                 </li>
 
@@ -2066,11 +2058,8 @@
 
 <li>
     <a href="{% url 'login' %}" class="nav-login-btn">
-        <!-- Login Icon SVG (Arrow pointing right) -->
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M11 7L9.6 8.4l2.6 2.6H2v2h10.2l-2.6 2.6L11 17l5-5zM20 5h-8v2h8v10h-8v2h8c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2z"/>
-        </svg>
-        LOGIN
+        <i class="fa-solid fa-arrow-right-to-bracket" style="font-size:12px"></i>
+        <span>LOGIN</span>
     </a>
 </li>
 
