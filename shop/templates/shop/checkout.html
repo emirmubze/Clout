@@ -453,61 +453,6 @@ body.standalone {
 }
 
 /* =====================================================
-   PAYMENT METHODS BOX
-===================================================== */
-.payment-methods-box {
-    margin: 0 24px 12px;
-    padding: 10px 14px;
-    background: var(--off-white);
-    border: 1px solid var(--border-subtle);
-    border-radius: var(--radius-md);
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    transition: all 0.2s ease;
-}
-
-.payment-methods-header {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.6px;
-    color: var(--dark-gray);
-}
-
-.payment-methods-header i {
-    color: var(--orange);
-    font-size: 12px;
-}
-
-.payment-methods-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-}
-
-.method-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    padding: 4px 8px;
-    background: var(--white);
-    border: 1px solid var(--border-subtle);
-    border-radius: 6px;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--black);
-}
-
-.method-tag i {
-    color: var(--orange);
-    font-size: 11px;
-}
-
-/* =====================================================
    SUMMARY
 ===================================================== */
 .summary-container {
@@ -859,21 +804,6 @@ body.standalone {
         </div>
 
         <!-- =====================================================
-             PAYMENT METHODS INFO
-        ===================================================== -->
-        <div class="payment-methods-box" id="paymentMethodsBox">
-            <div class="payment-methods-header">
-                <i class="fa-solid fa-credit-card" id="paymentMethodsIcon"></i>
-                <span id="paymentMethodsTitle">Payment Methods</span>
-            </div>
-            <div class="payment-methods-list" id="paymentMethodsList">
-                <span class="method-tag"><i class="fa-solid fa-qrcode"></i> UPI (GPay, PhonePe, Paytm, QR)</span>
-                <span class="method-tag"><i class="fa-solid fa-credit-card"></i> Debit / Credit Card</span>
-                <span class="method-tag"><i class="fa-solid fa-building-columns"></i> NetBanking</span>
-            </div>
-        </div>
-
-        <!-- =====================================================
              SUMMARY
         ===================================================== -->
         <div class="summary-container">
@@ -1093,31 +1023,6 @@ function updateBuyState(ok) {
     btn.disabled = !($('termsCheck')?.checked && ok);
 }
 
-function updatePaymentMethodsUI(country) {
-    const title = $('paymentMethodsTitle');
-    const list = $('paymentMethodsList');
-    if (!title || !list) return;
-
-    if (country.code === 'IN' || country.currency === 'INR') {
-        title.textContent = 'Payment Methods (India)';
-        list.innerHTML = `
-            <span class="method-tag"><i class="fa-solid fa-qrcode"></i> UPI (GPay, PhonePe, Paytm, QR)</span>
-            <span class="method-tag"><i class="fa-solid fa-credit-card"></i> Credit / Debit Card</span>
-            <span class="method-tag"><i class="fa-solid fa-building-columns"></i> NetBanking</span>
-            <span class="method-tag"><i class="fa-solid fa-wallet"></i> Wallets</span>
-        `;
-    } else {
-        title.textContent = `Payment Methods (${country.country})`;
-        list.innerHTML = `
-            <span class="method-tag"><i class="fa-solid fa-credit-card"></i> International Credit &amp; Debit Card</span>
-            <span class="method-tag"><i class="fa-brands fa-cc-visa"></i> Visa</span>
-            <span class="method-tag"><i class="fa-brands fa-cc-mastercard"></i> MasterCard</span>
-            <span class="method-tag"><i class="fa-brands fa-cc-amex"></i> Amex</span>
-            <span class="method-tag"><i class="fa-solid fa-globe"></i> Global Checkout</span>
-        `;
-    }
-}
-
 function updateCheckout() {
     const rate = getRate(currentCountry.currency);
     $('currencyHeader').textContent = `${currentCountry.currency} (${currentCountry.symbol})`;
@@ -1144,9 +1049,6 @@ function updateCheckout() {
     $('discountLocal').textContent = '- ' + formatMoney(discount, currentCountry.currency);
     $('taxLocal').textContent = formatMoney(tax, currentCountry.currency);
     $('totalLocal').textContent = formatMoney(total, currentCountry.currency);
-
-    // Update payment methods display
-    updatePaymentMethodsUI(currentCountry);
 
     updateBuyState(true);
 }
