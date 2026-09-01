@@ -661,12 +661,15 @@ body {
 
 .checkout-popup {
     position: relative;
-    width: min(740px, calc(100vw - 32px));
-    height: min(840px, calc(100vh - 24px));
+    width: min(520px, calc(100vw - 24px));
+    height: min(780px, calc(100vh - 20px));
     background: transparent;
-    border-radius: var(--radius-xl);
+    border-radius: 22px;
     overflow: hidden;
     animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .checkout-popup iframe {
