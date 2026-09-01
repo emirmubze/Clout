@@ -1,422 +1,309 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>CLOUT – Reset Link Sent</title>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Acme&family=DM+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
-
-    <style>
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --orange: #E04F00;
-            --success: #E04F00;
-            --black: #020202;
-            --white: #FFFFFF;
-            --off-white: #FBF8F4;
-
-            --heading: "Acme", sans-serif;
-            --body: "DM Sans", sans-serif;
-        }
-
-        body {
-            min-height: 100vh;
-
-            background: var(--off-white);
-
-            font-family: var(--body);
-
-            color: var(--black);
-
-            display: flex;
-
-            flex-direction: column;
-        }
-
-
-        .navbar {
-            height: 62px;
-
-            background: var(--black);
-
-            border-top: 1px solid var(--orange);
-
-            border-bottom: 1px solid rgba(255,255,255,.08);
-
-            display: flex;
-
-            align-items: center;
-        }
-
-        .nav-container {
-            width: min(1380px, calc(100% - 50px));
-
-            margin: auto;
-        }
-
-        .logo {
-            color: var(--orange);
-
-            font-family: var(--heading);
-
-            font-size: 15px;
-
-            font-weight: bold;
-
-            letter-spacing: 1.5px;
-
-            text-decoration: none;
-        }
-
-
-        .main {
-            flex: 1;
-
-            display: flex;
-
-            justify-content: center;
-
-            align-items: center;
-
-            padding: 40px 20px;
-
-            background: white;
-        }
-
-
-        .card {
-            width: 100%;
-
-            max-width: 520px;
-
-            padding: 36px;
-
-            background: white;
-
-            border: 1px solid #e1e1e1;
-
-            border-radius: 10px;
-
-            text-align: center;
-        }
-
-
-        .success-illustration {
-            display: flex;
-            justify-content: center;
-            margin: 0 auto 18px;
-        }
-
-        .success-illustration svg {
-            width: 170px;
-            height: 130px;
-        }
-
-
-        .title {
-            font-size: 28px;
-
-            margin-bottom: 12px;
-
-            font-family: var(--heading);
-        }
-
-
-        .description {
-            color: #536071;
-
-            font-size: 14px;
-
-            line-height: 1.6;
-
-            margin-bottom: 25px;
-        }
-
-
-        .email-box {
-            background: #f7f7f7;
-
-            border: 1px solid #e5e5e5;
-
-            border-radius: 6px;
-
-            padding: 12px;
-
-            font-size: 14px;
-
-            margin-bottom: 22px;
-
-            word-break: break-word;
-        }
-
-
-        .button {
-            display: block;
-
-            width: 100%;
-
-            height: 48px;
-
-            background: var(--success);
-
-            font-family: var(--body);
-
-            color: white;
-
-            border: none;
-            
-
-            border-radius: 8px;
-
-            text-decoration: none;
-
-            font-size: 16px;
-
-            font-weight: 600;
-
-            line-height: 48px;
-        }
-
-
-        .button:hover {
-            background: #C2410C;
-        }
-
-        .button-icon {
-            width: 18px;
-            height: 18px;
-            margin-right: 8px;
-            vertical-align: -4px;
-            fill: currentColor;
-        }
-
-
-        .resend {
-            margin-top: 18px;
-
-            font-size: 13px;
-
-            color: #536071;
-        }
-
-        .resend-box {
-            display: flex;
-            align-items: flex-start;
-            gap: 10px;
-            margin: 22px 0;
-            padding: 16px;
-            border-radius: 10px;
-            background: #FFF7F2;
-            color: #536071;
-            font-size: 14px;
-            line-height: 1.5;
-            text-align: left;
-        }
-
-        .resend-box svg {
-            flex: 0 0 22px;
-            width: 22px;
-            height: 22px;
-            margin-top: 1px;
-        }
-
-        .back-link {
-            display: block;
-            margin-top: 20px;
-            color: #536071;
-            font-size: 16px;
-            text-decoration: none;
-        }
-
-        .back-link:hover {
-            color: var(--success);
-        }
-
-
-        .link {
-            color: var(--orange);
-
-            text-decoration: none;
-
-            font-weight: 500;
-        }
-
-
-        .footer {
-            height: 80px;
-
-            background: var(--off-white);
-
-            border-top: 1px solid #e3e3e3;
-        }
-
-
-        .footer-container {
-            width: min(950px, calc(100% - 48px));
-
-            margin: auto;
-        }
-
-
-        .copyright {
-            padding-top: 30px;
-
-            font-size: 18px;
-        }
-
-
-        @media (max-width: 500px) {
-
-            body {
-                min-height: 100svh;
-                overflow-x: hidden;
-            }
-
-            .main {
-                width: 100%;
-            }
-
-            .footer {
-                height: auto;
-                min-height: 64px;
-                padding: 14px 18px max(14px, env(safe-area-inset-bottom));
-                display: flex;
-                align-items: center;
-            }
-
-            .footer-container {
-                width: 100%;
-                min-height: 34px;
-            }
-
-            .copyright {
-                padding-top: 0;
-            }
-
-            .nav-container {
-                width: calc(100% - 36px);
-            }
-
-            .card {
-                padding: 28px 20px;
-            }
-
-            .title {
-                font-size: 24px;
-            }
-
-            .copyright {
-                font-size: 13px;
-            }
-
-        }
-
-    </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reset Link Sent — CLOUT</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+:root {
+    --brand: #E04F00;
+    --brand-hover: #c84300;
+    --brand-light: #fff4ed;
+    --brand-glow: rgba(224, 79, 0, 0.2);
+    --dark: #090d16;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --card-bg: #ffffff;
+    --border: #e2e8f0;
+    --radius-xl: 20px;
+    --radius-md: 10px;
+    --radius-sm: 8px;
+    --shadow-card: 0 16px 40px -10px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.04);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Plus Jakarta Sans", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f8fafc;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+.navbar {
+    height: 64px;
+    background: var(--dark);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
+    width: min(1240px, calc(100% - 48px));
+    height: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+}
+
+.logo span {
+    color: var(--brand);
+}
+
+.back-home {
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-sm);
+    padding: 7px 15px;
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s ease;
+}
+
+.back-home:hover {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+.main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.card {
+    width: 100%;
+    max-width: 460px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 38px 34px 34px;
+    box-shadow: var(--shadow-card);
+    text-align: center;
+    animation: cardIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card-icon {
+    width: 64px;
+    height: 64px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    background: #ecfdf5;
+    border: 2px solid #a7f3d0;
+    color: #059669;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+.title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--dark);
+    letter-spacing: -0.4px;
+    margin-bottom: 8px;
+}
+
+.description {
+    font-size: 14.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 22px;
+}
+
+.info-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    background: var(--brand-light);
+    border: 1px solid rgba(224, 79, 0, 0.2);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+    text-align: left;
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 24px;
+}
+
+.info-banner i {
+    color: var(--brand);
+    font-size: 16px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.info-banner a {
+    color: var(--brand);
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.button-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.button {
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #FF6611 0%, #E04F00 100%);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px var(--brand-glow);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(224, 79, 0, 0.35);
+}
+
+.back-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 46px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: #ffffff;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.back-link:hover {
+    background: #f8fafc;
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+.footer {
+    height: 60px;
+    background: #ffffff;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+</style>
 <link rel="stylesheet" href="/static/responsive.css">
 </head>
 
-
 <body>
 
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{% url 'index' %}" class="logo">CLOUT<span>.</span></a>
+        <a href="{% url 'index' %}" class="back-home">
+            <i class="fa-solid fa-arrow-left" style="font-size:11px"></i>
+            <span>Home</span>
+        </a>
+    </div>
+</nav>
 
-    <nav class="navbar">
+<main class="main">
+    <div class="card">
+        <div class="card-icon">
+            <i class="fa-solid fa-envelope-circle-check"></i>
+        </div>
 
-        <div class="nav-container">
+        <h1 class="title">Reset Link Sent!</h1>
+        <p class="description">
+            We've sent a password reset link to the email address you provided. Please check your inbox and follow the instructions.
+        </p>
 
-            <a href="{% url 'index' %}" class="logo">
-                CLOUT
+        <div class="info-banner">
+            <i class="fa-solid fa-circle-info"></i>
+            <div>
+                Didn't receive the email? Check your spam/junk folder or <a href="{% url 'forgot_password' %}">try resending the link</a>.
+            </div>
+        </div>
+
+        <div class="button-group">
+            <a href="{% url 'forgot_password' %}" class="button">
+                <i class="fa-solid fa-rotate-right" style="font-size:13px"></i>
+                <span>Resend Reset Link</span>
             </a>
-
-        </div>
-
-    </nav>
-
-
-    <main class="main">
-
-        <div class="card">
-
-            <div class="success-illustration" aria-hidden="true">
-                <svg viewBox="0 0 170 130">
-                    <circle cx="85" cy="56" r="42" fill="#FFF0E8" />
-                    <path d="M42 42h86v61H42z" fill="#FFF" stroke="#F5B9A0" stroke-width="2" />
-                    <path d="m43 43 42 34 42-34" fill="#FFF8F4" stroke="#F5B9A0" stroke-width="2" />
-                    <path d="M53 57h29M53 68h41M53 79h34" stroke="#A7ADB5" stroke-width="2" />
-                    <path d="m48 99 37-30 37 30" fill="#E04F00" opacity=".9" />
-                    <circle cx="121" cy="42" r="20" fill="#E04F00" />
-                    <path d="m111 42 7 7 13-14" fill="none" stroke="#FFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
-                </svg>
-            </div>
-
-
-            <h1 class="title">
-                Reset Link Sent!
-            </h1>
-
-
-            <p class="description">
-                We've sent a password reset link to
-                the email address you provided.
-            </p>
-
-
-            <div class="resend-box">
-                <svg viewBox="0 0 24 24" fill="none" stroke="var(--success)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M12 3 21 6v5c0 5.2-3.7 8.8-9 10-5.3-1.2-9-4.8-9-10V6l9-3Z" />
-                    <path d="m8 12 2.5 2.5L16 9" />
-                </svg>
-                <span>
-                    Didn't receive the email? Check your spam folder
-                    or <a href="{% url 'forgot_password' %}" class="link">try resending the link.</a>
-                </span>
-            </div>
-
-
-            <a
-                href="{% url 'forgot_password' %}"
-                class="button"
-            >
-                <svg class="button-icon" viewBox="0 0 24 24" aria-hidden="true">
-                    <path d="m3 11 18-8-5 18-5-7-8-3Z" />
-                    <path d="m11 14 4-5" fill="none" stroke="#FFF" stroke-width="1.5" />
-                </svg>
-                Send Resent Link
+            <a href="{% url 'login' %}" class="back-link">
+                <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+                <span>Back to Login</span>
             </a>
-
-            <a href="{% url 'login' %}" class="back-link">Back to Login</a>
-
         </div>
+    </div>
+</main>
 
-    </main>
-
-
-    <footer class="footer">
-
-        <div class="footer-container">
-
-            <div class="copyright">
-                © 2026 Clout
-            </div>
-
-        </div>
-
-    </footer>
-
+<footer class="footer">
+    <div>&copy; 2026 Clout. All rights reserved.</div>
+</footer>
 
 </body>
-
 </html>

@@ -1,631 +1,373 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Acme&family=DM+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
-
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>CLOUT – Sign Up</title>
-
-    <style>
-
-        /* =========================
-           RESET
-        ========================= */
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-
-        :root {
-            --orange: #E04F00;
-            --black: #020202;
-            --dark: #0E0E0E;
-            --dark-gray: #383838;
-            --white: #FFFFFF;
-            --off-white: #FFF7ED;
-
-            --heading: "Acme", sans-serif;
-            --body: "DM Sans", sans-serif;
-        }
-
-
-        /* =========================
-           BODY
-        ========================= */
-
-        body {
-            min-height: 100svh;
-            overflow-x: hidden;
-            background: var(--white);
-            font-family: var(--body);
-            color: var(--black);
-
-            min-height: 100vh;
-
-            display: flex;
-            flex-direction: column;
-        }
-
-
-        /* =========================
-           NAVBAR
-        ========================= */
-
-        .navbar {
-            height: 62px;
-
-            background: var(--black);
-
-            border-top: 1px solid var(--orange);
-            border-bottom: 1px solid rgba(255,255,255,.08);
-
-            display: flex;
-            align-items: center;
-
-            z-index: 1000;
-        }
-
-
-        .nav-container {
-            width: min(1380px, calc(100% - 50px));
-
-            margin: auto;
-
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-
-        .logo {
-            color: var(--orange);
-
-            font-size: 15px;
-            font-weight: bold;
-
-            text-decoration: none;
-
-            font-family: var(--heading);
-
-            letter-spacing: 1.5px;
-        }
-
-
-        /* =========================
-           MAIN
-        ========================= */
-
-        .main {
-            flex: 1;
-            width: 100%;
-
-            display: flex;
-
-            justify-content: center;
-            align-items: center;
-
-            padding: 40px 20px;
-
-            background: var(--white);
-        }
-
-
-        /* =========================
-           CARD
-        ========================= */
-
-        .card {
-            background: #ffffff;
-
-            border: 1px solid #e1e1e1;
-
-            border-radius: 10px;
-
-            padding: 30px 36px 36px;
-
-            width: 100%;
-
-            max-width: 430px;
-
-            box-shadow:
-                0 2px 12px rgba(0,0,0,0.02);
-        }
-
-
-        .card-title {
-            font-size: 28px;
-
-            font-weight: 600;
-
-            text-align: left;
-
-            font-family: var(--heading);
-
-            margin-bottom: 28px;
-
-            letter-spacing: -0.2px;
-        }
-
-
-        .card-subtitle {
-            margin: -18px 0 28px;
-            color: #6B7280;
-            font-size: 14px;
-        }
-
-
-        /* =========================
-           FORM
-        ========================= */
-
-        .form-group {
-            margin-bottom: 18px;
-        }
-
-
-        .form-label {
-            display: block;
-
-            font-size: 14px;
-
-            color: #536071;
-
-            margin-bottom: 5px;
-
-            font-weight: 500;
-        }
-
-
-        .form-input {
-            width: 100%;
-
-            height: 40px;
-
-            padding: 0 14px;
-
-            border: 1px solid #d8dce2;
-
-            border-radius: 6px;
-
-            font-size: 14px;
-
-            background: #fff;
-
-            outline: none;
-
-            transition:
-                border 0.15s,
-                box-shadow 0.15s;
-        }
-
-
-        .field-icon-wrap {
-            position: relative;
-        }
-
-
-        .field-icon-wrap .form-input {
-            padding-left: 48px;
-        }
-
-
-        .input-wrap .password-input {
-            padding-left: 48px;
-        }
-
-
-        .field-icon {
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            width: 18px;
-            height: 18px;
-            color: #8D939B;
-            transform: translateY(-50%);
-            pointer-events: none;
-            z-index: 1;
-        }
-
-
-        .field-icon path,
-        .field-icon circle,
-        .field-icon rect {
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.7;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-
-
-        .form-input:focus {
-            border-color: var(--orange);
-
-            box-shadow:
-                0 0 0 3px rgba(249,115,22,0.12);
-        }
-
-
-        .form-input::placeholder {
-            color: #a7adb5;
-
-            font-size: 13px;
-        }
-
-
-        /* =========================
-           PHONE
-        ========================= */
-
-        .phone-input {
-            display: flex;
-            width: 100%;
-            height: 40px;
-            overflow: hidden;
-            border: 1px solid #d8dce2;
-            border-radius: 6px;
-            background: #fff;
-            transition: border 0.15s, box-shadow 0.15s;
-        }
-
-
-        .phone-input:focus-within {
-            border-color: var(--orange);
-            box-shadow: 0 0 0 3px rgba(224,79,0,0.12);
-        }
-
-
-        .country-code {
-            height: 40px;
-
-            width: 100px;
-
-            flex-shrink: 0;
-
-            padding: 0 24px 0 10px;
-            border: 0;
-            border-right: 1px solid #d8dce2;
-            border-radius: 0;
-
-            background: #fff;
-
-            color: #222;
-
-            font-family: var(--body);
-
-            font-size: 13px;
-
-            outline: none;
-
-            cursor: pointer;
-        }
-
-
-        .country-code:focus {
-            outline: none;
-        }
-
-
-        .phone-number {
-            flex: 1;
-            min-width: 0;
-            border: 0;
-            border-radius: 0;
-            padding-left: 14px;
-        }
-
-
-        .phone-number:focus {
-            box-shadow: none;
-        }
-
-
-        /* =========================
-           PASSWORD
-        ========================= */
-
-        .input-wrap {
-            position: relative;
-        }
-
-
-        .password-input {
-            padding-right: 42px;
-        }
-
-
-        .eye-btn {
-            position: absolute;
-
-            right: 12px;
-
-            top: 50%;
-
-            transform: translateY(-50%);
-
-            background: transparent;
-
-            border: none;
-
-            color: #a7adb5;
-
-            cursor: pointer;
-
-            width: 20px;
-
-            height: 20px;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: center;
-
-            padding: 0;
-        }
-
-
-        .eye-btn:hover {
-            color: #536071;
-        }
-
-
-        .eye-btn svg {
-            width: 17px;
-
-            height: 17px;
-
-            stroke: currentColor;
-
-            stroke-width: 2;
-
-            fill: none;
-        }
-
-
-        /* =========================
-           SIGN UP BUTTON
-        ========================= */
-
-        .signup-btn {
-            width: 100%;
-
-            height: 48px;
-
-            background: var(--orange);
-
-            border: none;
-
-            border-radius: 8px;
-
-            color: #fff;
-
-            font-size: 16px;
-
-            font-weight: 600;
-
-            font-family: var(--body);
-
-            cursor: pointer;
-
-            margin-top: 16px;
-
-            transition:
-                background 0.15s,
-                transform 0.1s,
-                box-shadow 0.15s;
-
-            letter-spacing: 0.2px;
-        }
-
-
-        .terms-group {
-            display: flex;
-            align-items: flex-start;
-            gap: 8px;
-            margin-top: 2px;
-            color: #202020;
-            font-size: 13px;
-            line-height: 1.55;
-        }
-
-
-        .terms-checkbox {
-            width: 12px;
-            height: 12px;
-            flex: 0 0 12px;
-            margin-top: 3px;
-            accent-color: var(--orange);
-        }
-
-
-        .terms-link {
-            color: var(--orange);
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-
-        .signup-btn:hover {
-            background: #EA580C;
-
-                box-shadow:
-                0 3px 10px rgba(249,115,22,0.24);
-        }
-
-
-        .signup-btn:active {
-            transform: scale(0.98);
-        }
-
-
-        /* =========================
-           LOGIN LINK
-        ========================= */
-
-        .login-text {
-            text-align: center;
-
-            margin-top: 20px;
-
-            font-size: 14px;
-
-            color: #536071;
-        }
-
-
-        .login-link {
-            color: var(--orange);
-
-            text-decoration: none;
-
-            font-weight: 500;
-        }
-
-
-        .login-link:hover {
-            color: #C2410C;
-        }
-
-
-        /* =========================
-           DIVIDER
-        ========================= */
-
-        .divider {
-            margin-top: 20px;
-
-            height: 1px;
-
-            background: #e8e8e8;
-        }
-
-
-        /* =========================
-           FOOTER
-        ========================= */
-
-        .footer {
-            min-height: 80px;
-            height: auto;
-
-            background: #FBF8F4;
-
-            border-top: 1px solid #E3E3E3;
-
-            margin-top: 0;
-            padding: 0 24px;
-            display: flex;
-            align-items: center;
-        }
-
-
-        .footer-container {
-            width: min(950px, calc(100% - 48px));
-
-            margin: auto;
-
-            display: flex;
-
-            align-items: center;
-
-            justify-content: space-between;
-            min-height: 80px;
-        }
-
-
-        .copyright {
-            font-size: 18px;
-
-            font-family: sans-serif;
-
-            color: #020202;
-
-            font-weight: 400;
-
-            margin-top: 0;
-        }
-
-
-        /* =========================
-           RESPONSIVE
-        ========================= */
-
-        @media (max-width: 500px) {
-
-            .nav-container {
-                width: calc(100% - 36px);
-            }
-
-
-            .card {
-                padding: 24px 20px 28px;
-
-                max-width: 100%;
-            }
-
-
-            .card-title {
-                font-size: 24px;
-
-                margin-bottom: 22px;
-            }
-
-
-            .form-input {
-                height: 38px;
-
-                font-size: 13px;
-            }
-
-
-            .country-code {
-                width: 96px;
-
-                height: 38px;
-
-                font-size: 12px;
-            }
-
-
-            .signup-btn {
-                height: 44px;
-
-                font-size: 16px;
-
-                margin-top: 14px;
-            }
-
-
-            .footer {
-                min-height: 64px;
-                padding: 14px 18px max(14px, env(safe-area-inset-bottom));
-            }
-
-            .footer-container {
-                width: 100%;
-                min-height: 34px;
-            }
-
-
-            .copyright {
-                font-size: 13px;
-            }
-
-        }
-
-    </style>
-
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign Up — CLOUT</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+:root {
+    --brand: #E04F00;
+    --brand-hover: #c84300;
+    --brand-light: #fff4ed;
+    --brand-glow: rgba(224, 79, 0, 0.2);
+    --dark: #090d16;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --card-bg: #ffffff;
+    --border: #e2e8f0;
+    --radius-xl: 20px;
+    --radius-md: 10px;
+    --radius-sm: 8px;
+    --shadow-card: 0 16px 40px -10px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.04);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Plus Jakarta Sans", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f8fafc;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* =========================================================
+   NAVBAR
+========================================================= */
+.navbar {
+    height: 64px;
+    background: var(--dark);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
+    width: min(1240px, calc(100% - 48px));
+    height: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.logo {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+}
+
+.logo span {
+    color: var(--brand);
+}
+
+.back-home {
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-sm);
+    padding: 7px 15px;
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s ease;
+}
+
+.back-home:hover {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+.main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 38px 34px 34px;
+    box-shadow: var(--shadow-card);
+    animation: cardIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.card-header {
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.card-icon {
+    width: 52px;
+    height: 52px;
+    margin: 0 auto 16px;
+    border-radius: 14px;
+    background: var(--brand-light);
+    color: var(--brand);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+}
+
+.card-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--dark);
+    letter-spacing: -0.4px;
+    margin-bottom: 6px;
+}
+
+.card-subtitle {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+/* =========================================================
+   FORM
+========================================================= */
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-label {
+    display: block;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 7px;
+}
+
+.field-icon-wrap,
+.input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.field-icon {
+    position: absolute;
+    left: 15px;
+    color: var(--text-muted);
+    font-size: 14px;
+    pointer-events: none;
+}
+
+.form-input {
+    width: 100%;
+    height: 46px;
+    padding: 0 16px 0 42px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    background: #ffffff;
+    font-family: inherit;
+    font-size: 14.5px;
+    color: var(--text-primary);
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-glow);
+}
+
+.form-input.password-input {
+    padding-right: 44px;
+}
+
+.phone-input {
+    display: flex;
+    width: 100%;
+    height: 46px;
+    border: 1.5px solid var(--border);
+    border-radius: var(--radius-md);
+    background: #ffffff;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.phone-input:focus-within {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px var(--brand-glow);
+}
+
+.country-code {
+    height: 100%;
+    width: 110px;
+    flex-shrink: 0;
+    border: none;
+    border-right: 1.5px solid var(--border);
+    padding: 0 10px;
+    font-family: inherit;
+    font-size: 13.5px;
+    color: var(--text-primary);
+    background: #f8fafc;
+    outline: none;
+    cursor: pointer;
+}
+
+.phone-number {
+    flex: 1;
+    height: 100%;
+    border: none;
+    padding: 0 16px;
+    font-family: inherit;
+    font-size: 14.5px;
+    color: var(--text-primary);
+    outline: none;
+}
+
+.eye-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 15px;
+    cursor: pointer;
+    padding: 6px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.15s ease;
+}
+
+.eye-btn:hover {
+    color: var(--text-primary);
+}
+
+.terms-group {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text-secondary);
+}
+
+.terms-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--brand);
+    margin-top: 2px;
+    cursor: pointer;
+}
+
+.terms-link {
+    color: var(--brand);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.terms-link:hover {
+    text-decoration: underline;
+}
+
+.signup-btn {
+    width: 100%;
+    height: 48px;
+    border: none;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #FF6611 0%, #E04F00 100%);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 15.5px;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 16px var(--brand-glow);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.signup-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(224, 79, 0, 0.35);
+}
+
+.signup-btn:active {
+    transform: translateY(0);
+}
+
+.divider {
+    height: 1px;
+    background: var(--border);
+    margin: 24px 0;
+}
+
+.login-text {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.login-link {
+    color: var(--brand);
+    text-decoration: none;
+    font-weight: 700;
+    margin-left: 4px;
+}
+
+.login-link:hover {
+    text-decoration: underline;
+}
+
+/* =========================================================
+   FOOTER
+========================================================= */
+.footer {
+    height: 60px;
+    background: #ffffff;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+</style>
 <link rel="stylesheet" href="/static/responsive.css">
 </head>
 

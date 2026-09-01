@@ -1,571 +1,554 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile — CLOUT</title>
 
-    <link
-        href="https://fonts.googleapis.com/css2?family=Acme&family=DM+Sans:wght@400;500;600;700&display=swap"
-        rel="stylesheet"
-    >
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+:root {
+    --brand: #E04F00;
+    --brand-hover: #c84300;
+    --brand-light: #fff4ed;
+    --brand-glow: rgba(224, 79, 0, 0.2);
+    --dark: #090d16;
+    --text-primary: #1e293b;
+    --text-secondary: #64748b;
+    --text-muted: #94a3b8;
+    --card-bg: #ffffff;
+    --border: #e2e8f0;
+    --radius-xl: 20px;
+    --radius-md: 10px;
+    --radius-sm: 8px;
+    --shadow-card: 0 16px 40px -10px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.04);
+}
 
-    <title>CLOUT – Profile</title>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+body {
+    font-family: "Plus Jakarta Sans", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #f8fafc;
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
 
-    <style>
+/* =========================================================
+   NAVBAR
+========================================================= */
+.navbar {
+    height: 64px;
+    background: var(--dark);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+.nav-container {
+    width: min(1240px, calc(100% - 48px));
+    height: 100%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
 
-        :root {
-            --orange: #E04F00;
-            --black: #020202;
-            --white: #FFFFFF;
-            --off-white: #FBF8F4;
+.logo {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 17px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+}
 
-            --heading: "Acme", sans-serif;
-            --body: "DM Sans", sans-serif;
-        }
+.logo span {
+    color: var(--brand);
+}
 
-        body {
-            background: var(--white);
-            font-family: var(--body);
-            color: var(--black);
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
+.back-home {
+    color: #e2e8f0;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-sm);
+    padding: 7px 15px;
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 13px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    transition: all 0.2s ease;
+}
 
-        .navbar {
-            height: 62px;
-            background: var(--black);
-            border-top: 1px solid var(--orange);
-            border-bottom: 1px solid rgba(255,255,255,.08);
-            display: flex;
-            align-items: center;
-            z-index: 1000;
-            flex-shrink: 0;
-        }
+.back-home:hover {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #ffffff;
+    transform: translateY(-1px);
+}
 
-        .nav-container {
-            width: min(1380px, calc(100% - 50px));
-            margin: auto;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
+/* =========================================================
+   MAIN
+========================================================= */
+.main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
 
-        .logo {
-            color: var(--orange);
-            font-size: 15px;
-            font-weight: bold;
-            text-decoration: none;
-            font-family: var(--heading);
-            letter-spacing: 1.5px;
-        }
+.card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xl);
+    padding: 38px 34px 34px;
+    box-shadow: var(--shadow-card);
+    animation: cardIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
 
-        .main {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-        }
+@keyframes cardIn {
+    from { opacity: 0; transform: translateY(12px) scale(0.98); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
 
-        .card {
-            width: 100%;
-            max-width: 500px;
-            background: white;
-            border: 2px solid #f4996870;
-            border-radius: 15px;
-            box-shadow: 0 20px 45px rgba(0,0,0,.045);
-            padding: 40px;
-        }
+.card-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--dark);
+    text-align: center;
+    letter-spacing: -0.4px;
+    margin-bottom: 24px;
+}
 
-        .card-title {
-            font-size: 28px;
-            font-weight: 600;
-            font-family: var(--heading);
-            text-align: center;
-            margin-bottom: 32px;
-            letter-spacing: -0.2px;
-        }
+.profile-section {
+    text-align: center;
+    margin-bottom: 24px;
+}
 
-        .profile-section {
-            text-align: center;
-            margin-bottom: 32px;
-        }
+.profile-image-container {
+    width: 110px;
+    height: 110px;
+    margin: 0 auto 20px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: var(--brand-light);
+    border: 3px solid var(--brand);
+    box-shadow: 0 4px 18px var(--brand-glow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--brand);
+}
 
-        /* Crop Modal Styles */
-        .crop-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.7);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
+.profile-image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
 
-        .crop-modal.active {
-            display: flex;
-        }
+.profile-info {
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 16px 20px;
+    text-align: left;
+    margin-bottom: 20px;
+}
 
-        .crop-modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 24px;
-            width: 90%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
+.info-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 13.5px;
+    border-bottom: 1px solid #f1f5f9;
+}
 
-        .crop-modal-title {
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            text-align: center;
-        }
+.info-row:last-child {
+    border-bottom: none;
+}
 
-        .crop-container {
-            margin-bottom: 20px;
-        }
+.info-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+}
 
-        .crop-preview {
-            max-width: 100%;
-            max-height: 400px;
-        }
+.info-value {
+    color: var(--text-primary);
+    font-weight: 700;
+}
 
-        .crop-modal-buttons {
-            display: flex;
-            gap: 12px;
-            justify-content: center;
-        }
+.file-input-wrapper {
+    position: relative;
+    overflow: hidden;
+    display: block;
+    width: 100%;
+    margin-bottom: 12px;
+}
 
-        .crop-btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+.file-input-wrapper input[type="file"] {
+    position: absolute;
+    left: -9999px;
+}
 
-        .crop-btn-confirm {
-            background: var(--orange);
-            color: white;
-        }
+.file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 46px;
+    background: linear-gradient(135deg, #FF6611 0%, #E04F00 100%);
+    color: #ffffff;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    font-size: 14.5px;
+    font-weight: 700;
+    text-align: center;
+    box-shadow: 0 4px 16px var(--brand-glow);
+    transition: all 0.2s ease;
+}
 
-        .crop-btn-confirm:hover {
-            background: #d65100;
-        }
+.file-input-label:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(224, 79, 0, 0.35);
+}
 
-        .crop-btn-cancel {
-            background: #f0ede6;
-            color: var(--black);
-            border: 1px solid #e8dcd0;
-        }
+.btn-danger {
+    width: 100%;
+    height: 44px;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.15s ease;
+}
 
-        .crop-btn-cancel:hover {
-            background: #e8dcd0;
-        }
+.btn-danger:hover {
+    background: #fee2e2;
+}
 
-        .profile-image-container {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px;
-            border-radius: 50%;
-            overflow: hidden;
-            background: #f0ede6;
-            border: 3px solid var(--orange);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 50px;
-        }
+.back-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 44px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    background: #ffffff;
+    color: var(--text-primary);
+    font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    margin-top: 14px;
+    transition: all 0.15s ease;
+}
 
-        .profile-image-container img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+.back-link:hover {
+    background: #f8fafc;
+    border-color: var(--brand);
+    color: var(--brand);
+}
 
-        .profile-info {
-            margin-bottom: 24px;
-        }
+/* Crop Modal */
+.crop-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(4px);
+    z-index: 2000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
 
-        .info-row {
-            margin-bottom: 12px;
-            font-size: 14px;
-        }
+.crop-modal.active {
+    display: flex;
+}
 
-        .info-label {
-            color: #536071;
-            font-weight: 600;
-        }
+.crop-modal-content {
+    background: #ffffff;
+    border-radius: var(--radius-xl);
+    padding: 28px;
+    width: min(500px, 100%);
+    box-shadow: 0 24px 60px -12px rgba(15, 23, 42, 0.25);
+    text-align: center;
+}
 
-        .info-value {
-            color: var(--black);
-            font-weight: 500;
-        }
+.crop-modal-title {
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 16px;
+    color: var(--dark);
+}
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+.crop-container {
+    margin-bottom: 20px;
+    max-height: 380px;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+}
 
-        .form-label {
-            display: block;
-            font-size: 14px;
-            color: #536071;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
+.crop-preview {
+    max-width: 100%;
+}
 
-        .file-input-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
+.crop-modal-buttons {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
 
-        .file-input-wrapper input[type="file"] {
-            position: absolute;
-            left: -9999px;
-        }
+.crop-btn {
+    height: 44px;
+    border-radius: var(--radius-md);
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+}
 
-        .file-input-label {
-            display: block;
-            padding: 12px 16px;
-            background: var(--orange);
-            color: white;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 600;
-            text-align: center;
-            transition: background 0.2s ease;
-        }
+.crop-btn-confirm {
+    background: var(--brand);
+    color: #ffffff;
+}
 
-        .file-input-label:hover {
-            background: #d65100;
-        }
+.crop-btn-confirm:hover {
+    background: var(--brand-hover);
+}
 
-        .button-group {
-            display: flex;
-            gap: 12px;
-        }
+.crop-btn-cancel {
+    background: #f1f5f9;
+    color: var(--text-primary);
+}
 
-        .btn {
-            flex: 1;
-            padding: 12px 16px;
-            border: none;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+.crop-btn-cancel:hover {
+    background: #e2e8f0;
+}
 
-        .btn-primary {
-            background: var(--orange);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #d65100;
-            transform: translateY(-2px);
-        }
-
-        .btn-secondary {
-            background: #f0ede6;
-            color: var(--black);
-            border: 1px solid #e8dcd0;
-        }
-
-        .btn-secondary:hover {
-            background: #e8dcd0;
-        }
-
-        .btn-danger {
-            background: #f5c4bc;
-            color: #b42318;
-            border: 1px solid #eab0a0;
-        }
-
-        .btn-danger:hover {
-            background: #eab0a0;
-        }
-
-        .back-link {
-            text-align: center;
-            margin-top: 24px;
-        }
-
-        .back-link a {
-            color: var(--orange);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 600;
-        }
-
-        .back-link a:hover {
-            text-decoration: underline;
-        }
-
-        .footer {
-            background: var(--black);
-            color: #777;
-            text-align: center;
-            padding: 27px 20px;
-            flex-shrink: 0;
-        }
-
-    </style>
-
+/* =========================================================
+   FOOTER
+========================================================= */
+.footer {
+    height: 60px;
+    background: #ffffff;
+    border-top: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+</style>
 <link rel="stylesheet" href="/static/responsive.css">
 </head>
 
 <body>
 
-    <!-- NAVBAR -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="{% url 'index' %}" class="logo">CLOUT<span>.</span></a>
+        <a href="{% url 'index' %}" class="back-home">
+            <i class="fa-solid fa-arrow-left" style="font-size:11px"></i>
+            <span>Home</span>
+        </a>
+    </div>
+</nav>
 
-    <nav class="navbar">
+<main class="main">
+    <div class="card">
+        <h1 class="card-title">User Profile</h1>
 
-        <div class="nav-container">
-
-            <a
-                href="{% url 'index' %}"
-                class="logo"
-            >
-                CLOUT
-            </a>
-
-        </div>
-
-    </nav>
-
-    <!-- MAIN -->
-
-    <main class="main">
-
-        <div class="card">
-
-            <h1 class="card-title">
-                Profile
-            </h1>
-
-            <div class="profile-section">
-
-                <div class="profile-image-container">
-                    {% if user.profile_image_url %}
-                        <img src="{{ user.profile_image_url }}" alt="Profile">
-                    {% else %}
-                        <span>{{ user.name|default:user.username|slice:':1'|upper }}</span>
-                    {% endif %}
-                </div>
-
-                <div class="profile-info">
-
-                    <div class="info-row">
-                        <span class="info-label">Name:</span>
-                        <span class="info-value">{{ user.name }}</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="info-label">Username:</span>
-                        <span class="info-value">{{ user.username }}</span>
-                    </div>
-
-                    <div class="info-row">
-                        <span class="info-label">Email:</span>
-                        <span class="info-value">{{ user.email }}</span>
-                    </div>
-
-                </div>
-
+        <div class="profile-section">
+            <div class="profile-image-container">
+                {% if user.profile_image_url %}
+                    <img src="{{ user.profile_image_url }}" alt="Profile">
+                {% else %}
+                    <span>{{ user.name|default:user.username|slice:':1'|upper }}</span>
+                {% endif %}
             </div>
 
-            <!-- UPLOAD FORM -->
+            <div class="profile-info">
+                <div class="info-row">
+                    <span class="info-label">Full Name</span>
+                    <span class="info-value">{{ user.name|default:"—" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Username</span>
+                    <span class="info-value">{{ user.username }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">{{ user.email }}</span>
+                </div>
+            </div>
+        </div>
 
-            <form id="uploadForm" method="POST" enctype="multipart/form-data">
+        <!-- UPLOAD FORM -->
+        <form id="uploadForm" method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="form-group">
+                <div class="file-input-wrapper">
+                    <input type="file" id="profile_image" name="profile_image" accept="image/*">
+                    <label for="profile_image" class="file-input-label">
+                        <i class="fa-solid fa-camera"></i>
+                        <span>Upload New Picture</span>
+                    </label>
+                </div>
+
+                {% if form.profile_image.errors %}
+                    <div class="form-error" style="margin-top:8px; color:#b91c1c; font-size:13px; font-weight:600;">
+                        {{ form.profile_image.errors|join:', ' }}
+                    </div>
+                {% endif %}
+
+                {% if form.non_field_errors %}
+                    <div class="form-error" style="margin-top:8px; color:#b91c1c; font-size:13px; font-weight:600;">
+                        {{ form.non_field_errors|join:', ' }}
+                    </div>
+                {% endif %}
+            </div>
+
+            <input type="hidden" id="croppedImageData" name="cropped_image_data">
+        </form>
+
+        <!-- REMOVE IMAGE BUTTON -->
+        {% if user.profile_image %}
+            <form method="POST" style="margin-top: 4px;">
                 {% csrf_token %}
-
-                <div class="form-group">
-
-                    <div class="file-input-wrapper">
-                        <input
-                            type="file"
-                            id="profile_image"
-                            name="profile_image"
-                            accept="image/*"
-                        >
-                        <label for="profile_image" class="file-input-label">
-                             Upload Profile Picture
-                        </label>
-                    </div>
-
-                    {% if form.profile_image.errors %}
-                        <div class="form-error" style="margin-top:8px; color:#c62828; font-size:13px;">
-                            {{ form.profile_image.errors|join:', ' }}
-                        </div>
-                    {% endif %}
-
-                    {% if form.non_field_errors %}
-                        <div class="form-error" style="margin-top:8px; color:#c62828; font-size:13px;">
-                            {{ form.non_field_errors|join:', ' }}
-                        </div>
-                    {% endif %}
-
-                </div>
-
-                <input type="hidden" id="croppedImageData" name="cropped_image_data">
-
+                <button type="submit" name="remove_image" class="btn-danger">
+                    <i class="fa-solid fa-trash-can" style="font-size:13px"></i>
+                    <span>Remove Picture</span>
+                </button>
             </form>
+        {% endif %}
 
-            <!-- REMOVE IMAGE BUTTON -->
-            {% if user.profile_image %}
+        <a href="{% url 'index' %}" class="back-link">
+            <i class="fa-solid fa-arrow-left" style="font-size:12px"></i>
+            <span>Back to Home</span>
+        </a>
+    </div>
+</main>
 
-                <form method="POST" style="margin-top: 12px;">
-                    {% csrf_token %}
-
-                    <button
-                        type="submit"
-                        name="remove_image"
-                        class="btn btn-danger"
-                        style="width: 100%;"
-                    >
-                        Remove Picture
-                    </button>
-
-                </form>
-
-            {% endif %}
-
-            <!-- BACK LINK -->
-
-            <div class="back-link">
-                <a href="{% url 'index' %}">
-                    ← Back to Home
-                </a>
-            </div>
-
+<!-- CROP MODAL -->
+<div id="cropModal" class="crop-modal">
+    <div class="crop-modal-content">
+        <div class="crop-modal-title">Crop Profile Picture</div>
+        <div class="crop-container">
+            <img id="cropImage" class="crop-preview" src="" alt="Crop Preview">
         </div>
-
-    </main>
-
-    <!-- CROP MODAL -->
-    <div id="cropModal" class="crop-modal">
-        <div class="crop-modal-content">
-            <div class="crop-modal-title">Crop Your Profile Picture</div>
-            <div class="crop-container">
-                <img id="cropImage" class="crop-preview" src="" alt="Crop Preview">
-            </div>
-            <div class="crop-modal-buttons">
-                <button type="button" class="crop-btn crop-btn-confirm" id="cropConfirmBtn">Save & Upload</button>
-                <button type="button" class="crop-btn crop-btn-cancel" id="cropCancelBtn">Cancel</button>
-            </div>
+        <div class="crop-modal-buttons">
+            <button type="button" class="crop-btn crop-btn-confirm" id="cropConfirmBtn">Save &amp; Upload</button>
+            <button type="button" class="crop-btn crop-btn-cancel" id="cropCancelBtn">Cancel</button>
         </div>
     </div>
+</div>
 
-    <!-- FOOTER -->
+<footer class="footer">
+    <div>&copy; 2026 Clout. All rights reserved.</div>
+</footer>
 
-    <footer class="footer">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+<script>
+let cropper = null;
+const profileImageInput = document.getElementById('profile_image');
+const cropModal = document.getElementById('cropModal');
+const cropImage = document.getElementById('cropImage');
+const uploadForm = document.getElementById('uploadForm');
 
-        <div class="footer-container">
-
-            <div class="copyright">
-                © 2026 Clout
-            </div>
-
-        </div>
-
-    </footer>
-
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
-
-    <script>
-        let cropper = null;
-        const profileImageInput = document.getElementById('profile_image');
-        const cropModal = document.getElementById('cropModal');
-        const cropImage = document.getElementById('cropImage');
-        const uploadForm = document.getElementById('uploadForm');
-        const croppedImageDataInput = document.getElementById('croppedImageData');
-
-        // Handle file selection
-        profileImageInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    cropImage.src = event.target.result;
-                    cropModal.classList.add('active');
-                    
-                    if (cropper) {
-                        cropper.destroy();
-                    }
-                    
-                    cropper = new Cropper(cropImage, {
-                        aspectRatio: 1,
-                        viewMode: 1,
-                        autoCropArea: 1,
-                        responsive: true,
-                        guides: true,
-                        highlight: true,
-                        cropBoxMovable: true,
-                        cropBoxResizable: true,
-                        toggleDragModeOnDblclick: true,
-                    });
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // Handle crop confirm
-        document.getElementById('cropConfirmBtn').addEventListener('click', function() {
-            const canvas = cropper.getCroppedCanvas({
-                maxWidth: 4096,
-                maxHeight: 4096,
-                fillColor: '#fff',
-                imageSmoothingEnabled: true,
-                imageSmoothingQuality: 'high',
-            });
-
-            // Convert canvas to blob and create a file
-            canvas.toBlob(function(blob) {
-                const dataTransfer = new DataTransfer();
-                const file = new File([blob], 'cropped-profile.jpg', { type: 'image/jpeg' });
-                dataTransfer.items.add(file);
-                profileImageInput.files = dataTransfer.files;
-
-                // Submit the form
-                uploadForm.submit();
-            }, 'image/jpeg', 0.95);
-
-            cropModal.classList.remove('active');
-        });
-
-        // Handle crop cancel
-        document.getElementById('cropCancelBtn').addEventListener('click', function() {
-            cropModal.classList.remove('active');
-            profileImageInput.value = '';
+profileImageInput.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            cropImage.src = event.target.result;
+            cropModal.classList.add('active');
+            
             if (cropper) {
                 cropper.destroy();
-                cropper = null;
             }
-        });
-    </script>
+            
+            cropper = new Cropper(cropImage, {
+                aspectRatio: 1,
+                viewMode: 1,
+                autoCropArea: 1,
+                responsive: true,
+                guides: true,
+                highlight: true,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: true,
+            });
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+document.getElementById('cropConfirmBtn').addEventListener('click', function() {
+    const canvas = cropper.getCroppedCanvas({
+        maxWidth: 2048,
+        maxHeight: 2048,
+        fillColor: '#fff',
+        imageSmoothingEnabled: true,
+        imageSmoothingQuality: 'high',
+    });
+
+    canvas.toBlob(function(blob) {
+        const dataTransfer = new DataTransfer();
+        const file = new File([blob], 'cropped-profile.jpg', { type: 'image/jpeg' });
+        dataTransfer.items.add(file);
+        profileImageInput.files = dataTransfer.files;
+        uploadForm.submit();
+    }, 'image/jpeg', 0.95);
+
+    cropModal.classList.remove('active');
+});
+
+document.getElementById('cropCancelBtn').addEventListener('click', function() {
+    cropModal.classList.remove('active');
+    profileImageInput.value = '';
+    if (cropper) {
+        cropper.destroy();
+        cropper = null;
+    }
+});
+</script>
 
 </body>
-
 </html>
