@@ -171,24 +171,40 @@ body {
     margin-bottom: 7px;
 }
 
+.field-icon-wrap,
 .input-wrap {
     position: relative;
-    display: flex;
-    align-items: center;
+    width: 100%;
 }
 
 .field-icon {
     position: absolute;
     left: 15px;
-    color: var(--text-muted);
-    font-size: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px !important;
+    height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
+    color: #94a3b8;
     pointer-events: none;
+    z-index: 2;
+}
+
+.field-icon path,
+.field-icon circle,
+.field-icon rect {
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.8;
+    stroke-linecap: round;
+    stroke-linejoin: round;
 }
 
 .form-input {
     width: 100%;
     height: 46px;
-    padding: 0 16px 0 42px;
+    padding: 0 16px 0 44px;
     border: 1.5px solid var(--border);
     border-radius: var(--radius-md);
     background: #ffffff;
@@ -396,7 +412,10 @@ body {
             <div class="form-group">
                 <label class="form-label" for="username">Username or Email</label>
                 <div class="input-wrap">
-                    <i class="fa-solid fa-user field-icon"></i>
+                    <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <circle cx="12" cy="8" r="3.5" />
+                        <path d="M5 20c.7-3.1 3.1-5 7-5s6.3 1.9 7 5" />
+                    </svg>
                     <input class="form-input" type="text" id="username" name="username" placeholder="Enter your email or username" autocomplete="username" required>
                 </div>
             </div>
@@ -404,7 +423,10 @@ body {
             <div class="form-group">
                 <label class="form-label" for="password">Password</label>
                 <div class="input-wrap">
-                    <i class="fa-solid fa-key field-icon"></i>
+                    <svg class="field-icon" viewBox="0 0 24 24" aria-hidden="true">
+                        <rect x="5" y="10" width="14" height="10" rx="2" />
+                        <path d="M8 10V8a4 4 0 1 1 8 0v2" />
+                    </svg>
                     <input class="form-input password-input" type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
                     <button class="eye-btn" type="button" id="togglePassword" aria-label="Show password">
                         <i class="fa-solid fa-eye" id="eyeIcon"></i>
