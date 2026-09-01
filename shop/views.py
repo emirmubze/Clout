@@ -2026,8 +2026,14 @@ def create_order(request):
         )
 
     currency = request.POST.get("currency", "USD").upper()
+    zero_decimal_currencies = {
+        "BIF", "CLP", "DJF", "GNF", "JPY", "KMF", "KRW",
+        "MGA", "PYG", "RWF", "UGX", "VND", "VUV", "XAF", "XOF", "XPF"
+    }
+    zero_decimal_currency = currency in zero_decimal_currencies
     try:
-        amount = Decimal(request.POST.get("amount", "18.82")).quantize(Decimal("0.01"))
+        quantize_step = Decimal("1") if zero_decimal_currency else Decimal("0.01")
+        amount = Decimal(request.POST.get("amount", "18.82")).quantize(quantize_step)
     except (InvalidOperation, TypeError):
         return JsonResponse(
             {"success": False, "message": "Invalid payment amount."},
@@ -2040,7 +2046,6 @@ def create_order(request):
             status=400,
         )
 
-    zero_decimal_currency = currency in {"JPY", "KRW"}
     minor_amount = int(amount if zero_decimal_currency else amount * 100)
     try:
         client = razorpay.Client(

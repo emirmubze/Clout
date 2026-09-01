@@ -1082,3 +1082,71 @@ class AuthApiTests(TestCase):
             HTTP_AUTHORIZATION=f"Bearer {login_response.json()['data']['accessToken']}",
         )
         self.assertEqual(response.status_code, 403)
+
+
+class CheckoutCurrencyTests(TestCase):
+    def setUp(self):
+        self.user = CustomUser.objects.create_user(
+            username="gbpbuyer",
+            email="gbpbuyer@example.com",
+            password="StrongPass123!",
+            name="GBP Buyer",
+        )
+        self.client.force_login(self.user)
+
+    def test_checkout_page_renders_currency_selector_and_countries(self):
+        response = self.client.get(reverse("checkout"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "COUNTRY / CURRENCY")
+        self.assertContains(response, "United Kingdom")
+        self.assertContains(response, "GBP")
+        self.assertContains(response, "£")
+        self.assertContains(response, "summary-header")
+
+    @override_settings(RAZORPAY_KEY_ID="rzp_test_key", RAZORPAY_KEY_SECRET="rzp_test_secret")
+    @patch("razorpay.Client")
+    def test_create_order_with_gbp_currency(self, mock_razorpay_client):
+        mock_instance = mock_razorpay_client.return_value
+        mock_instance.order.create.return_value = {"id": "order_gbp_999"}
+
+        response = self.client.post(
+            reverse("create_order"),
+            {
+                "currency": "GBP",
+                "amount": "14.87",
+                "country_code": "GB",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["currency"], "GBP")
+        self.assertEqual(data["amount"], 1487)
+        self.assertEqual(data["order_id"], "order_gbp_999")
+
+        order = Order.objects.get(razorpay_order_id="order_gbp_999")
+        self.assertEqual(order.currency, "GBP")
+        self.assertEqual(float(order.amount), 14.87)
+        self.assertEqual(order.user, self.user)
+
+    @override_settings(RAZORPAY_KEY_ID="rzp_test_key", RAZORPAY_KEY_SECRET="rzp_test_secret")
+    @patch("razorpay.Client")
+    def test_create_order_with_zero_decimal_currency(self, mock_razorpay_client):
+        mock_instance = mock_razorpay_client.return_value
+        mock_instance.order.create.return_value = {"id": "order_jpy_111"}
+
+        response = self.client.post(
+            reverse("create_order"),
+            {
+                "currency": "JPY",
+                "amount": "2880",
+                "country_code": "JP",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["currency"], "JPY")
+        self.assertEqual(data["amount"], 2880)
+        self.assertEqual(data["order_id"], "order_jpy_111")
+
