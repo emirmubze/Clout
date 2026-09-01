@@ -2254,9 +2254,11 @@ def dispatch_password_reset_email(user, reset_url):
     if resend_key:
         try:
             resend_from = getattr(settings, "RESEND_FROM_EMAIL", "").strip() or "Clout <onboarding@resend.dev>"
+            reply_email = getattr(settings, "SERVER_EMAIL", "clout.courses@gmail.com")
             payload = {
                 "from": resend_from,
                 "to": [user.email],
+                "reply_to": reply_email,
                 "subject": subject,
                 "text": text_body,
                 "html": html_body,
