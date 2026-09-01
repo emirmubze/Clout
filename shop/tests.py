@@ -1150,3 +1150,36 @@ class CheckoutCurrencyTests(TestCase):
         self.assertEqual(data["amount"], 2880)
         self.assertEqual(data["order_id"], "order_jpy_111")
 
+    @override_settings(RAZORPAY_KEY_ID="rzp_test_key", RAZORPAY_KEY_SECRET="rzp_test_secret")
+    @patch("razorpay.Client")
+    def test_create_order_unsupported_currency_falls_back_to_inr(self, mock_razorpay_client):
+        mock_instance = mock_razorpay_client.return_value
+
+        # First call (AFN) raises exception, second call (INR fallback) succeeds
+        mock_instance.order.create.side_effect = [
+            Exception("Currency is not supported"),
+            {"id": "order_inr_fallback_123"}
+        ]
+
+        response = self.client.post(
+            reverse("create_order"),
+            {
+                "currency": "AFN",
+                "amount": "1221.40",
+                "inr_amount": "1791.69",
+                "country_code": "AF",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["currency"], "INR")
+        self.assertEqual(data["display_currency"], "AFN")
+        self.assertEqual(data["amount"], 179169)
+        self.assertEqual(data["order_id"], "order_inr_fallback_123")
+
+        order = Order.objects.get(razorpay_order_id="order_inr_fallback_123")
+        self.assertEqual(order.currency, "INR")
+        self.assertEqual(float(order.amount), 1791.69)
+
+

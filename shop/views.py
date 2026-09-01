@@ -2046,40 +2046,80 @@ def create_order(request):
             status=400,
         )
 
-    minor_amount = int(amount if zero_decimal_currency else amount * 100)
+    inr_amount_str = request.POST.get("inr_amount")
     try:
-        client = razorpay.Client(
-            auth=(
-                settings.RAZORPAY_KEY_ID,
-                settings.RAZORPAY_KEY_SECRET
-            )
-        )
+        inr_amount = Decimal(inr_amount_str).quantize(Decimal("0.01")) if inr_amount_str else Decimal("1791.69")
+    except (InvalidOperation, TypeError):
+        inr_amount = Decimal("1791.69")
 
+    client = razorpay.Client(
+        auth=(
+            settings.RAZORPAY_KEY_ID,
+            settings.RAZORPAY_KEY_SECRET
+        )
+    )
+
+    minor_amount = int(amount if zero_decimal_currency else amount * 100)
+    rp = None
+    charge_currency = currency
+    charge_amount = amount
+    charge_minor_amount = minor_amount
+
+    # Attempt 1: Try creating the order with the selected currency
+    try:
         rp = client.order.create(
             {
-                "amount": minor_amount,
-                "currency": currency,
-                "receipt":
-                    f"clout-{request.user.id}-{uuid.uuid4().hex[:12]}",
+                "amount": charge_minor_amount,
+                "currency": charge_currency,
+                "receipt": f"clout-{request.user.id}-{uuid.uuid4().hex[:12]}",
                 "payment_capture": 1
             }
         )
-    except Exception:
-        logger.exception("Razorpay order creation failed")
-        return JsonResponse(
-            {
-                "success": False,
-                "message": "Razorpay could not create the payment order. Check the live API keys and currency settings."
-            },
-            status=502,
+    except Exception as exc:
+        logger.warning(
+            "Razorpay order creation with currency %s failed (%s). Attempting INR fallback.",
+            currency,
+            exc
         )
+        if currency != "INR":
+            # Attempt 2: Fallback to INR if Razorpay rejected the international currency
+            try:
+                charge_currency = "INR"
+                charge_amount = inr_amount
+                charge_minor_amount = int(inr_amount * 100)
+                rp = client.order.create(
+                    {
+                        "amount": charge_minor_amount,
+                        "currency": charge_currency,
+                        "receipt": f"clout-{request.user.id}-{uuid.uuid4().hex[:12]}",
+                        "payment_capture": 1
+                    }
+                )
+            except Exception:
+                logger.exception("Razorpay INR fallback order creation failed")
+                return JsonResponse(
+                    {
+                        "success": False,
+                        "message": "Razorpay could not create the payment order. Check the live API keys and currency settings."
+                    },
+                    status=502,
+                )
+        else:
+            logger.exception("Razorpay INR order creation failed")
+            return JsonResponse(
+                {
+                    "success": False,
+                    "message": "Razorpay could not create the payment order. Check the live API keys and currency settings."
+                },
+                status=502,
+            )
 
     Order.objects.create(
         user=request.user,
         product_name=
             "The AI Income Playbook",
-        amount=amount,
-        currency=currency,
+        amount=charge_amount,
+        currency=charge_currency,
         razorpay_order_id=
             rp["id"]
     )
@@ -2092,9 +2132,13 @@ def create_order(request):
             "order_id":
                 rp["id"],
             "amount":
-                minor_amount,
+                charge_minor_amount,
             "currency":
-                currency
+                charge_currency,
+            "display_currency":
+                currency,
+            "display_amount":
+                str(amount)
         }
     )
 

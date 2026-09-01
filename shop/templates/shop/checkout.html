@@ -1054,11 +1054,13 @@ async function loadExchangeRates() {
 
 function startPayment() {
     const rate = getRate(currentCountry.currency);
+    const inrRate = getRate('INR') || 86.50;
     if (!$('termsCheck')?.checked || !ratesLoaded || !Number.isFinite(rate) || rate <= 0) return;
 
     const isZeroDecimal = ZERO_DECIMAL_CURRENCIES.has(currentCountry.currency);
     const total = BASE_TOTAL_USD * rate;
     const paymentAmount = isZeroDecimal ? Math.round(total).toFixed(0) : total.toFixed(2);
+    const inrTotal = (BASE_TOTAL_USD * inrRate).toFixed(2);
     const button = $('buyBtn');
     button.disabled = true;
     button.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i><span>Processing...</span>';
@@ -1073,6 +1075,7 @@ function startPayment() {
         body: new URLSearchParams({
             currency: currentCountry.currency,
             amount: paymentAmount,
+            inr_amount: inrTotal,
             country_code: currentCountry.code
         })
     })
@@ -1080,7 +1083,7 @@ function startPayment() {
         .then(({ ok, data }) => {
             if (!ok || !data.success) throw new Error(data.message || 'Could not create payment order.');
 
-            const razorpay = new Razorpay({
+            const razorpayOptions = {
                 key: data.key,
                 amount: data.amount,
                 currency: data.currency,
@@ -1094,7 +1097,20 @@ function startPayment() {
                 theme: {
                     color: '#E04F00'
                 },
-                config: {
+                handler: payment => verifyPayment(payment),
+                modal: {
+                    ondismiss: resetPaymentButton
+                }
+            };
+
+            // Set display_currency so Razorpay Price Summary displays in the selected country's currency
+            if (currentCountry.currency) {
+                razorpayOptions.display_currency = currentCountry.currency;
+                razorpayOptions.display_amount = isZeroDecimal ? Math.round(total).toString() : total.toFixed(2);
+            }
+
+            if (currentCountry.currency === 'INR' || currentCountry.code === 'IN') {
+                razorpayOptions.config = {
                     display: {
                         blocks: {
                             payment_methods: {
@@ -1107,12 +1123,10 @@ function startPayment() {
                             show_default_blocks: false
                         }
                     }
-                },
-                handler: payment => verifyPayment(payment),
-                modal: {
-                    ondismiss: resetPaymentButton
-                }
-            });
+                };
+            }
+
+            const razorpay = new Razorpay(razorpayOptions);
 
             razorpay.on('payment.failed', event => {
                 alert(event.error?.description || 'Payment failed. Please try again.');
