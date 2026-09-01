@@ -16,21 +16,31 @@
 
     <style>
         :root {
-            --brand: #E04F00;
+            --orange: #E04F00;
+            --black: #020202;
+            --dark: #0E0E0E;
+            --dark-gray: #383838;
+            --white: #FFFFFF;
+            --peach: #FFDECC;
+            --warm-white: #FFDFD8;
+            --off-white: #FBF8F4;
+            --warm-gray: #F0EDE6;
+
+            --brand: var(--orange);
             --brand-hover: #c84300;
-            --brand-light: #fff3ec;
+            --brand-light: var(--peach);
             --brand-glow: rgba(224, 79, 0, 0.22);
-            --dark: #0f172a;
-            --text-primary: #1e293b;
-            --text-secondary: #64748b;
-            --text-muted: #94a3b8;
-            --bg-card: #ffffff;
-            --border-subtle: #e2e8f0;
+            --dark-color: var(--dark);
+            --text-primary: var(--black);
+            --text-secondary: var(--dark-gray);
+            --text-muted: #737373;
+            --bg-card: var(--white);
+            --border-subtle: var(--warm-gray);
             --radius-xl: 20px;
             --radius-lg: 14px;
             --radius-md: 10px;
             --radius-sm: 8px;
-            --shadow-card: 0 14px 40px -8px rgba(15, 23, 42, 0.08), 0 0 1px 1px rgba(15, 23, 42, 0.05);
+            --shadow-card: 0 14px 40px -8px rgba(2, 2, 2, 0.08), 0 0 1px 1px rgba(2, 2, 2, 0.05);
         }
 
         * {
@@ -41,7 +51,7 @@
 
         body {
             font-family: "Plus Jakarta Sans", "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: #f8fafc;
+            background: var(--off-white);
             color: var(--text-primary);
             -webkit-font-smoothing: antialiased;
             min-height: 100vh;
@@ -54,7 +64,7 @@
 ========================================================= */
         .navbar {
             height: 64px;
-            background: #090d16;
+            background: var(--dark);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             position: sticky;
             top: 0;
