@@ -232,9 +232,9 @@
       align-items: center;
       justify-content: center;
       gap: 8px;
-      min-width: 105px;
+      min-width: 120px;
       height: 36px;
-      padding: 0 18px;
+      padding: 0 20px;
       border-radius: 999px;
       text-decoration: none;
       font-size: 13px;
@@ -242,10 +242,12 @@
       letter-spacing: 0.5px;
       transition: all 0.2s ease;
       border: none;
-      background: linear-gradient(135deg, #FF6611 0%, #E04F00 100%);
+      background: var(--orange);
       color: white;
       box-shadow: 0 4px 14px rgba(224, 79, 0, 0.25);
       margin-left: 14px;
+      margin-top: 2px;
+      padding-top: 3px;
     }
 
     .nav-course-item {
@@ -349,15 +351,36 @@
 
     .nav-login-btn:hover,
     .nav-logout-btn:hover {
-      background: linear-gradient(135deg, #ff7a2e 0%, #eb5505 100%);
-      transform: translateY(-1px);
-      box-shadow: 0 6px 18px rgba(224, 79, 0, 0.35);
-      color: white;
+      background: #FFDECC;
+      transform: none;
+      box-shadow: 0 4px 14px rgba(255, 153, 68, 0.30);
+      color: var(--orange);
+    }
+
+    .nav-login-btn::after,
+    .nav-logout-btn::after {
+      display: none !important;
     }
 
     .nav-login-btn:active,
     .nav-logout-btn:active {
-      transform: scale(0.97);
+      transform: scale(0.95);
+    }
+
+    .nav-login-btn i,
+    .nav-logout-btn i {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+      display: inline-block;
+      transition: transform 0.3s ease;
+      color: #fff;
+    }
+
+    .nav-login-btn:hover i,
+    .nav-logout-btn:hover i {
+      transform: scale(1.12);
+      color: var(--orange);
     }
     .nav-message-item {
       list-style: none;
@@ -2049,7 +2072,7 @@
 
                 <li>
                     <a href="{% url 'logout' %}" class="nav-logout-btn">
-                        <i class="fa-solid fa-arrow-right-from-bracket" style="font-size:12px"></i>
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
                         <span>LOGOUT</span>
                     </a>
                 </li>
@@ -2058,7 +2081,7 @@
 
 <li>
     <a href="{% url 'login' %}" class="nav-login-btn">
-        <i class="fa-solid fa-arrow-right-to-bracket" style="font-size:12px"></i>
+        <i class="fa-solid fa-arrow-right-to-bracket"></i>
         <span>LOGIN</span>
     </a>
 </li>
