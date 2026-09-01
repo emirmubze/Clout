@@ -651,8 +651,8 @@ body {
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background: rgba(15, 23, 42, 0.65);
-    backdrop-filter: blur(8px);
+    background: rgba(15, 23, 42, 0.12);
+    backdrop-filter: blur(2px);
 }
 
 .checkout-overlay.is-open {
@@ -661,8 +661,8 @@ body {
 
 .checkout-popup {
     position: relative;
-    width: min(880px, 100%);
-    height: min(780px, calc(100vh - 40px));
+    width: min(520px, calc(100vw - 32px));
+    height: min(760px, calc(100vh - 24px));
     background: transparent;
     border-radius: var(--radius-xl);
     overflow: hidden;
