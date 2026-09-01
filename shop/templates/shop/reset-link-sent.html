@@ -66,17 +66,13 @@ body {
 }
 
 .logo {
-    color: #ffffff;
-    text-decoration: none;
-    font-size: 17px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    display: flex;
-    align-items: center;
-}
-
-.logo span {
     color: var(--brand);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    display: inline-flex;
+    align-items: center;
 }
 
 .back-home {
@@ -262,7 +258,7 @@ body {
 
 <nav class="navbar">
     <div class="nav-container">
-        <a href="{% url 'index' %}" class="logo">CLOUT<span>.</span></a>
+        <a href="{% url 'index' %}" class="logo">CLOUT</a>
         <a href="{% url 'index' %}" class="back-home">
             <i class="fa-solid fa-arrow-left" style="font-size:11px"></i>
             <span>Home</span>
