@@ -801,85 +801,72 @@
     }
     .lesson {
       display: grid;
-      grid-template-columns: 56px 1fr;
-      border-top: 1px solid rgba(255,255,255,.08);
-      padding: 24px 0 26px;
+      grid-template-columns: 70px 1fr;
+      min-height: 84px;
+      border-top: 1px solid rgba(255,255,255,.075);
       opacity: 0;
       transform: translateY(25px);
       transition: opacity .7s cubic-bezier(.16,1,.3,1), 
                   transform .7s cubic-bezier(.16,1,.3,1),
-                  padding .3s ease;
-    }
-    .lesson:last-child {
-      border-bottom: 1px solid rgba(255,255,255,.08);
+                  padding .4s cubic-bezier(.25,.46,.45,.94),
+                  background .4s cubic-bezier(.25,.46,.45,.94),
+                  border-color .4s cubic-bezier(.25,.46,.45,.94);
     }
     .lesson:hover {
-      padding-left: 6px;
+      padding-left: 10px;
     }
     .lesson.visible {
       opacity: 1;
       transform: translateY(0);
     }
     .lesson-number {
-      font-family: 'Instrument Serif', Georgia, serif;
-      color: rgba(255,255,255,.07);
-      font-size: 52px;
+      font-family: 'Instrument Serif', serif;
+      color: rgba(255,255,255,.045);
+      font-size: 72px;
       font-style: italic;
+      transition: color .4s cubic-bezier(.25,.46,.45,.94),
+                  transform .4s cubic-bezier(.25,.46,.45,.94);
       line-height: 1;
-      padding-top: 2px;
-      user-select: none;
-      transition: color .3s ease;
-    }
-    .lesson:hover .lesson-number {
-      color: rgba(224, 79, 0, 0.35);
+      padding-top: 12px;
     }
     .lesson-content {
-      padding: 0 0 0 4px;
-      min-width: 0;
+      padding: 22px 0 22px 10px;
+    }
+    .lesson:hover .lesson-number {
+      color: #d3540047;
+      transform: scale(1.05);
     }
     .lesson-content h3 {
       font-family: var(--heading);
-      font-size: 26px;
-      font-weight: 700;
-      color: #ffffff;
-      margin: 0;
-      line-height: 1.25;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      gap: 6px 12px;
-      transition: color .3s ease;
+      font-size: 30px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      transition: color .4s cubic-bezier(.25,.46,.45,.94),
+                  transform .4s cubic-bezier(.25,.46,.45,.94),
+                  letter-spacing .4s cubic-bezier(.25,.46,.45,.94);
     }
-    .lesson-title {
-      color: #ffffff;
-      display: inline;
-    }
-    .lesson:hover .lesson-title {
+    .lesson:hover .lesson-content h3 {
       color: var(--orange);
+      transform: translateX(4px);
+      letter-spacing: 0.3px;
     }
     .lesson-content p {
-      max-width: 580px;
-      color: rgba(255, 255, 255, 0.55);
-      font-size: 15px;
-      line-height: 1.55;
-      margin-top: 8px;
-      margin-bottom: 0;
-      transition: color .3s ease;
+      max-width: 570px;
+      color: #747474;
+      font-size: 17px;
+      line-height: 1.6;
+      transition: color .4s cubic-bezier(.25,.46,.45,.94);
     }
     .lesson:hover .lesson-content p {
-      color: rgba(255, 255, 255, 0.75);
+      color: #999;
     }
     .lesson-meta {
       color: var(--orange);
       font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 1.5px;
+      font-weight: 600;
+      letter-spacing: 1.8px;
+      margin-left: 7px;
       text-transform: uppercase;
-      white-space: nowrap;
-      display: inline-flex;
-      align-items: center;
-      flex-shrink: 0;
-      line-height: 1;
       transition: color .3s cubic-bezier(.25,.46,.45,.94),
                   transform .3s cubic-bezier(.25,.46,.45,.94);
     }
@@ -1218,172 +1205,57 @@
     ========================================================= */
     .faq {
       background: var(--off-white);
-      padding: 86px 0 92px;
-      margin-bottom: 0;
+      padding: 86px 0 0;
+      margin-bottom: 100px;
     }
     .faq-container {
       width: min(900px, calc(100% - 48px));
-      margin: 0 auto;
-    }
-    .faq .eyebrow {
-      display: inline-block;
-      font-size: 13px;
-      font-weight: 700;
-      letter-spacing: 3.5px;
-      color: #a09d98;
-      text-transform: uppercase;
-      margin-bottom: 12px;
+      margin: auto;
     }
     .faq-title {
-      margin-top: 0;
-      margin-bottom: 38px;
-      font-size: clamp(34px, 4.8vw, 52px);
-      font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: -0.5px;
-      color: var(--black);
+      margin-top: 13px;
+      margin-bottom: 43px;
     }
     .faq-item {
-      border-bottom: 1px solid #e2deda;
-      transition: border-color .25s ease;
+      border-bottom: 1px solid #ddd;
     }
     .faq-question {
       width: 100%;
       border: none;
       background: transparent;
-      padding: 24px 0;
+      padding: 20px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
       text-align: left;
       color: var(--black);
       font-family: var(--body);
-      font-size: 18.5px;
-      font-weight: 600;
+      font-size: 20px;
+      font-weight: 500;
       cursor: pointer;
-      gap: 16px;
-      line-height: 1.38;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-    .faq-question > span:first-child {
-      flex: 1;
-      min-width: 0;
-      padding-right: 12px;
     }
     .faq-plus {
-      color: #a09d98;
+      color: #bbb;
       font-size: 24px;
-      font-weight: 300;
-      line-height: 1;
-      flex-shrink: 0;
-      width: 24px;
-      height: 24px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform .3s cubic-bezier(.16,1,.3,1), color .2s ease;
-    }
-    .faq-question:hover .faq-plus {
-      color: var(--orange);
+      font-weight: 200;
+      transition: transform .3s ease;
     }
     .faq-answer {
       max-height: 0;
       overflow: hidden;
-      color: #555555;
-      font-size: 16px;
+      color: #777;
+      font-size: 18px;
       font-family: var(--body);
-      line-height: 1.65;
-      font-weight: 400;
-      padding-right: 20px;
-      transition: max-height .4s cubic-bezier(.16,1,.3,1), padding-bottom .3s ease, opacity .3s ease;
-      opacity: 0;
+      line-height: 1.7;
+      font-weight: 300;
+      transition: max-height .4s cubic-bezier(.16,1,.3,1);
     }
     .faq-item.active .faq-answer {
-      max-height: 450px;
-      padding-bottom: 22px;
-      opacity: 1;
+      max-height: 200px;
+      padding-bottom: 19px;
     }
     .faq-item.active .faq-plus {
       transform: rotate(45deg);
-      color: var(--orange);
-    }
-
-    @media (max-width: 768px) {
-      .faq {
-        padding: 76px 0 84px;
-        margin-bottom: 0;
-      }
-      .faq-container {
-        width: min(900px, calc(100% - 44px));
-        margin: 0 auto;
-      }
-      .faq .eyebrow {
-        font-size: 12.5px;
-        letter-spacing: 3px;
-        margin-bottom: 10px;
-      }
-      .faq-title {
-        font-size: 36px;
-        margin-top: 0;
-        margin-bottom: 34px;
-        line-height: 1.12;
-      }
-      .faq-question {
-        padding: 22px 0;
-        font-size: 18px;
-        gap: 14px;
-      }
-      .faq-plus {
-        font-size: 24px;
-        width: 24px;
-        height: 24px;
-      }
-      .faq-answer {
-        font-size: 15px;
-        padding-right: 10px;
-      }
-      .faq-item.active .faq-answer {
-        padding-bottom: 20px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .faq {
-        padding: 72px 0 80px;
-        margin-bottom: 0;
-      }
-      .faq-container {
-        width: calc(100% - 40px);
-        margin: 0 auto;
-      }
-      .faq .eyebrow {
-        font-size: 12px;
-        letter-spacing: 3px;
-        margin-bottom: 8px;
-      }
-      .faq-title {
-        font-size: 34px;
-        margin-top: 0;
-        margin-bottom: 32px;
-      }
-      .faq-question {
-        padding: 22px 0;
-        font-size: 17.5px;
-        gap: 12px;
-      }
-      .faq-plus {
-        font-size: 22px;
-        width: 22px;
-        height: 22px;
-      }
-      .faq-answer {
-        font-size: 14.5px;
-        padding-right: 8px;
-      }
-      .faq-item.active .faq-answer {
-        padding-bottom: 18px;
-      }
     }
 
     /* =========================================================
@@ -1786,37 +1658,18 @@
         width: 100%;
         max-width: 280px;
       }
-      .curriculum-container {
-        width: calc(100% - 32px);
-      }
       .lesson {
-        grid-template-columns: 44px 1fr;
-        padding: 20px 0 22px;
-        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        grid-template-columns: 40px 1fr;
       }
       .lesson-number {
-        font-size: 42px;
-        padding-top: 2px;
-      }
-      .lesson-content {
-        padding: 0 0 0 2px;
+        font-size: 32px;
+        padding-top: 24px;
       }
       .lesson-content h3 {
-        font-size: 20px;
-        gap: 4px 8px;
-        line-height: 1.25;
-      }
-      .lesson-meta {
-        font-size: 11px;
-        letter-spacing: 1.2px;
-        white-space: nowrap;
-        margin-left: 0;
+        font-size: 22px;
       }
       .lesson-content p {
-        font-size: 13.5px;
-        line-height: 1.5;
-        margin-top: 7px;
-        color: rgba(255, 255, 255, 0.52);
+        font-size: 15px;
       }
       .section-title {
         font-size: 40px;
@@ -1864,7 +1717,8 @@
       .curriculum-container,
       .audience-container,
       .about-container,
-      .process-container {
+      .process-container,
+      .faq-container {
         width: calc(100% - 32px);
       }
       .hero h1 {
@@ -2311,42 +2165,42 @@
     <div class="lesson reveal">
       <div class="lesson-number">01</div>
       <div class="lesson-content">
-        <h3><span class="lesson-title">AI Income Foundations</span> <span class="lesson-meta">8 LESSONS</span></h3>
+        <h3>AI Income Foundations <span class="lesson-meta">8 Lessons</span></h3>
         <p>Learn the fundamentals of AI-powered online income, discover profitable business models, and identify high-potential opportunities.</p>
       </div>
     </div>
     <div class="lesson reveal">
       <div class="lesson-number">02</div>
       <div class="lesson-content">
-        <h3><span class="lesson-title">Digital Products & PDFs</span> <span class="lesson-meta">9 LESSONS + TEMPLATES</span></h3>
+        <h3>Digital Products & PDFs <span class="lesson-meta">9 Lessons + Templates</span></h3>
         <p>Create digital products with AI, build profitable PDFs, automate content creation, and launch products that sell.</p>
       </div>
     </div>
     <div class="lesson reveal">
       <div class="lesson-number">03</div>
       <div class="lesson-content">
-        <h3><span class="lesson-title">AI Apps & Websites</span> <span class="lesson-meta">6 LESSONS + PROJECTS</span></h3>
+        <h3>AI Apps & Websites <span class="lesson-meta">6 Lessons + Projects</span></h3>
         <p>Build AI-powered apps and websites, discover winning business ideas, and create scalable online products.</p>
       </div>
     </div>
     <div class="lesson reveal">
       <div class="lesson-number">04</div>
       <div class="lesson-content">
-        <h3><span class="lesson-title">AI Games & Automation</span> <span class="lesson-meta">3 LESSONS + WORKSHOP</span></h3>
+        <h3>AI Games & Automation <span class="lesson-meta">3 Lessons + Workshop</span></h3>
         <p>Use AI to build game concepts, automate workflows, and turn creative ideas into opportunities.</p>
       </div>
     </div>
     <div class="lesson reveal">
       <div class="lesson-number">05</div>
       <div class="lesson-content">
-        <h3><span class="lesson-title">AI E-commerce Systems</span> <span class="lesson-meta">3 LESSONS + CASE STUDIES</span></h3>
+        <h3>AI E-commerce Systems <span class="lesson-meta">3 Lessons + Case Studies</span></h3>
         <p>Learn AI-powered e-commerce, product research, store automation, and traffic strategies.</p>
       </div>
     </div>
     <div class="lesson reveal">
       <div class="lesson-number">06</div>
       <div class="lesson-content">
-        <h3><span class="lesson-title">Scale to $10K+/Month</span> <span class="lesson-meta">4 LESSONS + PLAYBOOKS</span></h3>
+        <h3>Scale to $10K+/Month <span class="lesson-meta">4 Lessons + Playbooks</span></h3>
         <p>Scale multiple AI income streams, automate your business, and build long-term systems.</p>
       </div>
     </div>
