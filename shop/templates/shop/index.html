@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2019,7 +2020,9 @@
 <nav class="navbar">
     <div class="nav-container">
 
-        <a href="#home" class="logo">CLOUT</a>
+        <a href="#home" class="logo" aria-label="CLOUT Home">
+            <img src="{% static 'logo.png' %}" alt="CLOUT" class="logo-img">
+        </a>
 
         <button
             class="mobile-menu"

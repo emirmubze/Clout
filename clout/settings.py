@@ -481,7 +481,7 @@ EMAIL_USE_SSL = (
 
 EMAIL_HOST_USER = os.getenv(
     "EMAIL_HOST_USER",
-    "clout.courses@gmail.com",
+    "support@clout.courses",
 )
 
 EMAIL_HOST_PASSWORD = os.getenv(
@@ -498,18 +498,18 @@ EMAIL_BACKEND = os.getenv(
 
 DEFAULT_FROM_EMAIL = os.getenv(
     "DEFAULT_FROM_EMAIL",
-    "Clout <clout.courses@gmail.com>",
+    "Clout <noreply@clout.courses>",
 )
 
 SERVER_EMAIL = os.getenv(
     "SERVER_EMAIL",
-    "clout.courses@gmail.com",
+    "support@clout.courses",
 )
 
 EMAIL_TIMEOUT = 10
 
 RESEND_API_KEY = os.getenv("RESEND_API_KEY", "").strip()
-RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "Clout <onboarding@resend.dev>").strip()
+RESEND_FROM_EMAIL = os.getenv("RESEND_FROM_EMAIL", "Clout <noreply@clout.courses>").strip()
 BREVO_API_KEY = os.getenv("BREVO_API_KEY", "").strip()
 
 

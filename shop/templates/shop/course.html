@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1169,7 +1170,9 @@ button {
 <!-- Header -->
 <header class="header">
     <div class="header-inner">
-        <a href="{% url 'index' %}" class="logo">CLOUT</a>
+        <a href="{% url 'index' %}" class="logo" aria-label="CLOUT Home">
+            <img src="{% static 'logo.png' %}" alt="CLOUT" class="logo-img">
+        </a>
 
         <nav class="nav">
             <a href="{% url 'index' %}">

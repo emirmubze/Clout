@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -2041,8 +2042,8 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="nav-left">
-                <a href="{% url 'index' %}" class="logo-wrap">
-                    <span class="logo-text">CLOUT</span>
+                <a href="{% url 'index' %}" class="logo-wrap" aria-label="CLOUT Home">
+                    <img src="{% static 'logo.png' %}" alt="CLOUT" class="logo-img">
                 </a>
             </div>
 

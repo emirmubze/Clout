@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -416,8 +417,9 @@ body {
             <a
                 href="{% url 'index' %}"
                 class="logo"
+                aria-label="CLOUT Home"
             >
-                CLOUT
+                <img src="{% static 'logo.png' %}" alt="CLOUT" class="logo-img">
             </a>
 
         </div>

@@ -772,7 +772,9 @@ body {
 ========================================================= -->
 <nav class="navbar">
     <div class="nav-container">
-        <a href="{% url 'index' %}" class="logo">CLOUT</a>
+        <a href="{% url 'index' %}" class="logo" aria-label="CLOUT Home">
+            <img src="{% static 'logo.png' %}" alt="CLOUT" class="logo-img">
+        </a>
 
         <a href="{% url 'index' %}" class="back-home">
             <span>Home</span>

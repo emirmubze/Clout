@@ -10,6 +10,55 @@ body {
     overflow-x: clip;
 }
 
+/* =========================================================
+   GLOBAL BRAND LOGO (CONSISTENT DIMENSIONS ACROSS ALL NAVS)
+========================================================= */
+.logo,
+.logo-wrap {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    text-decoration: none !important;
+    line-height: 1 !important;
+    flex-shrink: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+.logo-img,
+.logo img,
+.logo-wrap img {
+    height: 34px !important;
+    max-height: 34px !important;
+    min-height: 34px !important;
+    width: auto !important;
+    max-width: 120px !important;
+    object-fit: contain !important;
+    display: block !important;
+    vertical-align: middle !important;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.logo:hover .logo-img,
+.logo:hover img,
+.logo-wrap:hover img {
+    opacity: 0.92;
+    transform: scale(1.02);
+}
+
+@media (max-width: 480px) {
+    .logo-img,
+    .logo img,
+    .logo-wrap img {
+        height: 30px !important;
+        max-height: 30px !important;
+        min-height: 30px !important;
+    }
+}
+
+
 img,
 video,
 svg,

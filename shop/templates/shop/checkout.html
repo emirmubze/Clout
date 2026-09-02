@@ -1136,7 +1136,7 @@ function startPayment() {
         .then(({ ok, data }) => {
             if (!ok || !data.success) throw new Error(data.message || 'Could not create payment order.');
 
-            const logoUrl = window.location.origin + "{% static 'bag.png' %}";
+            const logoUrl = window.location.origin + "{% static 'logo.png' %}";
 
             const razorpayOptions = {
                 key: data.key,

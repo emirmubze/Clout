@@ -54,7 +54,7 @@ services:
         sync: false
 
       - key: RESEND_FROM_EMAIL
-        value: "Clout <onboarding@resend.dev>"
+        value: "Clout <noreply@clout.courses>"
 
       # Durable object storage for uploaded images and videos.
       - key: USE_S3
@@ -88,10 +88,11 @@ services:
         value: "True"
 
       - key: EMAIL_HOST_USER
-        value: clout.courses@gmail.com
+        value: support@clout.courses
 
       - key: EMAIL_HOST_PASSWORD
         sync: false
 
       - key: DEFAULT_FROM_EMAIL
-        value: "Clout <clout.courses@gmail.com>"
+        value: "Clout <noreply@clout.courses>"
+
