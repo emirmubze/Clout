@@ -6,7 +6,7 @@ from django.http import QueryDict
 from django.shortcuts import redirect
 from django.urls import reverse
 
-from shop.views import serve_media_file
+from shop.views import serve_media_file, robots_txt, sitemap_xml
 
 
 def admin_login_redirect(request):
@@ -22,6 +22,8 @@ def admin_login_redirect(request):
     return redirect(login_url)
 
 urlpatterns = [
+    path("robots.txt", robots_txt, name="root_robots_txt"),
+    path("sitemap.xml", sitemap_xml, name="root_sitemap_xml"),
     path("admin/login/", admin_login_redirect, name="admin_login_redirect"),
     path("admin/", admin.site.urls),
     path("media/<path:path>", serve_media_file, name="media_file"),
