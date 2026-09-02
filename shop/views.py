@@ -2506,3 +2506,84 @@ def password_reset_success(request):
         request,
         "shop/password-reset-success.html"
     )
+
+
+# =========================================================
+# SEO: ROBOTS.TXT & SITEMAP.XML
+# =========================================================
+
+def robots_txt(request):
+    content = (
+        "User-agent: *\n"
+        "Allow: /\n"
+        "Allow: /course/\n"
+        "Allow: /contact/\n"
+        "Allow: /login/\n"
+        "Allow: /register/\n"
+        "Allow: /static/\n\n"
+        "Disallow: /admin/\n"
+        "Disallow: /admin-dashboard/\n"
+        "Disallow: /my-course/\n"
+        "Disallow: /checkout/\n"
+        "Disallow: /profile/\n"
+        "Disallow: /payment-success/\n"
+        "Disallow: /api/\n"
+        "Disallow: /forgot-password/\n"
+        "Disallow: /reset-link-sent/\n"
+        "Disallow: /reset-password/\n"
+        "Disallow: /password-reset-success/\n"
+        "Disallow: /toggle-course-access/\n"
+        "Disallow: /admin-user-add/\n"
+        "Disallow: /admin-user-delete/\n"
+        "Disallow: /admin-course-add/\n"
+        "Disallow: /admin-course-edit/\n"
+        "Disallow: /admin-course-delete/\n"
+        "Disallow: /admin-modules-save/\n"
+        "Disallow: /admin-r2-presign/\n"
+        "Disallow: /lesson-video/\n"
+        "Disallow: /course-video/\n"
+        "Disallow: /module-video/\n"
+        "Disallow: /message-video/\n"
+        "Disallow: /create-order/\n"
+        "Disallow: /verify-payment/\n\n"
+        "Sitemap: https://clout.courses/sitemap.xml\n"
+    )
+    response = HttpResponse(content, content_type="text/plain; charset=utf-8")
+    response["Cache-Control"] = "public, max-age=86400"
+    return response
+
+
+def sitemap_xml(request):
+    sitemap_content = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+        '    <url>\n'
+        '        <loc>https://clout.courses/</loc>\n'
+        '        <changefreq>weekly</changefreq>\n'
+        '        <priority>1.0</priority>\n'
+        '    </url>\n'
+        '    <url>\n'
+        '        <loc>https://clout.courses/course/</loc>\n'
+        '        <changefreq>weekly</changefreq>\n'
+        '        <priority>0.9</priority>\n'
+        '    </url>\n'
+        '    <url>\n'
+        '        <loc>https://clout.courses/contact/</loc>\n'
+        '        <changefreq>monthly</changefreq>\n'
+        '        <priority>0.7</priority>\n'
+        '    </url>\n'
+        '    <url>\n'
+        '        <loc>https://clout.courses/login/</loc>\n'
+        '        <changefreq>monthly</changefreq>\n'
+        '        <priority>0.5</priority>\n'
+        '    </url>\n'
+        '    <url>\n'
+        '        <loc>https://clout.courses/register/</loc>\n'
+        '        <changefreq>monthly</changefreq>\n'
+        '        <priority>0.6</priority>\n'
+        '    </url>\n'
+        '</urlset>\n'
+    )
+    response = HttpResponse(sitemap_content, content_type="application/xml; charset=utf-8")
+    response["Cache-Control"] = "public, max-age=86400"
+    return response

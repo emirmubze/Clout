@@ -251,4 +251,14 @@ urlpatterns = [
         views.password_reset_success,
         name="password_reset_success"
     ),
+    path(
+        "robots.txt",
+        views.robots_txt,
+        name="robots_txt"
+    ),
+    path(
+        "sitemap.xml",
+        views.sitemap_xml,
+        name="sitemap_xml"
+    ),
 ]

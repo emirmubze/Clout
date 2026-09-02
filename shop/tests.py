@@ -1183,3 +1183,56 @@ class CheckoutCurrencyTests(TestCase):
         self.assertEqual(float(order.amount), 1791.69)
 
 
+class SeoOptimizationTests(TestCase):
+    def test_robots_txt(self):
+        response = self.client.get(reverse("robots_txt"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("text/plain", response["Content-Type"])
+        self.assertContains(response, "User-agent: *")
+        self.assertContains(response, "Allow: /")
+        self.assertContains(response, "Disallow: /admin/")
+        self.assertContains(response, "Sitemap: https://clout.courses/sitemap.xml")
+
+    def test_sitemap_xml(self):
+        response = self.client.get(reverse("sitemap_xml"))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("application/xml", response["Content-Type"])
+        self.assertContains(response, "<urlset")
+        self.assertContains(response, "https://clout.courses/")
+        self.assertContains(response, "https://clout.courses/course/")
+        self.assertContains(response, "https://clout.courses/contact/")
+        self.assertContains(response, "https://clout.courses/login/")
+        self.assertContains(response, "https://clout.courses/register/")
+
+    def test_homepage_seo_metadata(self):
+        response = self.client.get(reverse("index"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<title>CLOUT — The AI Income Playbook | Make Money With AI</title>")
+        self.assertContains(response, '<link rel="canonical" href="https://clout.courses/">')
+        self.assertContains(response, '<meta name="description"')
+        self.assertContains(response, '<meta property="og:title"')
+        self.assertContains(response, '<meta name="twitter:card"')
+        self.assertContains(response, '"@type": "Course"')
+        self.assertContains(response, '"@type": "FAQPage"')
+
+    def test_course_detail_seo_metadata(self):
+        response = self.client.get(reverse("course_detail"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<title>Enroll in The AI Income Playbook — CLOUT</title>")
+        self.assertContains(response, '<link rel="canonical" href="https://clout.courses/course/">')
+        self.assertContains(response, '"@type": "Course"')
+
+    def test_contact_seo_metadata(self):
+        response = self.client.get(reverse("contact"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<title>Support & Contact — CLOUT</title>")
+        self.assertContains(response, '<link rel="canonical" href="https://clout.courses/contact/">')
+        self.assertContains(response, '"@type": "ContactPage"')
+
+    def test_private_pages_have_noindex(self):
+        response = self.client.get(reverse("forgot_password"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<meta name="robots" content="noindex, nofollow">')
+
+
+
