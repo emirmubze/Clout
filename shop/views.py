@@ -2520,7 +2520,12 @@ def robots_txt(request):
         "Allow: /contact/\n"
         "Allow: /login/\n"
         "Allow: /register/\n"
-        "Allow: /static/\n\n"
+        "Allow: /static/\n"
+        "Allow: /favicon.ico\n"
+        "Allow: /favicon.png\n"
+        "Allow: /apple-touch-icon.png\n"
+        "Allow: /site.webmanifest\n"
+        "Allow: /manifest.json\n\n"
         "Disallow: /admin/\n"
         "Disallow: /admin-dashboard/\n"
         "Disallow: /my-course/\n"
@@ -2587,3 +2592,53 @@ def sitemap_xml(request):
     response = HttpResponse(sitemap_content, content_type="application/xml; charset=utf-8")
     response["Cache-Control"] = "public, max-age=86400"
     return response
+
+
+def favicon_ico(request):
+    for candidate in [
+        settings.BASE_DIR / "shop" / "static" / "favicon.ico",
+        settings.STATIC_ROOT / "favicon.ico",
+    ]:
+        if os.path.exists(candidate):
+            response = FileResponse(open(candidate, "rb"), content_type="image/x-icon")
+            response["Cache-Control"] = "public, max-age=86400"
+            return response
+    raise Http404("Favicon not found")
+
+
+def favicon_png(request):
+    for candidate in [
+        settings.BASE_DIR / "shop" / "static" / "favicon.png",
+        settings.STATIC_ROOT / "favicon.png",
+    ]:
+        if os.path.exists(candidate):
+            response = FileResponse(open(candidate, "rb"), content_type="image/png")
+            response["Cache-Control"] = "public, max-age=86400"
+            return response
+    raise Http404("Favicon PNG not found")
+
+
+def apple_touch_icon(request):
+    for candidate in [
+        settings.BASE_DIR / "shop" / "static" / "apple-touch-icon.png",
+        settings.BASE_DIR / "shop" / "static" / "apple-touch-icon-precomposed.png",
+        settings.STATIC_ROOT / "apple-touch-icon.png",
+    ]:
+        if os.path.exists(candidate):
+            response = FileResponse(open(candidate, "rb"), content_type="image/png")
+            response["Cache-Control"] = "public, max-age=86400"
+            return response
+    raise Http404("Apple touch icon not found")
+
+
+def site_webmanifest(request):
+    for candidate in [
+        settings.BASE_DIR / "shop" / "static" / "site.webmanifest",
+        settings.BASE_DIR / "shop" / "static" / "manifest.json",
+        settings.STATIC_ROOT / "site.webmanifest",
+    ]:
+        if os.path.exists(candidate):
+            response = FileResponse(open(candidate, "rb"), content_type="application/manifest+json")
+            response["Cache-Control"] = "public, max-age=86400"
+            return response
+    raise Http404("Manifest not found")

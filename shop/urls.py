@@ -261,4 +261,34 @@ urlpatterns = [
         views.sitemap_xml,
         name="sitemap_xml"
     ),
+    path(
+        "favicon.ico",
+        views.favicon_ico,
+        name="favicon_ico"
+    ),
+    path(
+        "favicon.png",
+        views.favicon_png,
+        name="favicon_png"
+    ),
+    path(
+        "apple-touch-icon.png",
+        views.apple_touch_icon,
+        name="apple_touch_icon"
+    ),
+    path(
+        "apple-touch-icon-precomposed.png",
+        views.apple_touch_icon,
+        name="apple_touch_icon_precomposed"
+    ),
+    path(
+        "site.webmanifest",
+        views.site_webmanifest,
+        name="site_webmanifest"
+    ),
+    path(
+        "manifest.json",
+        views.site_webmanifest,
+        name="manifest_json"
+    ),
 ]

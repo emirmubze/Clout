@@ -1234,5 +1234,44 @@ class SeoOptimizationTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, '<meta name="robots" content="noindex, nofollow">')
 
+    def test_favicon_endpoints(self):
+        # Root favicon.ico
+        response_ico = self.client.get("/favicon.ico")
+        self.assertEqual(response_ico.status_code, 200)
+        self.assertIn("image/x-icon", response_ico["Content-Type"])
+
+        # Root favicon.png
+        response_png = self.client.get("/favicon.png")
+        self.assertEqual(response_png.status_code, 200)
+        self.assertIn("image/png", response_png["Content-Type"])
+
+        # Root apple-touch-icon.png
+        response_apple = self.client.get("/apple-touch-icon.png")
+        self.assertEqual(response_apple.status_code, 200)
+        self.assertIn("image/png", response_apple["Content-Type"])
+
+        # Root site.webmanifest
+        response_manifest = self.client.get("/site.webmanifest")
+        self.assertEqual(response_manifest.status_code, 200)
+
+        # Root manifest.json
+        response_json = self.client.get("/manifest.json")
+        self.assertEqual(response_json.status_code, 200)
+
+    def test_homepage_favicon_tags(self):
+        response = self.client.get(reverse("index"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, '<link rel="icon" type="image/x-icon" href="/static/favicon.ico">')
+        self.assertContains(response, '<link rel="icon" type="image/png" sizes="48x48" href="/static/favicon-48x48.png">')
+        self.assertContains(response, '<link rel="icon" type="image/png" sizes="96x96" href="/static/favicon-96x96.png">')
+        self.assertContains(response, '<link rel="icon" type="image/png" sizes="144x144" href="/static/favicon-144x144.png">')
+        self.assertContains(response, '<link rel="icon" type="image/png" sizes="192x192" href="/static/favicon-192x192.png">')
+        self.assertContains(response, '<link rel="icon" type="image/png" sizes="512x512" href="/static/favicon-512x512.png">')
+        self.assertContains(response, '<link rel="icon" type="image/png" href="/static/favicon.png">')
+        self.assertContains(response, '<link rel="shortcut icon" href="/static/favicon.ico">')
+        self.assertContains(response, '<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">')
+        self.assertContains(response, '<link rel="manifest" href="/static/site.webmanifest">')
+
+
 
 
