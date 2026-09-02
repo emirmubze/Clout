@@ -801,83 +801,85 @@
     }
     .lesson {
       display: grid;
-      grid-template-columns: 70px 1fr;
-      min-height: 84px;
-      border-top: 1px solid rgba(255,255,255,.075);
+      grid-template-columns: 56px 1fr;
+      border-top: 1px solid rgba(255,255,255,.08);
+      padding: 24px 0 26px;
       opacity: 0;
       transform: translateY(25px);
       transition: opacity .7s cubic-bezier(.16,1,.3,1), 
                   transform .7s cubic-bezier(.16,1,.3,1),
-                  padding .4s cubic-bezier(.25,.46,.45,.94),
-                  background .4s cubic-bezier(.25,.46,.45,.94),
-                  border-color .4s cubic-bezier(.25,.46,.45,.94);
+                  padding .3s ease;
+    }
+    .lesson:last-child {
+      border-bottom: 1px solid rgba(255,255,255,.08);
     }
     .lesson:hover {
-      padding-left: 10px;
+      padding-left: 6px;
     }
     .lesson.visible {
       opacity: 1;
       transform: translateY(0);
     }
     .lesson-number {
-      font-family: 'Instrument Serif', serif;
-      color: rgba(255,255,255,.045);
-      font-size: 72px;
+      font-family: 'Instrument Serif', Georgia, serif;
+      color: rgba(255,255,255,.07);
+      font-size: 52px;
       font-style: italic;
-      transition: color .4s cubic-bezier(.25,.46,.45,.94),
-                  transform .4s cubic-bezier(.25,.46,.45,.94);
       line-height: 1;
-      padding-top: 12px;
-    }
-    .lesson-content {
-      padding: 22px 0 22px 10px;
+      padding-top: 2px;
+      user-select: none;
+      transition: color .3s ease;
     }
     .lesson:hover .lesson-number {
-      color: #d3540047;
-      transform: scale(1.05);
+      color: rgba(224, 79, 0, 0.35);
+    }
+    .lesson-content {
+      padding: 0 0 0 4px;
+      min-width: 0;
     }
     .lesson-content h3 {
       font-family: var(--heading);
-      font-size: 30px;
-      font-weight: 600;
-      margin-bottom: 6px;
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      margin: 0;
+      line-height: 1.25;
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
-      gap: 6px 10px;
-      line-height: 1.25;
-      transition: color .4s cubic-bezier(.25,.46,.45,.94),
-                  transform .4s cubic-bezier(.25,.46,.45,.94),
-                  letter-spacing .4s cubic-bezier(.25,.46,.45,.94);
+      gap: 6px 12px;
+      transition: color .3s ease;
     }
     .lesson-title {
+      color: #ffffff;
       display: inline;
     }
-    .lesson:hover .lesson-content h3 {
+    .lesson:hover .lesson-title {
       color: var(--orange);
-      transform: translateX(4px);
-      letter-spacing: 0.3px;
     }
     .lesson-content p {
-      max-width: 570px;
-      color: #747474;
-      font-size: 17px;
-      line-height: 1.6;
-      transition: color .4s cubic-bezier(.25,.46,.45,.94);
+      max-width: 580px;
+      color: rgba(255, 255, 255, 0.55);
+      font-size: 15px;
+      line-height: 1.55;
+      margin-top: 8px;
+      margin-bottom: 0;
+      transition: color .3s ease;
     }
     .lesson:hover .lesson-content p {
-      color: #999;
+      color: rgba(255, 255, 255, 0.75);
     }
     .lesson-meta {
       color: var(--orange);
       font-size: 12px;
       font-weight: 700;
-      letter-spacing: 1.6px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
       white-space: nowrap;
       display: inline-flex;
       align-items: center;
       flex-shrink: 0;
+      line-height: 1;
       transition: color .3s cubic-bezier(.25,.46,.45,.94),
                   transform .3s cubic-bezier(.25,.46,.45,.94);
     }
@@ -1216,64 +1218,67 @@
     ========================================================= */
     .faq {
       background: var(--off-white);
-      padding: 80px 0 0;
-      margin-bottom: 80px;
+      padding: 86px 0 92px;
+      margin-bottom: 0;
     }
     .faq-container {
       width: min(900px, calc(100% - 48px));
-      margin: auto;
+      margin: 0 auto;
     }
     .faq .eyebrow {
       display: inline-block;
       font-size: 13px;
       font-weight: 700;
       letter-spacing: 3.5px;
-      color: #999;
+      color: #a09d98;
       text-transform: uppercase;
+      margin-bottom: 12px;
     }
     .faq-title {
-      margin-top: 10px;
+      margin-top: 0;
       margin-bottom: 38px;
-      font-size: clamp(30px, 4.2vw, 48px);
+      font-size: clamp(34px, 4.8vw, 52px);
+      font-weight: 700;
       line-height: 1.1;
       letter-spacing: -0.5px;
+      color: var(--black);
     }
     .faq-item {
-      border-bottom: 1px solid #e0dbd5;
+      border-bottom: 1px solid #e2deda;
       transition: border-color .25s ease;
     }
     .faq-question {
       width: 100%;
       border: none;
       background: transparent;
-      padding: 20px 0;
+      padding: 24px 0;
       display: flex;
       justify-content: space-between;
       align-items: center;
       text-align: left;
       color: var(--black);
       font-family: var(--body);
-      font-size: clamp(15.5px, 2.2vw, 19px);
+      font-size: 18.5px;
       font-weight: 600;
       cursor: pointer;
       gap: 16px;
-      line-height: 1.35;
+      line-height: 1.38;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
     }
     .faq-question > span:first-child {
       flex: 1;
       min-width: 0;
-      padding-right: 8px;
+      padding-right: 12px;
     }
     .faq-plus {
-      color: #888;
+      color: #a09d98;
       font-size: 24px;
       font-weight: 300;
       line-height: 1;
       flex-shrink: 0;
-      width: 26px;
-      height: 26px;
+      width: 24px;
+      height: 24px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -1285,8 +1290,8 @@
     .faq-answer {
       max-height: 0;
       overflow: hidden;
-      color: #5a5a5a;
-      font-size: clamp(14px, 1.8vw, 16px);
+      color: #555555;
+      font-size: 16px;
       font-family: var(--body);
       line-height: 1.65;
       font-weight: 400;
@@ -1295,8 +1300,8 @@
       opacity: 0;
     }
     .faq-item.active .faq-answer {
-      max-height: 400px;
-      padding-bottom: 20px;
+      max-height: 450px;
+      padding-bottom: 22px;
       opacity: 1;
     }
     .faq-item.active .faq-plus {
@@ -1306,22 +1311,65 @@
 
     @media (max-width: 768px) {
       .faq {
-        padding: 48px 0 0;
-        margin-bottom: 56px;
+        padding: 76px 0 84px;
+        margin-bottom: 0;
       }
       .faq-container {
-        width: calc(100% - 36px);
+        width: min(900px, calc(100% - 44px));
+        margin: 0 auto;
       }
       .faq .eyebrow {
-        font-size: 11.5px;
-        letter-spacing: 2.8px;
+        font-size: 12.5px;
+        letter-spacing: 3px;
+        margin-bottom: 10px;
       }
       .faq-title {
-        margin-top: 6px;
-        margin-bottom: 22px;
+        font-size: 36px;
+        margin-top: 0;
+        margin-bottom: 34px;
+        line-height: 1.12;
       }
       .faq-question {
-        padding: 17px 0;
+        padding: 22px 0;
+        font-size: 18px;
+        gap: 14px;
+      }
+      .faq-plus {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+      .faq-answer {
+        font-size: 15px;
+        padding-right: 10px;
+      }
+      .faq-item.active .faq-answer {
+        padding-bottom: 20px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .faq {
+        padding: 72px 0 80px;
+        margin-bottom: 0;
+      }
+      .faq-container {
+        width: calc(100% - 40px);
+        margin: 0 auto;
+      }
+      .faq .eyebrow {
+        font-size: 12px;
+        letter-spacing: 3px;
+        margin-bottom: 8px;
+      }
+      .faq-title {
+        font-size: 34px;
+        margin-top: 0;
+        margin-bottom: 32px;
+      }
+      .faq-question {
+        padding: 22px 0;
+        font-size: 17.5px;
         gap: 12px;
       }
       .faq-plus {
@@ -1330,43 +1378,11 @@
         height: 22px;
       }
       .faq-answer {
-        padding-right: 10px;
+        font-size: 14.5px;
+        padding-right: 8px;
       }
       .faq-item.active .faq-answer {
-        padding-bottom: 16px;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .faq {
-        padding: 38px 0 0;
-        margin-bottom: 44px;
-      }
-      .faq-container {
-        width: calc(100% - 28px);
-      }
-      .faq .eyebrow {
-        font-size: 11px;
-        letter-spacing: 2.4px;
-      }
-      .faq-title {
-        margin-top: 4px;
-        margin-bottom: 18px;
-      }
-      .faq-question {
-        padding: 15px 0;
-        gap: 10px;
-      }
-      .faq-plus {
-        font-size: 20px;
-        width: 20px;
-        height: 20px;
-      }
-      .faq-answer {
-        padding-right: 6px;
-      }
-      .faq-item.active .faq-answer {
-        padding-bottom: 14px;
+        padding-bottom: 18px;
       }
     }
 
@@ -1770,17 +1786,20 @@
         width: 100%;
         max-width: 280px;
       }
+      .curriculum-container {
+        width: calc(100% - 32px);
+      }
       .lesson {
-        grid-template-columns: 46px 1fr;
-        min-height: 72px;
+        grid-template-columns: 44px 1fr;
+        padding: 20px 0 22px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
       }
       .lesson-number {
-        font-size: 40px;
-        padding-top: 14px;
-        line-height: 1;
+        font-size: 42px;
+        padding-top: 2px;
       }
       .lesson-content {
-        padding: 16px 0 16px 6px;
+        padding: 0 0 0 2px;
       }
       .lesson-content h3 {
         font-size: 20px;
@@ -1789,13 +1808,15 @@
       }
       .lesson-meta {
         font-size: 11px;
-        letter-spacing: 1.3px;
+        letter-spacing: 1.2px;
         white-space: nowrap;
         margin-left: 0;
       }
       .lesson-content p {
-        font-size: 14.5px;
-        line-height: 1.55;
+        font-size: 13.5px;
+        line-height: 1.5;
+        margin-top: 7px;
+        color: rgba(255, 255, 255, 0.52);
       }
       .section-title {
         font-size: 40px;
@@ -1843,8 +1864,7 @@
       .curriculum-container,
       .audience-container,
       .about-container,
-      .process-container,
-      .faq-container {
+      .process-container {
         width: calc(100% - 32px);
       }
       .hero h1 {
