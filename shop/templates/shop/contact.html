@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <!-- Primary Meta Tags -->
 <title>Support & Contact — CLOUT</title>
@@ -95,6 +95,9 @@ body {
     color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
+    min-height: -webkit-fill-available;
+    min-height: 100svh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
 }
@@ -387,6 +390,7 @@ body {
     }
     .chat-box {
         height: calc(100vh - 90px);
+        height: calc(100dvh - 90px);
         border-radius: var(--radius-md);
     }
     .message-bar {

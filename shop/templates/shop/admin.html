@@ -4,7 +4,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="robots" content="noindex, nofollow">
     <title>CLOUT - Admin Dashboard</title>
 
@@ -85,11 +85,16 @@
 
         body {
             min-height: 100vh;
+            min-height: -webkit-fill-available;
+            min-height: 100svh;
+            min-height: 100dvh;
             background: var(--bg);
             color: var(--text-main);
             font-family: var(--body-font);
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
         }
 
         /* =====================================================
@@ -1990,9 +1995,11 @@
             text-align: center;
             color: var(--text-muted);
             font-size: 12px;
-            padding: 32px 0;
+            padding: 32px 0 calc(32px + env(safe-area-inset-bottom, 0px));
             border-top: 1px solid var(--border);
-            margin-top: 40px;
+            margin-top: auto;
+            flex-shrink: 0;
+            width: 100%;
         }
 
         /* =====================================================

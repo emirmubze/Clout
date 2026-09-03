@@ -2,12 +2,20 @@
 html {
     max-width: 100%;
     overflow-x: clip;
+    min-height: 100%;
+    min-height: -webkit-fill-available;
 }
 
 body {
     max-width: 100%;
     min-width: 0;
     overflow-x: clip;
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+    min-height: 100svh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* =========================================================
@@ -90,20 +98,31 @@ table {
     max-width: none;
 }
 
-footer {
+footer,
+.footer {
     width: 100%;
     flex-shrink: 0;
+    margin-top: auto;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @media (max-width: 768px) {
     body {
         min-width: 0;
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+        min-height: 100svh;
+        min-height: 100dvh;
     }
 
     .container,
     .wrapper,
     .content,
-    .layout {
+    .layout,
+    .main,
+    .page,
+    .success-wrapper,
+    .order-wrapper {
         max-width: 100%;
     }
 
@@ -113,14 +132,18 @@ footer {
         font-size: 16px;
     }
 
-    footer {
+    footer,
+    .footer {
         min-height: 0 !important;
         height: auto !important;
-        padding: 16px !important;
+        margin-top: auto !important;
+        padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px)) !important;
     }
 
     footer > *,
-    footer .footer-container {
+    footer .footer-container,
+    .footer > *,
+    .footer .footer-container {
         width: 100% !important;
         min-height: 0 !important;
         height: auto !important;

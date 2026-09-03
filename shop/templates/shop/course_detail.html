@@ -3,7 +3,7 @@
 {% load static %}
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
 <!-- Primary Meta Tags -->
 <title>Enroll in The AI Income Playbook — CLOUT</title>
@@ -118,6 +118,9 @@ body {
     -webkit-font-smoothing: antialiased;
     overflow-x: hidden;
     min-height: 100vh;
+    min-height: -webkit-fill-available;
+    min-height: 100svh;
+    min-height: 100dvh;
     display: flex;
     flex-direction: column;
 }
@@ -742,6 +745,7 @@ body {
     position: relative;
     width: min(700px, calc(100vw - 20px));
     height: min(700px, calc(100vh - 20px));
+    height: min(700px, calc(100dvh - 20px));
     background: transparent;
     border: none;
     border-radius: 22px;
@@ -802,6 +806,7 @@ body {
 
     .checkout-popup {
         height: calc(100vh - 20px);
+        height: calc(100dvh - 20px);
         border-radius: var(--radius-md);
     }
 }
@@ -819,6 +824,8 @@ body {
     font-size: 13px;
     color: var(--text-muted);
     margin-top: auto;
+    flex-shrink: 0;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 </style>
 <link rel="stylesheet" href="/static/responsive.css">
