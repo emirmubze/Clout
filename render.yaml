@@ -11,6 +11,12 @@ services:
     buildCommand: bash build.sh
     startCommand: gunicorn clout.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --timeout 300
 
+    # Persistent 10GB Disk for uploaded videos, thumbnails, avatars, and persistent data
+    disk:
+      name: clout-persistent-data
+      mountPath: /var/data
+      sizeGB: 10
+
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.8
@@ -20,6 +26,9 @@ services:
 
       - key: DJANGO_SECRET_KEY
         generateValue: true
+
+      - key: PERSISTENT_DATA_DIR
+        value: /var/data
 
       - key: DATABASE_URL
         fromDatabase:
@@ -56,9 +65,9 @@ services:
       - key: RESEND_FROM_EMAIL
         value: "Clout <noreply@clout.courses>"
 
-      # Durable object storage for uploaded images and videos.
+      # Optional Cloudflare R2 / S3 Object Storage (if provided, otherwise persistent disk is used)
       - key: USE_S3
-        value: "True"
+        sync: false
 
       - key: AWS_ACCESS_KEY_ID
         sync: false
@@ -95,4 +104,3 @@ services:
 
       - key: DEFAULT_FROM_EMAIL
         value: "Clout <noreply@clout.courses>"
-

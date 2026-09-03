@@ -121,9 +121,11 @@ Payment data → Verify signature with Razorpay → Update Order (paid=True) →
 
 ## ⚙️ Settings Configuration (`clout/settings.py`)
 
-### Database
-- SQLite3 (default development)
-- Location: `db.sqlite3`
+### Database & Persistent Storage
+- **PostgreSQL**: Production managed database configured via `DATABASE_URL`.
+- **SQLite (Development / Persistent Disk fallback)**: Automatically stored in `PERSISTENT_DATA_DIR / db.sqlite3` (e.g. `/var/data/db.sqlite3` on Render persistent disk).
+- **Persistent Media Storage**: Uploaded course videos, thumbnails, lesson files, and profile images are stored in `PERSISTENT_DATA_DIR / media/` or Cloudflare R2 / AWS S3 object storage to guarantee they survive all deployments.
+- **Sync Command**: `python manage.py sync_persistent_data` automatically synchronizes media and seeds PostgreSQL from SQLite when deployed.
 
 ### Authentication
 ```python

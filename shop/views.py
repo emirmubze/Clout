@@ -1735,9 +1735,10 @@ def serve_media_file(
     request,
     path
 ):
-    if settings.USE_S3:
+    media_url_str = str(getattr(settings, "MEDIA_URL", "") or "").strip()
+    if getattr(settings, "USE_S3", False) and media_url_str.startswith(("http://", "https://")):
         public_url = (
-            settings.MEDIA_URL.rstrip("/")
+            media_url_str.rstrip("/")
             + "/"
             + path.lstrip("/")
         )
@@ -1745,7 +1746,10 @@ def serve_media_file(
 
     file_path = os.path.join(settings.MEDIA_ROOT, path)
     if not os.path.exists(file_path):
-        if default_storage.exists(path):
+        fallback_path = os.path.join(settings.BASE_DIR, "media", path)
+        if os.path.exists(fallback_path):
+            file_path = fallback_path
+        elif default_storage.exists(path):
             try:
                 file_path = default_storage.path(path)
             except Exception:

@@ -183,6 +183,28 @@ WSGI_APPLICATION = "clout.wsgi.application"
 
 
 # =========================================================
+# PERSISTENT STORAGE PATH RESOLUTION
+# =========================================================
+
+PERSISTENT_DATA_DIR_ENV = (
+    os.getenv("PERSISTENT_DATA_DIR", "").strip()
+    or os.getenv("DATA_DIR", "").strip()
+)
+
+if PERSISTENT_DATA_DIR_ENV:
+    PERSISTENT_DATA_DIR = Path(PERSISTENT_DATA_DIR_ENV)
+elif Path("/var/data").exists() and Path("/var/data").is_dir():
+    PERSISTENT_DATA_DIR = Path("/var/data")
+else:
+    PERSISTENT_DATA_DIR = BASE_DIR
+
+try:
+    PERSISTENT_DATA_DIR.mkdir(parents=True, exist_ok=True)
+except Exception:
+    pass
+
+
+# =========================================================
 # DATABASE (PERSISTENT STORAGE SUPPORT)
 # =========================================================
 
@@ -208,11 +230,22 @@ else:
     sqlite_path = os.getenv("SQLITE_PATH", "").strip()
     if sqlite_path:
         db_path = Path(sqlite_path)
-        db_path.parent.mkdir(parents=True, exist_ok=True)
-    elif Path("/var/data").exists() and Path("/var/data").is_dir():
-        db_path = Path("/var/data/db.sqlite3")
     else:
-        db_path = BASE_DIR / "db.sqlite3"
+        db_path = PERSISTENT_DATA_DIR / "db.sqlite3"
+
+    try:
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        # If the persistent database file does not exist yet, but a seed db.sqlite3 exists in BASE_DIR,
+        # copy it so existing data is preserved on first boot into persistent storage!
+        if (
+            not db_path.exists()
+            and (BASE_DIR / "db.sqlite3").exists()
+            and db_path.resolve() != (BASE_DIR / "db.sqlite3").resolve()
+        ):
+            import shutil
+            shutil.copy2(BASE_DIR / "db.sqlite3", db_path)
+    except Exception:
+        pass
 
     DATABASES = {
         "default": {
@@ -293,67 +326,37 @@ STATIC_ROOT = (
 
 
 # =========================================================
+# CLOUDFLARE R2 / S3 & PERSISTENT MEDIA STORAGE
 # =========================================================
-# CLOUDFLARE R2 / S3 & STATIC STORAGE
-# =========================================================
 
-USE_S3 = (
-    os.getenv(
-        "USE_S3",
-        "False",
-    ).lower()
-    == "true"
-)
-
-AWS_ACCESS_KEY_ID = os.getenv(
-    "AWS_ACCESS_KEY_ID",
-    "",
-).strip()
-
-AWS_SECRET_ACCESS_KEY = os.getenv(
-    "AWS_SECRET_ACCESS_KEY",
-    "",
-).strip()
-
-AWS_STORAGE_BUCKET_NAME = os.getenv(
-    "AWS_STORAGE_BUCKET_NAME",
-    "clout",
-).strip()
-
-AWS_S3_REGION_NAME = os.getenv(
-    "AWS_S3_REGION_NAME",
-    "auto",
-).strip()
-
-AWS_S3_ENDPOINT_URL = (
-    os.getenv(
-        "AWS_S3_ENDPOINT_URL",
-        "",
-    )
-    .strip()
-    .rstrip("/")
-)
-
+AWS_ACCESS_KEY_ID = os.getenv("AWS_ACCESS_KEY_ID", "").strip()
+AWS_SECRET_ACCESS_KEY = os.getenv("AWS_SECRET_ACCESS_KEY", "").strip()
+AWS_STORAGE_BUCKET_NAME = os.getenv("AWS_STORAGE_BUCKET_NAME", "clout").strip()
+AWS_S3_REGION_NAME = os.getenv("AWS_S3_REGION_NAME", "auto").strip()
+AWS_S3_ENDPOINT_URL = os.getenv("AWS_S3_ENDPOINT_URL", "").strip().rstrip("/")
 AWS_S3_CUSTOM_DOMAIN = (
-    os.getenv(
-        "AWS_S3_CUSTOM_DOMAIN",
-        "",
-    )
+    os.getenv("AWS_S3_CUSTOM_DOMAIN", "")
     .strip()
     .removeprefix("https://")
     .removeprefix("http://")
     .rstrip("/")
 )
 
-r2_configured = bool(
-    USE_S3
-    and AWS_ACCESS_KEY_ID
+explicit_use_s3 = os.getenv("USE_S3", "").strip().lower()
+has_s3_credentials = bool(
+    AWS_ACCESS_KEY_ID
     and AWS_SECRET_ACCESS_KEY
     and AWS_STORAGE_BUCKET_NAME
-    and AWS_S3_ENDPOINT_URL
+    and (AWS_S3_ENDPOINT_URL or AWS_S3_CUSTOM_DOMAIN or AWS_S3_REGION_NAME)
+)
+
+r2_configured = (
+    has_s3_credentials
+    and (explicit_use_s3 in ("true", "1", "yes") or explicit_use_s3 == "")
 )
 
 if r2_configured:
+    USE_S3 = True
     AWS_S3_SIGNATURE_VERSION = "s3v4"
     AWS_S3_ADDRESSING_STYLE = "path"
     AWS_S3_FILE_OVERWRITE = False
@@ -382,9 +385,13 @@ if r2_configured:
 
     if AWS_S3_CUSTOM_DOMAIN:
         MEDIA_URL = f"https://{AWS_S3_CUSTOM_DOMAIN}/"
+    elif AWS_S3_ENDPOINT_URL:
+        MEDIA_URL = f"{AWS_S3_ENDPOINT_URL}/{AWS_STORAGE_BUCKET_NAME}/"
     else:
         MEDIA_URL = "/media/"
+    MEDIA_ROOT = PERSISTENT_DATA_DIR / "media"
 else:
+    USE_S3 = False
     STORAGES = {
         "default": {
             "BACKEND": "django.core.files.storage.FileSystemStorage",
@@ -394,7 +401,15 @@ else:
         },
     }
     MEDIA_URL = "/media/"
-    MEDIA_ROOT = BASE_DIR / "media"
+    MEDIA_ROOT = PERSISTENT_DATA_DIR / "media"
+
+# Ensure all media subdirectories exist in persistent storage
+try:
+    MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
+    for sub_dir in ["profiles", "course_videos", "course_thumbnails", "lesson_thumbnails", "contact_images", "contact_videos"]:
+        (MEDIA_ROOT / sub_dir).mkdir(parents=True, exist_ok=True)
+except Exception:
+    pass
 
 
 # =========================================================
