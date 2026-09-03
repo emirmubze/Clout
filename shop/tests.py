@@ -1270,5 +1270,246 @@ class SeoOptimizationTests(TestCase):
         self.assertContains(response, '<link rel="manifest" href="/static/site.webmanifest">')
 
 
+class SubtitleSystemTests(TestCase):
+    def setUp(self):
+        self.admin = CustomUser.objects.create_superuser(
+            username="admin_test",
+            email="admin@example.com",
+            password="AdminPass123!",
+        )
+        self.student = CustomUser.objects.create_user(
+            username="student_test",
+            email="student@example.com",
+            password="StudentPass123!",
+            has_course_access=True,
+        )
+        self.course = Course.objects.create(
+            title="AI Video Course",
+            description="Testing subtitles",
+            is_active=True,
+        )
+        self.module = Module.objects.create(
+            course=self.course,
+            title="Module 1",
+            order=1,
+        )
+        self.lesson = Lesson.objects.create(
+            module=self.module,
+            title="Lesson 1",
+            video_url="https://example.com/test_video.mp4",
+            order=1,
+            subtitle_status="ready",
+        )
+
+    def test_timestamp_utilities(self):
+        from shop.subtitles import format_vtt_timestamp, format_srt_timestamp, parse_timestamp_to_seconds
+
+        self.assertEqual(format_vtt_timestamp(0), "00:00:00.000")
+        self.assertEqual(format_vtt_timestamp(65.432), "00:01:05.432")
+        self.assertEqual(format_srt_timestamp(65.432), "00:01:05,432")
+        self.assertAlmostEqual(parse_timestamp_to_seconds("00:01:05.432"), 65.432, places=3)
+        self.assertAlmostEqual(parse_timestamp_to_seconds("01:05,432"), 65.432, places=3)
+
+    def test_vtt_and_srt_generation_and_parsing(self):
+        from shop.subtitles import cues_to_vtt, cues_to_srt, vtt_to_cues
+
+        sample_cues = [
+            {"id": 1, "start": 0.0, "end": 2.5, "text": "Welcome to the course."},
+            {"id": 2, "start": 2.5, "end": 5.0, "text": "Let's learn AI together."},
+        ]
+
+        vtt_output = cues_to_vtt(sample_cues)
+        self.assertTrue(vtt_output.startswith("WEBVTT"))
+        self.assertIn("00:00:00.000 --> 00:00:02.500", vtt_output)
+        self.assertIn("Welcome to the course.", vtt_output)
+
+        srt_output = cues_to_srt(sample_cues)
+        self.assertIn("00:00:00,000 --> 00:00:02,500", srt_output)
+        self.assertIn("Let's learn AI together.", srt_output)
+
+        parsed_cues = vtt_to_cues(vtt_output)
+        self.assertEqual(len(parsed_cues), 2)
+        self.assertEqual(parsed_cues[0]["text"], "Welcome to the course.")
+        self.assertAlmostEqual(parsed_cues[0]["start"], 0.0)
+        self.assertAlmostEqual(parsed_cues[0]["end"], 2.5)
+
+    def test_subtitle_track_creation_and_serving(self):
+        from shop.models import SubtitleTrack
+        from shop.subtitles import cues_to_vtt, cues_to_srt
+
+        cues = [
+            {"id": 1, "start": 0.0, "end": 3.0, "text": "Hello world in English"},
+        ]
+        sub = SubtitleTrack.objects.create(
+            lesson=self.lesson,
+            language_code="en",
+            language_name="English",
+            is_original=True,
+            cues_data=cues,
+            vtt_content=cues_to_vtt(cues),
+            srt_content=cues_to_srt(cues),
+            status="ready",
+        )
+
+        self.assertEqual(str(sub), "Lesson 1 [English]")
+        self.assertTrue(sub.vtt_public_url.startswith("/subtitles/vtt/"))
+        self.assertTrue(sub.srt_public_url.startswith("/subtitles/srt/"))
+
+        # Test serving VTT
+        vtt_res = self.client.get(reverse("serve_subtitle_vtt", args=[sub.id]))
+        self.assertEqual(vtt_res.status_code, 200)
+        self.assertIn("text/vtt", vtt_res["Content-Type"])
+        self.assertEqual(vtt_res["Access-Control-Allow-Origin"], "*")
+        self.assertIn("Hello world in English", vtt_res.content.decode("utf-8"))
+
+        # Test serving SRT
+        srt_res = self.client.get(reverse("serve_subtitle_srt", args=[sub.id]))
+        self.assertEqual(srt_res.status_code, 200)
+        self.assertIn("attachment", srt_res["Content-Disposition"])
+        self.assertIn("Hello world in English", srt_res.content.decode("utf-8"))
+
+    def test_api_lesson_subtitles_endpoint(self):
+        from shop.models import SubtitleTrack
+
+        SubtitleTrack.objects.create(
+            lesson=self.lesson,
+            language_code="en",
+            language_name="English",
+            status="ready",
+            cues_data=[{"id": 1, "start": 0.0, "end": 2.0, "text": "Hello"}],
+        )
+        SubtitleTrack.objects.create(
+            lesson=self.lesson,
+            language_code="ml",
+            language_name="Malayalam",
+            status="ready",
+            cues_data=[{"id": 1, "start": 0.0, "end": 2.0, "text": "നമസ്കാരം"}],
+        )
+
+        # Student with course access
+        self.client.force_login(self.student)
+        res = self.client.get(reverse("api_lesson_subtitles", args=[self.lesson.id]))
+        self.assertEqual(res.status_code, 200)
+        data = res.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(len(data["subtitles"]), 2)
+        lang_codes = [s["language_code"] for s in data["subtitles"]]
+        self.assertIn("en", lang_codes)
+        self.assertIn("ml", lang_codes)
+
+    def test_admin_subtitle_cue_editor_api(self):
+        from shop.models import SubtitleTrack
+
+        sub = SubtitleTrack.objects.create(
+            lesson=self.lesson,
+            language_code="hi",
+            language_name="Hindi",
+            status="ready",
+            cues_data=[{"id": 1, "start": 0.0, "end": 2.0, "text": "नमस्ते"}],
+        )
+
+        # Anonymous cannot access
+        self.client.logout()
+        res_anon = self.client.get(reverse("api_admin_subtitle_details", args=[sub.id]))
+        self.assertNotEqual(res_anon.status_code, 200)
+
+        # Admin can access details
+        self.client.force_login(self.admin)
+        res_admin = self.client.get(reverse("api_admin_subtitle_details", args=[sub.id]))
+        self.assertEqual(res_admin.status_code, 200)
+        data = res_admin.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["subtitle"]["language_name"], "Hindi")
+
+        # Admin can update cues
+        updated_cues = [
+            {"id": 1, "start": 0.5, "end": 3.0, "text": "नमस्ते दोस्तों, स्वागत है।"},
+            {"id": 2, "start": 3.2, "end": 6.0, "text": "आज हम AI सीखेंगे।"},
+        ]
+        update_res = self.client.post(
+            reverse("api_admin_update_cues", args=[sub.id]),
+            data=json.dumps({"cues": updated_cues}),
+            content_type="application/json",
+        )
+        self.assertEqual(update_res.status_code, 200)
+        sub.refresh_from_db()
+        self.assertEqual(len(sub.cues_data), 2)
+        self.assertEqual(sub.cues_data[0]["text"], "नमस्ते दोस्तों, स्वागत है।")
+        self.assertIn("WEBVTT", sub.vtt_content)
+
+    def test_admin_target_languages_config_api(self):
+        self.client.force_login(self.admin)
+
+        # GET active languages
+        get_res = self.client.get(reverse("api_admin_languages_config"))
+        self.assertEqual(get_res.status_code, 200)
+        get_data = get_res.json()
+        self.assertTrue(get_data["success"])
+        self.assertTrue(len(get_data["all_languages"]) > 8)
+
+        # POST new active languages
+        post_res = self.client.post(
+            reverse("api_admin_languages_config"),
+            data=json.dumps({"languages": ["en", "ml", "hi", "ta", "ar", "ja"]}),
+            content_type="application/json",
+        )
+        self.assertEqual(post_res.status_code, 200)
+        post_data = post_res.json()
+        self.assertTrue(post_data["success"])
+        self.assertEqual(post_data["active_languages"], ["en", "ml", "hi", "ta", "ar", "ja"])
+
+    def test_admin_delete_subtitle_api(self):
+        from shop.models import SubtitleTrack
+
+        sub = SubtitleTrack.objects.create(
+            lesson=self.lesson,
+            language_code="es",
+            language_name="Spanish",
+            status="ready",
+        )
+        self.client.force_login(self.admin)
+        del_res = self.client.post(reverse("api_admin_delete_subtitle", args=[sub.id]))
+        self.assertEqual(del_res.status_code, 200)
+        self.assertFalse(SubtitleTrack.objects.filter(id=sub.id).exists())
+
+    @patch("shop.subtitles.transcribe_video_audio")
+    @patch("shop.subtitles.resolve_video_file_to_local")
+    @patch("shop.subtitles.translate_cues_to_language")
+    def test_subtitle_generation_pipeline(self, mock_translate, mock_resolve, mock_transcribe):
+        from shop.subtitles import process_subtitles_for_lesson
+        from shop.models import SubtitleTrack
+
+        mock_resolve.return_value = ("c:/dummy/video.mp4", False)
+        mock_transcribe.return_value = (
+            [
+                {"id": 1, "start": 0.0, "end": 2.0, "text": "Welcome to the class."},
+                {"id": 2, "start": 2.1, "end": 4.5, "text": "In this lesson we build software."},
+            ],
+            "English",
+        )
+        mock_translate.return_value = [
+            {"id": 1, "start": 0.0, "end": 2.0, "text": "ക്ലാസ്സിലേക്ക് സ്വാഗതം."},
+            {"id": 2, "start": 2.1, "end": 4.5, "text": "ഈ പാഠത്തിൽ ഞങ്ങൾ സോഫ്റ്റ്‌വെയർ നിർമ്മിക്കുന്നു."},
+        ]
+
+        success = process_subtitles_for_lesson(self.lesson.id, target_languages=["en", "ml"])
+        self.assertTrue(success)
+
+        self.lesson.refresh_from_db()
+        self.assertEqual(self.lesson.subtitle_status, "ready")
+        self.assertEqual(self.lesson.detected_language, "English")
+
+        en_track = SubtitleTrack.objects.filter(lesson=self.lesson, language_code="en").first()
+        self.assertIsNotNone(en_track)
+        self.assertTrue(en_track.is_original)
+        self.assertEqual(len(en_track.cues_data), 2)
+
+        ml_track = SubtitleTrack.objects.filter(lesson=self.lesson, language_code="ml").first()
+        self.assertIsNotNone(ml_track)
+        self.assertFalse(ml_track.is_original)
+        self.assertIn("ക്ലാസ്സിലേക്ക് സ്വാഗതം", ml_track.vtt_content)
+
+
+
 
 
