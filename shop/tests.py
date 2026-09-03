@@ -1261,14 +1261,11 @@ class SeoOptimizationTests(TestCase):
     def test_homepage_favicon_tags(self):
         response = self.client.get(reverse("index"))
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, '<link rel="icon" type="image/x-icon" href="/static/favicon.ico">')
-        self.assertContains(response, '<link rel="icon" type="image/png" sizes="48x48" href="/static/favicon-48x48.png">')
-        self.assertContains(response, '<link rel="icon" type="image/png" sizes="96x96" href="/static/favicon-96x96.png">')
-        self.assertContains(response, '<link rel="icon" type="image/png" sizes="144x144" href="/static/favicon-144x144.png">')
-        self.assertContains(response, '<link rel="icon" type="image/png" sizes="192x192" href="/static/favicon-192x192.png">')
+        self.assertContains(response, '<link rel="icon" type="image/png" href="/favicon.png">')
+        self.assertContains(response, '<link rel="apple-touch-icon" href="/favicon.png">')
         self.assertContains(response, '<link rel="icon" type="image/png" sizes="512x512" href="/static/favicon-512x512.png">')
-        self.assertContains(response, '<link rel="icon" type="image/png" href="/static/favicon.png">')
-        self.assertContains(response, '<link rel="shortcut icon" href="/static/favicon.ico">')
+        self.assertContains(response, '<link rel="icon" type="image/png" sizes="192x192" href="/static/favicon-192x192.png">')
+        self.assertContains(response, '<link rel="icon" type="image/png" sizes="48x48" href="/static/favicon-48x48.png">')
         self.assertContains(response, '<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">')
         self.assertContains(response, '<link rel="manifest" href="/static/site.webmanifest">')
 
