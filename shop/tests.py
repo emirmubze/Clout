@@ -598,6 +598,117 @@ class UserAuthAndDashboardTests(TestCase):
         user.refresh_from_db()
         self.assertTrue(user.course_access_approved)
 
+    def test_saving_empty_module_creates_no_lessons(self):
+        admin = CustomUser.objects.create_user(
+            username="emptyadmin",
+            email="emptyadmin@example.com",
+            password="StrongPass123!",
+            is_staff=True,
+        )
+        course = Course.objects.create(title="Empty Test Course")
+        self.client.force_login(admin)
+        response = self.client.post(
+            reverse("admin_modules_save"),
+            {
+                "module_count": "1",
+                "module_id_0": "",
+                "module_title_0": "Empty New Module",
+                "module_description_0": "",
+                "module_lesson_count_0": "0",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        module = Module.objects.filter(title="Empty New Module").first()
+        self.assertIsNotNone(module)
+        self.assertEqual(module.lessons.count(), 0)
+
+    def test_admin_modules_save_returns_updated_modules_and_preserves_assets(self):
+        admin = CustomUser.objects.create_user(
+            username="modulesaver",
+            email="modulesaver@example.com",
+            password="StrongPass123!",
+            is_staff=True,
+        )
+        course = Course.objects.create(title="Curriculum Test Course", is_active=True)
+        module = Module.objects.create(course=course, title="Module Alpha", order=1)
+        lesson = Lesson.objects.create(
+            module=module,
+            title="Lesson Alpha 1",
+            video_url="https://example.com/video1.mp4",
+            thumbnail_url="https://example.com/thumb1.jpg",
+            order=1,
+        )
+
+        self.client.force_login(admin)
+        response = self.client.post(
+            reverse("admin_modules_save"),
+            {
+                "course_id": str(course.id),
+                "module_count": "1",
+                "module_id_0": str(module.id),
+                "module_title_0": "Module Alpha Renamed",
+                "module_description_0": "Module description",
+                "module_lesson_count_0": "1",
+                "module_0_lesson_id_0": str(lesson.id),
+                "module_0_lesson_title_0": "Lesson Alpha Renamed",
+                "module_0_lesson_description_0": "Lesson description",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["course_id"], course.id)
+        self.assertEqual(len(data["modules"]), 1)
+        self.assertEqual(data["modules"][0]["title"], "Module Alpha Renamed")
+        self.assertEqual(len(data["modules"][0]["lessons"]), 1)
+        self.assertEqual(data["modules"][0]["lessons"][0]["title"], "Lesson Alpha Renamed")
+        self.assertEqual(data["modules"][0]["lessons"][0]["video_url"], "https://example.com/video1.mp4")
+        self.assertEqual(data["modules"][0]["lessons"][0]["thumbnail_url"], "https://example.com/thumb1.jpg")
+
+        lesson.refresh_from_db()
+        self.assertEqual(lesson.title, "Lesson Alpha Renamed")
+        self.assertEqual(lesson.video_url, "https://example.com/video1.mp4")
+        self.assertEqual(lesson.thumbnail_url, "https://example.com/thumb1.jpg")
+
+    def test_admin_dashboard_renders_course_modules_and_lessons(self):
+        admin = CustomUser.objects.create_user(
+            username="dashboardadmin",
+            email="dashboardadmin@example.com",
+            password="StrongPass123!",
+            is_staff=True,
+            is_superuser=True,
+        )
+        course = Course.objects.create(title="Active Dashboard Course", is_active=True)
+        module = Module.objects.create(course=course, title="Dashboard Module 1", order=1)
+        Lesson.objects.create(module=module, title="Dashboard Lesson 1", order=1)
+
+        self.client.force_login(admin)
+        response = self.client.get(reverse("admin_dashboard"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Dashboard Module 1")
+        self.assertContains(response, "Dashboard Lesson 1")
+        self.assertEqual(len(response.context["course_modules"]), 1)
+        self.assertEqual(len(response.context["course_modules"][0]["lessons"]), 1)
+
+    def test_empty_module_renders_empty_state_in_course_view(self):
+        user = CustomUser.objects.create_user(
+            username="courseviewer",
+            email="courseviewer@example.com",
+            password="StrongPass123!",
+            is_superuser=True,
+        )
+        course = Course.objects.create(title="Active Empty Course", is_active=True)
+        Module.objects.create(course=course, title="Module Without Lessons", order=1)
+
+        self.client.force_login(user)
+        response = self.client.get(reverse("course"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Module Without Lessons")
+        self.assertContains(response, "No lessons added yet")
+        self.assertContains(response, "0 lessons")
+
     def test_admin_can_toggle_free_course_access(self):
         admin = CustomUser.objects.create_user(
             username="adminuser2",

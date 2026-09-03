@@ -303,7 +303,9 @@ def course(request):
 
         course_obj = Course.objects.filter(
             is_active=True
-        ).first()
+        ).order_by("-created_at").first()
+        if not course_obj:
+            course_obj = Course.objects.first()
 
         modules = []
 
@@ -328,7 +330,9 @@ def course(request):
 
             course_obj = Course.objects.filter(
                 is_active=True
-            ).first()
+            ).order_by("-created_at").first()
+            if not course_obj:
+                course_obj = Course.objects.first()
 
             modules = []
 
@@ -602,13 +606,27 @@ def admin_dashboard(request):
         paid_user_ids | approved_user_ids
     )
 
+    selected_course_id = request.GET.get(
+        "edit_course_id"
+    )
+
+    editing_course = None
+
+    if selected_course_id:
+        editing_course = Course.objects.filter(
+            id=selected_course_id
+        ).first()
+
     courses = Course.objects.filter(
         is_active=True
     ).order_by(
         "-created_at"
     )
 
-    active_course = courses.first()
+    active_course = editing_course or courses.first()
+    if not active_course:
+        active_course = Course.objects.first()
+
     course_modules = []
     if active_course:
         course_modules = [
@@ -628,28 +646,11 @@ def admin_dashboard(request):
                         "detected_language": lesson.detected_language,
                         "subtitle_count": lesson.subtitles.count(),
                     }
-                    for lesson in module.lessons.prefetch_related("subtitles").all()
+                    for lesson in module.lessons.prefetch_related("subtitles").all().order_by("order")
                 ],
             }
-            for module in active_course.modules.prefetch_related("lessons__subtitles").all()
+            for module in active_course.modules.prefetch_related("lessons__subtitles").all().order_by("order")
         ]
-
-    # =====================================================
-    # COURSE EDIT
-    # =====================================================
-
-    selected_course_id = request.GET.get(
-        "edit_course_id"
-    )
-
-    editing_course = None
-
-    if selected_course_id:
-
-        editing_course = get_object_or_404(
-            Course,
-            id=selected_course_id
-        )
 
     course_form = (
         CourseForm(
@@ -672,6 +673,7 @@ def admin_dashboard(request):
             "total_payments": total_payments,
             "course_buyers": course_buyers,
             "courses": courses,
+            "active_course": active_course,
             "course_modules": course_modules,
             "course_count": courses.count(),
             "course_form": course_form,
@@ -1122,7 +1124,18 @@ def _admin_modules_save_impl(request):
         except (json.JSONDecodeError, AttributeError):
             return JsonResponse({"success": False, "message": "Invalid module data."}, status=400)
 
-    course = Course.objects.filter(is_active=True).first()
+    course_id = request.POST.get("course_id") or request.GET.get("course_id")
+    course = None
+    if course_id:
+        course = Course.objects.filter(id=course_id).first()
+    if course is None:
+        selected_course_id = request.GET.get("edit_course_id")
+        if selected_course_id:
+            course = Course.objects.filter(id=selected_course_id).first()
+    if course is None:
+        course = Course.objects.filter(is_active=True).order_by("-created_at").first()
+    if course is None:
+        course = Course.objects.first()
     if course is None:
         course = Course.objects.create(
             title="My Course",
@@ -1134,6 +1147,7 @@ def _admin_modules_save_impl(request):
 
     try:
         with transaction.atomic():
+            saved_module_ids = []
             for order, item in enumerate(module_items, start=1):
                 title = str(item.get("title", "")).strip()
                 if not title:
@@ -1151,22 +1165,32 @@ def _admin_modules_save_impl(request):
                 if isinstance(item, dict) and item.get("video"):
                     module_obj.video = item["video"]
                 if isinstance(item, dict) and item.get("video_url"):
-                    module_obj.video_url = str(item["video_url"]).strip()
+                    v_url = str(item["video_url"]).strip()
+                    if v_url:
+                        module_obj.video_url = v_url
                 if isinstance(item, dict) and item.get("video_key"):
-                    _verify_r2_object(str(item["video_key"]).strip())
-                    module_obj.video = str(item["video_key"]).strip()
+                    v_key = str(item["video_key"]).strip()
+                    if v_key:
+                        _verify_r2_object(v_key)
+                        module_obj.video = v_key
                 module_obj.save()
+                saved_module_ids.append(module_obj.id)
 
                 lessons = item.get("lessons") if isinstance(item, dict) else []
+                saved_lesson_ids = []
                 for lesson_order, lesson_item in enumerate(lessons, start=1):
                     lesson_title = str(lesson_item.get("title", "")).strip() if isinstance(lesson_item, dict) else ""
                     if not lesson_title:
                         lesson_title = f"Lesson {lesson_order}"
 
                     lesson_id = lesson_item.get("id") if isinstance(lesson_item, dict) else None
-                    lesson_obj = module_obj.lessons.filter(id=lesson_id).first() if lesson_id else None
+                    lesson_obj = None
+                    if lesson_id:
+                        lesson_obj = Lesson.objects.filter(id=lesson_id).first()
                     if lesson_obj is None:
                         lesson_obj = Lesson(module=module_obj)
+                    else:
+                        lesson_obj.module = module_obj
 
                     lesson_obj.title = lesson_title
                     lesson_obj.description = str(lesson_item.get("description", "")).strip() if isinstance(lesson_item, dict) else ""
@@ -1179,20 +1203,28 @@ def _admin_modules_save_impl(request):
                         new_url = str(lesson_item["video_url"]).strip()
                         if new_url and new_url != lesson_obj.video_url:
                             has_video_change = True
-                        lesson_obj.video_url = new_url
+                            lesson_obj.video_url = new_url
                     if isinstance(lesson_item, dict) and lesson_item.get("video_key"):
                         v_key = str(lesson_item["video_key"]).strip()
-                        _verify_r2_object(v_key)
-                        lesson_obj.video = v_key
-                        has_video_change = True
+                        if v_key:
+                            _verify_r2_object(v_key)
+                            lesson_obj.video = v_key
+                            has_video_change = True
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail"):
                         lesson_obj.thumbnail = lesson_item["thumbnail"]
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail_url"):
-                        lesson_obj.thumbnail_url = str(lesson_item["thumbnail_url"]).strip()
+                        t_url = str(lesson_item["thumbnail_url"]).strip()
+                        if t_url:
+                            lesson_obj.thumbnail_url = t_url
                     lesson_obj.save()
+                    saved_lesson_ids.append(lesson_obj.id)
 
                     if (has_video_change or (lesson_obj.video or lesson_obj.video_url) and lesson_obj.subtitle_status == "none"):
                         lessons_to_trigger_subtitles.append(lesson_obj.id)
+
+                module_obj.lessons.exclude(id__in=saved_lesson_ids).delete()
+
+            course.modules.exclude(id__in=saved_module_ids).delete()
     except Exception:
         logger.exception("Admin module save failed")
         return JsonResponse(
@@ -1207,11 +1239,35 @@ def _admin_modules_save_impl(request):
         except Exception as exc:
             logger.warning("Could not start background subtitle generation for lesson %s: %s", lid, exc)
 
+    updated_course_modules = [
+        {
+            "id": mod.id,
+            "title": mod.title,
+            "description": mod.description,
+            "video_url": mod.video_public_url,
+            "lessons": [
+                {
+                    "id": les.id,
+                    "title": les.title,
+                    "description": les.description,
+                    "video_url": les.video_public_url,
+                    "thumbnail_url": les.thumbnail_public_url,
+                    "subtitle_status": les.subtitle_status,
+                    "detected_language": les.detected_language,
+                    "subtitle_count": les.subtitles.count(),
+                }
+                for les in mod.lessons.prefetch_related("subtitles").all().order_by("order")
+            ],
+        }
+        for mod in course.modules.prefetch_related("lessons__subtitles").all().order_by("order")
+    ]
+
     return JsonResponse({
         "success": True,
         "message": "Course modules saved successfully.",
         "course_id": course.id,
-        "module_count": len(module_items),
+        "module_count": len(updated_course_modules),
+        "modules": updated_course_modules,
     })
 
 

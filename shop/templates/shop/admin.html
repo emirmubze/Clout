@@ -3045,6 +3045,7 @@
 
                 <div class="module-manager">
                     {% csrf_token %}
+                    <input type="hidden" name="course_id" id="currentCourseId" value="{{ active_course.id|default:'' }}">
                     <div class="module-manager-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
                         <div>
                             <h3>Course Content Structure</h3>
@@ -3376,7 +3377,6 @@
             module.querySelector(".module-title-input").value = moduleData?.title || "";
             renumberEditorModules();
             (moduleData?.lessons || []).forEach(lessonData => addEditorLesson(module.querySelector(".editor-add-lesson"), lessonData));
-            if (!moduleData) addEditorLesson(module.querySelector(".editor-add-lesson"));
             updateModuleCount();
         }
 
@@ -3403,9 +3403,6 @@
 
         function addEditorLesson(button, lessonData = null) {
             const module = button.closest(".module-editor");
-            const moduleNumber = module.dataset.moduleNumber || "1";
-            moduleLessonCounts[moduleNumber] = (moduleLessonCounts[moduleNumber] || 0) + 1;
-            const number = moduleLessonCounts[moduleNumber];
             const lesson = document.createElement("div");
             lesson.className = "editor-lesson";
             if (lessonData?.id) lesson.dataset.lessonId = lessonData.id;
@@ -3427,14 +3424,14 @@
                 }
 
                 if (lessonData.video_url || count > 0 || status !== "none") {
-                    subtitleManageBtnHtml = `<button class="sub-manage-btn" type="button" onclick="openSubtitleManagerModal(${lessonData.id}, '${escapeHtml(lessonData.title || `Lesson ${number}`)}')"><i class="fa-solid fa-closed-captioning"></i> Manage Subtitles</button>`;
+                    subtitleManageBtnHtml = `<button class="sub-manage-btn" type="button" onclick="openSubtitleManagerModal(${lessonData.id}, '${escapeHtml(lessonData.title || 'Lesson')}')"><i class="fa-solid fa-closed-captioning"></i> Manage Subtitles</button>`;
                 }
             }
 
             lesson.innerHTML = `
                 <div class="editor-lesson-header">
                     <div class="editor-lesson-header-left">
-                        <strong><span class="editor-lesson-number">${String(number).padStart(2, "0")}</span> Lesson</strong>
+                        <strong><span class="editor-lesson-number">01</span> Lesson</strong>
                         ${subtitleBadgeHtml}
                     </div>
                     <div class="editor-lesson-header-right">
@@ -3455,7 +3452,7 @@
                     </div>
                     <div class="editor-form-row">
                         <div class="editor-form-group">
-                            <label>Lesson ${number} Video</label>
+                            <label class="editor-lesson-video-label">Lesson Video</label>
                             <div class="editor-video-row">
                                 <label class="editor-video-button">
                                     ▶ Choose Video
@@ -3485,6 +3482,7 @@
                 lesson.querySelector(".editor-thumbnail-box").replaceChildren(image);
             }
             if (lessonData?.video_url) lesson.querySelector(".editor-video-name").textContent = "Existing video attached";
+            renumberEditorLessons(module);
         }
 
         function deleteEditorLesson(button) {
@@ -3494,10 +3492,18 @@
         }
 
         function renumberEditorLessons(module) {
+            if (!module) return;
             module.querySelectorAll(".editor-lesson").forEach((lesson, index) => {
-                lesson.querySelector(".editor-lesson-number").textContent = String(index + 1).padStart(2, "0");
+                const num = index + 1;
+                const numEl = lesson.querySelector(".editor-lesson-number");
+                if (numEl) numEl.textContent = String(num).padStart(2, "0");
+                const label = lesson.querySelector(".editor-lesson-video-label");
+                if (label) label.textContent = `Lesson ${num} Video`;
             });
-            moduleLessonCounts[module.dataset.moduleNumber] = module.querySelectorAll(".editor-lesson").length;
+            const modNum = module.dataset.moduleNumber;
+            if (modNum) {
+                moduleLessonCounts[modNum] = module.querySelectorAll(".editor-lesson").length;
+            }
         }
 
         function toggleEditorModule(button) {
@@ -3533,6 +3539,18 @@
             window.history.back();
         }
 
+        function renderAllModules(modulesData) {
+            const container = document.getElementById("modules");
+            if (!container) return;
+            container.innerHTML = "";
+            moduleLessonCounts = {};
+            if (Array.isArray(modulesData) && modulesData.length > 0) {
+                modulesData.forEach(moduleData => addModule(moduleData));
+            }
+            renumberEditorModules();
+            updateModuleCount();
+        }
+
         async function saveCourse() {
             const saveButton = document.getElementById("saveButton");
             const moduleEditors = [...document.querySelectorAll("#modules .module-editor")];
@@ -3547,6 +3565,7 @@
 
             const token = document.querySelector("input[name='csrfmiddlewaretoken']")?.value || "";
             const formData = new FormData();
+            formData.append("course_id", document.getElementById("currentCourseId")?.value || "");
             formData.append("module_count", String(moduleEditors.length));
 
             moduleEditors.forEach((module, moduleIndex) => {
@@ -3615,6 +3634,14 @@
                         : `Server error (${response.status}). Check server logs.`);
                 }
                 if (!response.ok || !data.success) throw new Error(data.message || "Could not save modules.");
+
+                if (data.modules && Array.isArray(data.modules)) {
+                    renderAllModules(data.modules);
+                }
+                if (data.course_id) {
+                    const currentCourseIdInput = document.getElementById("currentCourseId");
+                    if (currentCourseIdInput) currentCourseIdInput.value = data.course_id;
+                }
                 alert(data.message || "Modules and lessons saved successfully.");
             } catch (error) {
                 alert(error.message || "Could not save modules and lessons.");
@@ -3627,8 +3654,7 @@
         }
 
         const existingCourseModules = JSON.parse(document.getElementById("course-modules-data")?.textContent || "[]");
-        existingCourseModules.forEach(moduleData => addModule(moduleData));
-        updateModuleCount();
+        renderAllModules(existingCourseModules);
     </script>
 
     <!-- =====================================================

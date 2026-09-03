@@ -946,12 +946,10 @@ button {
     border-radius: 6px;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
-    animation: fadeInCue 0.12s ease-out;
-}
-
-@keyframes fadeInCue {
-    from { opacity: 0; transform: translateY(3px); }
-    to { opacity: 1; transform: translateY(0); }
+    pointer-events: none;
+    user-select: none;
+    white-space: pre-line;
+    word-break: break-word;
 }
 
 @media (max-width: 640px) {
@@ -1218,6 +1216,22 @@ button {
 
 .module.open .lessons {
     display: block;
+}
+
+.module-empty-state {
+    padding: 14px 18px;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    font-style: italic;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #fafaf9;
+}
+
+.module-empty-state i {
+    font-size: 13px;
+    color: #94a3b8;
 }
 
 .lesson {
@@ -1738,22 +1752,9 @@ button {
                                     <i class="fa-solid fa-circle-check lesson-check"></i>
                                 </div>
                             {% empty %}
-                                <div
-                                    class="lesson"
-                                    data-title="{{ module.title|escape }}"
-                                    data-module="{{ module.title|escape }}"
-                                    data-description="This module does not have any lessons yet."
-                                    data-label="MODULE {{ forloop.counter|stringformat:'02d' }}"
-                                    data-video=""
-                                    onclick="selectLesson(this)"
-                                >
-                                    <div class="lesson-thumb">
-                                        <i class="fa-solid fa-video-slash"></i>
-                                    </div>
-                                    <div class="lesson-details">
-                                        <div class="lesson-title">{{ module.title }}</div>
-                                        <div class="lesson-meta">No lessons added</div>
-                                    </div>
+                                <div class="module-empty-state">
+                                    <i class="fa-regular fa-folder-open"></i>
+                                    <span>No lessons added yet</span>
                                 </div>
                             {% endfor %}
                         </div>
@@ -1770,22 +1771,9 @@ button {
                         </div>
                     </div>
                     <div class="lessons">
-                        <div
-                            class="lesson active"
-                            data-title="Course Not Ready"
-                            data-module="Course"
-                            data-description="No course content has been added yet."
-                            data-label="COURSE"
-                            data-video=""
-                            onclick="selectLesson(this)"
-                        >
-                            <div class="lesson-thumb">
-                                <i class="fa-solid fa-circle-info"></i>
-                            </div>
-                            <div class="lesson-details">
-                                <div class="lesson-title">Course Not Ready</div>
-                                <div class="lesson-meta">Check back later</div>
-                            </div>
+                        <div class="module-empty-state">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>No course content has been added yet</span>
                         </div>
                     </div>
                 </div>
@@ -1874,6 +1862,7 @@ button {
     let currentSubtitles = [];
     let selectedSubtitleLang = localStorage.getItem("clout_preferred_subtitle_lang") || "off";
     let activeCueList = [];
+    let currentRenderedCueText = "";
 
     /* =========================================================
        HELPERS: TIME FORMAT & EMBED DETECTION
@@ -2461,7 +2450,7 @@ button {
                     textLines.push(lines[i]);
                     i++;
                 }
-                const text = textLines.join(" ").trim();
+                const text = textLines.join("\n").trim();
                 if (text) {
                     cues.push({ start, end, text });
                 }
@@ -2487,6 +2476,7 @@ button {
     async function loadLessonSubtitles(lessonId) {
         currentSubtitles = [];
         activeCueList = [];
+        currentRenderedCueText = "";
         if (subtitleOverlay) subtitleOverlay.innerHTML = "";
         video.querySelectorAll("track").forEach(t => t.remove());
 
@@ -2561,6 +2551,7 @@ button {
 
         if (langCode === "off") {
             activeCueList = [];
+            currentRenderedCueText = "";
             if (subtitleOverlay) subtitleOverlay.innerHTML = "";
             video.querySelectorAll("track").forEach(t => t.remove());
             if (ccButton) ccButton.classList.remove("active");
@@ -2584,25 +2575,40 @@ button {
         trackEl.label = track.language_name;
         trackEl.srclang = track.language_code;
         trackEl.src = track.vtt_url;
-        trackEl.default = true;
+        trackEl.default = false;
         video.appendChild(trackEl);
+        if (trackEl.track) {
+            trackEl.track.mode = "hidden";
+        }
 
         activeCueList = await parseVttFromUrl(track.vtt_url);
+        currentRenderedCueText = "";
         updateSubtitleDisplay();
     }
 
     function updateSubtitleDisplay() {
         if (!subtitleOverlay) return;
-        if (selectedSubtitleLang === "off" || !activeCueList.length) {
-            subtitleOverlay.innerHTML = "";
+        if (selectedSubtitleLang === "off" || !activeCueList || !activeCueList.length) {
+            if (currentRenderedCueText !== "") {
+                subtitleOverlay.innerHTML = "";
+                currentRenderedCueText = "";
+            }
             return;
         }
 
         const curTime = video.currentTime;
         const activeCue = activeCueList.find(c => curTime >= c.start && curTime <= c.end);
+        const targetText = (activeCue && activeCue.text) ? activeCue.text : "";
 
-        if (activeCue && activeCue.text) {
-            subtitleOverlay.innerHTML = `<div class="subtitle-cue-box">${escapeHtml(activeCue.text)}</div>`;
+        // If the cue text has not changed, avoid touching the DOM to prevent blinking
+        if (targetText === currentRenderedCueText) {
+            return;
+        }
+
+        currentRenderedCueText = targetText;
+
+        if (targetText) {
+            subtitleOverlay.innerHTML = `<div class="subtitle-cue-box">${escapeHtml(targetText)}</div>`;
         } else {
             subtitleOverlay.innerHTML = "";
         }
@@ -2805,7 +2811,7 @@ button {
         const percent = total > 0 ? Math.round((watched / total) * 100) : 0;
 
         courseProgressFill.style.width = percent + "%";
-        courseProgressText.textContent = `${percent}% Completed (${watched}/${total})`;
+        courseProgressText.textContent = total > 0 ? `${percent}% Completed (${watched}/${total})` : "0% Completed";
 
         // Save watched lesson IDs to localStorage
         const watchedIds = Array.from(watchedLessons).map(l => l.dataset.lessonId).filter(Boolean);
@@ -2834,6 +2840,12 @@ button {
     const activeLesson = document.querySelector(".lesson.active") || document.querySelector(".lesson");
     if (activeLesson) {
         selectLesson(activeLesson);
+    } else {
+        emptyStateTitle.textContent = "No Lessons Available";
+        emptyStateDesc.textContent = "This course does not have any lessons added yet.";
+        videoEmptyState.classList.add("visible");
+        lessonTitle.textContent = "Welcome to your course";
+        lessonDescription.textContent = "No lessons have been published yet. Please check back later.";
     }
 
     showControls();
