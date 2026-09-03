@@ -209,6 +209,8 @@ except Exception:
 # =========================================================
 
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+DB_ENGINE = os.getenv("DB_ENGINE", "").strip()
+DB_HOST = os.getenv("DB_HOST", "").strip()
 
 if DATABASE_URL:
     DATABASES = {
@@ -226,17 +228,42 @@ if DATABASE_URL:
             ),
         )
     }
-else:
+elif DB_HOST or DB_ENGINE or os.getenv("USE_POSTGRES", "").lower() in ("1", "true", "yes"):
     DATABASES = {
         "default": {
-            "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.postgresql"),
+            "ENGINE": DB_ENGINE or "django.db.backends.postgresql",
             "NAME": os.getenv("DB_NAME", "clout"),
             "USER": os.getenv("DB_USER", "postgres"),
             "PASSWORD": os.getenv("DB_PASSWORD", "Mubashir@66"),
-            "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+            "HOST": DB_HOST or "127.0.0.1",
             "PORT": os.getenv("DB_PORT", "5432"),
             "CONN_MAX_AGE": 600,
             "CONN_HEALTH_CHECKS": True,
+        }
+    }
+else:
+    sqlite_path = os.getenv("SQLITE_PATH", "").strip()
+    if sqlite_path:
+        db_path = Path(sqlite_path)
+    else:
+        db_path = PERSISTENT_DATA_DIR / "db.sqlite3"
+
+    try:
+        db_path.parent.mkdir(parents=True, exist_ok=True)
+        if (
+            not db_path.exists()
+            and (BASE_DIR / "db.sqlite3").exists()
+            and db_path.resolve() != (BASE_DIR / "db.sqlite3").resolve()
+        ):
+            import shutil
+            shutil.copy2(BASE_DIR / "db.sqlite3", db_path)
+    except Exception:
+        pass
+
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": db_path,
         }
     }
 
