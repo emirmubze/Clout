@@ -22,6 +22,7 @@ from django.db import transaction
 from django.db.models import Q
 import mimetypes
 
+from django.core.files.base import ContentFile
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string

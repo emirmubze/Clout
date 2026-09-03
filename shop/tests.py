@@ -1281,7 +1281,12 @@ class SubtitleSystemTests(TestCase):
             username="student_test",
             email="student@example.com",
             password="StudentPass123!",
-            has_course_access=True,
+        )
+        Order.objects.create(
+            user=self.student,
+            razorpay_order_id="order_sub_test_123",
+            amount=499,
+            paid=True,
         )
         self.course = Course.objects.create(
             title="AI Video Course",

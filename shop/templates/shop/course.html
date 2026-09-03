@@ -60,6 +60,8 @@ html, body {
     min-height: -webkit-fill-available;
     min-height: 100svh;
     min-height: 100dvh;
+    width: 100%;
+    overflow-x: hidden;
 }
 
 body {
@@ -85,6 +87,7 @@ button {
    HEADER
 ========================================================= */
 .header {
+    width: 100%;
     height: 64px;
     background: #090d16;
     border-bottom: 1px solid rgba(255,255,255,.08);
@@ -114,6 +117,13 @@ button {
     line-height: 1;
     display: inline-flex;
     align-items: center;
+}
+
+.logo-img {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+    display: block;
 }
 
 .logo-badge {
@@ -573,6 +583,62 @@ button {
 
 .video-progress:hover .progress-tooltip {
     opacity: 1;
+}
+
+/* Video Overlays */
+.video-top-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 95px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.35) 55%, transparent 100%);
+    pointer-events: none;
+    z-index: 5;
+    transition: opacity 0.25s ease;
+}
+
+.video-bottom-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 110px;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.85) 0%, rgba(0, 0, 0, 0.35) 60%, transparent 100%);
+    pointer-events: none;
+    z-index: 5;
+    transition: opacity 0.25s ease;
+}
+
+/* Video Title in player */
+.video-title {
+    position: absolute;
+    top: 16px;
+    left: 20px;
+    right: 20px;
+    z-index: 6;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+}
+
+.video-module-name {
+    font-size: 11px;
+    font-weight: 800;
+    color: #ff7a29;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+}
+
+.video-lesson-name {
+    font-size: 16.5px;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.3;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
 }
 
 /* Controls Bar */
@@ -1223,9 +1289,9 @@ button {
 }
 
 .lesson-title {
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 600;
-    color: #999999;
+    color: #1e293b;
     line-height: 1.35;
     white-space: normal;
     word-wrap: break-word;
@@ -1233,8 +1299,8 @@ button {
 }
 
 .lesson.active .lesson-title {
-    color: #999999;
-    font-weight: 600;
+    color: #c2410c;
+    font-weight: 700;
 }
 
 .lesson-meta {
@@ -1471,28 +1537,6 @@ button {
                             aria-label="Forward 10 seconds"
                         >
                             <i class="fa-solid fa-rotate-right"></i>
-                        </button>
-
-                        <!-- Previous Lesson -->
-                        <button
-                            class="video-btn"
-                            id="previousButton"
-                            type="button"
-                            title="Previous lesson"
-                            aria-label="Previous lesson"
-                        >
-                            <i class="fa-solid fa-backward-step"></i>
-                        </button>
-
-                        <!-- Next Lesson -->
-                        <button
-                            class="video-btn"
-                            id="nextButton"
-                            type="button"
-                            title="Next lesson"
-                            aria-label="Next lesson"
-                        >
-                            <i class="fa-solid fa-forward-step"></i>
                         </button>
 
                         <!-- Volume -->
@@ -2202,17 +2246,23 @@ button {
         }
     }
 
-    previousButton.addEventListener("click", function(e) {
-        e.stopPropagation();
-        triggerPreviousLesson();
-    });
+    if (previousButton) {
+        previousButton.addEventListener("click", function(e) {
+            e.stopPropagation();
+            triggerPreviousLesson();
+        });
+    }
 
-    nextButton.addEventListener("click", function(e) {
-        e.stopPropagation();
-        triggerNextLesson();
-    });
+    if (nextButton) {
+        nextButton.addEventListener("click", function(e) {
+            e.stopPropagation();
+            triggerNextLesson();
+        });
+    }
 
-    nextLessonBtn.addEventListener("click", triggerNextLesson);
+    if (nextLessonBtn) {
+        nextLessonBtn.addEventListener("click", triggerNextLesson);
+    }
 
     markWatchedBtn.addEventListener("click", function() {
         if (currentLessonElement) {
