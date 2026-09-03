@@ -748,6 +748,153 @@ button {
     color: #ffffff;
 }
 
+/* =========================================================
+   SUBTITLES / CC & ON-SCREEN OVERLAY
+========================================================= */
+.subtitle-dropdown {
+    position: relative;
+}
+
+.cc-btn {
+    position: relative;
+}
+
+.cc-btn.active {
+    background: var(--brand-orange) !important;
+    border-color: var(--brand-orange) !important;
+    color: #ffffff !important;
+}
+
+.subtitle-menu {
+    position: absolute;
+    bottom: 44px;
+    right: 0;
+    background: rgba(14, 16, 20, 0.96);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: var(--radius-md, 10px);
+    backdrop-filter: blur(12px);
+    display: none;
+    flex-direction: column;
+    padding: 6px;
+    min-width: 175px;
+    max-height: 250px;
+    overflow-y: auto;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    z-index: 25;
+}
+
+.subtitle-menu.open {
+    display: flex;
+}
+
+.subtitle-menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 6px 10px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: 4px;
+}
+
+.subtitle-badge {
+    background: rgba(224, 79, 0, 0.25);
+    color: #ff7a29;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-weight: 800;
+}
+
+.subtitle-options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.subtitle-option {
+    padding: 7px 10px;
+    color: #e2e8f0;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-align: left;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    transition: background 0.12s ease, color 0.12s ease;
+}
+
+.subtitle-option:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+}
+
+.subtitle-option.active {
+    background: var(--brand-orange);
+    color: #ffffff;
+}
+
+.subtitle-option .check-mark {
+    font-size: 11px;
+    opacity: 0;
+}
+
+.subtitle-option.active .check-mark {
+    opacity: 1;
+}
+
+.video-subtitle-overlay {
+    position: absolute;
+    bottom: 64px;
+    left: 5%;
+    right: 5%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    pointer-events: none;
+    z-index: 11;
+    transition: bottom 0.2s ease;
+}
+
+.video-container.controls-hidden .video-subtitle-overlay {
+    bottom: 24px;
+}
+
+.subtitle-cue-box {
+    display: inline-block;
+    max-width: 85%;
+    background: rgba(10, 12, 16, 0.88);
+    color: #ffffff;
+    font-size: 16.5px;
+    font-weight: 600;
+    line-height: 1.45;
+    letter-spacing: 0.2px;
+    padding: 6px 14px;
+    border-radius: 6px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    animation: fadeInCue 0.12s ease-out;
+}
+
+@keyframes fadeInCue {
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 640px) {
+    .subtitle-cue-box {
+        font-size: 13px;
+        padding: 4px 10px;
+    }
+}
+
 /* Controls Hide State */
 .video-container.controls-hidden .video-controls,
 .video-container.controls-hidden .video-progress,
@@ -1268,6 +1415,7 @@ button {
                 <!-- Overlays -->
                 <div class="video-top-overlay"></div>
                 <div class="video-bottom-overlay"></div>
+                <div class="video-subtitle-overlay" id="subtitleOverlay"></div>
 
                 <!-- Video Title -->
                 <div class="video-title" id="playerTitle">
@@ -1389,6 +1537,31 @@ button {
                                 <div class="speed-option" data-speed="1.25">1.25x</div>
                                 <div class="speed-option" data-speed="1.5">1.5x</div>
                                 <div class="speed-option" data-speed="2">2x</div>
+                            </div>
+                        </div>
+
+                        <!-- Subtitles / CC Language Selector -->
+                        <div class="subtitle-dropdown" id="subtitleDropdown">
+                            <button
+                                class="video-btn cc-btn"
+                                id="ccButton"
+                                type="button"
+                                title="Subtitles / Closed Captions"
+                                aria-label="Subtitles / Closed Captions"
+                            >
+                                <i class="fa-solid fa-closed-captioning" id="ccIcon"></i>
+                            </button>
+                            <div class="subtitle-menu" id="subtitleMenu">
+                                <div class="subtitle-menu-header">
+                                    <span>Subtitles</span>
+                                    <span class="subtitle-badge" id="subtitleCountBadge">0</span>
+                                </div>
+                                <div class="subtitle-options-list" id="subtitleOptionsList">
+                                    <div class="subtitle-option active" data-lang="off">
+                                        <span>Off</span>
+                                        <i class="fa-solid fa-check check-mark"></i>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -1625,6 +1798,14 @@ button {
     const fullscreenButton = document.getElementById("fullscreenButton");
     const fullscreenIcon = document.getElementById("fullscreenIcon");
 
+    const ccButton = document.getElementById("ccButton");
+    const ccIcon = document.getElementById("ccIcon");
+    const subtitleDropdown = document.getElementById("subtitleDropdown");
+    const subtitleMenu = document.getElementById("subtitleMenu");
+    const subtitleOptionsList = document.getElementById("subtitleOptionsList");
+    const subtitleCountBadge = document.getElementById("subtitleCountBadge");
+    const subtitleOverlay = document.getElementById("subtitleOverlay");
+
     const resumeButton = document.getElementById("resumeButton");
     const resumeText = document.getElementById("resumeText");
     const playerModuleName = document.getElementById("playerModuleName");
@@ -1646,6 +1827,9 @@ button {
     let isDraggingProgress = false;
     let lastClickTime = 0;
     let lastVolume = 1;
+    let currentSubtitles = [];
+    let selectedSubtitleLang = localStorage.getItem("clout_preferred_subtitle_lang") || "off";
+    let activeCueList = [];
 
     /* =========================================================
        HELPERS: TIME FORMAT & EMBED DETECTION
@@ -1720,7 +1904,7 @@ button {
 
         if (!video.paused) {
             controlsTimer = setTimeout(function() {
-                if (!video.paused && !speedMenu.classList.contains("open")) {
+                if (!video.paused && !speedMenu.classList.contains("open") && !subtitleMenu.classList.contains("open")) {
                     videoContainer.classList.add("controls-hidden");
                 }
             }, 2600);
@@ -1730,7 +1914,7 @@ button {
     videoContainer.addEventListener("mousemove", showControls);
     videoContainer.addEventListener("touchstart", showControls, { passive: true });
     videoContainer.addEventListener("mouseleave", function() {
-        if (!video.paused) {
+        if (!video.paused && !subtitleMenu.classList.contains("open") && !speedMenu.classList.contains("open")) {
             videoContainer.classList.add("controls-hidden");
         }
     });
@@ -1879,6 +2063,9 @@ button {
                 progressBuffered.style.width = Math.min(100, bufferedPercent) + "%";
             } catch (e) {}
         }
+
+        // Subtitle synchronization
+        updateSubtitleDisplay();
 
         // Save progress every second
         if (currentLessonKey && video.currentTime > 2) {
@@ -2164,13 +2351,221 @@ button {
             this.classList.add("active");
             speedMenu.classList.remove("open");
         });
-    });
-
-    document.addEventListener("click", function(e) {
+    });    document.addEventListener("click", function(e) {
         if (!e.target.closest(".speed-dropdown")) {
             speedMenu.classList.remove("open");
         }
     });
+
+    /* =========================================================
+       SUBTITLE ENGINE & LANGUAGE SELECTOR
+    ========================================================= */
+    if (ccButton) {
+        ccButton.addEventListener("click", function(e) {
+            e.stopPropagation();
+            subtitleMenu.classList.toggle("open");
+            speedMenu.classList.remove("open");
+        });
+    }
+
+    document.addEventListener("click", function(e) {
+        if (!e.target.closest(".subtitle-dropdown")) {
+            subtitleMenu.classList.remove("open");
+        }
+    });
+
+    function parseTimestampToSeconds(ts) {
+        if (!ts) return 0;
+        const clean = String(ts).trim().replace(",", ".");
+        const parts = clean.split(":");
+        try {
+            if (parts.length === 3) return parseInt(parts[0], 10) * 3600 + parseInt(parts[1], 10) * 60 + parseFloat(parts[2]);
+            if (parts.length === 2) return parseInt(parts[0], 10) * 60 + parseFloat(parts[1]);
+            return parseFloat(parts[0]) || 0;
+        } catch (e) {
+            return 0;
+        }
+    }
+
+    function parseVttText(vttText) {
+        const cues = [];
+        if (!vttText) return cues;
+        const lines = vttText.split(/\r?\n/).map(l => l.trim());
+        const timeRegex = /((?:\d{2}:)?\d{2}:\d{2}[\.,]\d{3})\s*-->\s*((?:\d{2}:)?\d{2}:\d{2}[\.,]\d{3})/;
+
+        let i = 0;
+        while (i < lines.length) {
+            const line = lines[i];
+            if (!line || line.startsWith("WEBVTT") || line.startsWith("NOTE") || line.startsWith("STYLE")) {
+                i++;
+                continue;
+            }
+            const match = timeRegex.exec(line);
+            if (match) {
+                const start = parseTimestampToSeconds(match[1]);
+                const end = parseTimestampToSeconds(match[2]);
+                const textLines = [];
+                i++;
+                while (i < lines.length && lines[i] && !timeRegex.test(lines[i])) {
+                    if (lines[i].match(/^\d+$/) && i + 1 < lines.length && timeRegex.test(lines[i + 1])) break;
+                    textLines.push(lines[i]);
+                    i++;
+                }
+                const text = textLines.join(" ").trim();
+                if (text) {
+                    cues.push({ start, end, text });
+                }
+                continue;
+            }
+            i++;
+        }
+        return cues;
+    }
+
+    async function parseVttFromUrl(vttUrl) {
+        try {
+            const resp = await fetch(vttUrl);
+            if (!resp.ok) return [];
+            const text = await resp.text();
+            return parseVttText(text);
+        } catch (err) {
+            console.warn("Could not load VTT file:", err);
+            return [];
+        }
+    }
+
+    async function loadLessonSubtitles(lessonId) {
+        currentSubtitles = [];
+        activeCueList = [];
+        if (subtitleOverlay) subtitleOverlay.innerHTML = "";
+        video.querySelectorAll("track").forEach(t => t.remove());
+
+        if (!lessonId) {
+            renderSubtitleOptions();
+            return;
+        }
+
+        try {
+            const resp = await fetch(`/api/lessons/${lessonId}/subtitles/`);
+            const data = await resp.json();
+            if (data.success && Array.isArray(data.subtitles)) {
+                currentSubtitles = data.subtitles;
+            }
+        } catch (err) {
+            console.warn("Could not load subtitles for lesson:", err);
+        }
+
+        renderSubtitleOptions();
+
+        if (selectedSubtitleLang && selectedSubtitleLang !== "off") {
+            const match = currentSubtitles.find(s => s.language_code === selectedSubtitleLang);
+            if (match) {
+                await applySubtitleTrack(match);
+            } else {
+                if (ccButton) ccButton.classList.remove("active");
+            }
+        } else {
+            if (ccButton) ccButton.classList.remove("active");
+        }
+    }
+
+    function renderSubtitleOptions() {
+        if (!subtitleOptionsList || !subtitleCountBadge) return;
+        subtitleOptionsList.innerHTML = "";
+        subtitleCountBadge.textContent = currentSubtitles.length;
+
+        // "Off" option
+        const offOption = document.createElement("div");
+        offOption.className = "subtitle-option" + (selectedSubtitleLang === "off" ? " active" : "");
+        offOption.dataset.lang = "off";
+        offOption.innerHTML = `<span>Off</span><i class="fa-solid fa-check check-mark"></i>`;
+        offOption.addEventListener("click", () => selectSubtitleLanguage("off"));
+        subtitleOptionsList.appendChild(offOption);
+
+        // Language tracks
+        currentSubtitles.forEach(sub => {
+            const opt = document.createElement("div");
+            opt.className = "subtitle-option" + (selectedSubtitleLang === sub.language_code ? " active" : "");
+            opt.dataset.lang = sub.language_code;
+            const nativeName = sub.native_name && sub.native_name !== sub.language_name ? ` (${sub.native_name})` : "";
+            opt.innerHTML = `<span>${sub.language_name}${nativeName}</span><i class="fa-solid fa-check check-mark"></i>`;
+            opt.addEventListener("click", () => selectSubtitleLanguage(sub.language_code));
+            subtitleOptionsList.appendChild(opt);
+        });
+
+        if (!currentSubtitles.length) {
+            const noSubMsg = document.createElement("div");
+            noSubMsg.style.cssText = "padding:6px 10px; font-size:11px; color:#64748B; font-style:italic;";
+            noSubMsg.textContent = "No subtitles for this lesson";
+            subtitleOptionsList.appendChild(noSubMsg);
+        }
+    }
+
+    async function selectSubtitleLanguage(langCode) {
+        selectedSubtitleLang = langCode;
+        localStorage.setItem("clout_preferred_subtitle_lang", langCode);
+
+        document.querySelectorAll(".subtitle-option").forEach(opt => {
+            opt.classList.toggle("active", opt.dataset.lang === langCode);
+        });
+
+        if (langCode === "off") {
+            activeCueList = [];
+            if (subtitleOverlay) subtitleOverlay.innerHTML = "";
+            video.querySelectorAll("track").forEach(t => t.remove());
+            if (ccButton) ccButton.classList.remove("active");
+            subtitleMenu.classList.remove("open");
+            return;
+        }
+
+        const track = currentSubtitles.find(s => s.language_code === langCode);
+        if (track) {
+            await applySubtitleTrack(track);
+        }
+        subtitleMenu.classList.remove("open");
+    }
+
+    async function applySubtitleTrack(track) {
+        if (ccButton) ccButton.classList.add("active");
+        video.querySelectorAll("track").forEach(t => t.remove());
+
+        const trackEl = document.createElement("track");
+        trackEl.kind = "subtitles";
+        trackEl.label = track.language_name;
+        trackEl.srclang = track.language_code;
+        trackEl.src = track.vtt_url;
+        trackEl.default = true;
+        video.appendChild(trackEl);
+
+        activeCueList = await parseVttFromUrl(track.vtt_url);
+        updateSubtitleDisplay();
+    }
+
+    function updateSubtitleDisplay() {
+        if (!subtitleOverlay) return;
+        if (selectedSubtitleLang === "off" || !activeCueList.length) {
+            subtitleOverlay.innerHTML = "";
+            return;
+        }
+
+        const curTime = video.currentTime;
+        const activeCue = activeCueList.find(c => curTime >= c.start && curTime <= c.end);
+
+        if (activeCue && activeCue.text) {
+            subtitleOverlay.innerHTML = `<div class="subtitle-cue-box">${escapeHtml(activeCue.text)}</div>`;
+        } else {
+            subtitleOverlay.innerHTML = "";
+        }
+    }
+
+    function escapeHtml(str) {
+        return String(str || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
 
     /* =========================================================
        PICTURE IN PICTURE & FULLSCREEN
@@ -2230,9 +2625,8 @@ button {
     /* =========================================================
        KEYBOARD SHORTCUTS
     ========================================================= */
-    window.addEventListener("keydown", function(e) {
-        // Ignore typing in input/textarea
-        if (["INPUT", "TEXTAREA", "SELECT"].includes(document.activeElement.tagName)) return;
+    document.addEventListener("keydown", function(e) {
+        if (["input", "textarea"].includes(e.target.tagName.toLowerCase())) return;
 
         switch (e.key.toLowerCase()) {
             case " ":
@@ -2268,6 +2662,10 @@ button {
                     lastVolume = video.volume;
                     setVolume(0);
                 }
+                break;
+            case "c":
+                e.preventDefault();
+                if (ccButton) ccButton.click();
                 break;
             case "f":
                 e.preventDefault();
@@ -2324,8 +2722,9 @@ button {
         const label = lesson.dataset.label || "COURSE CONTENT";
         const videoUrl = lesson.dataset.video || "";
         const posterUrl = lesson.dataset.poster || "";
+        const lessonId = lesson.dataset.lessonId || "";
 
-        currentLessonKey = "course_progress_lesson_" + (lesson.dataset.lessonId || title);
+        currentLessonKey = "course_progress_lesson_" + (lessonId || title);
 
         // Update Text
         playerModuleName.textContent = moduleName.toUpperCase();
@@ -2340,8 +2739,9 @@ button {
         progressBuffered.style.width = "0%";
         playerTime.textContent = "0:00 / 0:00";
 
-        // Load media
+        // Load media & subtitles
         loadVideo(videoUrl, posterUrl);
+        loadLessonSubtitles(lessonId);
     };
 
     /* =========================================================

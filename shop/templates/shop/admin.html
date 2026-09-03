@@ -1373,6 +1373,327 @@
             background: var(--red-light);
         }
 
+        /* Subtitle Management Elements */
+        .editor-lesson-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .editor-lesson-header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .sub-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 20px;
+            letter-spacing: 0.2px;
+        }
+
+        .sub-badge.ready {
+            background: #DCFCE7;
+            color: #15803D;
+            border: 1px solid #BBF7D0;
+        }
+
+        .sub-badge.processing {
+            background: #FEF3C7;
+            color: #B45309;
+            border: 1px solid #FDE68A;
+        }
+
+        .sub-badge.failed {
+            background: #FEE2E2;
+            color: #B91C1C;
+            border: 1px solid #FECACA;
+        }
+
+        .sub-badge.none {
+            background: #F1F5F9;
+            color: #64748B;
+            border: 1px solid #E2E8F0;
+        }
+
+        .sub-manage-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11.5px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 6px;
+            background: #FFF7ED;
+            color: #C2410C;
+            border: 1px solid #FFEDD5;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .sub-manage-btn:hover {
+            background: #EA580C;
+            color: #FFFFFF;
+            border-color: #EA580C;
+        }
+
+        .sub-header-config-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 6px;
+            background: #FFFFFF;
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sub-header-config-btn:hover {
+            background: #F8FAFC;
+            border-color: #94A3B8;
+        }
+
+        /* Subtitle Modals */
+        .sub-modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.65);
+            backdrop-filter: blur(4px);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+        }
+
+        .sub-modal-backdrop.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sub-modal-container {
+            background: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 820px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--border);
+            animation: modalPop 0.2s ease-out;
+        }
+
+        @keyframes modalPop {
+            from { transform: scale(0.95); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .sub-modal-header {
+            padding: 16px 22px;
+            background: #F8FAFC;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sub-modal-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sub-modal-close {
+            background: transparent;
+            border: none;
+            font-size: 18px;
+            color: #64748B;
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .sub-modal-close:hover {
+            color: #0F172A;
+            background: #E2E8F0;
+        }
+
+        .sub-modal-body {
+            padding: 22px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .sub-modal-footer {
+            padding: 14px 22px;
+            background: #F8FAFC;
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .sub-track-card {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            background: #FFFFFF;
+            transition: all 0.15s ease;
+        }
+
+        .sub-track-card:hover {
+            border-color: #CBD5E1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .sub-track-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sub-lang-pill {
+            font-size: 12px;
+            font-weight: 800;
+            background: #F1F5F9;
+            color: #0F172A;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .sub-actions-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sub-action-btn {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: #FFFFFF;
+            color: var(--text-main);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+
+        .sub-action-btn:hover {
+            background: #F8FAFC;
+            border-color: #94A3B8;
+        }
+
+        .sub-action-btn.edit-btn {
+            background: #FFF7ED;
+            color: #C2410C;
+            border-color: #FFEDD5;
+        }
+
+        .sub-action-btn.edit-btn:hover {
+            background: #EA580C;
+            color: #FFFFFF;
+        }
+
+        .sub-action-btn.delete-btn {
+            color: #DC2626;
+        }
+
+        .sub-action-btn.delete-btn:hover {
+            background: #FEE2E2;
+            border-color: #FECACA;
+        }
+
+        .cues-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .cues-table th {
+            text-align: left;
+            padding: 8px 10px;
+            background: #F8FAFC;
+            border-bottom: 2px solid var(--border);
+            font-weight: 700;
+            color: #64748B;
+            font-size: 11.5px;
+            text-transform: uppercase;
+        }
+
+        .cues-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid var(--border-light);
+            vertical-align: top;
+        }
+
+        .cue-time-input {
+            width: 105px;
+            padding: 6px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            background: #FFFFFF;
+        }
+
+        .cue-text-input {
+            width: 100%;
+            padding: 6px 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 13px;
+            resize: vertical;
+            min-height: 42px;
+            background: #FFFFFF;
+        }
+
+        .cue-del-btn {
+            background: transparent;
+            border: none;
+            color: #DC2626;
+            cursor: pointer;
+            padding: 6px 8px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .cue-del-btn:hover {
+            background: #FEE2E2;
+        }
+
         .editor-lesson-content {
             padding: 20px;
             display: grid;
@@ -2724,9 +3045,15 @@
 
                 <div class="module-manager">
                     {% csrf_token %}
-                    <div class="module-manager-header">
-                        <h3>Course Content Structure</h3>
-                        <p>Lessons and video content are stored in Cloudflare R2 / AWS storage.</p>
+                    <div class="module-manager-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+                        <div>
+                            <h3>Course Content Structure</h3>
+                            <p>Lessons and video content are stored in Cloudflare R2 / AWS storage.</p>
+                        </div>
+                        <button type="button" class="sub-header-config-btn" onclick="openSubtitleLanguagesConfigModal()">
+                            <i class="fa-solid fa-language" style="color: #EA580C;"></i>
+                            <span>Subtitle Target Languages</span>
+                        </button>
                     </div>
 
                     <div id="modules"></div>
@@ -3082,10 +3409,38 @@
             const lesson = document.createElement("div");
             lesson.className = "editor-lesson";
             if (lessonData?.id) lesson.dataset.lessonId = lessonData.id;
+
+            let subtitleBadgeHtml = "";
+            let subtitleManageBtnHtml = "";
+
+            if (lessonData?.id) {
+                const status = lessonData.subtitle_status || "none";
+                const count = lessonData.subtitle_count || 0;
+                if (status === "ready") {
+                    subtitleBadgeHtml = `<span class="sub-badge ready" id="sub-badge-${lessonData.id}"><i class="fa-solid fa-closed-captioning"></i> ${count} Subtitles</span>`;
+                } else if (status === "processing") {
+                    subtitleBadgeHtml = `<span class="sub-badge processing" id="sub-badge-${lessonData.id}"><i class="fa-solid fa-spinner fa-spin"></i> Generating AI Subtitles...</span>`;
+                } else if (status === "failed") {
+                    subtitleBadgeHtml = `<span class="sub-badge failed" id="sub-badge-${lessonData.id}"><i class="fa-solid fa-circle-exclamation"></i> Subtitles Failed</span>`;
+                } else if (lessonData.video_url) {
+                    subtitleBadgeHtml = `<span class="sub-badge none" id="sub-badge-${lessonData.id}"><i class="fa-solid fa-closed-captioning"></i> No Subtitles</span>`;
+                }
+
+                if (lessonData.video_url || count > 0 || status !== "none") {
+                    subtitleManageBtnHtml = `<button class="sub-manage-btn" type="button" onclick="openSubtitleManagerModal(${lessonData.id}, '${escapeHtml(lessonData.title || `Lesson ${number}`)}')"><i class="fa-solid fa-closed-captioning"></i> Manage Subtitles</button>`;
+                }
+            }
+
             lesson.innerHTML = `
                 <div class="editor-lesson-header">
-                    <strong><span class="editor-lesson-number">${String(number).padStart(2, "0")}</span> Lesson</strong>
-                    <button class="editor-lesson-delete" type="button" onclick="deleteEditorLesson(this)">Delete Lesson</button>
+                    <div class="editor-lesson-header-left">
+                        <strong><span class="editor-lesson-number">${String(number).padStart(2, "0")}</span> Lesson</strong>
+                        ${subtitleBadgeHtml}
+                    </div>
+                    <div class="editor-lesson-header-right">
+                        ${subtitleManageBtnHtml}
+                        <button class="editor-lesson-delete" type="button" onclick="deleteEditorLesson(this)">Delete Lesson</button>
+                    </div>
                 </div>
                 <div class="editor-lesson-content">
                     <div>
@@ -4061,7 +4416,592 @@
             return div.innerHTML;
         }
 
+        /* =========================================================
+           SUBTITLE MANAGEMENT & CUE EDITOR JAVASCRIPT
+        ========================================================= */
+        let activeSubtitleManagerLessonId = null;
+        let activeEditingSubtitleId = null;
+        let activeEditingCues = [];
+
+        window.openSubtitleManagerModal = async function(lessonId, lessonTitle) {
+            activeSubtitleManagerLessonId = lessonId;
+            const modal = document.getElementById("subtitleManagerModal");
+            const titleEl = document.getElementById("subModalLessonTitle");
+            const bodyEl = document.getElementById("subModalTracksList");
+            const infoEl = document.getElementById("subModalInfoBanner");
+
+            if (titleEl) titleEl.textContent = lessonTitle || "Lesson Subtitles";
+            if (bodyEl) bodyEl.innerHTML = `<div style="text-align:center; padding:30px; color:#64748B;"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px; margin-bottom:10px; display:block;"></i> Loading subtitles...</div>`;
+            if (modal) modal.classList.add("open");
+
+            await loadSubtitleManagerData(lessonId);
+        };
+
+        window.closeSubtitleManagerModal = function() {
+            const modal = document.getElementById("subtitleManagerModal");
+            if (modal) modal.classList.remove("open");
+            activeSubtitleManagerLessonId = null;
+        };
+
+        async function loadSubtitleManagerData(lessonId) {
+            const bodyEl = document.getElementById("subModalTracksList");
+            const infoEl = document.getElementById("subModalInfoBanner");
+            const retryBtn = document.getElementById("subModalRetryBtn");
+            const langSelect = document.getElementById("subModalAddLangSelect");
+
+            try {
+                const resp = await fetch(`/api/lessons/${lessonId}/subtitles/`);
+                const data = await resp.json();
+
+                if (!data.success) {
+                    bodyEl.innerHTML = `<div style="color:#DC2626; padding:20px; text-align:center;">${escapeHtml(data.message || "Failed to load subtitles")}</div>`;
+                    return;
+                }
+
+                // Info banner
+                const status = data.subtitle_status || "none";
+                const detected = data.detected_language || "Auto-detect";
+                const error = data.error_message || "";
+
+                let statusBadge = `<span class="sub-badge none">No Subtitles</span>`;
+                if (status === "ready") statusBadge = `<span class="sub-badge ready"><i class="fa-solid fa-check"></i> Ready</span>`;
+                if (status === "processing") statusBadge = `<span class="sub-badge processing"><i class="fa-solid fa-spinner fa-spin"></i> Generating in background...</span>`;
+                if (status === "failed") statusBadge = `<span class="sub-badge failed"><i class="fa-solid fa-triangle-exclamation"></i> Generation Failed</span>`;
+
+                infoEl.innerHTML = `
+                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#F8FAFC; border:1px solid var(--border); border-radius:8px; padding:12px 16px; margin-bottom:18px;">
+                        <div>
+                            <div style="font-size:12px; color:#64748B; font-weight:600;">Spoken Language: <strong style="color:#0F172A;">${escapeHtml(detected)}</strong></div>
+                            <div style="margin-top:4px; font-size:12px;">Status: ${statusBadge}</div>
+                            ${error ? `<div style="margin-top:6px; color:#DC2626; font-size:11.5px; font-weight:600;"><i class="fa-solid fa-circle-exclamation"></i> ${escapeHtml(error)}</div>` : ""}
+                        </div>
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            ${status === "failed" || status === "none" ? `
+                                <button type="button" class="sub-manage-btn" style="background:#EA580C; color:#FFF; border-color:#EA580C;" onclick="regenerateLessonSubtitles(${lessonId})">
+                                    <i class="fa-solid fa-rotate-right"></i> ${status === "failed" ? "Retry Generation" : "Generate Subtitles"}
+                                </button>
+                            ` : `
+                                <button type="button" class="sub-action-btn" onclick="regenerateLessonSubtitles(${lessonId})">
+                                    <i class="fa-solid fa-rotate-right"></i> Regenerate All
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+
+                // Tracks list
+                const subtitles = data.subtitles || [];
+                if (!subtitles.length) {
+                    bodyEl.innerHTML = `
+                        <div style="text-align:center; padding:32px 16px; border:1.5px dashed var(--border); border-radius:8px; background:#FAFAFA;">
+                            <i class="fa-solid fa-closed-captioning" style="font-size:32px; color:#94A3B8; margin-bottom:10px; display:block;"></i>
+                            <div style="font-weight:700; color:#0F172A; font-size:14px;">No subtitles generated yet</div>
+                            <div style="font-size:12px; color:#64748B; margin-top:4px; margin-bottom:14px;">Subtitles are automatically created when you upload video, or you can generate them now.</div>
+                            <button type="button" class="sub-manage-btn" style="background:#EA580C; color:#FFF; border-color:#EA580C;" onclick="regenerateLessonSubtitles(${lessonId})">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Multilingual Subtitles
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                bodyEl.innerHTML = subtitles.map(sub => {
+                    const isOrig = sub.is_original;
+                    const native = sub.native_name && sub.native_name !== sub.language_name ? ` (${escapeHtml(sub.native_name)})` : "";
+                    return `
+                        <div class="sub-track-card">
+                            <div class="sub-track-info">
+                                <span class="sub-lang-pill">${escapeHtml(sub.language_code)}</span>
+                                <div>
+                                    <div style="font-weight:700; font-size:13.5px; color:#0F172A;">
+                                        ${escapeHtml(sub.language_name)}${native}
+                                        ${isOrig ? `<span style="font-size:10.5px; background:#E0F2FE; color:#0369A1; padding:2px 6px; border-radius:4px; margin-left:6px; font-weight:700;">Original Audio</span>` : ""}
+                                    </div>
+                                    <div style="font-size:11.5px; color:#64748B; margin-top:2px;">
+                                        ${sub.cues_count} cues formatted
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="sub-actions-group">
+                                <button type="button" class="sub-action-btn edit-btn" onclick="openCueEditorModal(${sub.id})">
+                                    <i class="fa-solid fa-pen-to-square"></i> Edit & Timecode
+                                </button>
+                                <a href="${sub.vtt_url}" target="_blank" class="sub-action-btn" download title="Download WebVTT">
+                                    <i class="fa-solid fa-download"></i> .VTT
+                                </a>
+                                <a href="${sub.srt_url}" class="sub-action-btn" download title="Download SRT">
+                                    <i class="fa-solid fa-file-arrow-down"></i> .SRT
+                                </a>
+                                <button type="button" class="sub-action-btn delete-btn" onclick="deleteSubtitleTrack(${sub.id}, ${lessonId})" title="Remove language subtitle">
+                                    <i class="fa-solid fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+
+            } catch (err) {
+                bodyEl.innerHTML = `<div style="color:#DC2626; padding:20px; text-align:center;">Network error loading subtitles.</div>`;
+            }
+        }
+
+        window.regenerateLessonSubtitles = async function(lessonId) {
+            const token = document.querySelector("input[name='csrfmiddlewaretoken']")?.value || "";
+            try {
+                showToast("Starting AI Speech-to-Text & Subtitle Translation...");
+                const resp = await fetch(`/api/admin/lessons/${lessonId}/regenerate-subtitles/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": token,
+                        "Content-Type": "application/json",
+                    },
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast("AI Subtitle generation running in background!");
+                    // Update badge in editor
+                    const badge = document.getElementById(`sub-badge-${lessonId}`);
+                    if (badge) {
+                        badge.className = "sub-badge processing";
+                        badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generating AI Subtitles...`;
+                    }
+                    if (activeSubtitleManagerLessonId === lessonId) {
+                        await loadSubtitleManagerData(lessonId);
+                    }
+                } else {
+                    showToast(data.message || "Failed to start generation.", true);
+                }
+            } catch (err) {
+                showToast("Error triggering subtitle regeneration.", true);
+            }
+        };
+
+        window.addLanguageSubtitleToActiveLesson = async function() {
+            if (!activeSubtitleManagerLessonId) return;
+            const select = document.getElementById("subModalAddLangSelect");
+            const langCode = select ? select.value : "";
+            if (!langCode) {
+                showToast("Please select a language to generate.", true);
+                return;
+            }
+
+            const token = document.querySelector("input[name='csrfmiddlewaretoken']")?.value || "";
+            try {
+                showToast(`Generating subtitles for ${langCode.toUpperCase()}...`);
+                const resp = await fetch(`/api/admin/lessons/${activeSubtitleManagerLessonId}/add-subtitle-language/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": token,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ language_code: langCode })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast(data.message);
+                    setTimeout(() => loadSubtitleManagerData(activeSubtitleManagerLessonId), 1500);
+                } else {
+                    showToast(data.message || "Failed adding language subtitle.", true);
+                }
+            } catch (err) {
+                showToast("Error adding language subtitle.", true);
+            }
+        };
+
+        window.deleteSubtitleTrack = async function(subtitleId, lessonId) {
+            if (!confirm("Are you sure you want to remove this subtitle language?")) return;
+            const token = document.querySelector("input[name='csrfmiddlewaretoken']")?.value || "";
+            try {
+                const resp = await fetch(`/api/admin/subtitles/${subtitleId}/delete/`, {
+                    method: "POST",
+                    headers: { "X-CSRFToken": token },
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast(data.message);
+                    await loadSubtitleManagerData(lessonId);
+                } else {
+                    showToast(data.message || "Failed deleting subtitle.", true);
+                }
+            } catch (err) {
+                showToast("Error deleting subtitle track.", true);
+            }
+        };
+
+        /* =========================================================
+           CUE TEXT & TIMECODE EDITOR
+        ========================================================= */
+        window.openCueEditorModal = async function(subtitleId) {
+            activeEditingSubtitleId = subtitleId;
+            const modal = document.getElementById("subtitleCueEditorModal");
+            const titleEl = document.getElementById("cueEditorModalTitle");
+            const tbody = document.getElementById("cueEditorTbody");
+
+            if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#64748B;"><i class="fa-solid fa-spinner fa-spin"></i> Loading cue data...</td></tr>`;
+            if (modal) modal.classList.add("open");
+
+            try {
+                const resp = await fetch(`/api/admin/subtitles/${subtitleId}/`);
+                const data = await resp.json();
+
+                if (!data.success || !data.subtitle) {
+                    if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="color:#DC2626; text-align:center; padding:20px;">Failed to load cues.</td></tr>`;
+                    return;
+                }
+
+                const sub = data.subtitle;
+                if (titleEl) titleEl.innerHTML = `Edit Subtitles: <strong style="color:#EA580C; margin-left:6px;">${escapeHtml(sub.language_name)}</strong> <span style="font-size:12px; color:#64748B; margin-left:8px;">(${escapeHtml(sub.lesson_title)})</span>`;
+
+                activeEditingCues = Array.isArray(sub.cues) ? JSON.parse(JSON.stringify(sub.cues)) : [];
+                renderCueEditorRows();
+
+            } catch (err) {
+                if (tbody) tbody.innerHTML = `<tr><td colspan="5" style="color:#DC2626; text-align:center; padding:20px;">Network error loading cues.</td></tr>`;
+            }
+        };
+
+        window.closeCueEditorModal = function() {
+            const modal = document.getElementById("subtitleCueEditorModal");
+            if (modal) modal.classList.remove("open");
+            activeEditingSubtitleId = null;
+            activeEditingCues = [];
+        };
+
+        function renderCueEditorRows() {
+            const tbody = document.getElementById("cueEditorTbody");
+            if (!tbody) return;
+
+            if (!activeEditingCues.length) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:24px; color:#64748B; font-style:italic;">No cues in this subtitle track. Click "+ Add New Cue" below to start.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = activeEditingCues.map((cue, index) => {
+                const startStr = cue.start_formatted || formatSecondsToVtt(cue.start || 0);
+                const endStr = cue.end_formatted || formatSecondsToVtt(cue.end || (cue.start || 0) + 2);
+                return `
+                    <tr data-cue-index="${index}">
+                        <td style="font-weight:700; color:#64748B; width:36px;">${index + 1}</td>
+                        <td style="width:120px;">
+                            <input type="text" class="cue-time-input" value="${escapeHtml(startStr)}" onchange="updateCueStartTime(${index}, this.value)">
+                        </td>
+                        <td style="width:120px;">
+                            <input type="text" class="cue-time-input" value="${escapeHtml(endStr)}" onchange="updateCueEndTime(${index}, this.value)">
+                        </td>
+                        <td>
+                            <textarea class="cue-text-input" onchange="updateCueText(${index}, this.value)">${escapeHtml(cue.text || "")}</textarea>
+                        </td>
+                        <td style="width:40px; text-align:center;">
+                            <button type="button" class="cue-del-btn" onclick="deleteCueRow(${index})" title="Delete Cue">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join("");
+        }
+
+        window.addNewCueRow = function() {
+            let lastEnd = 0;
+            if (activeEditingCues.length > 0) {
+                lastEnd = activeEditingCues[activeEditingCues.length - 1].end || 0;
+            }
+            const newStart = Math.round((lastEnd + 0.1) * 1000) / 1000;
+            const newEnd = Math.round((newStart + 2.5) * 1000) / 1000;
+
+            activeEditingCues.push({
+                id: activeEditingCues.length + 1,
+                start: newStart,
+                end: newEnd,
+                start_formatted: formatSecondsToVtt(newStart),
+                end_formatted: formatSecondsToVtt(newEnd),
+                text: "New subtitle text...",
+            });
+            renderCueEditorRows();
+            const container = document.querySelector("#subtitleCueEditorModal .sub-modal-body");
+            if (container) container.scrollTop = container.scrollHeight;
+        };
+
+        window.deleteCueRow = function(index) {
+            activeEditingCues.splice(index, 1);
+            renderCueEditorRows();
+        };
+
+        window.updateCueStartTime = function(index, value) {
+            if (activeEditingCues[index]) {
+                const sec = parseVttTimestampToSeconds(value);
+                activeEditingCues[index].start = sec;
+                activeEditingCues[index].start_formatted = formatSecondsToVtt(sec);
+            }
+        };
+
+        window.updateCueEndTime = function(index, value) {
+            if (activeEditingCues[index]) {
+                const sec = parseVttTimestampToSeconds(value);
+                activeEditingCues[index].end = sec;
+                activeEditingCues[index].end_formatted = formatSecondsToVtt(sec);
+            }
+        };
+
+        window.updateCueText = function(index, value) {
+            if (activeEditingCues[index]) {
+                activeEditingCues[index].text = String(value || "").trim();
+            }
+        };
+
+        window.saveCueEditorChanges = async function() {
+            if (!activeEditingSubtitleId) return;
+            const saveBtn = document.getElementById("saveCuesBtn");
+            const token = document.querySelector("input[name='csrfmiddlewaretoken']")?.value || "";
+
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Saving...`;
+            }
+
+            try {
+                const resp = await fetch(`/api/admin/subtitles/${activeEditingSubtitleId}/update-cues/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": token,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ cues: activeEditingCues })
+                });
+                const data = await resp.json();
+
+                if (data.success) {
+                    showToast(data.message || "Subtitles updated successfully!");
+                    closeCueEditorModal();
+                    if (activeSubtitleManagerLessonId) {
+                        await loadSubtitleManagerData(activeSubtitleManagerLessonId);
+                    }
+                } else {
+                    showToast(data.message || "Failed to save subtitle cues.", true);
+                }
+            } catch (err) {
+                showToast("Error saving subtitle changes.", true);
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.innerHTML = `<i class="fa-solid fa-check"></i> Save Changes`;
+                }
+            }
+        };
+
+        function formatSecondsToVtt(sec) {
+            if (!Number.isFinite(sec) || sec < 0) sec = 0;
+            const h = Math.floor(sec / 3600);
+            const m = Math.floor((sec % 3600) / 60);
+            const s = Math.floor(sec % 60);
+            const ms = Math.floor(Math.round((sec - Math.floor(sec)) * 1000));
+            return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}.${String(ms).padStart(3, "0")}`;
+        }
+
+        function parseVttTimestampToSeconds(str) {
+            if (!str) return 0;
+            const clean = str.trim().replace(",", ".");
+            const parts = clean.split(":");
+            try {
+                if (parts.length === 3) return parseInt(parts[0], 10) * 3600 + parseInt(parts[1], 10) * 60 + parseFloat(parts[2]);
+                if (parts.length === 2) return parseInt(parts[0], 10) * 60 + parseFloat(parts[1]);
+                return parseFloat(parts[0]) || 0;
+            } catch (e) {
+                return 0;
+            }
+        }
+
+        /* =========================================================
+           TARGET LANGUAGES GLOBAL CONFIGURATION
+        ========================================================= */
+        window.openSubtitleLanguagesConfigModal = async function() {
+            const modal = document.getElementById("subtitleLanguagesConfigModal");
+            const grid = document.getElementById("subLanguagesCheckboxGrid");
+
+            if (grid) grid.innerHTML = `<div style="grid-column: 1/-1; text-align:center; padding:20px; color:#64748B;"><i class="fa-solid fa-spinner fa-spin"></i> Loading languages...</div>`;
+            if (modal) modal.classList.add("open");
+
+            try {
+                const resp = await fetch("/api/admin/subtitles/languages/");
+                const data = await resp.json();
+
+                if (data.success && Array.isArray(data.all_languages)) {
+                    const activeSet = new Set(data.active_languages || []);
+                    grid.innerHTML = data.all_languages.map(lang => {
+                        const checked = activeSet.has(lang.code) ? "checked" : "";
+                        const native = lang.native && lang.native !== lang.name ? ` (${lang.native})` : "";
+                        return `
+                            <label style="display:flex; align-items:center; gap:8px; padding:10px 14px; border:1px solid var(--border); border-radius:8px; cursor:pointer; background:#FFFFFF; transition:all 0.15s ease;">
+                                <input type="checkbox" name="target_languages" value="${lang.code}" ${checked} style="accent-color: #EA580C; width:16px; height:16px;">
+                                <span style="font-size:13px; font-weight:700; color:#0F172A;">${escapeHtml(lang.name)} <span style="font-weight:400; color:#64748B; font-size:11.5px;">${escapeHtml(native)}</span></span>
+                            </label>
+                        `;
+                    }).join("");
+                }
+            } catch (err) {
+                if (grid) grid.innerHTML = `<div style="grid-column: 1/-1; color:#DC2626; text-align:center; padding:20px;">Failed to load language configurations.</div>`;
+            }
+        };
+
+        window.closeSubtitleLanguagesConfigModal = function() {
+            const modal = document.getElementById("subtitleLanguagesConfigModal");
+            if (modal) modal.classList.remove("open");
+        };
+
+        window.saveSubtitleLanguagesConfig = async function() {
+            const token = document.querySelector("input[name='csrfmiddlewaretoken']")?.value || "";
+            const checkedBoxes = document.querySelectorAll("input[name='target_languages']:checked");
+            const selectedLangs = Array.from(checkedBoxes).map(cb => cb.value);
+
+            if (!selectedLangs.length) {
+                showToast("Please select at least one target language.", true);
+                return;
+            }
+
+            try {
+                const resp = await fetch("/api/admin/subtitles/languages/", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": token,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ languages: selectedLangs })
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast("Supported subtitle languages updated!");
+                    closeSubtitleLanguagesConfigModal();
+                } else {
+                    showToast(data.message || "Failed updating languages.", true);
+                }
+            } catch (err) {
+                showToast("Error updating languages config.", true);
+            }
+        };
+
     })();
     </script>
+
+    <!-- =========================================================
+         SUBTITLE MANAGER MODAL DIALOG
+    ========================================================= -->
+    <div class="sub-modal-backdrop" id="subtitleManagerModal">
+        <div class="sub-modal-container">
+            <div class="sub-modal-header">
+                <div class="sub-modal-title">
+                    <i class="fa-solid fa-closed-captioning" style="color: #EA580C;"></i>
+                    <span id="subModalLessonTitle">Lesson Subtitles</span>
+                </div>
+                <button type="button" class="sub-modal-close" onclick="closeSubtitleManagerModal()" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="sub-modal-body">
+                <div id="subModalInfoBanner"></div>
+
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                    <h4 style="margin:0; font-size:14px; font-weight:800; color:#0F172A;">Generated Subtitle Tracks</h4>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <select id="subModalAddLangSelect" style="padding:6px 10px; border:1px solid var(--border); border-radius:6px; font-size:12px; background:#FFF;">
+                            <option value="">-- Add Language --</option>
+                            <option value="en">English</option>
+                            <option value="ml">Malayalam (മലയാളം)</option>
+                            <option value="hi">Hindi (हिन्दी)</option>
+                            <option value="ta">Tamil (தமிழ்)</option>
+                            <option value="ar">Arabic (العربية)</option>
+                            <option value="fr">French (Français)</option>
+                            <option value="es">Spanish (Español)</option>
+                            <option value="de">German (Deutsch)</option>
+                            <option value="ja">Japanese (日本語)</option>
+                            <option value="pt">Portuguese (Português)</option>
+                            <option value="ru">Russian (Русский)</option>
+                            <option value="zh">Chinese (中文)</option>
+                            <option value="it">Italian (Italiano)</option>
+                            <option value="te">Telugu (తెలుగు)</option>
+                            <option value="bn">Bengali (বাংলা)</option>
+                            <option value="ko">Korean (한국어)</option>
+                        </select>
+                        <button type="button" class="sub-action-btn edit-btn" onclick="addLanguageSubtitleToActiveLesson()">
+                            <i class="fa-solid fa-plus"></i> Add
+                        </button>
+                    </div>
+                </div>
+
+                <div id="subModalTracksList"></div>
+            </div>
+            <div class="sub-modal-footer">
+                <button type="button" class="cancel-btn" onclick="closeSubtitleManagerModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         CUE EDITOR MODAL DIALOG
+    ========================================================= -->
+    <div class="sub-modal-backdrop" id="subtitleCueEditorModal">
+        <div class="sub-modal-container" style="max-width: 900px;">
+            <div class="sub-modal-header">
+                <div class="sub-modal-title">
+                    <i class="fa-solid fa-pen-to-square" style="color: #EA580C;"></i>
+                    <span id="cueEditorModalTitle">Edit Subtitles</span>
+                </div>
+                <button type="button" class="sub-modal-close" onclick="closeCueEditorModal()" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="sub-modal-body" style="max-height: 60vh;">
+                <table class="cues-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Start Time</th>
+                            <th>End Time</th>
+                            <th>Subtitle Text</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="cueEditorTbody"></tbody>
+                </table>
+            </div>
+            <div class="sub-modal-footer" style="justify-content: space-between;">
+                <button type="button" class="sub-action-btn" onclick="addNewCueRow()">
+                    <i class="fa-solid fa-plus"></i> Add New Cue
+                </button>
+                <div style="display:flex; gap:10px;">
+                    <button type="button" class="cancel-btn" onclick="closeCueEditorModal()">Cancel</button>
+                    <button type="button" class="save-btn" id="saveCuesBtn" onclick="saveCueEditorChanges()">
+                        <i class="fa-solid fa-check"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- =========================================================
+         TARGET LANGUAGES CONFIG MODAL
+    ========================================================= -->
+    <div class="sub-modal-backdrop" id="subtitleLanguagesConfigModal">
+        <div class="sub-modal-container" style="max-width: 680px;">
+            <div class="sub-modal-header">
+                <div class="sub-modal-title">
+                    <i class="fa-solid fa-language" style="color: #EA580C;"></i>
+                    <span>Automatic Subtitle Languages</span>
+                </div>
+                <button type="button" class="sub-modal-close" onclick="closeSubtitleLanguagesConfigModal()" aria-label="Close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="sub-modal-body">
+                <p style="margin-top:0; margin-bottom:16px; font-size:13px; color:#64748B; line-height:1.5;">
+                    Select the languages to generate automatically whenever an admin uploads a video. The spoken audio language is detected automatically using Whisper AI and translated into each selected language.
+                </p>
+                <div id="subLanguagesCheckboxGrid" style="display:grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap:10px;"></div>
+            </div>
+            <div class="sub-modal-footer">
+                <button type="button" class="cancel-btn" onclick="closeSubtitleLanguagesConfigModal()">Cancel</button>
+                <button type="button" class="save-btn" onclick="saveSubtitleLanguagesConfig()">Save Preferences</button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

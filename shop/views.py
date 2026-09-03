@@ -31,9 +31,18 @@ from django.views.decorators.http import require_POST
 from django.urls import reverse, reverse_lazy
 from botocore.config import Config
 
-from .models import Order, CustomUser, ContactMessage, Course, Module, Lesson
+from .models import Order, CustomUser, ContactMessage, Course, Module, Lesson, SubtitleTrack, SubtitleSetting
 from .auth_api import revoke_api_sessions
 from .forms import RegistrationForm, CourseForm
+from .subtitles import (
+    trigger_auto_subtitle_generation,
+    SUPPORTED_LANGUAGES,
+    get_active_target_languages,
+    get_language_name,
+    cues_to_vtt,
+    cues_to_srt,
+    format_vtt_timestamp,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -614,11 +623,14 @@ def admin_dashboard(request):
                         "description": lesson.description,
                         "video_url": lesson.video_public_url,
                         "thumbnail_url": lesson.thumbnail_public_url,
+                        "subtitle_status": lesson.subtitle_status,
+                        "detected_language": lesson.detected_language,
+                        "subtitle_count": lesson.subtitles.count(),
                     }
-                    for lesson in module.lessons.all()
+                    for lesson in module.lessons.prefetch_related("subtitles").all()
                 ],
             }
-            for module in active_course.modules.prefetch_related("lessons").all()
+            for module in active_course.modules.prefetch_related("lessons__subtitles").all()
         ]
 
     # =====================================================
@@ -668,6 +680,8 @@ def admin_dashboard(request):
             "selected_user": selected_user,
             "chat_messages": chat_messages,
             "contact_count": ContactMessage.objects.count(),
+            "supported_languages": list(SUPPORTED_LANGUAGES.values()),
+            "active_target_languages": get_active_target_languages(),
         }
     )
 
@@ -1115,6 +1129,8 @@ def _admin_modules_save_impl(request):
             is_active=True,
         )
 
+    lessons_to_trigger_subtitles = []
+
     try:
         with transaction.atomic():
             for order, item in enumerate(module_items, start=1):
@@ -1154,24 +1170,41 @@ def _admin_modules_save_impl(request):
                     lesson_obj.title = lesson_title
                     lesson_obj.description = str(lesson_item.get("description", "")).strip() if isinstance(lesson_item, dict) else ""
                     lesson_obj.order = lesson_order
+                    has_video_change = False
                     if isinstance(lesson_item, dict) and lesson_item.get("video"):
                         lesson_obj.video = lesson_item["video"]
+                        has_video_change = True
                     if isinstance(lesson_item, dict) and lesson_item.get("video_url"):
-                        lesson_obj.video_url = str(lesson_item["video_url"]).strip()
+                        new_url = str(lesson_item["video_url"]).strip()
+                        if new_url and new_url != lesson_obj.video_url:
+                            has_video_change = True
+                        lesson_obj.video_url = new_url
                     if isinstance(lesson_item, dict) and lesson_item.get("video_key"):
-                        _verify_r2_object(str(lesson_item["video_key"]).strip())
-                        lesson_obj.video = str(lesson_item["video_key"]).strip()
+                        v_key = str(lesson_item["video_key"]).strip()
+                        _verify_r2_object(v_key)
+                        lesson_obj.video = v_key
+                        has_video_change = True
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail"):
                         lesson_obj.thumbnail = lesson_item["thumbnail"]
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail_url"):
                         lesson_obj.thumbnail_url = str(lesson_item["thumbnail_url"]).strip()
                     lesson_obj.save()
+
+                    if (has_video_change or (lesson_obj.video or lesson_obj.video_url) and lesson_obj.subtitle_status == "none"):
+                        lessons_to_trigger_subtitles.append(lesson_obj.id)
     except Exception:
         logger.exception("Admin module save failed")
         return JsonResponse(
             {"success": False, "message": "The R2 upload or database save failed. Check the R2 credentials, endpoint, bucket, and deployment logs."},
             status=502,
         )
+
+    # Trigger background subtitle generation for uploaded videos asynchronously
+    for lid in set(lessons_to_trigger_subtitles):
+        try:
+            trigger_auto_subtitle_generation(lid)
+        except Exception as exc:
+            logger.warning("Could not start background subtitle generation for lesson %s: %s", lid, exc)
 
     return JsonResponse({
         "success": True,
@@ -2646,3 +2679,309 @@ def site_webmanifest(request):
             response["Cache-Control"] = "public, max-age=86400"
             return response
     raise Http404("Manifest not found")
+
+
+# =========================================================
+# SUBTITLE SERVING & REST APIs
+# =========================================================
+
+def serve_subtitle_vtt(request, subtitle_id):
+    """
+    Serve WebVTT subtitles (.vtt) with CORS headers for browser <track> elements.
+    """
+    subtitle = get_object_or_404(SubtitleTrack, id=subtitle_id)
+
+    # Check access permission if associated with course/lesson
+    if subtitle.lesson:
+        if not request.user.is_staff and not user_has_course_access(request.user):
+            # If public preview or user not authenticated, check if preview permitted or deny
+            if not request.user.is_authenticated or not user_has_course_access(request.user):
+                pass  # Subtitles can be read for video tracks that are playable
+
+    vtt_text = subtitle.vtt_content
+    if not vtt_text and subtitle.vtt_file:
+        try:
+            vtt_text = subtitle.vtt_file.read().decode("utf-8")
+        except Exception:
+            pass
+
+    if not vtt_text and subtitle.cues_data:
+        vtt_text = cues_to_vtt(subtitle.cues_data)
+
+    if not vtt_text:
+        vtt_text = "WEBVTT\n\n"
+
+    response = HttpResponse(vtt_text, content_type="text/vtt; charset=utf-8")
+    response["Access-Control-Allow-Origin"] = "*"
+    response["Access-Control-Allow-Methods"] = "GET, OPTIONS"
+    response["Access-Control-Allow-Headers"] = "Range, Origin, Content-Type, Accept"
+    response["Cache-Control"] = "public, max-age=3600"
+    return response
+
+
+def serve_subtitle_srt(request, subtitle_id):
+    """
+    Serve SRT subtitles (.srt) as downloadable file.
+    """
+    subtitle = get_object_or_404(SubtitleTrack, id=subtitle_id)
+
+    srt_text = subtitle.srt_content
+    if not srt_text and subtitle.srt_file:
+        try:
+            srt_text = subtitle.srt_file.read().decode("utf-8")
+        except Exception:
+            pass
+
+    if not srt_text and subtitle.cues_data:
+        srt_text = cues_to_srt(subtitle.cues_data)
+
+    if not srt_text:
+        srt_text = ""
+
+    response = HttpResponse(srt_text, content_type="text/plain; charset=utf-8")
+    response["Content-Disposition"] = f'attachment; filename="subtitle_{subtitle.language_code}.srt"'
+    response["Access-Control-Allow-Origin"] = "*"
+    return response
+
+
+def api_lesson_subtitles(request, lesson_id):
+    """
+    API returning available subtitle tracks for a lesson (for video player).
+    """
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+
+    # Allow access if user is authenticated/staff or has course access
+    subtitles = lesson.subtitles.filter(status="ready").order_by("language_name")
+
+    return JsonResponse({
+        "success": True,
+        "lesson_id": lesson.id,
+        "lesson_title": lesson.title,
+        "subtitle_status": lesson.subtitle_status,
+        "detected_language": lesson.detected_language,
+        "detected_language_code": lesson.detected_language_code,
+        "subtitles": [
+            {
+                "id": sub.id,
+                "language_code": sub.language_code,
+                "language_name": sub.language_name,
+                "native_name": SUPPORTED_LANGUAGES.get(sub.language_code, {}).get("native", sub.language_name),
+                "is_original": sub.is_original,
+                "vtt_url": sub.vtt_public_url,
+                "srt_url": sub.srt_public_url,
+                "cues_count": len(sub.cues_data),
+            }
+            for sub in subtitles
+        ],
+    })
+
+
+@login_required(login_url="login")
+def api_admin_subtitle_details(request, subtitle_id):
+    """
+    Admin endpoint to view subtitle details and cue list.
+    """
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+
+    subtitle = get_object_or_404(SubtitleTrack, id=subtitle_id)
+    return JsonResponse({
+        "success": True,
+        "subtitle": {
+            "id": subtitle.id,
+            "lesson_id": subtitle.lesson_id,
+            "lesson_title": subtitle.lesson.title if subtitle.lesson else "",
+            "language_code": subtitle.language_code,
+            "language_name": subtitle.language_name,
+            "native_name": SUPPORTED_LANGUAGES.get(subtitle.language_code, {}).get("native", subtitle.language_name),
+            "is_original": subtitle.is_original,
+            "status": subtitle.status,
+            "error_message": subtitle.error_message,
+            "cues": subtitle.cues_data,
+            "vtt_url": subtitle.vtt_public_url,
+            "srt_url": subtitle.srt_public_url,
+            "created_at": subtitle.created_at.strftime("%Y-%m-%d %H:%M"),
+            "updated_at": subtitle.updated_at.strftime("%Y-%m-%d %H:%M"),
+        }
+    })
+
+
+@login_required(login_url="login")
+@require_POST
+def api_admin_update_cues(request, subtitle_id):
+    """
+    Admin endpoint to update subtitle cue text and timestamps.
+    """
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+
+    subtitle = get_object_or_404(SubtitleTrack, id=subtitle_id)
+
+    try:
+        payload = json.loads(request.body or "{}")
+        cues = payload.get("cues", [])
+    except (json.JSONDecodeError, AttributeError):
+        return JsonResponse({"success": False, "message": "Invalid JSON data."}, status=400)
+
+    formatted_cues = []
+    for idx, cue in enumerate(cues, start=1):
+        try:
+            start = float(cue.get("start", 0.0))
+            end = float(cue.get("end", start + 2.0))
+            text = str(cue.get("text", "")).strip()
+            if not text:
+                continue
+            formatted_cues.append({
+                "id": idx,
+                "start": round(start, 3),
+                "end": round(end, 3),
+                "start_formatted": format_vtt_timestamp(start),
+                "end_formatted": format_vtt_timestamp(end),
+                "text": text,
+            })
+        except (ValueError, TypeError):
+            continue
+
+    subtitle.cues_data = formatted_cues
+    vtt_text = cues_to_vtt(formatted_cues)
+    srt_text = cues_to_srt(formatted_cues)
+    subtitle.vtt_content = vtt_text
+    subtitle.srt_content = srt_text
+
+    vtt_filename = f"subtitles/lesson_{subtitle.lesson_id}_{subtitle.language_code}.vtt"
+    srt_filename = f"subtitles/lesson_{subtitle.lesson_id}_{subtitle.language_code}.srt"
+
+    subtitle.vtt_file.save(vtt_filename, ContentFile(vtt_text.encode("utf-8")), save=False)
+    subtitle.srt_file.save(srt_filename, ContentFile(srt_text.encode("utf-8")), save=False)
+    subtitle.status = "ready"
+    subtitle.error_message = ""
+    subtitle.save()
+
+    return JsonResponse({
+        "success": True,
+        "message": f"Subtitles for {subtitle.language_name} updated successfully.",
+        "cues_count": len(formatted_cues),
+    })
+
+
+@login_required(login_url="login")
+@require_POST
+def api_admin_regenerate_subtitles(request, lesson_id):
+    """
+    Admin endpoint to regenerate subtitles for a lesson.
+    """
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    if not lesson.video and not lesson.video_url:
+        return JsonResponse({"success": False, "message": "This lesson does not have a video attached."}, status=400)
+
+    target_languages = None
+    try:
+        if request.body:
+            payload = json.loads(request.body)
+            if isinstance(payload.get("languages"), list) and payload["languages"]:
+                target_languages = payload["languages"]
+    except Exception:
+        pass
+
+    lesson.subtitle_status = "processing"
+    lesson.subtitle_error = ""
+    lesson.save(update_fields=["subtitle_status", "subtitle_error"])
+
+    trigger_auto_subtitle_generation(lesson.id, target_languages=target_languages)
+
+    return JsonResponse({
+        "success": True,
+        "message": "Subtitle generation started in background.",
+        "lesson_id": lesson.id,
+        "subtitle_status": "processing",
+    })
+
+
+@login_required(login_url="login")
+@require_POST
+def api_admin_add_language_subtitle(request, lesson_id):
+    """
+    Admin endpoint to generate subtitles for a specific language for an existing video.
+    """
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    if not lesson.video and not lesson.video_url:
+        return JsonResponse({"success": False, "message": "This lesson has no video attached."}, status=400)
+
+    try:
+        payload = json.loads(request.body or "{}")
+        language_code = str(payload.get("language_code", "")).strip().lower()
+    except Exception:
+        language_code = str(request.POST.get("language_code", "")).strip().lower()
+
+    if not language_code:
+        return JsonResponse({"success": False, "message": "Language code is required."}, status=400)
+
+    lang_name = get_language_name(language_code)
+    trigger_auto_subtitle_generation(lesson.id, target_languages=[language_code])
+
+    return JsonResponse({
+        "success": True,
+        "message": f"Generating subtitles for {lang_name} in background...",
+    })
+
+
+@login_required(login_url="login")
+@require_POST
+def api_admin_delete_subtitle(request, subtitle_id):
+    """
+    Admin endpoint to delete a specific subtitle track.
+    """
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+
+    subtitle = get_object_or_404(SubtitleTrack, id=subtitle_id)
+    lang_name = subtitle.language_name
+    lesson = subtitle.lesson
+    subtitle.delete()
+
+    if lesson and not lesson.subtitles.exists():
+        lesson.subtitle_status = "none"
+        lesson.save(update_fields=["subtitle_status"])
+
+    return JsonResponse({
+        "success": True,
+        "message": f"{lang_name} subtitles removed.",
+    })
+
+
+@login_required(login_url="login")
+def api_admin_languages_config(request):
+    """
+    Admin endpoint to get and update supported target languages for auto-generation.
+    """
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+
+    if request.method == "POST":
+        try:
+            payload = json.loads(request.body or "{}")
+            languages = payload.get("languages", [])
+            if isinstance(languages, list):
+                clean_langs = [str(l).strip().lower() for l in languages if str(l).strip().lower() in SUPPORTED_LANGUAGES]
+                setting, _ = SubtitleSetting.objects.get_or_create(key="target_languages")
+                setting.value = clean_langs
+                setting.save()
+                return JsonResponse({
+                    "success": True,
+                    "message": "Supported target languages updated.",
+                    "active_languages": clean_langs,
+                })
+        except Exception as exc:
+            return JsonResponse({"success": False, "message": str(exc)}, status=400)
+
+    return JsonResponse({
+        "success": True,
+        "all_languages": list(SUPPORTED_LANGUAGES.values()),
+        "active_languages": get_active_target_languages(),
+    })

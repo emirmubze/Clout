@@ -406,7 +406,7 @@ else:
 # Ensure all media subdirectories exist in persistent storage
 try:
     MEDIA_ROOT.mkdir(parents=True, exist_ok=True)
-    for sub_dir in ["profiles", "course_videos", "course_thumbnails", "lesson_thumbnails", "contact_images", "contact_videos"]:
+    for sub_dir in ["profiles", "course_videos", "course_thumbnails", "lesson_thumbnails", "contact_images", "contact_videos", "subtitles"]:
         (MEDIA_ROOT / sub_dir).mkdir(parents=True, exist_ok=True)
 except Exception:
     pass

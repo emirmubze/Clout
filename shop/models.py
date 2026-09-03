@@ -312,6 +312,31 @@ class Lesson(models.Model):
     order = models.IntegerField(
         default=0,
     )
+    subtitle_status = models.CharField(
+        max_length=20,
+        choices=[
+            ("none", "None"),
+            ("pending", "Pending"),
+            ("processing", "Processing"),
+            ("ready", "Ready"),
+            ("failed", "Failed"),
+        ],
+        default="none",
+    )
+    detected_language = models.CharField(
+        max_length=50,
+        blank=True,
+        default="",
+    )
+    detected_language_code = models.CharField(
+        max_length=15,
+        blank=True,
+        default="",
+    )
+    subtitle_error = models.TextField(
+        blank=True,
+        default="",
+    )
     created_at = models.DateTimeField(
         auto_now_add=True,
     )
@@ -366,6 +391,114 @@ class Lesson(models.Model):
             pass
 
         return ""
+
+
+class SubtitleTrack(models.Model):
+    lesson = models.ForeignKey(
+        Lesson,
+        on_delete=models.CASCADE,
+        related_name="subtitles",
+        null=True,
+        blank=True,
+    )
+    course = models.ForeignKey(
+        Course,
+        on_delete=models.CASCADE,
+        related_name="subtitles",
+        null=True,
+        blank=True,
+    )
+    language_code = models.CharField(
+        max_length=15,
+    )
+    language_name = models.CharField(
+        max_length=50,
+    )
+    is_original = models.BooleanField(
+        default=False,
+    )
+    vtt_file = models.FileField(
+        upload_to="subtitles/",
+        null=True,
+        blank=True,
+    )
+    srt_file = models.FileField(
+        upload_to="subtitles/",
+        null=True,
+        blank=True,
+    )
+    vtt_content = models.TextField(
+        blank=True,
+        default="",
+    )
+    srt_content = models.TextField(
+        blank=True,
+        default="",
+    )
+    cues_data = models.JSONField(
+        blank=True,
+        default=list,
+    )
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("pending", "Pending"),
+            ("processing", "Processing"),
+            ("ready", "Ready"),
+            ("failed", "Failed"),
+        ],
+        default="ready",
+    )
+    error_message = models.TextField(
+        blank=True,
+        default="",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+
+    class Meta:
+        ordering = ["language_name"]
+        unique_together = [("lesson", "language_code")]
+
+    def __str__(self):
+        parent = self.lesson.title if self.lesson else (self.course.title if self.course else "Unknown")
+        return f"{parent} [{self.language_name}]"
+
+    @property
+    def vtt_public_url(self):
+        from django.urls import reverse
+        try:
+            return reverse("serve_subtitle_vtt", args=[self.id])
+        except Exception:
+            return f"/subtitles/vtt/{self.id}/"
+
+    @property
+    def srt_public_url(self):
+        from django.urls import reverse
+        try:
+            return reverse("serve_subtitle_srt", args=[self.id])
+        except Exception:
+            return f"/subtitles/srt/{self.id}/"
+
+
+class SubtitleSetting(models.Model):
+    key = models.CharField(
+        max_length=100,
+        unique=True,
+    )
+    value = models.JSONField(
+        default=dict,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+
+    def __str__(self):
+        return self.key
 
 
 class Order(models.Model):

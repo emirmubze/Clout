@@ -129,6 +129,64 @@ urlpatterns = [
     ),
 
     # =====================================================
+    # SUBTITLES & MULTILINGUAL AI APIs
+    # =====================================================
+
+    path(
+        "subtitles/vtt/<int:subtitle_id>/",
+        views.serve_subtitle_vtt,
+        name="serve_subtitle_vtt"
+    ),
+
+    path(
+        "subtitles/srt/<int:subtitle_id>/",
+        views.serve_subtitle_srt,
+        name="serve_subtitle_srt"
+    ),
+
+    path(
+        "api/lessons/<int:lesson_id>/subtitles/",
+        views.api_lesson_subtitles,
+        name="api_lesson_subtitles"
+    ),
+
+    path(
+        "api/admin/subtitles/<int:subtitle_id>/",
+        views.api_admin_subtitle_details,
+        name="api_admin_subtitle_details"
+    ),
+
+    path(
+        "api/admin/subtitles/<int:subtitle_id>/update-cues/",
+        views.api_admin_update_cues,
+        name="api_admin_update_cues"
+    ),
+
+    path(
+        "api/admin/subtitles/<int:subtitle_id>/delete/",
+        views.api_admin_delete_subtitle,
+        name="api_admin_delete_subtitle"
+    ),
+
+    path(
+        "api/admin/lessons/<int:lesson_id>/regenerate-subtitles/",
+        views.api_admin_regenerate_subtitles,
+        name="api_admin_regenerate_subtitles"
+    ),
+
+    path(
+        "api/admin/lessons/<int:lesson_id>/add-subtitle-language/",
+        views.api_admin_add_language_subtitle,
+        name="api_admin_add_language_subtitle"
+    ),
+
+    path(
+        "api/admin/subtitles/languages/",
+        views.api_admin_languages_config,
+        name="api_admin_languages_config"
+    ),
+
+    # =====================================================
     # LOGIN
     # =====================================================
 
