@@ -492,8 +492,6 @@ def process_subtitles_for_lesson(
     """
     from .models import Lesson, SubtitleTrack
 
-    connection.close()
-
     lesson = Lesson.objects.filter(id=lesson_id).first()
     if not lesson or (not lesson.video and not lesson.video_url):
         logger.warning("Lesson %s does not exist or has no video attached.", lesson_id)
@@ -607,7 +605,6 @@ def process_subtitles_for_lesson(
                 os.remove(temp_file_path)
             except Exception:
                 pass
-        connection.close()
 
 
 def trigger_auto_subtitle_generation(
@@ -618,9 +615,18 @@ def trigger_auto_subtitle_generation(
     Trigger subtitle generation in a safe background thread.
     Non-blocking: returns immediately so video uploads complete without delay.
     """
+    def _thread_worker():
+        try:
+            process_subtitles_for_lesson(lesson_id, target_languages)
+        finally:
+            try:
+                from django.db import connection
+                connection.close()
+            except Exception:
+                pass
+
     worker_thread = threading.Thread(
-        target=process_subtitles_for_lesson,
-        args=(lesson_id, target_languages),
+        target=_thread_worker,
         daemon=True,
         name=f"SubtitlesWorker-Lesson-{lesson_id}"
     )
