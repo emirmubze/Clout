@@ -3307,6 +3307,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
+        function escapeHtml(value) {
+            const div = document.createElement("div");
+            div.textContent = value == null ? "" : String(value);
+            return div.innerHTML;
+        }
+        window.escapeHtml = escapeHtml;
+
         let moduleLessonCounts = {};
 
         window.uploadLargeVideo = async function(file, progressCallback) {
@@ -3424,7 +3431,7 @@
                 }
 
                 if (lessonData.video_url || count > 0 || status !== "none") {
-                    subtitleManageBtnHtml = `<button class="sub-manage-btn" type="button" onclick="openSubtitleManagerModal(${lessonData.id}, '${escapeHtml(lessonData.title || 'Lesson')}')"><i class="fa-solid fa-closed-captioning"></i> Manage Subtitles</button>`;
+                    subtitleManageBtnHtml = `<button class="sub-manage-btn" type="button" data-lesson-id="${lessonData.id}" data-lesson-title="${escapeHtml(lessonData.title || 'Lesson')}" onclick="openSubtitleManagerModal(this.dataset.lessonId, this.dataset.lessonTitle)"><i class="fa-solid fa-closed-captioning"></i> Manage Subtitles</button>`;
                 }
             }
 
