@@ -1738,19 +1738,8 @@ button {
                 </div>
 
                 <!-- Overlays -->
-                <div class="video-top-overlay"></div>
                 <div class="video-bottom-overlay"></div>
                 <div class="video-subtitle-overlay" id="subtitleOverlay"></div>
-
-                <!-- Video Title -->
-                <div class="video-title" id="playerTitle">
-                    <span class="video-module-name" id="playerModuleName">
-                        SELECT A LESSON
-                    </span>
-                    <span class="video-lesson-name" id="playerLessonName">
-                        Choose a lesson to begin
-                    </span>
-                </div>
 
                 <!-- Progress Bar -->
                 <div class="video-progress" id="progressArea">
@@ -3072,11 +3061,11 @@ button {
         currentLessonKey = "course_progress_lesson_" + (lessonId || title);
 
         // Update Text
-        playerModuleName.textContent = moduleName.toUpperCase();
-        playerLessonName.textContent = title;
-        lessonTitle.textContent = title;
-        lessonDescription.textContent = description;
-        lessonLabel.querySelector("span").textContent = label;
+        if (playerModuleName) playerModuleName.textContent = moduleName.toUpperCase();
+        if (playerLessonName) playerLessonName.textContent = title;
+        if (lessonTitle) lessonTitle.textContent = title;
+        if (lessonDescription) lessonDescription.textContent = description;
+        if (lessonLabel && lessonLabel.querySelector("span")) lessonLabel.querySelector("span").textContent = label;
 
         // Reset progress bar visual
         progressFill.style.width = "0%";
