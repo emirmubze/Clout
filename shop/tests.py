@@ -1626,6 +1626,120 @@ class SubtitleSystemTests(TestCase):
         self.assertIn("ക്ലാസ്സിലേക്ക് സ്വാഗതം", ml_track.vtt_content)
 
 
+class DataPersistenceTests(TestCase):
+    def setUp(self):
+        self.admin = CustomUser.objects.create_superuser(
+            username="persistadmin",
+            email="persistadmin@example.com",
+            password="AdminPassword123!",
+            is_staff=True,
+            is_superuser=True,
+        )
+
+    def test_admin_creates_modules_lessons_and_survives_logout_and_login(self):
+        self.client.login(username="persistadmin", password="AdminPassword123!")
+
+        # 1. Admin creates module and lessons
+        save_response = self.client.post(
+            reverse("admin_modules_save"),
+            {
+                "module_count": "1",
+                "module_title_0": "Persistent Module 1",
+                "module_description_0": "Module description for persistence test",
+                "module_lesson_count_0": "2",
+                "module_0_lesson_title_0": "Lesson 1 - Core Foundations",
+                "module_0_lesson_description_0": "Foundations description",
+                "module_0_lesson_title_1": "Lesson 2 - Advanced Practice",
+                "module_0_lesson_description_1": "Practice description",
+            },
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(save_response.status_code, 200)
+        data = save_response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["module_count"], 1)
+        self.assertEqual(len(data["modules"][0]["lessons"]), 2)
+
+        # 2. Admin logs out
+        logout_response = self.client.get(reverse("logout"))
+        self.assertRedirects(logout_response, reverse("login"))
+
+        # 3. Verify data in database is completely intact
+        self.assertEqual(Module.objects.filter(title="Persistent Module 1").count(), 1)
+        self.assertEqual(Lesson.objects.filter(title="Lesson 1 - Core Foundations").count(), 1)
+        self.assertEqual(Lesson.objects.filter(title="Lesson 2 - Advanced Practice").count(), 1)
+
+        # 4. Admin logs back in
+        login_response = self.client.post(
+            reverse("login"),
+            {"username": "persistadmin", "password": "AdminPassword123!"},
+        )
+        self.assertRedirects(login_response, reverse("admin_dashboard"))
+
+        # 5. Admin visits admin dashboard and curriculum data is present
+        dashboard_response = self.client.get(reverse("admin_dashboard"))
+        self.assertEqual(dashboard_response.status_code, 200)
+        course_modules = dashboard_response.context["course_modules"]
+        self.assertEqual(len(course_modules), 1)
+        self.assertEqual(course_modules[0]["title"], "Persistent Module 1")
+        self.assertEqual(len(course_modules[0]["lessons"]), 2)
+        self.assertEqual(course_modules[0]["lessons"][0]["title"], "Lesson 1 - Core Foundations")
+        self.assertEqual(course_modules[0]["lessons"][1]["title"], "Lesson 2 - Advanced Practice")
+
+    def test_admin_modules_save_empty_payload_does_not_wipe_curriculum(self):
+        course = Course.objects.create(title="Safety Test Course", is_active=True)
+        mod = Module.objects.create(course=course, title="Existing Safe Module", order=1)
+        Lesson.objects.create(module=mod, title="Existing Safe Lesson", order=1)
+
+        self.client.force_login(self.admin)
+
+        # Send empty POST payload
+        response = self.client.post(
+            reverse("admin_modules_save"),
+            {"course_id": str(course.id), "module_count": "0"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 400)
+        self.assertFalse(response.json()["success"])
+
+        # Verify existing module and lesson were NOT deleted
+        self.assertEqual(Module.objects.filter(id=mod.id).count(), 1)
+        self.assertEqual(Lesson.objects.filter(module=mod).count(), 1)
+
+    def test_active_course_resolution_stability(self):
+        # Create Course A with modules
+        course_a = Course.objects.create(title="Primary Curriculum Course", is_active=True)
+        mod = Module.objects.create(course=course_a, title="Curriculum Module", order=1)
+        Lesson.objects.create(module=mod, title="Curriculum Lesson", order=1)
+
+        # Create Course B without modules
+        course_b = Course.objects.create(title="New Empty Course", is_active=True)
+
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("admin_dashboard"))
+        self.assertEqual(response.status_code, 200)
+
+        # active_course should resolve to course_a which has the configured modules
+        self.assertEqual(response.context["active_course"].id, course_a.id)
+        self.assertEqual(len(response.context["course_modules"]), 1)
+
+    def test_sync_persistent_data_is_safe_and_idempotent(self):
+        from django.core.management import call_command
+        course = Course.objects.create(title="Sync Safe Course", is_active=True)
+        mod = Module.objects.create(course=course, title="Sync Safe Module", order=1)
+        lesson = Lesson.objects.create(module=mod, title="Sync Safe Lesson", order=1)
+
+        # Call sync_persistent_data multiple times
+        call_command("sync_persistent_data")
+        call_command("sync_persistent_data")
+
+        # Verify no data corruption or duplicate records
+        self.assertEqual(Course.objects.filter(id=course.id).count(), 1)
+        self.assertEqual(Module.objects.filter(id=mod.id).count(), 1)
+        self.assertEqual(Lesson.objects.filter(id=lesson.id).count(), 1)
+
+
+
 
 
 

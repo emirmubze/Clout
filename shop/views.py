@@ -302,8 +302,11 @@ def course(request):
     ):
 
         course_obj = Course.objects.filter(
-            is_active=True
-        ).order_by("-created_at").first()
+            is_active=True,
+            modules__isnull=False
+        ).distinct().first()
+        if not course_obj:
+            course_obj = Course.objects.filter(is_active=True).first()
         if not course_obj:
             course_obj = Course.objects.first()
 
@@ -329,8 +332,11 @@ def course(request):
         if user_has_course_access(request.user):
 
             course_obj = Course.objects.filter(
-                is_active=True
-            ).order_by("-created_at").first()
+                is_active=True,
+                modules__isnull=False
+            ).distinct().first()
+            if not course_obj:
+                course_obj = Course.objects.filter(is_active=True).first()
             if not course_obj:
                 course_obj = Course.objects.first()
 
@@ -620,10 +626,14 @@ def admin_dashboard(request):
     courses = Course.objects.filter(
         is_active=True
     ).order_by(
-        "-created_at"
+        "id"
     )
 
-    active_course = editing_course or courses.first()
+    active_course = editing_course
+    if not active_course:
+        active_course = courses.filter(modules__isnull=False).distinct().first()
+    if not active_course:
+        active_course = courses.first()
     if not active_course:
         active_course = Course.objects.first()
 
@@ -685,6 +695,7 @@ def admin_dashboard(request):
             "contact_count": ContactMessage.objects.count(),
             "supported_languages": list(SUPPORTED_LANGUAGES.values()),
             "active_target_languages": get_active_target_languages(),
+            "use_s3": getattr(settings, "USE_S3", False),
         }
     )
 
@@ -1124,6 +1135,9 @@ def _admin_modules_save_impl(request):
         except (json.JSONDecodeError, AttributeError):
             return JsonResponse({"success": False, "message": "Invalid module data."}, status=400)
 
+    if not module_items:
+        return JsonResponse({"success": False, "message": "At least one module is required to save."}, status=400)
+
     course_id = request.POST.get("course_id") or request.GET.get("course_id")
     course = None
     if course_id:
@@ -1133,12 +1147,14 @@ def _admin_modules_save_impl(request):
         if selected_course_id:
             course = Course.objects.filter(id=selected_course_id).first()
     if course is None:
-        course = Course.objects.filter(is_active=True).order_by("-created_at").first()
+        course = Course.objects.filter(is_active=True, modules__isnull=False).distinct().first()
+    if course is None:
+        course = Course.objects.filter(is_active=True).first()
     if course is None:
         course = Course.objects.first()
     if course is None:
         course = Course.objects.create(
-            title="My Course",
+            title="The AI Income Playbook",
             description="",
             is_active=True,
         )

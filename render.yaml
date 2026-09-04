@@ -9,7 +9,7 @@ services:
     name: clout
     runtime: python
     buildCommand: bash build.sh
-    startCommand: gunicorn clout.wsgi:application --bind 0.0.0.0:$PORT --workers 1 --timeout 300
+    startCommand: bash start.sh
 
     # Persistent 10GB Disk for uploaded videos, thumbnails, avatars, and persistent data
     disk:

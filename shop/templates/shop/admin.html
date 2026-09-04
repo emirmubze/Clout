@@ -3314,10 +3314,13 @@
         }
         window.escapeHtml = escapeHtml;
 
-        let moduleLessonCounts = {};
+        const IS_S3_ENABLED = {{ use_s3|yesno:"true,false" }};
 
         window.uploadLargeVideo = async function(file, progressCallback) {
             if (!file) throw new Error("No video selected.");
+            if (!IS_S3_ENABLED) {
+                return null;
+            }
 
             const csrfInput = document.querySelector("input[name='csrfmiddlewaretoken']");
             const response = await fetch("{% url 'r2_presign_upload' %}", {
@@ -3336,7 +3339,7 @@
             });
             const data = await response.json().catch(() => ({}));
             if (!response.ok || !data.success) {
-                throw new Error(data.message || "Could not prepare the R2 video upload.");
+                return null;
             }
 
             return await new Promise((resolve, reject) => {
@@ -3598,9 +3601,6 @@
                     if (lessonVideoInput?.files?.[0]) {
                         lesson.pendingVideo = lessonVideoInput.files[0];
                     }
-                    if (lessonVideoInput?.files?.[0]) {
-                        formData.append(`module_${moduleIndex}_lesson_video_key_${lessonIndex}`, "");
-                    }
                     if (lessonThumbnailInput?.files?.[0]) {
                         formData.append(`module_${moduleIndex}_lesson_thumbnail_${lessonIndex}`, lessonThumbnailInput.files[0]);
                     }
@@ -3612,16 +3612,24 @@
                     const lessons = [...module.querySelectorAll(".editor-lesson")];
                     for (const [lessonIndex, lesson] of lessons.entries()) {
                         if (lesson.pendingVideo) {
-                            if (saveButton) saveButton.textContent = "Uploading video...";
-                            formData.set(
-                                `module_${moduleIndex}_lesson_video_key_${lessonIndex}`,
-                                await window.uploadLargeVideo(lesson.pendingVideo, percent => {
-                                    if (saveButton) saveButton.textContent = `Uploading ${percent}%...`;
-                                })
-                            );
+                            if (saveButton) saveButton.textContent = "Processing video...";
+                            try {
+                                const r2Key = await window.uploadLargeVideo(lesson.pendingVideo, percent => {
+                                    if (saveButton) saveButton.textContent = `Uploading video ${percent}%...`;
+                                });
+                                if (r2Key) {
+                                    formData.set(`module_${moduleIndex}_lesson_video_key_${lessonIndex}`, r2Key);
+                                } else {
+                                    formData.set(`module_${moduleIndex}_lesson_video_${lessonIndex}`, lesson.pendingVideo);
+                                }
+                            } catch (uploadErr) {
+                                console.warn("Direct upload fallback:", uploadErr);
+                                formData.set(`module_${moduleIndex}_lesson_video_${lessonIndex}`, lesson.pendingVideo);
+                            }
                         }
                     }
                 }
+                if (saveButton) saveButton.textContent = "Saving course changes...";
                 const response = await fetch("{% url 'admin_modules_save' %}", {
                     method: "POST",
                     headers: {
