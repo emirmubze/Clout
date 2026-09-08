@@ -1099,6 +1099,18 @@ button {
     }
 }
 
+/* Native Video Cue styling for Picture-in-Picture (PiP) and native player */
+video::cue {
+    background-color: rgba(10, 12, 16, 0.88);
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.4;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+    border-radius: 4px;
+}
+
 /* Controls Hide State */
 .video-container.controls-hidden .video-controls,
 .video-container.controls-hidden .video-progress,
@@ -2775,6 +2787,84 @@ button {
         }
     }
 
+    let nativeSubtitleTrack = null;
+
+    function isPipActive() {
+        return !!(document.pictureInPictureElement && document.pictureInPictureElement === video);
+    }
+
+    function syncSubtitleMode() {
+        const inPip = isPipActive();
+        const hasActiveSub = selectedSubtitleLang !== "off" && activeCueList && activeCueList.length > 0;
+
+        // Sync native TextTrack mode
+        if (nativeSubtitleTrack) {
+            if (!hasActiveSub) {
+                nativeSubtitleTrack.mode = "disabled";
+            } else {
+                // When in PiP mode, native track MUST be "showing" to render directly inside the OS PiP window
+                // When in normal player mode, mode is "hidden" so custom styled overlay renders cleanly
+                nativeSubtitleTrack.mode = inPip ? "showing" : "hidden";
+            }
+        }
+
+        // Disable any other inactive tracks on video element
+        if (video.textTracks && video.textTracks.length) {
+            for (let i = 0; i < video.textTracks.length; i++) {
+                const t = video.textTracks[i];
+                if (t === nativeSubtitleTrack) continue;
+                t.mode = "disabled";
+            }
+        }
+
+        // Handle DOM overlay visibility in PiP
+        if (subtitleOverlay) {
+            if (inPip || !hasActiveSub) {
+                subtitleOverlay.innerHTML = "";
+                currentRenderedCueText = "";
+                subtitleOverlay.style.visibility = inPip ? "hidden" : "visible";
+            } else {
+                subtitleOverlay.style.visibility = "visible";
+                updateSubtitleDisplay();
+            }
+        }
+    }
+
+    function setupNativeTextTrack(trackInfo, cues) {
+        try {
+            if (!nativeSubtitleTrack || nativeSubtitleTrack.label !== trackInfo.language_name) {
+                if (video.addTextTrack) {
+                    nativeSubtitleTrack = video.addTextTrack("subtitles", trackInfo.language_name, trackInfo.language_code);
+                }
+            }
+
+            if (nativeSubtitleTrack) {
+                const existingCues = Array.from(nativeSubtitleTrack.cues || []);
+                existingCues.forEach(c => {
+                    try { nativeSubtitleTrack.removeCue(c); } catch (e) {}
+                });
+
+                cues.forEach(c => {
+                    try {
+                        let cueObj = null;
+                        if (typeof VTTCue !== "undefined") {
+                            cueObj = new VTTCue(c.start, c.end, c.text);
+                        } else if (typeof TextTrackCue !== "undefined") {
+                            cueObj = new TextTrackCue(c.start, c.end, c.text);
+                        }
+                        if (cueObj) {
+                            nativeSubtitleTrack.addCue(cueObj);
+                        }
+                    } catch (cueErr) {
+                        console.warn("Could not add native cue:", cueErr);
+                    }
+                });
+            }
+        } catch (err) {
+            console.warn("Could not setup native TextTrack for PiP:", err);
+        }
+    }
+
     async function selectSubtitleLanguage(langCode) {
         selectedSubtitleLang = langCode;
         localStorage.setItem("clout_preferred_subtitle_lang", langCode);
@@ -2786,7 +2876,18 @@ button {
         if (langCode === "off") {
             activeCueList = [];
             currentRenderedCueText = "";
-            if (subtitleOverlay) subtitleOverlay.innerHTML = "";
+            if (subtitleOverlay) {
+                subtitleOverlay.innerHTML = "";
+                subtitleOverlay.style.visibility = "visible";
+            }
+            if (nativeSubtitleTrack) {
+                nativeSubtitleTrack.mode = "disabled";
+            }
+            if (video.textTracks && video.textTracks.length) {
+                for (let i = 0; i < video.textTracks.length; i++) {
+                    video.textTracks[i].mode = "disabled";
+                }
+            }
             video.querySelectorAll("track").forEach(t => t.remove());
             if (ccButton) ccButton.classList.remove("active");
             subtitleMenu.classList.remove("open");
@@ -2804,24 +2905,18 @@ button {
         if (ccButton) ccButton.classList.add("active");
         video.querySelectorAll("track").forEach(t => t.remove());
 
-        const trackEl = document.createElement("track");
-        trackEl.kind = "subtitles";
-        trackEl.label = track.language_name;
-        trackEl.srclang = track.language_code;
-        trackEl.src = track.vtt_url;
-        trackEl.default = false;
-        video.appendChild(trackEl);
-        if (trackEl.track) {
-            trackEl.track.mode = "hidden";
-        }
-
         activeCueList = await parseVttFromUrl(track.vtt_url);
         currentRenderedCueText = "";
-        updateSubtitleDisplay();
+
+        setupNativeTextTrack(track, activeCueList);
+        syncSubtitleMode();
     }
 
     function updateSubtitleDisplay() {
         if (!subtitleOverlay) return;
+        if (isPipActive()) {
+            return; // In PiP mode, native TextTrack renders cues inside PiP window
+        }
         if (selectedSubtitleLang === "off" || !activeCueList || !activeCueList.length) {
             if (currentRenderedCueText !== "") {
                 subtitleOverlay.innerHTML = "";
@@ -2860,6 +2955,14 @@ button {
     /* =========================================================
        PICTURE IN PICTURE & FULLSCREEN
     ========================================================= */
+    video.addEventListener("enterpictureinpicture", function() {
+        syncSubtitleMode();
+    });
+
+    video.addEventListener("leavepictureinpicture", function() {
+        syncSubtitleMode();
+    });
+
     if (!document.pictureInPictureEnabled) {
         if (pipButton) pipButton.style.display = "none";
     }
