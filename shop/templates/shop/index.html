@@ -317,6 +317,12 @@
       font-weight: 700;
     }
 
+    .payment-upi-note {
+      color: rgba(255, 255, 255, 0.75);
+      font-size: 12px;
+      margin-left: 2px;
+    }
+
     .buy-button {
       position: relative;
       left: auto;
@@ -2307,24 +2313,25 @@
     @media (max-width: 700px) {
       .payment-bar {
         height: 48px;
-        padding: 0 16px;
+        padding: 0 14px;
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 12px;
+        gap: 10px;
       }
 
       .payment-info {
         position: static;
         left: auto;
-        font-size: 12px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: 11.5px;
+        white-space: normal;
+        overflow: visible;
         text-align: left;
         max-width: none;
         flex: 1;
+        min-width: 0;
         margin: 0;
+        line-height: 1.25;
       }
 
       .payment-info strong {
@@ -2333,8 +2340,14 @@
       }
 
       .payment-desc {
-        font-size: 12px;
-        color: rgba(255, 255, 255, 0.85);
+        font-size: 11.5px;
+        color: rgba(255, 255, 255, 0.88);
+      }
+
+      .payment-upi-note {
+        display: inline !important;
+        color: rgba(255, 255, 255, 0.72);
+        font-size: 10.5px;
       }
 
       .buy-button {
@@ -2532,22 +2545,31 @@
     @media (max-width: 480px) {
       .payment-bar {
         height: 48px;
-        padding: 0 12px;
+        padding: 0 10px;
+        gap: 6px;
       }
 
       .payment-info {
-        font-size: 11.5px;
+        font-size: 11px;
+        line-height: 1.25;
+        white-space: normal;
+      }
+
+      .payment-desc {
+        font-size: 10.5px;
       }
 
       .payment-upi-note {
-        display: none;
+        display: inline !important;
+        color: rgba(255, 255, 255, 0.75);
+        font-size: 10px;
       }
 
       .buy-button {
-        min-width: 96px;
+        min-width: 90px;
         height: 30px;
-        font-size: 11.5px;
-        padding: 0 12px;
+        font-size: 11px;
+        padding: 0 10px;
       }
 
       .nav-container {
@@ -2701,13 +2723,22 @@
 
     @media (max-width: 359px) {
       .payment-info {
-        font-size: 10.5px;
+        font-size: 10px;
+      }
+
+      .payment-desc {
+        font-size: 9.5px;
+      }
+
+      .payment-upi-note {
+        display: inline !important;
+        font-size: 9px;
       }
 
       .buy-button {
-        min-width: 88px;
-        padding: 0 8px;
-        font-size: 10.5px;
+        min-width: 82px;
+        padding: 0 6px;
+        font-size: 10px;
       }
 
       .hero h1 {
