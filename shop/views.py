@@ -752,6 +752,10 @@ def admin_course_add(request):
         if video_key:
             _verify_r2_object(video_key)
             course.video = video_key
+        thumbnail_key = (request.POST.get("thumbnail_key") or "").strip()
+        if thumbnail_key:
+            _verify_r2_object(thumbnail_key)
+            course.thumbnail = thumbnail_key
         course.save()
 
         # AJAX RESPONSE
@@ -863,6 +867,10 @@ def admin_course_edit(
         if video_key:
             _verify_r2_object(video_key)
             course.video = video_key
+        thumbnail_key = (request.POST.get("thumbnail_key") or "").strip()
+        if thumbnail_key:
+            _verify_r2_object(thumbnail_key)
+            course.thumbnail = thumbnail_key
         if (
             Order.objects.filter(paid=True).exists()
             or CustomUser.objects.filter(course_access_approved=True).exists()
@@ -1009,14 +1017,16 @@ def r2_presign_upload(request):
     allowed_folders = {
         "course_videos",
         "course_thumbnails",
+        "lesson_thumbnails",
         "contact_videos",
         "contact_images",
+        "profiles",
     }
     if folder not in allowed_folders:
         return JsonResponse({"success": False, "message": "Invalid upload folder."}, status=400)
     if not filename:
         return JsonResponse({"success": False, "message": "A filename is required."}, status=400)
-    if folder == "course_videos":
+    if folder == "course_videos" or folder == "contact_videos":
         content_type = "video/mp4"
 
     safe_filename = re.sub(r"[^A-Za-z0-9._-]", "-", filename).strip(".") or "upload"
@@ -1058,7 +1068,14 @@ def r2_presign_upload(request):
 def _verify_r2_object(object_key):
     if not object_key or object_key.startswith("/") or ".." in object_key:
         raise ValueError("Invalid R2 object key.")
-    if not object_key.startswith(("course_videos/", "course_thumbnails/", "contact_videos/", "contact_images/")):
+    if not object_key.startswith((
+        "course_videos/",
+        "course_thumbnails/",
+        "lesson_thumbnails/",
+        "contact_videos/",
+        "contact_images/",
+        "profiles/",
+    )):
         raise ValueError("Invalid R2 object folder.")
 
     client = boto3.client(
@@ -1108,6 +1125,7 @@ def _admin_modules_save_impl(request):
                 lesson_video_key = (request.POST.get(f"module_{index}_lesson_video_key_{lesson_index}") or "").strip()
                 lesson_thumbnail = request.FILES.get(f"module_{index}_lesson_thumbnail_{lesson_index}") or None
                 lesson_thumbnail_url = (request.POST.get(f"module_{index}_lesson_thumbnail_url_{lesson_index}") or "").strip()
+                lesson_thumbnail_key = (request.POST.get(f"module_{index}_lesson_thumbnail_key_{lesson_index}") or "").strip()
                 lessons.append({
                     "id": lesson_id,
                     "title": lesson_title,
@@ -1117,6 +1135,7 @@ def _admin_modules_save_impl(request):
                     "video_key": lesson_video_key,
                     "thumbnail": lesson_thumbnail,
                     "thumbnail_url": lesson_thumbnail_url,
+                    "thumbnail_key": lesson_thumbnail_key,
                 })
 
             module_items.append({
@@ -1232,6 +1251,11 @@ def _admin_modules_save_impl(request):
                         t_url = str(lesson_item["thumbnail_url"]).strip()
                         if t_url:
                             lesson_obj.thumbnail_url = t_url
+                    if isinstance(lesson_item, dict) and lesson_item.get("thumbnail_key"):
+                        t_key = str(lesson_item["thumbnail_key"]).strip()
+                        if t_key:
+                            _verify_r2_object(t_key)
+                            lesson_obj.thumbnail = t_key
                     lesson_obj.save()
                     saved_lesson_ids.append(lesson_obj.id)
 

@@ -1738,6 +1738,70 @@ class DataPersistenceTests(TestCase):
         self.assertEqual(Module.objects.filter(id=mod.id).count(), 1)
         self.assertEqual(Lesson.objects.filter(id=lesson.id).count(), 1)
 
+    def test_public_file_url_resolution_r2_custom_domain(self):
+        from shop.models import _public_file_url
+        with self.settings(AWS_S3_CUSTOM_DOMAIN="cdn.clout.courses", USE_S3=True):
+            # Key with custom domain
+            url = _public_file_url("course_videos/test-video.mp4")
+            self.assertEqual(url, "https://cdn.clout.courses/course_videos/test-video.mp4")
+
+            # Key with explicit http url takes precedence
+            url_http = _public_file_url("course_videos/test.mp4", "https://custom.com/video.mp4")
+            self.assertEqual(url_http, "https://custom.com/video.mp4")
+
+    def test_public_file_url_resolution_r2_endpoint_and_bucket(self):
+        from shop.models import _public_file_url
+        with self.settings(
+            AWS_S3_CUSTOM_DOMAIN="",
+            AWS_S3_ENDPOINT_URL="https://account-id.r2.cloudflarestorage.com",
+            AWS_STORAGE_BUCKET_NAME="clout",
+            USE_S3=True,
+        ):
+            url = _public_file_url("lesson_thumbnails/thumb-1.jpg")
+            self.assertEqual(url, "https://account-id.r2.cloudflarestorage.com/clout/lesson_thumbnails/thumb-1.jpg")
+
+    def test_admin_modules_save_preserves_existing_media_on_text_edit(self):
+        course = Course.objects.create(title="Media Preserve Course", is_active=True)
+        mod = Module.objects.create(course=course, title="Initial Module", order=1)
+        lesson = Lesson.objects.create(
+            module=mod,
+            title="Initial Lesson",
+            video="course_videos/persisted-video.mp4",
+            video_url="https://r2.clout.courses/course_videos/persisted-video.mp4",
+            thumbnail="lesson_thumbnails/persisted-thumb.jpg",
+            thumbnail_url="https://r2.clout.courses/lesson_thumbnails/persisted-thumb.jpg",
+            order=1,
+        )
+
+        self.client.force_login(self.admin)
+        payload = {
+            "course_id": str(course.id),
+            "module_count": "1",
+            "module_id_0": str(mod.id),
+            "module_title_0": "Renamed Module",
+            "module_lesson_count_0": "1",
+            "module_0_lesson_id_0": str(lesson.id),
+            "module_0_lesson_title_0": "Renamed Lesson Title",
+            "module_0_lesson_description_0": "Updated Description",
+        }
+
+        response = self.client.post(
+            reverse("admin_modules_save"),
+            payload,
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["success"])
+
+        lesson.refresh_from_db()
+        self.assertEqual(lesson.title, "Renamed Lesson Title")
+        self.assertEqual(lesson.description, "Updated Description")
+        self.assertEqual(str(lesson.video), "course_videos/persisted-video.mp4")
+        self.assertEqual(lesson.video_url, "https://r2.clout.courses/course_videos/persisted-video.mp4")
+        self.assertEqual(str(lesson.thumbnail), "lesson_thumbnails/persisted-thumb.jpg")
+        self.assertEqual(lesson.thumbnail_url, "https://r2.clout.courses/lesson_thumbnails/persisted-thumb.jpg")
+
+
 
 
 

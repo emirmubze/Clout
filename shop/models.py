@@ -12,17 +12,38 @@ def _public_file_url(file_field, explicit_url=""):
     if not file_field:
         return ""
 
+    raw_val = str(getattr(file_field, "name", "") or str(file_field)).strip()
+    if raw_val.startswith(("http://", "https://")):
+        return raw_val
+
     custom_domain = str(
         getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
     ).strip().rstrip("/")
-    file_name = str(getattr(file_field, "name", "")).lstrip("/")
+    file_name = raw_val.lstrip("/")
     if custom_domain and file_name:
         return f"https://{custom_domain}/{file_name}"
 
+    endpoint = str(
+        getattr(settings, "AWS_S3_ENDPOINT_URL", "")
+    ).strip().rstrip("/")
+    bucket = str(
+        getattr(settings, "AWS_STORAGE_BUCKET_NAME", "")
+    ).strip()
+    if getattr(settings, "USE_S3", False) and endpoint and bucket and file_name:
+        return f"{endpoint}/{bucket}/{file_name}"
+
     try:
-        return str(file_field.url or "")
+        url = str(file_field.url or "").strip()
+        if url:
+            return url
     except (AttributeError, ValueError):
-        return ""
+        pass
+
+    if file_name:
+        media_url = getattr(settings, "MEDIA_URL", "/media/").rstrip("/")
+        return f"{media_url}/{file_name}"
+
+    return ""
 
 
 class CustomUser(AbstractUser):
@@ -60,33 +81,16 @@ class CustomUser(AbstractUser):
         if not self.profile_image:
             return ""
 
-        try:
-            image_url = self.profile_image.url
-            separator = "&" if "?" in image_url else "?"
-            cache_version = quote(
-                str(self.profile_image),
-                safe="",
-            )
-            return f"{image_url}{separator}v={cache_version}"
+        url = _public_file_url(self.profile_image)
+        if not url:
+            return ""
 
-        except (AttributeError, ValueError):
-            domain = getattr(
-                settings,
-                "AWS_S3_CUSTOM_DOMAIN",
-                "",
-            )
-
-            if not domain:
-                return ""
-
-            relative_path = str(
-                self.profile_image
-            ).lstrip("/")
-
-            return (
-                f"https://{domain.rstrip('/')}"
-                f"/{relative_path}"
-            )
+        separator = "&" if "?" in url else "?"
+        cache_version = quote(
+            str(self.profile_image),
+            safe="",
+        )
+        return f"{url}{separator}v={cache_version}"
 
     def __str__(self):
         return self.username
@@ -169,6 +173,14 @@ class ContactMessage(models.Model):
             f"{self.message[:40]}"
         )
 
+    @property
+    def image_url(self):
+        return _public_file_url(self.image)
+
+    @property
+    def video_url(self):
+        return _public_file_url(self.video)
+
 
 class Course(models.Model):
     title = models.CharField(
@@ -231,6 +243,14 @@ class Course(models.Model):
 
     def __str__(self):
         return self.title
+
+    @property
+    def video_public_url(self):
+        return _public_file_url(self.video, self.video_url)
+
+    @property
+    def thumbnail_public_url(self):
+        return _public_file_url(self.thumbnail)
 
 
 class Module(models.Model):
@@ -356,41 +376,11 @@ class Lesson(models.Model):
 
     @property
     def video_public_url(self):
-        """
-        Return a browser-playable video URL.
-
-        Priority:
-        1. Explicit public R2 URL in video_url
-        2. Django storage URL from video
-        """
-
         return _public_file_url(self.video, self.video_url)
 
     @property
     def thumbnail_public_url(self):
-        if self.thumbnail_url:
-            url = str(
-                self.thumbnail_url
-            ).strip()
-
-            if url.startswith(
-                ("http://", "https://")
-            ):
-                return url
-
-        if not self.thumbnail:
-            return ""
-
-        try:
-            url = self.thumbnail.url
-
-            if url:
-                return str(url)
-
-        except (AttributeError, ValueError):
-            pass
-
-        return ""
+        return _public_file_url(self.thumbnail, self.thumbnail_url)
 
 
 class SubtitleTrack(models.Model):

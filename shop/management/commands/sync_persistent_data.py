@@ -67,26 +67,34 @@ class Command(BaseCommand):
             self.stdout.write("[OK] Media storage directory verified.")
 
         # ---------------------------------------------------------
-        # 2. AUTO-MIGRATE SQLITE TO POSTGRESQL IF POSTGRESQL IS EMPTY
         # ---------------------------------------------------------
+        # 2. VERIFY DATABASE STATUS (NON-DESTRUCTIVE)
+        # ---------------------------------------------------------
+        seed_flag = options.get("seed_from_sqlite", False)
         is_postgres = "postgres" in connection.vendor.lower()
         sqlite_source = Path(settings.BASE_DIR) / "db.sqlite3"
 
-        if is_postgres and sqlite_source.exists():
-            pg_user_count = CustomUser.objects.count()
-            pg_course_count = Course.objects.count()
-
-            if pg_course_count == 0 or pg_user_count == 0:
-                self.stdout.write(self.style.NOTICE("==> PostgreSQL database missing initial seed data. Migrating seed data from SQLite safely..."))
-                self._import_from_sqlite(sqlite_source)
-            else:
-                self.stdout.write(f"[OK] PostgreSQL database active with {pg_user_count} users, {pg_course_count} courses.")
+        if seed_flag and sqlite_source.exists():
+            self.stdout.write(self.style.NOTICE("==> Manual seed flag passed. Migrating initial seed data from SQLite safely..."))
+            self._import_from_sqlite(sqlite_source)
         else:
             current_users = CustomUser.objects.count()
             current_courses = Course.objects.count()
-            self.stdout.write(f"[OK] Database active with {current_users} users, {current_courses} courses.")
+            current_modules = Module.objects.count()
+            current_lessons = Lesson.objects.count()
+            self.stdout.write(
+                f"[OK] Database ({connection.vendor}) persistent source of truth verified: "
+                f"{current_users} users, {current_courses} courses, {current_modules} modules, {current_lessons} lessons."
+            )
 
         self.stdout.write(self.style.SUCCESS("==> Persistent data synchronization complete."))
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--seed-from-sqlite",
+            action="store_true",
+            help="Explicitly import seed data from repository db.sqlite3 into the database (manual operation only).",
+        )
 
     def _import_from_sqlite(self, sqlite_path):
         try:
@@ -124,7 +132,7 @@ class Command(BaseCommand):
                     if pk:
                         user_map[pk] = user
 
-                self.stdout.write(self.style.SUCCESS(f"[OK] Migrated {len(user_map)} users to PostgreSQL."))
+                self.stdout.write(self.style.SUCCESS(f"[OK] Migrated {len(user_map)} users to database."))
             else:
                 user_map = {}
 
@@ -154,7 +162,7 @@ class Command(BaseCommand):
                     if pk:
                         course_map[pk] = course
 
-                self.stdout.write(self.style.SUCCESS(f"[OK] Migrated {len(course_map)} courses to PostgreSQL."))
+                self.stdout.write(self.style.SUCCESS(f"[OK] Migrated {len(course_map)} courses to database."))
             else:
                 course_map = {}
 
@@ -185,7 +193,7 @@ class Command(BaseCommand):
                     if pk:
                         module_map[pk] = module
 
-                self.stdout.write(self.style.SUCCESS(f"[OK] Migrated {len(module_map)} modules to PostgreSQL."))
+                self.stdout.write(self.style.SUCCESS(f"[OK] Migrated {len(module_map)} modules to database."))
             else:
                 module_map = {}
 
@@ -216,7 +224,7 @@ class Command(BaseCommand):
                     )
                     lesson_count += 1
 
-                self.stdout.write(self.style.SUCCESS(f"[OK] Migrated {lesson_count} lessons to PostgreSQL."))
+                self.stdout.write(self.style.SUCCESS(f"[OK] Migrated {lesson_count} lessons to database."))
 
             # 5. Order
             cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='shop_order'")
@@ -243,7 +251,7 @@ class Command(BaseCommand):
                     )
                     order_count += 1
 
-                self.stdout.write(self.style.SUCCESS(f"[OK] Migrated {order_count} orders to PostgreSQL."))
+                self.stdout.write(self.style.SUCCESS(f"[OK] Migrated {order_count} orders to database."))
 
             conn.close()
 
@@ -266,4 +274,4 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.WARNING(f"Sequence reset warning: {seq_err}"))
 
         except Exception as e:
-            self.stdout.write(self.style.ERROR(f"Error during SQLite to PostgreSQL migration: {e}"))
+            self.stdout.write(self.style.ERROR(f"Error during SQLite to database migration: {e}"))

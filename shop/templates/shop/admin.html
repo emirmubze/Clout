@@ -3364,6 +3364,54 @@
             });
         };
 
+        window.uploadLargeThumbnail = async function(file, progressCallback) {
+            if (!file) throw new Error("No thumbnail selected.");
+            if (!IS_S3_ENABLED) {
+                return null;
+            }
+
+            const csrfInput = document.querySelector("input[name='csrfmiddlewaretoken']");
+            const response = await fetch("{% url 'r2_presign_upload' %}", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": csrfInput ? csrfInput.value : "",
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+                credentials: "same-origin",
+                body: JSON.stringify({
+                    filename: file.name,
+                    content_type: file.type || "image/jpeg",
+                    folder: "lesson_thumbnails"
+                })
+            });
+            const data = await response.json().catch(() => ({}));
+            if (!response.ok || !data.success) {
+                return null;
+            }
+
+            return await new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open("PUT", data.upload_url, true);
+                xhr.setRequestHeader("Content-Type", file.type || "image/jpeg");
+                xhr.upload.onprogress = event => {
+                    if (event.lengthComputable && progressCallback) {
+                        progressCallback(Math.round(event.loaded / event.total * 100));
+                    }
+                };
+                xhr.onload = () => {
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        resolve(data.object_key);
+                        return;
+                    }
+                    const responseBody = xhr.responseText ? ` ${xhr.responseText.slice(0, 240)}` : "";
+                    reject(new Error(`R2 thumbnail upload failed (${xhr.status}).${responseBody}`));
+                };
+                xhr.onerror = () => reject(new Error("The browser could not reach R2 for thumbnail upload."));
+                xhr.send(file);
+            });
+        };
+
         function addModule(moduleData = null) {
             const module = document.createElement("div");
             module.className = "module-editor";
@@ -3602,7 +3650,7 @@
                         lesson.pendingVideo = lessonVideoInput.files[0];
                     }
                     if (lessonThumbnailInput?.files?.[0]) {
-                        formData.append(`module_${moduleIndex}_lesson_thumbnail_${lessonIndex}`, lessonThumbnailInput.files[0]);
+                        lesson.pendingThumbnail = lessonThumbnailInput.files[0];
                     }
                 });
             });
@@ -3623,8 +3671,23 @@
                                     formData.set(`module_${moduleIndex}_lesson_video_${lessonIndex}`, lesson.pendingVideo);
                                 }
                             } catch (uploadErr) {
-                                console.warn("Direct upload fallback:", uploadErr);
+                                console.warn("Direct video upload fallback:", uploadErr);
                                 formData.set(`module_${moduleIndex}_lesson_video_${lessonIndex}`, lesson.pendingVideo);
+                            }
+                        }
+
+                        if (lesson.pendingThumbnail) {
+                            if (saveButton) saveButton.textContent = "Processing thumbnail...";
+                            try {
+                                const r2ThumbKey = await window.uploadLargeThumbnail(lesson.pendingThumbnail);
+                                if (r2ThumbKey) {
+                                    formData.set(`module_${moduleIndex}_lesson_thumbnail_key_${lessonIndex}`, r2ThumbKey);
+                                } else {
+                                    formData.set(`module_${moduleIndex}_lesson_thumbnail_${lessonIndex}`, lesson.pendingThumbnail);
+                                }
+                            } catch (thumbErr) {
+                                console.warn("Direct thumbnail upload fallback:", thumbErr);
+                                formData.set(`module_${moduleIndex}_lesson_thumbnail_${lessonIndex}`, lesson.pendingThumbnail);
                             }
                         }
                     }
