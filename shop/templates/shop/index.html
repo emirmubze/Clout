@@ -708,6 +708,10 @@
       display: none;
     }
 
+    .mobile-user-profile-header {
+      display: none !important;
+    }
+
     .mobile-nav-arrow {
       display: none;
     }
@@ -2073,8 +2077,7 @@
       }
 
       .nav-course-desktop,
-      .mobile-menu,
-      .nav-links {
+      .mobile-menu {
         display: none !important;
       }
 
@@ -2107,6 +2110,133 @@
         border: 2px solid var(--orange);
         background: #ffffff;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      }
+
+      .profile-link.active {
+        box-shadow: 0 0 0 3px rgba(224, 79, 0, 0.35), 0 4px 14px rgba(224, 79, 0, 0.55);
+        border-color: #ff6b1a;
+        transform: scale(1.06);
+      }
+
+      .mobile-user-profile-header {
+        display: flex !important;
+        flex-direction: column;
+        gap: 12px;
+        padding: 14px 16px 16px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        border-radius: 12px;
+        margin-bottom: 10px;
+        box-sizing: border-box;
+      }
+
+      .mobile-user-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .mobile-user-avatar {
+        width: 44px;
+        height: 44px;
+        border-radius: 50%;
+        background: #ffffff;
+        border: 2px solid var(--orange);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        flex-shrink: 0;
+      }
+
+      .mobile-user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+
+      .mobile-user-avatar .profile-icon {
+        font-size: 20px;
+        color: #111827;
+        display: none;
+      }
+
+      .mobile-user-avatar.no-profile-image .profile-icon,
+      .mobile-user-avatar.image-failed .profile-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .mobile-user-avatar.no-profile-image img,
+      .mobile-user-avatar.image-failed img {
+        display: none;
+      }
+
+      .mobile-user-info {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+        flex: 1;
+        gap: 2px;
+      }
+
+      .mobile-user-name {
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.3px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+      }
+
+      .mobile-user-email {
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.2;
+      }
+
+      .mobile-edit-profile-btn {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        height: 38px;
+        background: rgba(224, 79, 0, 0.14);
+        border: 1px solid rgba(224, 79, 0, 0.45);
+        border-radius: 8px;
+        color: #ffffff !important;
+        font-size: 12.5px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        text-decoration: none;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+      }
+
+      .mobile-edit-profile-btn:hover,
+      .mobile-edit-profile-btn:active {
+        background: var(--orange);
+        border-color: var(--orange);
+      }
+
+      .mobile-edit-profile-btn i {
+        font-size: 13px;
+        color: var(--orange);
+        transition: color 0.2s ease;
+      }
+
+      .mobile-edit-profile-btn:hover i,
+      .mobile-edit-profile-btn:active i {
+        color: #ffffff;
       }
 
       .mobile-menu .bar {
@@ -2755,6 +2885,27 @@
 
       <ul class="nav-links" id="navLinks">
 
+        {% if user.is_authenticated %}
+        <li class="mobile-user-profile-header">
+          <div class="mobile-user-card">
+            <div class="mobile-user-avatar{% if not request.user.profile_image_url %} no-profile-image{% endif %}">
+              {% if request.user.profile_image_url %}
+              <img src="{{ request.user.profile_image_url }}" alt="Profile" onerror="this.parentElement.classList.add('image-failed')">
+              {% endif %}
+              <span class="profile-icon" aria-hidden="true">👤</span>
+            </div>
+            <div class="mobile-user-info">
+              <span class="mobile-user-name">{{ request.user.name|default:request.user.username }}</span>
+              <span class="mobile-user-email">{{ request.user.email }}</span>
+            </div>
+          </div>
+          <a href="{% url 'profile' %}" class="mobile-edit-profile-btn">
+            <i class="fa-solid fa-pen-to-square"></i>
+            <span>EDIT PROFILE</span>
+          </a>
+        </li>
+        {% endif %}
+
         <li>
           <a href="#home"><span>HOME</span><i class="fa-solid fa-chevron-right mobile-nav-arrow" aria-hidden="true"></i></a>
         </li>
@@ -2781,8 +2932,8 @@
           {% if user.is_authenticated %}
           <div class="mobile-auth-row">
             <a href="{% url 'profile' %}" class="mobile-secondary-btn">
-              <i class="fa-solid fa-user"></i>
-              <span>PROFILE</span>
+              <i class="fa-solid fa-pen-to-square"></i>
+              <span>EDIT PROFILE</span>
             </a>
             <a href="{% url 'logout' %}" class="mobile-secondary-btn mobile-logout">
               <i class="fa-solid fa-arrow-right-from-bracket"></i>
@@ -3265,25 +3416,31 @@
     ========================================================= */
     function toggleMenu() {
       const menu = document.getElementById("navLinks");
-      const menuButton = document.getElementById("menuButton");
+      const profileLinks = document.querySelectorAll(".profile-link");
       const body = document.body;
+      if (!menu) return;
       const isOpen = menu.classList.toggle("show");
-      if (menuButton) {
-        menuButton.classList.toggle("open", isOpen);
-        menuButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
-      }
+      profileLinks.forEach(btn => btn.classList.toggle("active", isOpen));
       body.classList.toggle("menu-open", isOpen);
     }
+
+    // On mobile, tapping the profile button in the navbar toggles the navigation drawer
+    document.querySelectorAll(".profile-link").forEach(btn => {
+      btn.addEventListener("click", function(e) {
+        if (window.innerWidth <= 900) {
+          e.preventDefault();
+          e.stopPropagation();
+          toggleMenu();
+        }
+      });
+    });
 
     document.querySelectorAll(".nav-links a").forEach(link => {
       link.addEventListener("click", () => {
         const menu = document.getElementById("navLinks");
-        const menuButton = document.getElementById("menuButton");
+        const profileLinks = document.querySelectorAll(".profile-link");
         if (menu) menu.classList.remove("show");
-        if (menuButton) {
-          menuButton.classList.remove("open");
-          menuButton.setAttribute("aria-expanded", "false");
-        }
+        profileLinks.forEach(btn => btn.classList.remove("active"));
         document.body.classList.remove("menu-open");
       });
     });
@@ -3291,13 +3448,10 @@
     document.addEventListener("click", (e) => {
       const navbar = document.querySelector(".navbar");
       const menu = document.getElementById("navLinks");
-      const menuButton = document.getElementById("menuButton");
+      const profileLinks = document.querySelectorAll(".profile-link");
       if (menu && menu.classList.contains("show") && navbar && !navbar.contains(e.target)) {
         menu.classList.remove("show");
-        if (menuButton) {
-          menuButton.classList.remove("open");
-          menuButton.setAttribute("aria-expanded", "false");
-        }
+        profileLinks.forEach(btn => btn.classList.remove("active"));
         document.body.classList.remove("menu-open");
       }
     });
