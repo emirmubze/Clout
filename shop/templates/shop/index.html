@@ -438,8 +438,7 @@
       vertical-align: middle;
     }
 
-    .nav-course-item {
-      list-style: none;
+    .nav-course-desktop {
       position: absolute;
       left: calc(50% + 300px);
       top: 50%;
@@ -2042,11 +2041,8 @@
         gap: 12px;
       }
 
-      .nav-course-item {
-        position: static;
-        transform: none;
-        top: auto;
-        left: auto;
+      .nav-course-desktop {
+        display: none !important;
       }
 
       .course-button {
@@ -2782,7 +2778,8 @@
         display: none !important;
       }
 
-      .nav-right {
+      .nav-right,
+      .nav-course-desktop {
         display: none !important;
       }
 
@@ -2792,8 +2789,7 @@
 
       .nav-links li:has(.nav-login-btn),
       .nav-links li:has(.nav-logout-btn),
-      .nav-links .mobile-only-nav-item,
-      .nav-links .nav-course-item {
+      .nav-links .mobile-only-nav-item {
         position: static !important;
         right: auto !important;
         top: auto !important;
@@ -2891,7 +2887,7 @@
           <a href="#contact">CONTACT</a>
         </li>
 
-        <li class="nav-course-item">
+        <li class="mobile-only-nav-item">
           <a href="{% if request.user.is_authenticated and user_has_course_access %}{% url 'course' %}{% elif request.user.is_authenticated %}{% url 'checkout' %}{% else %}{% url 'login' %}{% endif %}"
             class="course-button {% if request.user.is_authenticated and user_has_course_access %}unlocked{% else %}locked{% endif %}"
             aria-label="Course access">
@@ -2918,6 +2914,16 @@
         {% endif %}
 
       </ul>
+
+      <div class="nav-course-desktop">
+        <a href="{% if request.user.is_authenticated and user_has_course_access %}{% url 'course' %}{% elif request.user.is_authenticated %}{% url 'checkout' %}{% else %}{% url 'login' %}{% endif %}"
+          class="course-button {% if request.user.is_authenticated and user_has_course_access %}unlocked{% else %}locked{% endif %}"
+          aria-label="Course access">
+          <i
+            class="fa-solid {% if request.user.is_authenticated and user_has_course_access %}fa-unlock{% else %}fa-lock{% endif %}"></i>
+          <span>COURSE</span>
+        </a>
+      </div>
 
       <div class="nav-right">
         {% if user.is_authenticated %}
@@ -3297,9 +3303,10 @@
        NAVBAR ALIGNMENT WITH HERO CONTENT
     ========================================================= */
     function alignNavbarWithContent() {
+      const navContainer = document.querySelector(".nav-container");
       const navLinks = document.querySelector(".nav-links");
       const heroLeft = document.querySelector(".hero-left");
-      const courseItem = document.querySelector(".nav-course-item");
+      const courseDesktop = document.querySelector(".nav-course-desktop");
       const heroPriceCard = document.querySelector(".hero-price");
 
       if (window.innerWidth <= 900) {
@@ -3309,30 +3316,33 @@
           navLinks.style.position = "";
           navLinks.style.top = "";
         }
-        if (courseItem) {
-          courseItem.style.left = "";
-          courseItem.style.transform = "";
-          courseItem.style.position = "";
-          courseItem.style.top = "";
+        if (courseDesktop) {
+          courseDesktop.style.left = "";
+          courseDesktop.style.transform = "";
         }
         return;
       }
 
+      const containerRect = navContainer ? navContainer.getBoundingClientRect() : null;
+      const containerLeft = containerRect ? containerRect.left : 0;
+
       if (navLinks && heroLeft) {
         const leftRect = heroLeft.getBoundingClientRect();
+        const offsetLeft = leftRect.left - containerLeft;
         navLinks.style.position = "absolute";
-        navLinks.style.left = `${leftRect.left}px`;
+        navLinks.style.left = `${offsetLeft}px`;
         navLinks.style.top = "50%";
         navLinks.style.transform = "translateY(-50%)";
       }
 
-      if (courseItem && heroPriceCard) {
+      if (courseDesktop && heroPriceCard) {
         const cardRect = heroPriceCard.getBoundingClientRect();
         const cardCenter = cardRect.left + cardRect.width / 2;
-        courseItem.style.position = "absolute";
-        courseItem.style.left = `${cardCenter}px`;
-        courseItem.style.top = "50%";
-        courseItem.style.transform = "translate(-50%, -50%)";
+        const offsetCenter = cardCenter - containerLeft;
+        courseDesktop.style.position = "absolute";
+        courseDesktop.style.left = `${offsetCenter}px`;
+        courseDesktop.style.top = "50%";
+        courseDesktop.style.transform = "translate(-50%, -50%)";
       }
     }
 
