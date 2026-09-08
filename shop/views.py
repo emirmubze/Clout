@@ -1081,15 +1081,18 @@ def _verify_r2_object(object_key):
     if not getattr(settings, "USE_S3", False):
         return
 
-    client = boto3.client(
-        "s3",
-        aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
-        endpoint_url=settings.AWS_S3_ENDPOINT_URL,
-        region_name=settings.AWS_S3_REGION_NAME,
-        config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
-    )
-    client.head_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=object_key)
+    try:
+        client = boto3.client(
+            "s3",
+            aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
+            aws_secret_access_key=settings.AWS_SECRET_ACCESS_KEY,
+            endpoint_url=settings.AWS_S3_ENDPOINT_URL,
+            region_name=settings.AWS_S3_REGION_NAME,
+            config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
+        )
+        client.head_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=object_key)
+    except Exception as exc:
+        logger.warning("R2 head_object verification warning for %s: %s", object_key, exc)
 
 
 def _admin_modules_save_impl(request):
