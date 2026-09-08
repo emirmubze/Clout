@@ -4,8 +4,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
 
   <!-- Primary Meta Tags -->
   <title>CLOUT — The AI Income Playbook | Make Money With AI</title>
@@ -382,21 +381,12 @@
     .nav-links {
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 28px;
       padding-right: 0;
       list-style: none;
       margin: 0;
       flex: none;
       justify-content: center;
-    }
-
-    .nav-links li {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      list-style: none;
-      margin: 0;
-      padding: 0;
     }
 
     .nav-links a {
@@ -407,78 +397,84 @@
       padding-left: 10px;
       padding-right: 10px;
       transition: color .25s ease;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
     }
 
     .nav-login-btn,
-    .nav-logout-btn,
-    .course-button {
+    .nav-logout-btn {
       display: inline-flex;
       align-items: center;
       justify-content: center;
       gap: 8px;
-      min-width: 108px;
-      height: 38px;
-      padding: 0 18px;
+      min-width: 120px;
+      height: 36px;
+      padding: 0 20px;
       border-radius: 999px;
       text-decoration: none;
       font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.5px;
-      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+      transition: all 0.2s ease;
       border: none;
       background: var(--orange);
       color: white;
       box-shadow: 0 4px 14px rgba(224, 79, 0, 0.25);
-      margin: 0;
-      line-height: 1;
-      box-sizing: border-box;
-      vertical-align: middle;
+      margin-left: 14px;
+      margin-top: 2px;
+      padding-top: 3px;
     }
 
-    .nav-course-item,
-    .nav-profile-item,
-    .nav-auth-item,
-    .nav-message-item {
+    .nav-course-item {
       list-style: none;
+    }
+
+    .course-button {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      margin: 0;
-      padding: 0;
+      gap: 8px;
+      min-width: 120px;
+      height: 36px;
+      padding: 0 20px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      transition: all 0.2s ease;
+      border: none;
+      background: var(--orange);
+      color: white;
+      box-shadow: 0 4px 14px rgba(224, 79, 0, 0.25);
+      margin-left: 210px;
+      margin-top: 2px;
+      padding-top: 3px;
     }
 
-    .course-button:hover,
-    .nav-login-btn:hover,
-    .nav-logout-btn:hover {
+    .course-button:hover {
       background: #FFDECC;
-      transform: translateY(-1px);
+      transform: none;
       box-shadow: 0 4px 14px rgba(255, 153, 68, 0.30);
       color: var(--orange);
     }
 
-    .course-button:active,
-    .nav-login-btn:active,
-    .nav-logout-btn:active {
-      transform: scale(0.96);
+    .course-button::after {
+      display: none !important;
     }
 
-    .course-button i,
-    .nav-login-btn i,
-    .nav-logout-btn i {
+    .course-button:active {
+      transform: scale(0.95);
+    }
+
+    .course-button i {
       font-size: 14px;
       font-weight: 700;
       line-height: 1;
       display: inline-block;
-      transition: transform 0.3s ease, color 0.3s ease;
+      transition: transform 0.3s ease;
       color: #fff;
     }
 
-    .course-button:hover i,
-    .nav-login-btn:hover i,
-    .nav-logout-btn:hover i {
+    .course-button:hover i {
       transform: scale(1.12);
       color: var(--orange);
     }
@@ -491,66 +487,6 @@
     .course-button:hover.locked i,
     .course-button:hover.unlocked i {
       color: var(--orange);
-    }
-
-    .profile-link {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      width: 38px;
-      height: 38px;
-      border-radius: 50%;
-      background: #ffffff;
-      border: 2px solid var(--orange);
-      text-decoration: none;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-      flex-shrink: 0;
-      box-sizing: border-box;
-      vertical-align: middle;
-      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    .profile-link:hover {
-      transform: scale(1.08);
-      box-shadow: 0 0 12px rgba(224, 79, 0, 0.45);
-    }
-
-    .profile-circle,
-    .profile-link img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      display: block;
-      border-radius: 50%;
-      background: #ffffff;
-      margin: 0;
-      padding: 0;
-    }
-
-    .profile-link .profile-icon {
-      font-size: 18px;
-      font-weight: 700;
-      line-height: 1;
-      color: #111827;
-      display: none;
-    }
-
-    .profile-link.no-profile-image .profile-icon,
-    .profile-link.image-failed .profile-icon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-    }
-
-    .profile-link.no-profile-image .profile-circle,
-    .profile-link.image-failed .profile-circle {
-      display: none;
     }
 
     .nav-login-btn svg,
@@ -586,6 +522,122 @@
       line-height: 1;
     }
 
+    .nav-login-btn:hover,
+    .nav-logout-btn:hover {
+      background: #FFDECC;
+      transform: none;
+      box-shadow: 0 4px 14px rgba(255, 153, 68, 0.30);
+      color: var(--orange);
+    }
+
+    .nav-login-btn::after,
+    .nav-logout-btn::after {
+      display: none !important;
+    }
+
+    .nav-login-btn:active,
+    .nav-logout-btn:active {
+      transform: scale(0.95);
+    }
+
+    .nav-login-btn i,
+    .nav-logout-btn i {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+      display: inline-block;
+      transition: transform 0.3s ease;
+      color: #fff;
+    }
+
+    .nav-login-btn:hover i,
+    .nav-logout-btn:hover i {
+      transform: scale(1.12);
+      color: var(--orange);
+    }
+
+    .nav-message-item {
+      list-style: none;
+    }
+
+    .nav-message-item:first-of-type {
+      display: none;
+    }
+
+    .nav-message-item:not(:first-of-type) {
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .nav-links li:has(.nav-logout-btn),
+    .nav-links li:has(.nav-login-btn) {
+      position: absolute !important;
+      right: 50px;
+      top: 50%;
+      transform: translateY(-50%);
+      margin-left: 0;
+    }
+
+    .profile-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      text-decoration: none;
+      border-color: var(--orange);
+      overflow: hidden;
+      margin-top: 2px;
+      margin-right: -5px;
+    }
+
+    .profile-circle,
+    .profile-link img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: inherit;
+    }
+
+    .profile-link .profile-icon {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1;
+      color: white;
+    }
+
+    .profile-link .profile-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      font-size: 20px;
+    }
+
+    .profile-link .profile-icon {
+      display: none;
+    }
+
+    .profile-link.no-profile-image .profile-icon,
+    .profile-link.image-failed .profile-icon {
+      display: inline-flex;
+    }
+
+    .profile-link.no-profile-image .profile-circle,
+    .profile-link.image-failed .profile-circle {
+      display: none;
+    }
+
     .profile-image {
       width: 50px;
       height: 50px;
@@ -617,21 +669,6 @@
       height: 1px;
       background: var(--orange);
       transition: width .3s ease;
-    }
-
-    .nav-login-btn::after,
-    .nav-logout-btn::after,
-    .course-button::after,
-    .profile-link::after {
-      display: none !important;
-    }
-
-    .nav-links a:hover {
-      color: var(--orange);
-    }
-
-    .nav-links a:hover::after {
-      width: 100%;
     }
 
     .nav-login-btn::after,
@@ -2834,28 +2871,28 @@
 
         {% if user.is_authenticated %}
 
-        <li class="nav-auth-item">
-          <a href="{% url 'logout' %}" class="nav-logout-btn">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            <span>LOGOUT</span>
-          </a>
-        </li>
-
-        <li class="nav-profile-item">
+        <li class="nav-message-item">
           <a href="{% url 'profile' %}"
             class="profile-link{% if not request.user.profile_image_url %} no-profile-image{% endif %}"
             aria-label="Profile">
             {% if request.user.profile_image_url %}
-            <img class="profile-circle" src="{{ request.user.profile_image_url }}" alt="Profile"
+            <img class="profile-circle" src="{{ request.user.profile_image_url }}" alt=""
               onerror="this.parentElement.classList.add('image-failed')">
             {% endif %}
             <span class="profile-icon" aria-hidden="true">👤</span>
           </a>
         </li>
 
+        <li>
+          <a href="{% url 'logout' %}" class="nav-logout-btn">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <span>LOGOUT</span>
+          </a>
+        </li>
+
         {% else %}
 
-        <li class="nav-auth-item">
+        <li>
           <a href="{% url 'login' %}" class="nav-login-btn">
             <i class="fa-solid fa-arrow-right-to-bracket"></i>
             <span>LOGIN</span>
@@ -2981,8 +3018,7 @@
         </div>
       </div>
       <p class="curriculum-footer reveal">By the end, you'll have an AI income system you can launch, scale, and say,
-        <span>"this makes money."</span>
-      </p>
+        <span>"this makes money."</span></p>
     </div>
   </section>
 
