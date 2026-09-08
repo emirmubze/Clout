@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.templatetags.static import static
 from urllib.parse import quote
 
 
@@ -98,11 +99,11 @@ class CustomUser(AbstractUser):
     @property
     def profile_image_url(self):
         if not self.profile_image:
-            return ""
+            return static("default-profile.jpg")
 
         url = _public_file_url(self.profile_image)
         if not url:
-            return ""
+            return static("default-profile.jpg")
 
         separator = "&" if "?" in url else "?"
         cache_version = quote(

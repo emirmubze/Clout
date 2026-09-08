@@ -622,7 +622,7 @@
       object-fit: cover;
       display: block;
       border-radius: 50%;
-      background: #ffffff;
+      background: #000000;
     }
 
     .profile-link .profile-icon {
@@ -2823,21 +2823,18 @@
           <span>LOGOUT</span>
         </a>
         <a href="{% url 'profile' %}"
-          class="profile-link{% if not request.user.profile_image_url %} no-profile-image{% endif %}"
+          class="profile-link"
           aria-label="Profile">
-          {% if request.user.profile_image_url %}
           <img class="profile-circle" src="{{ request.user.profile_image_url }}" alt="Profile"
-            onerror="this.parentElement.classList.add('image-failed')">
-          {% endif %}
-          <span class="profile-icon" aria-hidden="true">👤</span>
+            onerror="this.src='{% static 'default-profile.jpg' %}'">
         </a>
         {% else %}
         <a href="{% url 'login' %}" class="nav-login-btn">
           <i class="fa-solid fa-arrow-right-to-bracket"></i>
           <span>LOGIN</span>
         </a>
-        <a href="{% url 'login' %}" class="profile-link no-profile-image mobile-only-profile" aria-label="Login">
-          <span class="profile-icon" aria-hidden="true">👤</span>
+        <a href="{% url 'login' %}" class="profile-link mobile-only-profile" aria-label="Login">
+          <img class="profile-circle" src="{% static 'default-profile.jpg' %}" alt="Profile">
         </a>
         {% endif %}
       </div>
