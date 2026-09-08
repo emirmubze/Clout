@@ -240,7 +240,7 @@ if DATABASE_URL:
             ssl_require=ssl_require,
         )
     }
-elif DB_HOST or DB_ENGINE or DB_NAME or USE_POSTGRES:
+elif DB_HOST:
     db_options = {}
     db_sslmode = os.getenv("DB_SSLMODE", "").strip()
     if db_sslmode:
@@ -248,11 +248,11 @@ elif DB_HOST or DB_ENGINE or DB_NAME or USE_POSTGRES:
 
     DATABASES = {
         "default": {
-            "ENGINE": "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME", "clout").strip() or "clout",
+            "ENGINE": DB_ENGINE or "django.db.backends.postgresql",
+            "NAME": DB_NAME or "clout",
             "USER": os.getenv("DB_USER", "postgres").strip() or "postgres",
             "PASSWORD": os.getenv("DB_PASSWORD", "Mubashir@66"),
-            "HOST": os.getenv("DB_HOST", "127.0.0.1").strip(),
+            "HOST": DB_HOST,
             "PORT": os.getenv("DB_PORT", "5432").strip() or "5432",
             "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", "600")),
             "CONN_HEALTH_CHECKS": True,
