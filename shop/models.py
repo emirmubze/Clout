@@ -8,12 +8,16 @@ def _public_file_url(file_field, explicit_url=""):
     url = str(explicit_url or "").strip()
     if url.startswith(("http://", "https://")):
         return url
+    if ".r2.dev/" in url or url.startswith("pub-"):
+        return f"https://{url.lstrip('/')}"
 
     raw_val = ""
     if file_field:
         raw_val = str(getattr(file_field, "name", "") or str(file_field)).strip()
         if raw_val.startswith(("http://", "https://")):
             return raw_val
+        if ".r2.dev/" in raw_val or raw_val.startswith("pub-"):
+            return f"https://{raw_val.lstrip('/')}"
 
     target = raw_val or url
     if not target:
@@ -21,6 +25,14 @@ def _public_file_url(file_field, explicit_url=""):
 
     if target.startswith(("http://", "https://")):
         return target
+    if ".r2.dev/" in target or target.startswith("pub-"):
+        return f"https://{target.lstrip('/')}"
+
+    file_name = target.lstrip("/")
+    for prefix in ("course_videos/", "lesson_thumbnails/", "course_images/", "course_intro_videos/", "avatars/", "subtitles/"):
+        if prefix in file_name:
+            file_name = file_name[file_name.index(prefix):]
+            break
 
     custom_domain = (
         str(getattr(settings, "AWS_S3_CUSTOM_DOMAIN", ""))
@@ -29,7 +41,6 @@ def _public_file_url(file_field, explicit_url=""):
         .removeprefix("http://")
         .rstrip("/")
     )
-    file_name = target.lstrip("/")
 
     if custom_domain and file_name:
         return f"https://{custom_domain}/{file_name}"

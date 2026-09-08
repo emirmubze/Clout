@@ -32,7 +32,10 @@ from django.views.decorators.http import require_POST
 from django.urls import reverse, reverse_lazy
 from botocore.config import Config
 
-from .models import Order, CustomUser, ContactMessage, Course, Module, Lesson, SubtitleTrack, SubtitleSetting
+from .models import (
+    Order, CustomUser, ContactMessage, Course, Module, Lesson,
+    SubtitleTrack, SubtitleSetting, _public_file_url
+)
 from .auth_api import revoke_api_sessions
 from .forms import RegistrationForm, CourseForm
 from .subtitles import (
@@ -1071,8 +1074,15 @@ def _clean_r2_key(raw_key):
     key = str(raw_key).strip()
     if "://" in key:
         key = key.split("://", 1)[1]
+    for prefix in ("course_videos/", "lesson_thumbnails/", "course_images/", "course_intro_videos/", "avatars/", "subtitles/"):
+        if prefix in key:
+            key = key[key.index(prefix):]
+            break
+    else:
         if "/" in key:
-            key = key.split("/", 1)[1]
+            first_part = key.split("/", 1)[0]
+            if "." in first_part or "localhost" in first_part:
+                key = key.split("/", 1)[1]
     key = key.lstrip("/")
     if ".." in key:
         key = key.replace("..", "")
@@ -1221,9 +1231,10 @@ def _admin_modules_save_impl(request):
                 if isinstance(item, dict) and item.get("video_key"):
                     v_key = str(item["video_key"]).strip()
                     if v_key:
-                        _verify_r2_object(v_key)
-                        module_obj.video = v_key
-                        module_obj.video_url = _public_file_url(v_key)
+                        cleaned_key = _clean_r2_key(v_key)
+                        _verify_r2_object(cleaned_key)
+                        module_obj.video = cleaned_key
+                        module_obj.video_url = _public_file_url(cleaned_key, explicit_url=v_key if v_key.startswith(("http://", "https://")) else "")
                 module_obj.save()
                 saved_module_ids.append(module_obj.id)
 
@@ -1259,9 +1270,10 @@ def _admin_modules_save_impl(request):
                     if isinstance(lesson_item, dict) and lesson_item.get("video_key"):
                         v_key = str(lesson_item["video_key"]).strip()
                         if v_key:
-                            _verify_r2_object(v_key)
-                            lesson_obj.video = v_key
-                            lesson_obj.video_url = _public_file_url(v_key)
+                            cleaned_key = _clean_r2_key(v_key)
+                            _verify_r2_object(cleaned_key)
+                            lesson_obj.video = cleaned_key
+                            lesson_obj.video_url = _public_file_url(cleaned_key, explicit_url=v_key if v_key.startswith(("http://", "https://")) else "")
                             has_video_change = True
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail"):
                         lesson_obj.thumbnail = lesson_item["thumbnail"]
@@ -1273,9 +1285,10 @@ def _admin_modules_save_impl(request):
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail_key"):
                         t_key = str(lesson_item["thumbnail_key"]).strip()
                         if t_key:
-                            _verify_r2_object(t_key)
-                            lesson_obj.thumbnail = t_key
-                            lesson_obj.thumbnail_url = _public_file_url(t_key)
+                            cleaned_key = _clean_r2_key(t_key)
+                            _verify_r2_object(cleaned_key)
+                            lesson_obj.thumbnail = cleaned_key
+                            lesson_obj.thumbnail_url = _public_file_url(cleaned_key, explicit_url=t_key if t_key.startswith(("http://", "https://")) else "")
                     lesson_obj.save()
                     saved_lesson_ids.append(lesson_obj.id)
 

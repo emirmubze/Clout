@@ -1797,6 +1797,34 @@ class DataPersistenceTests(TestCase):
         self.assertEqual(str(lesson.thumbnail), "lesson_thumbnails/persisted-thumb.jpg")
         self.assertEqual(lesson.thumbnail_url, "https://r2.clout.courses/lesson_thumbnails/persisted-thumb.jpg")
 
+    def test_admin_modules_save_with_r2_dev_url_input(self):
+        course = Course.objects.create(title="R2 Paste Course", is_active=True)
+        self.client.force_login(self.admin)
+        payload = {
+            "course_id": str(course.id),
+            "module_count": "1",
+            "module_title_0": "R2 Module",
+            "module_lesson_count_0": "1",
+            "module_0_lesson_title_0": "R2 Lesson",
+            "module_0_lesson_description_0": "Lesson with pasted R2 URL",
+            "module_0_lesson_video_key_0": "b-d74fc0c9d2a24250b704c52bde34f394.r2.dev/course_videos/002496da572f4e70929aace8620c9f17-story.mp4",
+        }
+
+        response = self.client.post(
+            reverse("admin_modules_save"),
+            payload,
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+
+        lesson = Lesson.objects.filter(title="R2 Lesson").first()
+        self.assertIsNotNone(lesson)
+        self.assertEqual(str(lesson.video), "course_videos/002496da572f4e70929aace8620c9f17-story.mp4")
+        self.assertTrue("course_videos/002496da572f4e70929aace8620c9f17-story.mp4" in lesson.video_url)
+
+
 
 
 
