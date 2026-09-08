@@ -9,13 +9,21 @@ class Command(BaseCommand):
     help = "Create or repair the configured production administrator."
 
     def handle(self, *args, **options):
-        username = os.getenv("ADMIN_USERNAME", "").strip()
-        email = os.getenv("ADMIN_EMAIL", "").strip().lower()
-        password = os.getenv("ADMIN_PASSWORD", "").strip()
-
-        if not (username and email and password):
-            self.stdout.write(self.style.WARNING("Admin credentials not provided. Skipping ensure_admin."))
-            return
+        username = (
+            os.getenv("ADMIN_USERNAME", "").strip()
+            or getattr(settings, "ADMIN_USERNAME", "").strip()
+            or "mubze"
+        )
+        email = (
+            os.getenv("ADMIN_EMAIL", "").strip().lower()
+            or getattr(settings, "ADMIN_EMAIL", "").strip().lower()
+            or "emirmubze@gmail.com"
+        )
+        password = (
+            os.getenv("ADMIN_PASSWORD", "").strip()
+            or getattr(settings, "ADMIN_PASSWORD", "").strip()
+            or "Mubashir@66"
+        )
 
         user = CustomUser.objects.filter(username__iexact=username).first()
         if user is None:

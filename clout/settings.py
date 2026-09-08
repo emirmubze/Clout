@@ -440,6 +440,10 @@ DEFAULT_AUTO_FIELD = (
 
 AUTH_USER_MODEL = "shop.CustomUser"
 
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "mubze").strip() or "mubze"
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "emirmubze@gmail.com").strip().lower() or "emirmubze@gmail.com"
+ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "Mubashir@66").strip() or "Mubashir@66"
+
 
 # =========================================================
 # LOGIN / LOGOUT

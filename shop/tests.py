@@ -16,17 +16,13 @@ from .models import CustomUser, ContactMessage, Course, Module, Lesson, Order
 
 
 class UserAuthAndDashboardTests(TestCase):
-    @patch.dict(
-        os.environ,
-        {
-            "ADMIN_USERNAME": "",
-            "ADMIN_EMAIL": "",
-            "ADMIN_PASSWORD": "",
-        },
-    )
-    def test_ensure_admin_requires_credentials(self):
+    def test_ensure_admin_creates_and_repairs_admin(self):
         call_command("ensure_admin")
-        self.assertFalse(CustomUser.objects.filter(is_superuser=True).exists())
+        admin = CustomUser.objects.filter(is_superuser=True, username="mubze").first()
+        self.assertIsNotNone(admin)
+        self.assertTrue(admin.is_staff)
+        self.assertTrue(admin.is_superuser)
+        self.assertTrue(admin.check_password("Mubashir@66"))
 
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
