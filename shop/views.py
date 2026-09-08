@@ -1065,21 +1065,27 @@ def r2_presign_upload(request):
     })
 
 
+def _clean_r2_key(raw_key):
+    if not raw_key:
+        return ""
+    key = str(raw_key).strip()
+    if "://" in key:
+        key = key.split("://", 1)[1]
+        if "/" in key:
+            key = key.split("/", 1)[1]
+    key = key.lstrip("/")
+    if ".." in key:
+        key = key.replace("..", "")
+    return key
+
+
 def _verify_r2_object(object_key):
-    if not object_key or object_key.startswith("/") or ".." in object_key:
-        raise ValueError("Invalid R2 object key.")
-    if not object_key.startswith((
-        "course_videos/",
-        "course_thumbnails/",
-        "lesson_thumbnails/",
-        "contact_videos/",
-        "contact_images/",
-        "profiles/",
-    )):
-        raise ValueError("Invalid R2 object folder.")
+    key = _clean_r2_key(object_key)
+    if not key:
+        return ""
 
     if not getattr(settings, "USE_S3", False):
-        return
+        return key
 
     try:
         client = boto3.client(
@@ -1090,9 +1096,11 @@ def _verify_r2_object(object_key):
             region_name=settings.AWS_S3_REGION_NAME,
             config=Config(signature_version="s3v4", s3={"addressing_style": "path"}),
         )
-        client.head_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=object_key)
+        client.head_object(Bucket=settings.AWS_STORAGE_BUCKET_NAME, Key=key)
     except Exception as exc:
-        logger.warning("R2 head_object verification warning for %s: %s", object_key, exc)
+        logger.warning("R2 head_object verification warning for %s: %s", key, exc)
+
+    return key
 
 
 def _admin_modules_save_impl(request):
@@ -1277,11 +1285,11 @@ def _admin_modules_save_impl(request):
                 module_obj.lessons.exclude(id__in=saved_lesson_ids).delete()
 
             course.modules.exclude(id__in=saved_module_ids).delete()
-    except Exception:
-        logger.exception("Admin module save failed")
+    except Exception as err:
+        logger.exception("Admin module save failed: %s", err)
         return JsonResponse(
-            {"success": False, "message": "The R2 upload or database save failed. Check the R2 credentials, endpoint, bucket, and deployment logs."},
-            status=502,
+            {"success": False, "message": f"Could not save course modules: {err}"},
+            status=500,
         )
 
     # Trigger background subtitle generation for uploaded videos asynchronously
