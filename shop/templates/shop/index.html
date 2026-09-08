@@ -399,6 +399,19 @@
       transition: color .25s ease;
     }
 
+    .nav-right {
+      position: absolute;
+      right: 0;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 10;
+    }
+
+    .mobile-only-nav-item {
+      display: none;
+    }
+
     .nav-login-btn,
     .nav-logout-btn {
       display: inline-flex;
@@ -2011,6 +2024,10 @@
         gap: 12px;
       }
 
+      .nav-right {
+        gap: 12px;
+      }
+
       .course-button {
         margin-left: 0;
       }
@@ -2744,8 +2761,17 @@
         display: none !important;
       }
 
+      .nav-right {
+        display: none !important;
+      }
+
+      .mobile-only-nav-item {
+        display: block !important;
+      }
+
       .nav-links li:has(.nav-login-btn),
-      .nav-links li:has(.nav-logout-btn) {
+      .nav-links li:has(.nav-logout-btn),
+      .nav-links .mobile-only-nav-item {
         position: static !important;
         right: auto !important;
         top: auto !important;
@@ -2853,38 +2879,45 @@
         </li>
 
         {% if user.is_authenticated %}
-
-        <li>
+        <li class="mobile-only-nav-item">
           <a href="{% url 'logout' %}" class="nav-logout-btn">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
             <span>LOGOUT</span>
           </a>
         </li>
-
-        <li class="nav-message-item">
-          <a href="{% url 'profile' %}"
-            class="profile-link{% if not request.user.profile_image_url %} no-profile-image{% endif %}"
-            aria-label="Profile">
-            {% if request.user.profile_image_url %}
-            <img class="profile-circle" src="{{ request.user.profile_image_url }}" alt="Profile"
-              onerror="this.parentElement.classList.add('image-failed')">
-            {% endif %}
-            <span class="profile-icon" aria-hidden="true">👤</span>
-          </a>
-        </li>
-
         {% else %}
-
-        <li>
+        <li class="mobile-only-nav-item">
           <a href="{% url 'login' %}" class="nav-login-btn">
             <i class="fa-solid fa-arrow-right-to-bracket"></i>
             <span>LOGIN</span>
           </a>
         </li>
-
         {% endif %}
 
       </ul>
+
+      <div class="nav-right">
+        {% if user.is_authenticated %}
+        <a href="{% url 'logout' %}" class="nav-logout-btn">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span>LOGOUT</span>
+        </a>
+        <a href="{% url 'profile' %}"
+          class="profile-link{% if not request.user.profile_image_url %} no-profile-image{% endif %}"
+          aria-label="Profile">
+          {% if request.user.profile_image_url %}
+          <img class="profile-circle" src="{{ request.user.profile_image_url }}" alt="Profile"
+            onerror="this.parentElement.classList.add('image-failed')">
+          {% endif %}
+          <span class="profile-icon" aria-hidden="true">👤</span>
+        </a>
+        {% else %}
+        <a href="{% url 'login' %}" class="nav-login-btn">
+          <i class="fa-solid fa-arrow-right-to-bracket"></i>
+          <span>LOGIN</span>
+        </a>
+        {% endif %}
+      </div>
 
     </div>
   </nav>
