@@ -702,12 +702,14 @@
 
     .mobile-menu {
       display: none;
-      background: none;
-      border: none;
-      color: white;
-      font-size: 25px;
-      cursor: pointer;
-      line-height: 1;
+    }
+
+    .mobile-nav-arrow {
+      display: none;
+    }
+
+    .mobile-nav-actions {
+      display: none;
     }
 
     /* =========================================================
@@ -2036,31 +2038,236 @@
        TABLET & MOBILE
     ========================================================= */
     @media (max-width: 900px) {
-      .nav-links {
+      .navbar {
+        height: 62px;
+        min-height: 62px;
+        background: #020202;
+        position: relative;
+        z-index: 1000;
+        border-top: 1px solid var(--orange);
+        border-bottom: 1px solid rgba(255, 255, 255, .08);
+      }
+
+      .nav-container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+        height: 100%;
+        margin: 0;
+      }
+
+      .logo {
         position: static;
-        transform: none;
-        top: auto;
-        left: auto;
-        gap: 12px;
+        display: inline-flex;
+        align-items: center;
       }
 
-      .nav-right {
-        gap: 12px;
-      }
-
+      .nav-right,
       .nav-course-desktop {
         display: none !important;
       }
 
-      .course-button {
-        margin-left: 0;
+      .mobile-menu {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        gap: 5px;
+        width: 38px;
+        height: 38px;
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 8px;
+        cursor: pointer;
+        padding: 0;
+        margin-left: auto;
+        transition: all 0.25s ease;
+        z-index: 1001;
       }
 
-      .nav-login-btn,
-      .nav-logout-btn {
-        min-width: 90px;
-        padding: 0 12px;
-        margin-left: 0;
+      .mobile-menu .bar {
+        width: 20px;
+        height: 2px;
+        background: #ffffff;
+        border-radius: 2px;
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.2s ease;
+        transform-origin: center;
+        display: block;
+      }
+
+      .mobile-menu.open .bar-1 {
+        transform: translateY(7px) rotate(45deg);
+      }
+
+      .mobile-menu.open .bar-2 {
+        opacity: 0;
+        transform: scaleX(0);
+      }
+
+      .mobile-menu.open .bar-3 {
+        transform: translateY(-7px) rotate(-45deg);
+      }
+
+      .mobile-menu.open {
+        background: rgba(224, 79, 0, 0.18);
+        border-color: rgba(224, 79, 0, 0.45);
+      }
+
+      .nav-links {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-width: 100%;
+        background: rgba(8, 8, 8, 0.98);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+        box-shadow: 0 24px 48px rgba(0, 0, 0, 0.85);
+        padding: 14px 20px 24px;
+        margin: 0;
+        list-style: none;
+        align-items: stretch;
+        gap: 0;
+        box-sizing: border-box;
+        opacity: 0;
+        visibility: hidden;
+        pointer-events: none;
+        transform: translateY(-8px);
+        transition: opacity 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.25s;
+        z-index: 999;
+      }
+
+      .nav-links.show {
+        opacity: 1;
+        visibility: visible;
+        pointer-events: auto;
+        transform: translateY(0);
+      }
+
+      .nav-links li {
+        width: 100%;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        position: static !important;
+        top: auto !important;
+        right: auto !important;
+        left: auto !important;
+        transform: none !important;
+      }
+
+      .nav-links > li:not(.mobile-nav-actions) > a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        height: 48px;
+        padding: 0 10px;
+        color: rgba(255, 255, 255, 0.88);
+        font-size: 13.5px;
+        font-weight: 600;
+        letter-spacing: 2px;
+        text-decoration: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        transition: all 0.2s ease;
+        border-radius: 6px;
+      }
+
+      .nav-links > li:not(.mobile-nav-actions) > a:hover,
+      .nav-links > li:not(.mobile-nav-actions) > a:active {
+        color: var(--orange);
+        background: rgba(255, 255, 255, 0.03);
+      }
+
+      .mobile-nav-arrow {
+        display: inline-block;
+        font-size: 11px;
+        opacity: 0.35;
+        color: #ffffff;
+        transition: transform 0.2s, opacity 0.2s;
+      }
+
+      .nav-links > li:not(.mobile-nav-actions) > a:hover .mobile-nav-arrow {
+        opacity: 0.9;
+        transform: translateX(3px);
+        color: var(--orange);
+      }
+
+      .mobile-nav-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 18px;
+        padding-top: 6px;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .mobile-primary-btn {
+        height: 48px;
+        border-radius: 999px;
+        background: linear-gradient(135deg, #E04F00 0%, #FF6B1A 100%);
+        color: #ffffff !important;
+        font-size: 13.5px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 9px;
+        text-decoration: none;
+        box-shadow: 0 4px 18px rgba(224, 79, 0, 0.4);
+        transition: transform 0.15s, box-shadow 0.15s;
+        border: none;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .mobile-primary-btn:active {
+        transform: scale(0.98);
+        box-shadow: 0 2px 10px rgba(224, 79, 0, 0.3);
+      }
+
+      .mobile-auth-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+        width: 100%;
+      }
+
+      .mobile-secondary-btn {
+        height: 44px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.07);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #ffffff !important;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        transition: background 0.2s, border-color 0.2s;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .mobile-secondary-btn:active {
+        background: rgba(255, 255, 255, 0.14);
+      }
+
+      .mobile-logout {
+        background: rgba(255, 255, 255, 0.04);
+        color: rgba(255, 255, 255, 0.8) !important;
       }
 
       .hero-container {
@@ -2093,18 +2300,35 @@
 
     @media (max-width: 700px) {
       .payment-bar {
-        height: 52px;
-        padding: 0 12px;
-        justify-content: center;
+        height: 48px;
+        padding: 0 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
       }
 
       .payment-info {
         position: static;
         left: auto;
-        font-size: 11px;
-        white-space: normal;
-        text-align: center;
-        max-width: 60%;
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: left;
+        max-width: none;
+        flex: 1;
+        margin: 0;
+      }
+
+      .payment-info strong {
+        font-weight: 700;
+        color: #fff;
+      }
+
+      .payment-desc {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.85);
       }
 
       .buy-button {
@@ -2112,166 +2336,17 @@
         left: auto;
         transform: none;
         width: auto;
-        min-width: 120px;
-        height: 30px;
-        font-size: 11px;
+        min-width: 105px;
+        height: 32px;
+        font-size: 12px;
+        font-weight: 700;
         padding: 0 14px;
+        border-radius: 999px;
+        flex-shrink: 0;
       }
 
       .buy-button:hover {
         transform: translateY(-1px);
-      }
-
-      .nav-container {
-        width: calc(100% - 20px);
-        justify-content: space-between;
-        flex-wrap: wrap;
-      }
-
-      .navbar {
-        height: auto;
-        min-height: 62px;
-      }
-
-      .logo {
-        position: static;
-        font-size: 30px;
-        letter-spacing: 1px;
-        line-height: 1;
-      }
-
-      .nav-links {
-        display: flex;
-        display: none;
-        position: static;
-        flex: 0 0 100%;
-        width: 100%;
-        max-width: 100%;
-        box-sizing: border-box;
-        background: var(--black);
-        padding: 0 18px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 14px;
-        border-bottom: 1px solid #222;
-        opacity: 0;
-        transition: opacity .25s ease, padding .35s ease;
-      }
-
-      .nav-links.show {
-        display: flex;
-        padding: 16px 18px 22px;
-        opacity: 1;
-      }
-
-      .nav-links li {
-        width: auto;
-        position: static !important;
-        top: auto !important;
-        right: auto !important;
-        transform: none !important;
-      }
-
-      .nav-links a {
-        display: block;
-        width: 100%;
-        max-width: 100%;
-        padding: 0;
-        font-size: 13px;
-      }
-
-      .nav-links li:has(.nav-login-btn),
-      .nav-links li:has(.nav-logout-btn) {
-        position: static !important;
-        right: auto !important;
-        top: auto !important;
-        transform: none !important;
-        margin-left: 0;
-      }
-
-      .nav-login-btn,
-      .nav-logout-btn {
-        display: flex;
-        align-items: center;
-        flex-direction: row;
-        white-space: nowrap;
-        line-height: 1;
-        width: 100%;
-        min-width: 0;
-        height: 58px;
-        border-radius: 999px;
-        font-size: 18px;
-        letter-spacing: 0.8px;
-        justify-content: center;
-        gap: 12px;
-        box-shadow: 0 10px 22px rgba(224, 79, 0, 0.18);
-        padding: 0 22px;
-        margin: 0;
-      }
-
-      .course-button {
-        display: flex;
-        align-items: center;
-        flex-direction: row;
-        white-space: nowrap;
-        line-height: 1;
-        width: 100%;
-        min-width: 0;
-        margin: 0;
-        padding: 0 16px;
-      }
-
-      .nav-links a.course-button,
-      .nav-links a.nav-login-btn,
-      .nav-links a.nav-logout-btn {
-        display: flex;
-      }
-
-      .nav-logout-btn::before,
-      .nav-login-btn::before {
-        display: none;
-      }
-
-      .mobile-menu {
-        position: relative;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 36px;
-        height: 36px;
-        border: none;
-        background: transparent;
-        border-radius: 6px;
-        padding: 0;
-        margin-left: auto;
-        color: #fff;
-      }
-
-      .mobile-menu::before,
-      .mobile-menu::after,
-      .mobile-menu span {
-        content: "";
-        position: absolute;
-        width: 22px;
-        height: 2px;
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 2px;
-        display: block;
-      }
-
-      .mobile-menu::before {
-        transform: translateY(-7px);
-      }
-
-      .mobile-menu::after {
-        transform: translateY(7px);
-      }
-
-      .mobile-menu span {
-        position: static;
-        width: 22px;
-        height: 2px;
-        display: block;
       }
 
       .hero {
@@ -2444,37 +2519,35 @@
     @media (max-width: 480px) {
       .payment-bar {
         height: 48px;
-        padding: 0 10px;
+        padding: 0 12px;
       }
 
       .payment-info {
-        font-size: 9px;
-        max-width: 62%;
+        font-size: 11.5px;
+      }
+
+      .payment-upi-note {
+        display: none;
       }
 
       .buy-button {
-        min-width: 100px;
-        height: 28px;
-        font-size: 9px;
-        padding: 0 10px;
+        min-width: 96px;
+        height: 30px;
+        font-size: 11.5px;
+        padding: 0 12px;
       }
 
       .nav-container {
-        width: calc(100% - 18px);
+        padding: 0 16px;
       }
 
       .nav-links {
-        flex-basis: 100%;
-      }
-
-      .logo {
-        font-size: 22px;
+        padding: 10px 16px 20px;
       }
 
       .mobile-menu {
-        width: 38px;
-        height: 38px;
-        font-size: 28px;
+        width: 36px;
+        height: 36px;
       }
 
       .container,
@@ -2602,13 +2675,13 @@
 
     @media (max-width: 359px) {
       .payment-info {
-        max-width: 58%;
-        font-size: 8px;
+        font-size: 10.5px;
       }
 
       .buy-button {
-        min-width: 96px;
+        min-width: 88px;
         padding: 0 8px;
+        font-size: 10.5px;
       }
 
       .hero h1 {
@@ -2629,223 +2702,6 @@
     }
 
 
-    /* =========================================================
-   MOBILE NAVBAR FIX — CLOUT
-   Added override so it works cleanly on phone screens.
-========================================================= */
-    @media (max-width: 700px) {
-      .navbar {
-        height: auto !important;
-        min-height: 62px !important;
-        background: #020202 !important;
-      }
-
-      .nav-container {
-        width: 100% !important;
-        max-width: none !important;
-        padding: 0 16px !important;
-        margin: 0 !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        flex-wrap: wrap !important;
-        box-sizing: border-box !important;
-      }
-
-      .logo {
-        position: static !important;
-        font-size: 28px !important;
-        line-height: 62px !important;
-        letter-spacing: 1px !important;
-        margin: 0 !important;
-      }
-
-      .mobile-menu {
-        display: flex !important;
-        position: relative !important;
-        width: 36px !important;
-        height: 36px !important;
-        margin-left: auto !important;
-        align-items: center !important;
-        justify-content: center !important;
-        background: transparent !important;
-        border: 0 !important;
-        padding: 0 !important;
-      }
-
-      .mobile-menu::before,
-      .mobile-menu::after,
-      .mobile-menu span {
-        content: "";
-        position: absolute;
-        width: 22px !important;
-        height: 2px !important;
-        background: #fff !important;
-        border-radius: 2px !important;
-        display: block !important;
-      }
-
-      .mobile-menu::before {
-        transform: translateY(-7px);
-      }
-
-      .mobile-menu span {
-        position: static !important;
-        transform: none !important;
-      }
-
-      .mobile-menu::after {
-        transform: translateY(7px);
-      }
-
-      .nav-links {
-        display: none !important;
-        flex: 0 0 100% !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        margin: 0 !important;
-        padding: 14px 8px 20px !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 0 !important;
-        background: #020202 !important;
-        border-top: 1px solid rgba(255, 255, 255, .06) !important;
-        border-bottom: 1px solid #222 !important;
-        box-sizing: border-box !important;
-        opacity: 0 !important;
-      }
-
-      .nav-links.show {
-        display: flex !important;
-        padding: 14px 8px 20px !important;
-        opacity: 1 !important;
-      }
-
-      .nav-links li {
-        width: 100% !important;
-        position: static !important;
-        top: auto !important;
-        right: auto !important;
-        transform: none !important;
-        margin: 0 !important;
-        box-sizing: border-box !important;
-      }
-
-      .nav-links>li:not(.nav-course-item)>a {
-        display: flex !important;
-        align-items: center !important;
-        width: 100% !important;
-        min-height: 42px !important;
-        padding: 0 8px !important;
-        font-size: 13px !important;
-        font-weight: 700 !important;
-        box-sizing: border-box !important;
-      }
-
-      .nav-links .course-button {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        width: 100% !important;
-        height: 44px !important;
-        min-width: 0 !important;
-        margin: 8px 0 5px !important;
-        padding: 0 16px !important;
-        border-radius: 999px !important;
-        font-size: 13px !important;
-        gap: 8px !important;
-        box-sizing: border-box !important;
-      }
-
-      .nav-links .nav-login-btn,
-      .nav-links .nav-logout-btn {
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        flex-direction: row !important;
-        width: 100% !important;
-        height: 54px !important;
-        min-width: 0 !important;
-        margin: 8px 0 0 !important;
-        padding: 0 18px !important;
-        border-radius: 999px !important;
-        font-size: 13px !important;
-        font-weight: 700 !important;
-        letter-spacing: .4px !important;
-        gap: 10px !important;
-        box-sizing: border-box !important;
-      }
-
-      .nav-login-btn::before,
-      .nav-logout-btn::before {
-        display: none !important;
-      }
-
-      .nav-message-item {
-        display: none !important;
-      }
-
-      .nav-right,
-      .nav-course-desktop {
-        display: none !important;
-      }
-
-      .mobile-only-nav-item {
-        display: block !important;
-      }
-
-      .nav-links li:has(.nav-login-btn),
-      .nav-links li:has(.nav-logout-btn),
-      .nav-links .mobile-only-nav-item {
-        position: static !important;
-        right: auto !important;
-        top: auto !important;
-        left: auto !important;
-        transform: none !important;
-        margin-left: 0 !important;
-      }
-    }
-
-    @media (max-width: 480px) {
-      .nav-container {
-        padding: 0 16px !important;
-      }
-
-      .logo {
-        font-size: 27px !important;
-      }
-
-      .nav-links {
-        padding-left: 8px !important;
-        padding-right: 8px !important;
-      }
-
-      .nav-links .course-button {
-        height: 44px !important;
-        font-size: 12px !important;
-      }
-
-      .nav-links .nav-login-btn,
-      .nav-links .nav-logout-btn {
-        height: 54px !important;
-        font-size: 13px !important;
-      }
-    }
-
-    @media (max-width: 359px) {
-      .nav-container {
-        padding: 0 12px !important;
-      }
-
-      .logo {
-        font-size: 25px !important;
-      }
-
-      .mobile-menu {
-        width: 34px !important;
-        height: 34px !important;
-      }
-    }
   </style>
   <link rel="stylesheet" href="/static/responsive.css">
 </head>
@@ -2855,7 +2711,7 @@
   <div class="payment-bar">
     <div class="payment-info">
       <strong>$18</strong>
-      <span> - One-time payment(upi - payment available)</span>
+      <span class="payment-desc"> - One-time payment<span class="payment-upi-note"> (upi - payment available)</span></span>
     </div>
     <a href="{% url 'course_detail' %}" class="buy-button">
       Buy the Course
@@ -2872,53 +2728,55 @@
         <img src="{% static 'logo.png' %}" alt="CLOUT" class="logo-img">
       </a>
 
-      <button class="mobile-menu" id="menuButton" onclick="toggleMenu()" aria-label="Open menu">
-        <span></span>
+      <button class="mobile-menu" id="menuButton" onclick="toggleMenu()" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span class="bar bar-1"></span>
+        <span class="bar bar-2"></span>
+        <span class="bar bar-3"></span>
       </button>
 
       <ul class="nav-links" id="navLinks">
 
         <li>
-          <a href="#home">HOME</a>
+          <a href="#home"><span>HOME</span><i class="fa-solid fa-chevron-right mobile-nav-arrow" aria-hidden="true"></i></a>
         </li>
 
         <li>
-          <a href="#course">COURSE</a>
+          <a href="#course"><span>COURSE</span><i class="fa-solid fa-chevron-right mobile-nav-arrow" aria-hidden="true"></i></a>
         </li>
 
         <li>
-          <a href="#about">ABOUT</a>
+          <a href="#about"><span>ABOUT</span><i class="fa-solid fa-chevron-right mobile-nav-arrow" aria-hidden="true"></i></a>
         </li>
 
         <li>
-          <a href="#contact">CONTACT</a>
+          <a href="#contact"><span>CONTACT</span><i class="fa-solid fa-chevron-right mobile-nav-arrow" aria-hidden="true"></i></a>
         </li>
 
-        <li class="mobile-only-nav-item">
-          <a href="{% if request.user.is_authenticated and user_has_course_access %}{% url 'course' %}{% elif request.user.is_authenticated %}{% url 'checkout' %}{% else %}{% url 'login' %}{% endif %}"
-            class="course-button {% if request.user.is_authenticated and user_has_course_access %}unlocked{% else %}locked{% endif %}"
-            aria-label="Course access">
-            <i
-              class="fa-solid {% if request.user.is_authenticated and user_has_course_access %}fa-unlock{% else %}fa-lock{% endif %}"></i>
-            <span>COURSE</span>
+        <li class="mobile-nav-actions">
+          <a href="{% if request.user.is_authenticated and user_has_course_access %}{% url 'course' %}{% elif request.user.is_authenticated %}{% url 'checkout' %}{% else %}{% url 'course_detail' %}{% endif %}"
+            class="mobile-primary-btn">
+            <i class="fa-solid {% if request.user.is_authenticated and user_has_course_access %}fa-play{% else %}fa-lock{% endif %}"></i>
+            <span>{% if request.user.is_authenticated and user_has_course_access %}GO TO COURSE{% else %}GET THE COURSE — $18{% endif %}</span>
           </a>
-        </li>
 
-        {% if user.is_authenticated %}
-        <li class="mobile-only-nav-item">
-          <a href="{% url 'logout' %}" class="nav-logout-btn">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            <span>LOGOUT</span>
-          </a>
-        </li>
-        {% else %}
-        <li class="mobile-only-nav-item">
-          <a href="{% url 'login' %}" class="nav-login-btn">
+          {% if user.is_authenticated %}
+          <div class="mobile-auth-row">
+            <a href="{% url 'profile' %}" class="mobile-secondary-btn">
+              <i class="fa-solid fa-user"></i>
+              <span>PROFILE</span>
+            </a>
+            <a href="{% url 'logout' %}" class="mobile-secondary-btn mobile-logout">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+              <span>LOGOUT</span>
+            </a>
+          </div>
+          {% else %}
+          <a href="{% url 'login' %}" class="mobile-secondary-btn">
             <i class="fa-solid fa-arrow-right-to-bracket"></i>
             <span>LOGIN</span>
           </a>
+          {% endif %}
         </li>
-        {% endif %}
 
       </ul>
 
@@ -3385,15 +3243,41 @@
     ========================================================= */
     function toggleMenu() {
       const menu = document.getElementById("navLinks");
+      const menuButton = document.getElementById("menuButton");
       const body = document.body;
-      menu.classList.toggle("show");
-      body.classList.toggle("menu-open");
+      const isOpen = menu.classList.toggle("show");
+      if (menuButton) {
+        menuButton.classList.toggle("open", isOpen);
+        menuButton.setAttribute("aria-expanded", isOpen ? "true" : "false");
+      }
+      body.classList.toggle("menu-open", isOpen);
     }
+
     document.querySelectorAll(".nav-links a").forEach(link => {
       link.addEventListener("click", () => {
-        document.getElementById("navLinks").classList.remove("show");
+        const menu = document.getElementById("navLinks");
+        const menuButton = document.getElementById("menuButton");
+        if (menu) menu.classList.remove("show");
+        if (menuButton) {
+          menuButton.classList.remove("open");
+          menuButton.setAttribute("aria-expanded", "false");
+        }
         document.body.classList.remove("menu-open");
       });
+    });
+
+    document.addEventListener("click", (e) => {
+      const navbar = document.querySelector(".navbar");
+      const menu = document.getElementById("navLinks");
+      const menuButton = document.getElementById("menuButton");
+      if (menu && menu.classList.contains("show") && navbar && !navbar.contains(e.target)) {
+        menu.classList.remove("show");
+        if (menuButton) {
+          menuButton.classList.remove("open");
+          menuButton.setAttribute("aria-expanded", "false");
+        }
+        document.body.classList.remove("menu-open");
+      }
     });
 
     /* =========================================================
