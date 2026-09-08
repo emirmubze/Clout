@@ -3525,6 +3525,9 @@
                                 </label>
                                 <span class="editor-video-name">No video selected</span>
                             </div>
+                            <div style="margin-top:6px;">
+                                <input class="editor-lesson-video-url" type="text" placeholder="Or paste Cloudflare R2 / S3 Video URL / Key" style="font-size:12px; padding:6px 10px; width:100%; border:1px solid var(--border); border-radius:6px; box-sizing:border-box;">
+                            </div>
                         </div>
                         <div class="editor-form-group">
                             <label>Lesson Title</label>
@@ -3546,7 +3549,11 @@
                 image.src = lessonData.thumbnail_url;
                 lesson.querySelector(".editor-thumbnail-box").replaceChildren(image);
             }
-            if (lessonData?.video_url) lesson.querySelector(".editor-video-name").textContent = "Existing video attached";
+            if (lessonData?.video_url) {
+                const vUrlEl = lesson.querySelector(".editor-lesson-video-url");
+                if (vUrlEl) vUrlEl.value = lessonData.video_url;
+                lesson.querySelector(".editor-video-name").textContent = "Existing video attached";
+            }
             renumberEditorLessons(module);
         }
 
@@ -3649,10 +3656,12 @@
 
                     const lessonTitle = (lessonTitleInput?.value || `Lesson ${lessonIndex + 1}`).trim();
                     const lessonDescription = lessonDescriptionInput?.value.trim() || "";
+                    const lessonVideoUrlInput = lesson.querySelector(".editor-lesson-video-url");
 
                     formData.append(`module_${moduleIndex}_lesson_id_${lessonIndex}`, lesson.dataset.lessonId || "");
                     formData.append(`module_${moduleIndex}_lesson_title_${lessonIndex}`, lessonTitle || `Lesson ${lessonIndex + 1}`);
                     formData.append(`module_${moduleIndex}_lesson_description_${lessonIndex}`, lessonDescription);
+                    formData.append(`module_${moduleIndex}_lesson_video_url_${lessonIndex}`, lessonVideoUrlInput?.value.trim() || "");
                     if (lessonVideoInput?.files?.[0]) {
                         lesson.pendingVideo = lessonVideoInput.files[0];
                     }
