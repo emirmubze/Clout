@@ -136,7 +136,7 @@ footer,
         min-height: 0 !important;
         height: auto !important;
         margin-top: auto !important;
-        padding: 24px 16px calc(48px + env(safe-area-inset-bottom, 0px)) !important;
+        padding: 22px 16px calc(22px + env(safe-area-inset-bottom, 0px)) !important;
     }
 
     footer > *,
