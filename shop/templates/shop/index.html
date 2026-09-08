@@ -438,6 +438,14 @@
 
     .nav-course-item {
       list-style: none;
+      position: absolute;
+      left: calc(50% + 300px);
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 5;
     }
 
     .course-button {
@@ -2028,6 +2036,13 @@
         gap: 12px;
       }
 
+      .nav-course-item {
+        position: static;
+        transform: none;
+        top: auto;
+        left: auto;
+      }
+
       .course-button {
         margin-left: 0;
       }
@@ -2771,10 +2786,12 @@
 
       .nav-links li:has(.nav-login-btn),
       .nav-links li:has(.nav-logout-btn),
-      .nav-links .mobile-only-nav-item {
+      .nav-links .mobile-only-nav-item,
+      .nav-links .nav-course-item {
         position: static !important;
         right: auto !important;
         top: auto !important;
+        left: auto !important;
         transform: none !important;
         margin-left: 0 !important;
       }
@@ -3270,6 +3287,31 @@
   </aside>
 
   <script>
+    /* =========================================================
+       COURSE BUTTON ALIGNMENT WITH HERO CARD
+    ========================================================= */
+    function alignCourseButtonWithCard() {
+      const courseItem = document.querySelector(".nav-course-item");
+      const heroPriceCard = document.querySelector(".hero-price");
+      if (!courseItem || !heroPriceCard) return;
+
+      if (window.innerWidth <= 900) {
+        courseItem.style.left = "";
+        courseItem.style.transform = "";
+        return;
+      }
+
+      const cardRect = heroPriceCard.getBoundingClientRect();
+      const cardCenter = cardRect.left + cardRect.width / 2;
+      courseItem.style.left = `${cardCenter}px`;
+      courseItem.style.transform = "translate(-50%, -50%)";
+    }
+
+    window.addEventListener("resize", alignCourseButtonWithCard);
+    window.addEventListener("load", alignCourseButtonWithCard);
+    document.addEventListener("DOMContentLoaded", alignCourseButtonWithCard);
+    alignCourseButtonWithCard();
+
     /* =========================================================
        HERO TEXT ANIMATION
     ========================================================= */
