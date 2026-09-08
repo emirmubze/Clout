@@ -42,13 +42,14 @@ services:
         value: https://clout.onrender.com,https://clout.courses,https://www.clout.courses
 
       - key: ADMIN_USERNAME
-        sync: false
+        value: mubze
 
       - key: ADMIN_EMAIL
-        sync: false
+        value: emirmubze@gmail.com
 
       - key: ADMIN_PASSWORD
-        sync: false
+        value: Mubashir@66
+
 
       - key: RAZORPAY_KEY_ID
         sync: false

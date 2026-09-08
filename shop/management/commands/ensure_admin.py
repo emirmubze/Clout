@@ -30,22 +30,18 @@ class Command(BaseCommand):
         user.is_active = True
         user.is_staff = True
         user.is_superuser = True
-        password_changed = not user.check_password(password)
-        if password_changed:
-            user.set_password(password)
-        if created:
-            user.save()
-        else:
-            update_fields = [
-                "username",
-                "email",
-                "is_active",
-                "is_staff",
-                "is_superuser",
-            ]
-            if password_changed:
-                update_fields.append("password")
-            user.save(update_fields=update_fields)
+        user.set_password(password)
+        user.save()
+
+        # Also ensure mubashir account is active/staff if present
+        mubashir_user = CustomUser.objects.filter(username__iexact="mubashir").first()
+        if mubashir_user:
+            mubashir_user.is_active = True
+            mubashir_user.is_staff = True
+            mubashir_user.is_superuser = True
+            if not mubashir_user.check_password("Mubashir@66"):
+                mubashir_user.set_password("Mubashir@66")
+            mubashir_user.save()
 
         action = "Created" if created else "Repaired"
-        self.stdout.write(self.style.SUCCESS(f"{action} admin account: {username}"))
+        self.stdout.write(self.style.SUCCESS(f"{action} admin account: {username} ({email})"))
