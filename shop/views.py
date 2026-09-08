@@ -1078,6 +1078,9 @@ def _verify_r2_object(object_key):
     )):
         raise ValueError("Invalid R2 object folder.")
 
+    if not getattr(settings, "USE_S3", False):
+        return
+
     client = boto3.client(
         "s3",
         aws_access_key_id=settings.AWS_ACCESS_KEY_ID,
