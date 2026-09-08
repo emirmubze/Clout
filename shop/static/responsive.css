@@ -103,7 +103,6 @@ footer,
     width: 100%;
     flex-shrink: 0;
     margin-top: auto;
-    padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 @media (max-width: 768px) {
