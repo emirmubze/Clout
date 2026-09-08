@@ -252,6 +252,11 @@ class Course(models.Model):
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        if self.video and not self.video_url:
+            self.video_url = _public_file_url(self.video)
+        super().save(*args, **kwargs)
+
     @property
     def video_public_url(self):
         return _public_file_url(self.video, self.video_url)
@@ -300,6 +305,11 @@ class Module(models.Model):
         return (
             f"{self.course.title} - {self.title}"
         )
+
+    def save(self, *args, **kwargs):
+        if self.video and not self.video_url:
+            self.video_url = _public_file_url(self.video)
+        super().save(*args, **kwargs)
 
     @property
     def video_public_url(self):
@@ -381,6 +391,13 @@ class Lesson(models.Model):
             f"{self.module.title} - "
             f"{self.title}"
         )
+
+    def save(self, *args, **kwargs):
+        if self.video and not self.video_url:
+            self.video_url = _public_file_url(self.video)
+        if self.thumbnail and not self.thumbnail_url:
+            self.thumbnail_url = _public_file_url(self.thumbnail)
+        super().save(*args, **kwargs)
 
     @property
     def video_public_url(self):

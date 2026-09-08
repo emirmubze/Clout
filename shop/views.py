@@ -1205,6 +1205,7 @@ def _admin_modules_save_impl(request):
                 module_obj.order = order
                 if isinstance(item, dict) and item.get("video"):
                     module_obj.video = item["video"]
+                    module_obj.video_url = _public_file_url(module_obj.video)
                 if isinstance(item, dict) and item.get("video_url"):
                     v_url = str(item["video_url"]).strip()
                     if v_url:
@@ -1214,6 +1215,7 @@ def _admin_modules_save_impl(request):
                     if v_key:
                         _verify_r2_object(v_key)
                         module_obj.video = v_key
+                        module_obj.video_url = _public_file_url(v_key)
                 module_obj.save()
                 saved_module_ids.append(module_obj.id)
 
@@ -1239,6 +1241,7 @@ def _admin_modules_save_impl(request):
                     has_video_change = False
                     if isinstance(lesson_item, dict) and lesson_item.get("video"):
                         lesson_obj.video = lesson_item["video"]
+                        lesson_obj.video_url = _public_file_url(lesson_obj.video)
                         has_video_change = True
                     if isinstance(lesson_item, dict) and lesson_item.get("video_url"):
                         new_url = str(lesson_item["video_url"]).strip()
@@ -1250,9 +1253,11 @@ def _admin_modules_save_impl(request):
                         if v_key:
                             _verify_r2_object(v_key)
                             lesson_obj.video = v_key
+                            lesson_obj.video_url = _public_file_url(v_key)
                             has_video_change = True
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail"):
                         lesson_obj.thumbnail = lesson_item["thumbnail"]
+                        lesson_obj.thumbnail_url = _public_file_url(lesson_obj.thumbnail)
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail_url"):
                         t_url = str(lesson_item["thumbnail_url"]).strip()
                         if t_url:
@@ -1262,6 +1267,7 @@ def _admin_modules_save_impl(request):
                         if t_key:
                             _verify_r2_object(t_key)
                             lesson_obj.thumbnail = t_key
+                            lesson_obj.thumbnail_url = _public_file_url(t_key)
                     lesson_obj.save()
                     saved_lesson_ids.append(lesson_obj.id)
 
