@@ -9,38 +9,46 @@ def _public_file_url(file_field, explicit_url=""):
     if url.startswith(("http://", "https://")):
         return url
 
-    if not file_field:
+    raw_val = ""
+    if file_field:
+        raw_val = str(getattr(file_field, "name", "") or str(file_field)).strip()
+        if raw_val.startswith(("http://", "https://")):
+            return raw_val
+
+    target = raw_val or url
+    if not target:
         return ""
 
-    raw_val = str(getattr(file_field, "name", "") or str(file_field)).strip()
-    if raw_val.startswith(("http://", "https://")):
-        return raw_val
+    if target.startswith(("http://", "https://")):
+        return target
 
-    custom_domain = str(
-        getattr(settings, "AWS_S3_CUSTOM_DOMAIN", "")
-    ).strip().rstrip("/")
-    file_name = raw_val.lstrip("/")
+    custom_domain = (
+        str(getattr(settings, "AWS_S3_CUSTOM_DOMAIN", ""))
+        .strip()
+        .removeprefix("https://")
+        .removeprefix("http://")
+        .rstrip("/")
+    )
+    file_name = target.lstrip("/")
+
     if custom_domain and file_name:
         return f"https://{custom_domain}/{file_name}"
 
-    endpoint = str(
-        getattr(settings, "AWS_S3_ENDPOINT_URL", "")
-    ).strip().rstrip("/")
-    bucket = str(
-        getattr(settings, "AWS_STORAGE_BUCKET_NAME", "")
-    ).strip()
+    endpoint = str(getattr(settings, "AWS_S3_ENDPOINT_URL", "")).strip().rstrip("/")
+    bucket = str(getattr(settings, "AWS_STORAGE_BUCKET_NAME", "")).strip()
     if getattr(settings, "USE_S3", False) and endpoint and bucket and file_name:
         return f"{endpoint}/{bucket}/{file_name}"
 
-    try:
-        url = str(file_field.url or "").strip()
-        if url:
-            return url
-    except (AttributeError, ValueError):
-        pass
+    if file_field:
+        try:
+            field_url = str(file_field.url or "").strip()
+            if field_url:
+                return field_url
+        except (AttributeError, ValueError):
+            pass
 
     if file_name:
-        media_url = getattr(settings, "MEDIA_URL", "/media/").rstrip("/")
+        media_url = str(getattr(settings, "MEDIA_URL", "/media/")).rstrip("/")
         return f"{media_url}/{file_name}"
 
     return ""

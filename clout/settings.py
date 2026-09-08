@@ -248,11 +248,11 @@ elif DB_HOST or DB_ENGINE or DB_NAME or USE_POSTGRES:
 
     DATABASES = {
         "default": {
-            "ENGINE": DB_ENGINE or "django.db.backends.postgresql",
-            "NAME": DB_NAME or "clout",
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME", "clout").strip() or "clout",
             "USER": os.getenv("DB_USER", "postgres").strip() or "postgres",
             "PASSWORD": os.getenv("DB_PASSWORD", "Mubashir@66"),
-            "HOST": DB_HOST or os.getenv("DB_HOST", "127.0.0.1").strip() or "127.0.0.1",
+            "HOST": os.getenv("DB_HOST", "127.0.0.1").strip(),
             "PORT": os.getenv("DB_PORT", "5432").strip() or "5432",
             "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", "600")),
             "CONN_HEALTH_CHECKS": True,
@@ -407,6 +407,7 @@ if r2_configured:
                 "addressing_style": "path",
                 "file_overwrite": False,
                 "querystring_auth": False,
+                "custom_domain": AWS_S3_CUSTOM_DOMAIN or None,
             },
         },
         "staticfiles": {
