@@ -1075,17 +1075,17 @@ button {
 
 .subtitle-cue-box {
     display: inline-block;
-    max-width: 85%;
-    background: rgba(10, 12, 16, 0.88);
+    max-width: 90%;
+    background: transparent;
     color: #ffffff;
-    font-size: 16.5px;
-    font-weight: 600;
+    font-size: 17px;
+    font-weight: 700;
     line-height: 1.45;
     letter-spacing: 0.2px;
-    padding: 6px 14px;
-    border-radius: 6px;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+    padding: 0;
+    border-radius: 0;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 3px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.85);
+    box-shadow: none;
     pointer-events: none;
     user-select: none;
     white-space: pre-line;
@@ -1094,21 +1094,22 @@ button {
 
 @media (max-width: 640px) {
     .subtitle-cue-box {
-        font-size: 13px;
-        padding: 4px 10px;
+        font-size: 14px;
+        padding: 0;
     }
 }
 
 /* Native Video Cue styling for Picture-in-Picture (PiP) and native player */
 video::cue {
-    background-color: rgba(10, 12, 16, 0.88);
+    background-color: transparent;
+    background: transparent;
     color: #ffffff;
     font-family: inherit;
-    font-size: 15px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 700;
     line-height: 1.4;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-    border-radius: 4px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 3px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.85);
+    border-radius: 0;
 }
 
 /* Controls Hide State */
