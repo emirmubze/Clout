@@ -379,14 +379,16 @@
     }
 
     .nav-links {
+      position: absolute;
+      left: calc(50% - 450px);
+      top: 50%;
+      transform: translateY(-50%);
       display: flex;
       align-items: center;
       gap: 28px;
       padding-right: 0;
       list-style: none;
       margin: 0;
-      flex: none;
-      justify-content: center;
     }
 
     .nav-links a {
@@ -2029,6 +2031,10 @@
     ========================================================= */
     @media (max-width: 900px) {
       .nav-links {
+        position: static;
+        transform: none;
+        top: auto;
+        left: auto;
         gap: 12px;
       }
 
@@ -3288,29 +3294,52 @@
 
   <script>
     /* =========================================================
-       COURSE BUTTON ALIGNMENT WITH HERO CARD
+       NAVBAR ALIGNMENT WITH HERO CONTENT
     ========================================================= */
-    function alignCourseButtonWithCard() {
+    function alignNavbarWithContent() {
+      const navLinks = document.querySelector(".nav-links");
+      const heroLeft = document.querySelector(".hero-left");
       const courseItem = document.querySelector(".nav-course-item");
       const heroPriceCard = document.querySelector(".hero-price");
-      if (!courseItem || !heroPriceCard) return;
 
       if (window.innerWidth <= 900) {
-        courseItem.style.left = "";
-        courseItem.style.transform = "";
+        if (navLinks) {
+          navLinks.style.left = "";
+          navLinks.style.transform = "";
+          navLinks.style.position = "";
+          navLinks.style.top = "";
+        }
+        if (courseItem) {
+          courseItem.style.left = "";
+          courseItem.style.transform = "";
+          courseItem.style.position = "";
+          courseItem.style.top = "";
+        }
         return;
       }
 
-      const cardRect = heroPriceCard.getBoundingClientRect();
-      const cardCenter = cardRect.left + cardRect.width / 2;
-      courseItem.style.left = `${cardCenter}px`;
-      courseItem.style.transform = "translate(-50%, -50%)";
+      if (navLinks && heroLeft) {
+        const leftRect = heroLeft.getBoundingClientRect();
+        navLinks.style.position = "absolute";
+        navLinks.style.left = `${leftRect.left}px`;
+        navLinks.style.top = "50%";
+        navLinks.style.transform = "translateY(-50%)";
+      }
+
+      if (courseItem && heroPriceCard) {
+        const cardRect = heroPriceCard.getBoundingClientRect();
+        const cardCenter = cardRect.left + cardRect.width / 2;
+        courseItem.style.position = "absolute";
+        courseItem.style.left = `${cardCenter}px`;
+        courseItem.style.top = "50%";
+        courseItem.style.transform = "translate(-50%, -50%)";
+      }
     }
 
-    window.addEventListener("resize", alignCourseButtonWithCard);
-    window.addEventListener("load", alignCourseButtonWithCard);
-    document.addEventListener("DOMContentLoaded", alignCourseButtonWithCard);
-    alignCourseButtonWithCard();
+    window.addEventListener("resize", alignNavbarWithContent);
+    window.addEventListener("load", alignNavbarWithContent);
+    document.addEventListener("DOMContentLoaded", alignNavbarWithContent);
+    alignNavbarWithContent();
 
     /* =========================================================
        HERO TEXT ANIMATION
