@@ -211,34 +211,52 @@ except Exception:
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
 DB_ENGINE = os.getenv("DB_ENGINE", "").strip()
 DB_HOST = os.getenv("DB_HOST", "").strip()
+DB_NAME = os.getenv("DB_NAME", "").strip()
+USE_POSTGRES = os.getenv("USE_POSTGRES", "").lower() in ("1", "true", "yes")
 
 if DATABASE_URL:
+    is_postgres_url = (
+        DATABASE_URL.startswith(("postgres://", "postgresql://"))
+        or "postgres" in DATABASE_URL.lower()
+    )
+    is_remote_host = (
+        "127.0.0.1" not in DATABASE_URL
+        and "localhost" not in DATABASE_URL
+    )
+    ssl_require = bool(
+        is_postgres_url
+        and "sslmode=disable" not in DATABASE_URL.lower()
+        and (
+            "sslmode=require" in DATABASE_URL.lower()
+            or "render.com" in os.getenv("RENDER_EXTERNAL_HOSTNAME", "")
+            or (not DEBUG and is_remote_host)
+        )
+    )
     DATABASES = {
-        "default": dj_database_url.config(
-            default=DATABASE_URL,
-            conn_max_age=600,
+        "default": dj_database_url.parse(
+            DATABASE_URL,
+            conn_max_age=int(os.getenv("DB_CONN_MAX_AGE", "600")),
             conn_health_checks=True,
-            ssl_require=bool(
-                "postgres" in DATABASE_URL
-                and (
-                    "render.com" in os.getenv("RENDER_EXTERNAL_HOSTNAME", "")
-                    or "sslmode=require" in DATABASE_URL
-                    or (not DEBUG and "127.0.0.1" not in DATABASE_URL and "localhost" not in DATABASE_URL)
-                )
-            ),
+            ssl_require=ssl_require,
         )
     }
-elif DB_HOST or DB_ENGINE or os.getenv("USE_POSTGRES", "").lower() in ("1", "true", "yes"):
+elif DB_HOST or DB_ENGINE or DB_NAME or USE_POSTGRES:
+    db_options = {}
+    db_sslmode = os.getenv("DB_SSLMODE", "").strip()
+    if db_sslmode:
+        db_options["sslmode"] = db_sslmode
+
     DATABASES = {
         "default": {
             "ENGINE": DB_ENGINE or "django.db.backends.postgresql",
-            "NAME": os.getenv("DB_NAME", "clout"),
-            "USER": os.getenv("DB_USER", "postgres"),
+            "NAME": DB_NAME or "clout",
+            "USER": os.getenv("DB_USER", "postgres").strip() or "postgres",
             "PASSWORD": os.getenv("DB_PASSWORD", "Mubashir@66"),
-            "HOST": DB_HOST or "127.0.0.1",
-            "PORT": os.getenv("DB_PORT", "5432"),
-            "CONN_MAX_AGE": 600,
+            "HOST": DB_HOST or os.getenv("DB_HOST", "127.0.0.1").strip() or "127.0.0.1",
+            "PORT": os.getenv("DB_PORT", "5432").strip() or "5432",
+            "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", "600")),
             "CONN_HEALTH_CHECKS": True,
+            "OPTIONS": db_options,
         }
     }
 else:

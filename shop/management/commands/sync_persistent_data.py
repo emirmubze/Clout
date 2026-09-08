@@ -68,24 +68,32 @@ class Command(BaseCommand):
 
         # ---------------------------------------------------------
         # ---------------------------------------------------------
-        # 2. VERIFY DATABASE STATUS (NON-DESTRUCTIVE)
+        # 2. VERIFY DATABASE STATUS (NON-DESTRUCTIVE & AUTO-SEED)
         # ---------------------------------------------------------
         seed_flag = options.get("seed_from_sqlite", False)
         is_postgres = "postgres" in connection.vendor.lower()
         sqlite_source = Path(settings.BASE_DIR) / "db.sqlite3"
+        current_courses = Course.objects.count()
 
-        if seed_flag and sqlite_source.exists():
-            self.stdout.write(self.style.NOTICE("==> Manual seed flag passed. Migrating initial seed data from SQLite safely..."))
+        # If manual flag passed OR empty new database on PostgreSQL with sqlite source present
+        if (seed_flag or (current_courses == 0 and sqlite_source.exists())) and sqlite_source.exists():
+            reason = "Manual seed flag passed" if seed_flag else "Empty database detected on boot"
+            self.stdout.write(self.style.NOTICE(f"==> {reason}. Migrating initial seed data safely from SQLite..."))
             self._import_from_sqlite(sqlite_source)
         else:
             current_users = CustomUser.objects.count()
-            current_courses = Course.objects.count()
             current_modules = Module.objects.count()
             current_lessons = Lesson.objects.count()
             self.stdout.write(
                 f"[OK] Database ({connection.vendor}) persistent source of truth verified: "
                 f"{current_users} users, {current_courses} courses, {current_modules} modules, {current_lessons} lessons."
             )
+
+        # ---------------------------------------------------------
+        # 3. ALIGN POSTGRESQL SEQUENCES
+        # ---------------------------------------------------------
+        if is_postgres:
+            self._reset_pg_sequences()
 
         self.stdout.write(self.style.SUCCESS("==> Persistent data synchronization complete."))
 
@@ -95,6 +103,29 @@ class Command(BaseCommand):
             action="store_true",
             help="Explicitly import seed data from repository db.sqlite3 into the database (manual operation only).",
         )
+
+    def _reset_pg_sequences(self):
+        try:
+            with connection.cursor() as pg_cur:
+                for table in [
+                    "shop_customuser",
+                    "shop_course",
+                    "shop_module",
+                    "shop_lesson",
+                    "shop_order",
+                    "shop_contactmessage",
+                    "shop_authsession",
+                    "shop_subtitletrack",
+                    "shop_subtitlesetting",
+                ]:
+                    try:
+                        pg_cur.execute(
+                            f"SELECT setval(pg_get_serial_sequence('{table}', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM {table};"
+                        )
+                    except Exception:
+                        pass
+        except Exception as seq_err:
+            self.stdout.write(self.style.WARNING(f"Sequence reset warning: {seq_err}"))
 
     def _import_from_sqlite(self, sqlite_path):
         try:
@@ -255,23 +286,8 @@ class Command(BaseCommand):
 
             conn.close()
 
-            # Fix PostgreSQL auto-increment sequences if on PostgreSQL
-            try:
-                with connection.cursor() as pg_cur:
-                    for table in [
-                        "shop_customuser",
-                        "shop_course",
-                        "shop_module",
-                        "shop_lesson",
-                        "shop_order",
-                        "shop_contactmessage",
-                        "shop_authsession",
-                    ]:
-                        pg_cur.execute(
-                            f"SELECT setval(pg_get_serial_sequence('{table}', 'id'), coalesce(max(id), 1), max(id) IS NOT null) FROM {table};"
-                        )
-            except Exception as seq_err:
-                self.stdout.write(self.style.WARNING(f"Sequence reset warning: {seq_err}"))
+            # Align PostgreSQL sequences
+            self._reset_pg_sequences()
 
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Error during SQLite to database migration: {e}"))
