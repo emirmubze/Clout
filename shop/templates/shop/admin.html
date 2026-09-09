@@ -1346,6 +1346,10 @@
             background: #FAFAFA;
         }
 
+        .module-editor-body[hidden] {
+            display: none !important;
+        }
+
         .editor-lesson {
             margin-bottom: 16px;
             background: #FFFFFF;
@@ -3419,6 +3423,95 @@
             });
         };
 
+        function getModuleCollapseStorageKey() {
+            const courseId = document.getElementById("currentCourseId")?.value || "default";
+            return "clout_admin_collapsed_modules_" + courseId;
+        }
+
+        function saveModuleCollapseStates() {
+            try {
+                const modules = document.querySelectorAll("#modules .module-editor");
+                const collapsedIds = [];
+                const collapsedIndexes = [];
+                const collapsedTitles = [];
+
+                modules.forEach((module, index) => {
+                    const body = module.querySelector(".module-editor-body");
+                    const isCollapsed = Boolean(body && body.hidden);
+                    if (isCollapsed) {
+                        const moduleId = module.dataset.moduleId;
+                        if (moduleId) {
+                            collapsedIds.push(String(moduleId));
+                        }
+                        collapsedIndexes.push(index);
+                        const titleInput = module.querySelector(".module-title-input");
+                        const title = titleInput ? titleInput.value.trim() : "";
+                        if (title) {
+                            collapsedTitles.push(title);
+                        }
+                    }
+                });
+
+                const state = {
+                    collapsedIds: collapsedIds,
+                    collapsedIndexes: collapsedIndexes,
+                    collapsedTitles: collapsedTitles
+                };
+
+                localStorage.setItem(getModuleCollapseStorageKey(), JSON.stringify(state));
+            } catch (err) {
+                console.warn("Could not save module collapse states:", err);
+            }
+        }
+
+        function isModuleCollapsed(module, index) {
+            try {
+                const raw = localStorage.getItem(getModuleCollapseStorageKey());
+                if (!raw) return false;
+                const state = JSON.parse(raw);
+                if (!state || typeof state !== "object") return false;
+
+                const moduleId = module.dataset?.moduleId ? String(module.dataset.moduleId) : "";
+                if (moduleId && Array.isArray(state.collapsedIds) && state.collapsedIds.includes(moduleId)) {
+                    return true;
+                }
+
+                const titleInput = module.querySelector(".module-title-input");
+                const title = titleInput ? titleInput.value.trim() : "";
+                if (title && Array.isArray(state.collapsedTitles) && state.collapsedTitles.includes(title)) {
+                    return true;
+                }
+
+                if (!moduleId && !title && Array.isArray(state.collapsedIndexes) && state.collapsedIndexes.includes(index)) {
+                    return true;
+                }
+
+                return false;
+            } catch (err) {
+                return false;
+            }
+        }
+
+        function applyModuleCollapseState(module, index) {
+            if (!module) return;
+            const body = module.querySelector(".module-editor-body");
+            const toggleBtn = module.querySelector(".module-editor-actions .editor-icon-btn:not(.editor-delete)");
+            if (!body || !toggleBtn) return;
+
+            const collapsed = isModuleCollapsed(module, index);
+            body.hidden = collapsed;
+            toggleBtn.textContent = collapsed ? "+" : "-";
+            toggleBtn.setAttribute("aria-expanded", String(!collapsed));
+            toggleBtn.title = collapsed ? "Expand module" : "Collapse module";
+        }
+
+        function restoreAllModuleCollapseStates() {
+            const modules = document.querySelectorAll("#modules .module-editor");
+            modules.forEach((module, index) => {
+                applyModuleCollapseState(module, index);
+            });
+        }
+
         function addModule(moduleData = null) {
             const module = document.createElement("div");
             module.className = "module-editor";
@@ -3430,8 +3523,8 @@
                         <input class="module-title-input" type="text" placeholder="Module title">
                     </div>
                     <div class="module-editor-actions">
-                        <button class="editor-icon-btn" type="button" onclick="toggleEditorModule(this)">-</button>
-                        <button class="editor-icon-btn editor-delete" type="button" onclick="deleteEditorModule(this)">✕</button>
+                        <button class="editor-icon-btn" type="button" onclick="toggleEditorModule(this)" title="Collapse module" aria-expanded="true">-</button>
+                        <button class="editor-icon-btn editor-delete" type="button" onclick="deleteEditorModule(this)" title="Delete module">✕</button>
                     </div>
                 </div>
                 <div class="module-editor-body">
@@ -3439,7 +3532,11 @@
                     <button class="editor-add-lesson" type="button" onclick="addEditorLesson(this)">+ Add Lesson / Video</button>
                 </div>`;
             document.getElementById("modules").appendChild(module);
-            module.querySelector(".module-title-input").value = moduleData?.title || "";
+            const titleInput = module.querySelector(".module-title-input");
+            if (titleInput) {
+                titleInput.value = moduleData?.title || "";
+                titleInput.addEventListener("input", saveModuleCollapseStates);
+            }
             renumberEditorModules();
             (moduleData?.lessons || []).forEach(lessonData => addEditorLesson(module.querySelector(".editor-add-lesson"), lessonData));
             updateModuleCount();
@@ -3449,6 +3546,7 @@
             button.closest(".module-editor").remove();
             renumberEditorModules();
             updateModuleCount();
+            saveModuleCollapseStates();
         }
 
         function renumberEditorModules() {
@@ -3581,10 +3679,15 @@
         }
 
         function toggleEditorModule(button) {
-            const body = button.closest(".module-editor").querySelector(".module-editor-body");
+            const module = button.closest(".module-editor");
+            const body = module ? module.querySelector(".module-editor-body") : null;
+            if (!body) return;
             const collapsed = body.hidden;
             body.hidden = !collapsed;
             button.textContent = collapsed ? "-" : "+";
+            button.setAttribute("aria-expanded", String(collapsed));
+            button.title = collapsed ? "Collapse module" : "Expand module";
+            saveModuleCollapseStates();
         }
 
         function resetEditorThumbnailPlaceholder(box) {
@@ -3623,6 +3726,7 @@
             }
             renumberEditorModules();
             updateModuleCount();
+            restoreAllModuleCollapseStates();
         }
 
         async function saveCourse() {
