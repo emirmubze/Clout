@@ -3531,17 +3531,19 @@
                         </div>
                         <div class="editor-form-group">
                             <label>Lesson Title</label>
-                            <input type="text" placeholder="e.g. Introduction to the Course">
+                            <input class="editor-lesson-title-input" type="text" placeholder="e.g. Introduction to the Course">
                         </div>
                         <div class="editor-form-group">
                             <label>Description</label>
-                            <textarea placeholder="Describe what students will learn in this video..."></textarea>
+                            <textarea class="editor-lesson-description-input" placeholder="Describe what students will learn in this video..."></textarea>
                         </div>
                     </div>
                 </div>`;
             module.querySelector(".editor-lessons").appendChild(lesson);
-            lesson.querySelector("input[type='text']").value = lessonData?.title || "";
-            lesson.querySelector("textarea").value = lessonData?.description || "";
+            const titleInput = lesson.querySelector(".editor-lesson-title-input");
+            if (titleInput) titleInput.value = lessonData?.title || "";
+            const descInput = lesson.querySelector(".editor-lesson-description-input");
+            if (descInput) descInput.value = lessonData?.description || "";
             if (lessonData?.thumbnail_url) {
                 const image = document.createElement("img");
                 image.alt = "Lesson thumbnail";
@@ -3649,8 +3651,8 @@
                 formData.append(`module_lesson_count_${moduleIndex}`, String(lessonEditors.length));
 
                 lessonEditors.forEach((lesson, lessonIndex) => {
-                    const lessonTitleInput = lesson.querySelector("input[type='text']");
-                    const lessonDescriptionInput = lesson.querySelector("textarea");
+                    const lessonTitleInput = lesson.querySelector(".editor-lesson-title-input");
+                    const lessonDescriptionInput = lesson.querySelector(".editor-lesson-description-input");
                     const lessonVideoInput = lesson.querySelector(".editor-video-input");
                     const lessonThumbnailInput = lesson.querySelector(".editor-thumbnail-input");
 

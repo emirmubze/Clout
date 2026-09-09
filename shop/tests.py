@@ -1824,6 +1824,22 @@ class DataPersistenceTests(TestCase):
         self.assertEqual(str(lesson.video), "course_videos/002496da572f4e70929aace8620c9f17-story.mp4")
         self.assertTrue("course_videos/002496da572f4e70929aace8620c9f17-story.mp4" in lesson.video_url)
 
+    def test_lesson_display_title_fallback_and_formatting(self):
+        course = Course.objects.create(title="Title Test Course", is_active=True)
+        module = Module.objects.create(course=course, title="Module 1", order=1)
+        lesson_clean = Lesson.objects.create(module=module, title="Lesson 1: Introduction", order=1)
+        lesson_url = Lesson.objects.create(
+            module=module,
+            title="https://pub-d74fc0c9d2a24250b704c52bde34f394.r2.dev/course_videos/course1.mp4",
+            order=2,
+        )
+        lesson_empty = Lesson.objects.create(module=module, title="", order=3)
+
+        self.assertEqual(lesson_clean.display_title, "Lesson 1: Introduction")
+        self.assertEqual(lesson_url.display_title, "Lesson 2: Course1")
+        self.assertEqual(lesson_empty.display_title, "Lesson 3")
+
+
 
 
 

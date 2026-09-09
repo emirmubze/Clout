@@ -1207,7 +1207,25 @@ video::cue {
     font-size: 15px;
     color: var(--text-muted);
     line-height: 1.7;
-    white-space: pre-line;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.lesson-info p a,
+.lesson-desc-link {
+    color: var(--brand-orange, #ea580c);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 600;
+    word-break: break-all;
+    transition: color 0.15s ease, opacity 0.15s ease;
+}
+
+.lesson-info p a:hover,
+.lesson-desc-link:hover {
+    color: #c2410c;
+    opacity: 0.85;
+    text-decoration: underline;
 }
 
 /* =========================================================
@@ -1963,7 +1981,7 @@ video::cue {
                                 <div
                                     class="lesson {% if forloop.first and forloop.parentloop.first %}active{% endif %}"
                                     data-lesson-id="{{ lesson.id }}"
-                                    data-title="{{ lesson.title|escape }}"
+                                    data-title="{% if lesson.display_title %}{{ lesson.display_title|escape }}{% else %}{{ lesson.title|escape }}{% endif %}"
                                     data-module="{{ module.title|escape }}"
                                     data-description="{{ lesson.description|default:'Select this lesson to begin learning.'|escape }}"
                                     data-label="MODULE {{ forloop.parentloop.counter|stringformat:'02d' }}"
@@ -1973,11 +1991,11 @@ video::cue {
                                 >
                                     <div class="lesson-thumb">
                                         {% if lesson.thumbnail_public_url %}
-                                            <img src="{{ lesson.thumbnail_public_url }}" alt="{{ lesson.title }} thumbnail">
+                                            <img src="{{ lesson.thumbnail_public_url }}" alt="{% if lesson.display_title %}{{ lesson.display_title }}{% else %}{{ lesson.title }}{% endif %} thumbnail">
                                         {% elif lesson.thumbnail %}
-                                            <img src="{{ lesson.thumbnail.url }}" alt="{{ lesson.title }} thumbnail">
+                                            <img src="{{ lesson.thumbnail.url }}" alt="{% if lesson.display_title %}{{ lesson.display_title }}{% else %}{{ lesson.title }}{% endif %} thumbnail">
                                         {% elif lesson.thumbnail_url %}
-                                            <img src="{{ lesson.thumbnail_url }}" alt="{{ lesson.title }} thumbnail">
+                                            <img src="{{ lesson.thumbnail_url }}" alt="{% if lesson.display_title %}{{ lesson.display_title }}{% else %}{{ lesson.title }}{% endif %} thumbnail">
                                         {% else %}
                                             <i class="fa-solid fa-play"></i>
                                         {% endif %}
@@ -1988,7 +2006,7 @@ video::cue {
 
                                     <div class="lesson-details">
                                         <div class="lesson-title">
-                                            {{ lesson.title }}
+                                            {% if lesson.display_title %}{{ lesson.display_title }}{% else %}{{ lesson.title }}{% endif %}
                                         </div>
                                         <div class="lesson-meta">
                                             <i class="fa-regular fa-circle-play" style="font-size: 10px;"></i>
@@ -3128,6 +3146,53 @@ video::cue {
     });
 
     /* =========================================================
+       FORMAT DESCRIPTION WITH CLICKABLE LINKS
+    ========================================================= */
+    function formatDescriptionWithLinks(rawText) {
+        if (!rawText) return "";
+
+        // Escape HTML to prevent XSS
+        const escapeHtml = (str) => {
+            const div = document.createElement("div");
+            div.textContent = str;
+            return div.innerHTML;
+        };
+
+        const escaped = escapeHtml(rawText);
+
+        // Match URLs (http://, https://, www.)
+        const urlPattern = /(https?:\/\/[^\s<]+|www\.[^\s<]+)/gi;
+
+        return escaped.replace(urlPattern, (matchedUrl) => {
+            let cleanUrl = matchedUrl;
+            let trailingPunct = "";
+
+            // Detach trailing punctuation characters commonly attached at the end of sentences
+            const matchTrailing = cleanUrl.match(/([.,!?:;)}\]>]+|\.{2,})$/);
+            if (matchTrailing) {
+                trailingPunct = matchTrailing[0];
+                cleanUrl = cleanUrl.slice(0, -trailingPunct.length);
+            }
+
+            // Fix unbalanced closing parentheses (e.g., "(https://example.com)")
+            const openParenCount = (cleanUrl.match(/\(/g) || []).length;
+            const closeParenCount = (cleanUrl.match(/\)/g) || []).length;
+            if (closeParenCount > openParenCount) {
+                const diff = closeParenCount - openParenCount;
+                const extraParens = cleanUrl.slice(-diff);
+                cleanUrl = cleanUrl.slice(0, -diff);
+                trailingPunct = extraParens + trailingPunct;
+            }
+
+            const href = cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://")
+                ? cleanUrl
+                : `https://${cleanUrl}`;
+
+            return `<a href="${href}" target="_blank" rel="noopener noreferrer" class="lesson-desc-link">${cleanUrl}</a>${trailingPunct}`;
+        });
+    }
+
+    /* =========================================================
        MODULE ACCORDION TOGGLE
     ========================================================= */
     window.toggleModule = function(header) {
@@ -3168,7 +3233,7 @@ video::cue {
         if (playerModuleName) playerModuleName.textContent = moduleName.toUpperCase();
         if (playerLessonName) playerLessonName.textContent = title;
         if (lessonTitle) lessonTitle.textContent = title;
-        if (lessonDescription) lessonDescription.textContent = description;
+        if (lessonDescription) lessonDescription.innerHTML = formatDescriptionWithLinks(description);
         if (lessonLabel && lessonLabel.querySelector("span")) lessonLabel.querySelector("span").textContent = label;
 
         // Reset progress bar visual
@@ -3227,7 +3292,7 @@ video::cue {
         emptyStateDesc.textContent = "This course does not have any lessons added yet.";
         videoEmptyState.classList.add("visible");
         lessonTitle.textContent = "Welcome to your course";
-        lessonDescription.textContent = "No lessons have been published yet. Please check back later.";
+        lessonDescription.innerHTML = formatDescriptionWithLinks("No lessons have been published yet. Please check back later.");
     }
 
     showControls();

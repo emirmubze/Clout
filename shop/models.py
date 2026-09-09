@@ -412,6 +412,26 @@ class Lesson(models.Model):
         super().save(*args, **kwargs)
 
     @property
+    def display_title(self):
+        title = (self.title or "").strip()
+        if not title:
+            return f"Lesson {self.order}"
+        # If title is a URL or file path, format a clean title
+        if title.startswith(("http://", "https://", "course_videos/", "/media/")) or any(title.lower().endswith(ext) for ext in [".mp4", ".mov", ".mkv", ".webm", ".m4v", ".avi"]):
+            import os
+            from urllib.parse import urlparse
+            path = urlparse(title).path if title.startswith(("http://", "https://")) else title
+            filename = os.path.basename(path)
+            raw_name, _ = os.path.splitext(filename)
+            if raw_name:
+                formatted = raw_name.replace("_", " ").replace("-", " ").strip()
+                if formatted.lower().startswith("lesson"):
+                    return formatted.capitalize()
+                return f"Lesson {self.order}: {formatted.title()}"
+            return f"Lesson {self.order}"
+        return title
+
+    @property
     def video_public_url(self):
         return _public_file_url(self.video, self.video_url)
 

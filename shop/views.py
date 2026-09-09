@@ -651,7 +651,7 @@ def admin_dashboard(request):
                 "lessons": [
                     {
                         "id": lesson.id,
-                        "title": lesson.title,
+                        "title": getattr(lesson, "display_title", lesson.title),
                         "description": lesson.description,
                         "video_url": lesson.video_public_url,
                         "thumbnail_url": lesson.thumbnail_public_url,
@@ -1321,7 +1321,7 @@ def _admin_modules_save_impl(request):
             "lessons": [
                 {
                     "id": les.id,
-                    "title": les.title,
+                    "title": getattr(les, "display_title", les.title),
                     "description": les.description,
                     "video_url": les.video_public_url,
                     "thumbnail_url": les.thumbnail_public_url,
