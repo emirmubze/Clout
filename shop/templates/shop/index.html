@@ -317,6 +317,10 @@
       font-weight: 700;
     }
 
+    .payment-desc-mobile {
+      display: none;
+    }
+
     .payment-upi-note {
       color: rgba(255, 255, 255, 0.75);
       font-size: 12px;
@@ -2344,6 +2348,14 @@
         color: rgba(255, 255, 255, 0.88);
       }
 
+      .payment-desc-desktop {
+        display: none !important;
+      }
+
+      .payment-desc-mobile {
+        display: inline !important;
+      }
+
       .payment-upi-note {
         display: inline !important;
         color: rgba(255, 255, 255, 0.72);
@@ -2768,7 +2780,8 @@
   <div class="payment-bar">
     <div class="payment-info">
       <strong>$18</strong>
-      <span class="payment-desc"> - One-time payment<span class="payment-upi-note"> (upi - payment available)</span></span>
+      <span class="payment-desc payment-desc-desktop"> - One-time payment<span class="payment-upi-note"> (upi - payment available)</span></span>
+      <span class="payment-desc payment-desc-mobile"> – UPI payment available</span>
     </div>
     <a href="{% url 'course_detail' %}" class="buy-button">
       Buy the Course
