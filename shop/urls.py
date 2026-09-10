@@ -181,6 +181,12 @@ urlpatterns = [
     ),
 
     path(
+        "api/admin/lessons/<int:lesson_id>/reset-subtitles/",
+        views.api_admin_reset_subtitles,
+        name="api_admin_reset_subtitles"
+    ),
+
+    path(
         "api/admin/subtitles/languages/",
         views.api_admin_languages_config,
         name="api_admin_languages_config"

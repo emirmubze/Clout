@@ -40,6 +40,7 @@ from .auth_api import revoke_api_sessions
 from .forms import RegistrationForm, CourseForm
 from .subtitles import (
     trigger_auto_subtitle_generation,
+    get_groq_api_key,
     SUPPORTED_LANGUAGES,
     get_active_target_languages,
     get_language_name,
@@ -184,7 +185,7 @@ def ai_chat(request):
         })
 
     request_body = json.dumps({
-        "model": "openai/gpt-oss-20b",
+        "model": "llama-3.3-70b-versatile",
         "messages": [
             {
                 "role": "system",
@@ -1292,7 +1293,7 @@ def _admin_modules_save_impl(request):
                     lesson_obj.save()
                     saved_lesson_ids.append(lesson_obj.id)
 
-                    if (has_video_change or (lesson_obj.video or lesson_obj.video_url) and lesson_obj.subtitle_status == "none"):
+                    if get_groq_api_key() and (has_video_change or ((lesson_obj.video or lesson_obj.video_url) and lesson_obj.subtitle_status == "none")):
                         lessons_to_trigger_subtitles.append(lesson_obj.id)
 
                 module_obj.lessons.exclude(id__in=saved_lesson_ids).delete()
@@ -2932,6 +2933,7 @@ def api_lesson_subtitles(request, lesson_id):
         "lesson_id": lesson.id,
         "lesson_title": lesson.title,
         "subtitle_status": lesson.subtitle_status,
+        "error_message": lesson.subtitle_error or "",
         "detected_language": lesson.detected_language,
         "detected_language_code": lesson.detected_language_code,
         "subtitles": [
@@ -3051,6 +3053,12 @@ def api_admin_regenerate_subtitles(request, lesson_id):
     if not lesson.video and not lesson.video_url:
         return JsonResponse({"success": False, "message": "This lesson does not have a video attached."}, status=400)
 
+    if not get_groq_api_key():
+        return JsonResponse({
+            "success": False,
+            "message": "GROQ_API_KEY is not configured yet. Please add GROQ_API_KEY to your environment to enable AI subtitle generation."
+        }, status=400)
+
     target_languages = None
     try:
         if request.body:
@@ -3087,6 +3095,12 @@ def api_admin_add_language_subtitle(request, lesson_id):
     if not lesson.video and not lesson.video_url:
         return JsonResponse({"success": False, "message": "This lesson has no video attached."}, status=400)
 
+    if not get_groq_api_key():
+        return JsonResponse({
+            "success": False,
+            "message": "GROQ_API_KEY is not configured yet. Please add GROQ_API_KEY to your environment to enable AI subtitle generation."
+        }, status=400)
+
     try:
         payload = json.loads(request.body or "{}")
         language_code = str(payload.get("language_code", "")).strip().lower()
@@ -3102,6 +3116,29 @@ def api_admin_add_language_subtitle(request, lesson_id):
     return JsonResponse({
         "success": True,
         "message": f"Generating subtitles for {lang_name} in background...",
+    })
+
+
+@login_required(login_url="login")
+@require_POST
+def api_admin_reset_subtitles(request, lesson_id):
+    """
+    Admin endpoint to reset subtitle status and clear errors for a lesson.
+    """
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+
+    lesson = get_object_or_404(Lesson, id=lesson_id)
+    has_ready = lesson.subtitles.filter(status="ready").exists()
+    lesson.subtitle_status = "ready" if has_ready else "none"
+    lesson.subtitle_error = ""
+    lesson.save(update_fields=["subtitle_status", "subtitle_error"])
+
+    return JsonResponse({
+        "success": True,
+        "message": "Subtitle status reset successfully.",
+        "lesson_id": lesson.id,
+        "subtitle_status": lesson.subtitle_status,
     })
 
 

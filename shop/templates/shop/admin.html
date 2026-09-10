@@ -4702,9 +4702,16 @@
                             ${error ? `<div style="margin-top:6px; color:#DC2626; font-size:11.5px; font-weight:600;"><i class="fa-solid fa-circle-exclamation"></i> ${escapeHtml(error)}</div>` : ""}
                         </div>
                         <div style="display:flex; align-items:center; gap:8px;">
-                            ${status === "failed" || status === "none" ? `
+                            ${status === "failed" ? `
                                 <button type="button" class="sub-manage-btn" style="background:#EA580C; color:#FFF; border-color:#EA580C;" onclick="regenerateLessonSubtitles(${lessonId})">
-                                    <i class="fa-solid fa-rotate-right"></i> ${status === "failed" ? "Retry Generation" : "Generate Subtitles"}
+                                    <i class="fa-solid fa-rotate-right"></i> Retry Generation
+                                </button>
+                                <button type="button" class="sub-action-btn" onclick="resetLessonSubtitles(${lessonId})">
+                                    <i class="fa-solid fa-xmark"></i> Clear Error
+                                </button>
+                            ` : status === "none" ? `
+                                <button type="button" class="sub-manage-btn" style="background:#EA580C; color:#FFF; border-color:#EA580C;" onclick="regenerateLessonSubtitles(${lessonId})">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Subtitles
                                 </button>
                             ` : `
                                 <button type="button" class="sub-action-btn" onclick="regenerateLessonSubtitles(${lessonId})">
@@ -4722,7 +4729,7 @@
                         <div style="text-align:center; padding:32px 16px; border:1.5px dashed var(--border); border-radius:8px; background:#FAFAFA;">
                             <i class="fa-solid fa-closed-captioning" style="font-size:32px; color:#94A3B8; margin-bottom:10px; display:block;"></i>
                             <div style="font-weight:700; color:#0F172A; font-size:14px;">No subtitles generated yet</div>
-                            <div style="font-size:12px; color:#64748B; margin-top:4px; margin-bottom:14px;">Subtitles are automatically created when you upload video, or you can generate them now.</div>
+                            <div style="font-size:12px; color:#64748B; margin-top:4px; margin-bottom:14px;">Subtitles are automatically created with AI speech recognition when GROQ_API_KEY is configured, or you can generate them now.</div>
                             <button type="button" class="sub-manage-btn" style="background:#EA580C; color:#FFF; border-color:#EA580C;" onclick="regenerateLessonSubtitles(${lessonId})">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Multilingual Subtitles
                             </button>
@@ -4799,6 +4806,38 @@
                 }
             } catch (err) {
                 showToast("Error triggering subtitle regeneration.", true);
+            }
+        };
+
+        window.resetLessonSubtitles = async function(lessonId) {
+            const token = document.querySelector("input[name='csrfmiddlewaretoken']")?.value || "";
+            try {
+                showToast("Resetting subtitle status...");
+                const resp = await fetch(`/api/admin/lessons/${lessonId}/reset-subtitles/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": token,
+                        "Content-Type": "application/json",
+                    },
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast("Subtitle status reset successfully.");
+                    const badge = document.getElementById(`sub-badge-${lessonId}`);
+                    if (badge) {
+                        badge.className = "sub-badge " + (data.subtitle_status || "none");
+                        badge.innerHTML = data.subtitle_status === "ready"
+                            ? `<i class="fa-solid fa-closed-captioning"></i> Subtitles Ready`
+                            : `<i class="fa-solid fa-closed-captioning"></i> No Subtitles`;
+                    }
+                    if (activeSubtitleManagerLessonId === lessonId) {
+                        await loadSubtitleManagerData(lessonId);
+                    }
+                } else {
+                    showToast(data.message || "Failed to reset subtitle status.", true);
+                }
+            } catch (err) {
+                showToast("Error resetting subtitle status.", true);
             }
         };
 

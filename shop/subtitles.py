@@ -445,15 +445,26 @@ def translate_cues_to_language(
         )
 
         try:
-            completion = client.chat.completions.create(
-                model="openai/gpt-oss-20b",
-                messages=[
-                    {"role": "system", "content": f"You are an expert subtitle translator specialized in {target_lang_name}."},
-                    {"role": "user", "content": prompt}
-                ],
-                temperature=0.2,
-                max_tokens=2048,
-            )
+            try:
+                completion = client.chat.completions.create(
+                    model="llama-3.3-70b-versatile",
+                    messages=[
+                        {"role": "system", "content": f"You are an expert subtitle translator specialized in {target_lang_name}."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.2,
+                    max_tokens=2048,
+                )
+            except Exception:
+                completion = client.chat.completions.create(
+                    model="llama-3.1-8b-instant",
+                    messages=[
+                        {"role": "system", "content": f"You are an expert subtitle translator specialized in {target_lang_name}."},
+                        {"role": "user", "content": prompt}
+                    ],
+                    temperature=0.2,
+                    max_tokens=2048,
+                )
             raw_text = completion.choices[0].message.content.strip()
 
             cleaned_text = re.sub(r"^```(?:json)?\s*", "", raw_text, flags=re.MULTILINE)
@@ -495,6 +506,15 @@ def process_subtitles_for_lesson(
     lesson = Lesson.objects.filter(id=lesson_id).first()
     if not lesson or (not lesson.video and not lesson.video_url):
         logger.warning("Lesson %s does not exist or has no video attached.", lesson_id)
+        return False
+
+    api_key = get_groq_api_key()
+    if not api_key:
+        logger.info("GROQ_API_KEY is not configured. Skipping automated subtitle generation for Lesson %s.", lesson_id)
+        has_ready = lesson.subtitles.filter(status="ready").exists()
+        lesson.subtitle_status = "ready" if has_ready else "none"
+        lesson.subtitle_error = ""
+        lesson.save(update_fields=["subtitle_status", "subtitle_error"])
         return False
 
     lesson.subtitle_status = "processing"
@@ -594,7 +614,8 @@ def process_subtitles_for_lesson(
 
     except Exception as exc:
         logger.exception("Subtitle generation failed for Lesson %s: %s", lesson_id, exc)
-        lesson.subtitle_status = "failed"
+        has_ready = lesson.subtitles.filter(status="ready").exists()
+        lesson.subtitle_status = "ready" if has_ready else "failed"
         lesson.subtitle_error = str(exc)
         lesson.save(update_fields=["subtitle_status", "subtitle_error"])
         return False
