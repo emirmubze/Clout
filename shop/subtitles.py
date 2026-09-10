@@ -311,51 +311,79 @@ def resolve_video_file_to_local(video_field, video_url: str = "") -> Tuple[str, 
     raise FileNotFoundError("Could not locate or download the video file for transcription.")
 
 
-def transcribe_video_audio(local_file_path: str) -> Tuple[List[Dict[str, Any]], str]:
+import shutil
+import subprocess
+
+def get_ffmpeg_executable() -> Optional[str]:
     """
-    Perform Speech-to-Text transcription on the video file using Groq Whisper.
-    Returns (cues, detected_language_name).
+    Find ffmpeg executable path on system or via imageio_ffmpeg.
     """
-    client = get_ai_client()
+    system_ffmpeg = shutil.which("ffmpeg")
+    if system_ffmpeg:
+        return system_ffmpeg
+    try:
+        import imageio_ffmpeg
+        exe = imageio_ffmpeg.get_ffmpeg_exe()
+        if exe and os.path.exists(exe):
+            return exe
+    except Exception:
+        pass
+    for candidate in ["/usr/bin/ffmpeg", "/usr/local/bin/ffmpeg"]:
+        if os.path.exists(candidate):
+            return candidate
+    return None
 
-    file_size_mb = os.path.getsize(local_file_path) / (1024 * 1024)
-    logger.info("Transcribing video (%s, %.2f MB) with Whisper...", local_file_path, file_size_mb)
 
-    audio_path_to_send = local_file_path
-    temp_audio_created = False
+def extract_audio_from_video(local_file_path: str, bitrate: str = "48k") -> Tuple[str, bool]:
+    """
+    Extract a compact 16kHz mono MP3 from any video or audio file using ffmpeg.
+    Always creates a dedicated lightweight audio stream (< 10MB) so Groq's 25MB limit is never exceeded.
+    Returns (audio_path, is_temp).
+    """
+    ffmpeg_exe = get_ffmpeg_executable()
+    if not ffmpeg_exe:
+        logger.warning("No ffmpeg executable found. Proceeding with raw file.")
+        return local_file_path, False
 
-    if file_size_mb > 24:
-        try:
-            import subprocess
-            import imageio_ffmpeg
-            ffmpeg_exe = imageio_ffmpeg.get_ffmpeg_exe()
-            temp_audio = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
-            temp_audio.close()
-            cmd = [
-                ffmpeg_exe, "-y", "-i", local_file_path,
-                "-vn", "-ar", "16000", "-ac", "1", "-b:a", "64k",
-                temp_audio.name
-            ]
-            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-            audio_path_to_send = temp_audio.name
-            temp_audio_created = True
-            logger.info("Extracted compressed audio (%.2f MB) for Whisper.", os.path.getsize(temp_audio.name) / (1024 * 1024))
-        except Exception as exc:
-            logger.warning("Could not extract compressed audio with ffmpeg (%s), proceeding with original file.", exc)
+    temp_audio = tempfile.NamedTemporaryFile(suffix=".mp3", delete=False)
+    temp_audio.close()
+
+    cmd = [
+        ffmpeg_exe, "-y", "-i", local_file_path,
+        "-vn", "-ar", "16000", "-ac", "1", "-b:a", bitrate,
+        "-f", "mp3", temp_audio.name
+    ]
 
     try:
-        with open(audio_path_to_send, "rb") as audio_file:
-            transcript_response = client.audio.transcriptions.create(
-                model="whisper-large-v3",
-                file=audio_file,
-                response_format="verbose_json",
-            )
-    finally:
-        if temp_audio_created and os.path.exists(audio_path_to_send):
+        subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        if os.path.exists(temp_audio.name) and os.path.getsize(temp_audio.name) > 0:
+            extracted_size_mb = os.path.getsize(temp_audio.name) / (1024 * 1024)
+            logger.info("Extracted compressed audio (%.2f MB, %s bitrate) for Whisper.", extracted_size_mb, bitrate)
+            return temp_audio.name, True
+    except Exception as exc:
+        logger.warning("ffmpeg audio extraction failed (%s).", exc)
+        if os.path.exists(temp_audio.name):
             try:
-                os.remove(audio_path_to_send)
+                os.remove(temp_audio.name)
             except Exception:
                 pass
+
+    return local_file_path, False
+
+
+def transcribe_single_audio_file(client, audio_path: str, prompt: str = "") -> Tuple[List[Dict[str, Any]], str]:
+    """
+    Transcribe a single audio file (must be <= 25MB) using Groq Whisper.
+    """
+    with open(audio_path, "rb") as audio_file:
+        kwargs = {
+            "model": "whisper-large-v3",
+            "file": audio_file,
+            "response_format": "verbose_json",
+        }
+        if prompt:
+            kwargs["prompt"] = prompt
+        transcript_response = client.audio.transcriptions.create(**kwargs)
 
     detected_lang = getattr(transcript_response, "language", "") or "english"
     detected_lang = str(detected_lang).strip().lower()
@@ -399,6 +427,85 @@ def transcribe_video_audio(local_file_path: str) -> Tuple[List[Dict[str, Any]], 
             })
 
     return cues, detected_lang.capitalize()
+
+
+def transcribe_video_audio(local_file_path: str) -> Tuple[List[Dict[str, Any]], str]:
+    """
+    Perform Speech-to-Text transcription on a video file using Groq Whisper.
+    Automatically extracts ultra-lightweight compressed audio.
+    If the audio is longer than ~2 hours (>24MB), automatically chunks and merges transcripts.
+    """
+    client = get_ai_client()
+
+    # Step 1: Always extract lightweight 16kHz mono audio
+    audio_path, is_temp_audio = extract_audio_from_video(local_file_path, bitrate="48k")
+    temp_files_to_cleanup = [audio_path] if is_temp_audio else []
+
+    try:
+        audio_size_mb = os.path.getsize(audio_path) / (1024 * 1024)
+        logger.info("Prepared audio for Whisper (%s, %.2f MB)...", audio_path, audio_size_mb)
+
+        # If audio is STILL > 24MB, try lower bitrate (32k)
+        if audio_size_mb > 24:
+            logger.info("Audio size %.2f MB exceeds 24MB. Re-compressing at 32k...", audio_size_mb)
+            lower_audio_path, is_lower_temp = extract_audio_from_video(local_file_path, bitrate="32k")
+            if is_lower_temp:
+                temp_files_to_cleanup.append(lower_audio_path)
+                audio_path = lower_audio_path
+                audio_size_mb = os.path.getsize(audio_path) / (1024 * 1024)
+
+        # If still > 24MB (extremely long video), chunk by 10-minute segments
+        if audio_size_mb > 24:
+            ffmpeg_exe = get_ffmpeg_executable()
+            if ffmpeg_exe:
+                logger.info("Audio size %.2f MB still > 24MB. Chunking with ffmpeg in 600s segments...", audio_size_mb)
+                temp_dir = tempfile.mkdtemp(prefix="whisper_chunks_")
+                segment_pattern = os.path.join(temp_dir, "chunk_%03d.mp3")
+                cmd = [
+                    ffmpeg_exe, "-y", "-i", audio_path,
+                    "-f", "segment", "-segment_time", "600",
+                    "-c", "copy", segment_pattern
+                ]
+                subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                chunk_files = sorted([os.path.join(temp_dir, f) for f in os.listdir(temp_dir) if f.endswith(".mp3")])
+
+                all_cues = []
+                detected_lang = "English"
+                current_time_offset = 0.0
+                cue_counter = 1
+
+                for idx, chunk_file in enumerate(chunk_files):
+                    chunk_cues, chunk_lang = transcribe_single_audio_file(client, chunk_file)
+                    if idx == 0:
+                        detected_lang = chunk_lang
+
+                    for c in chunk_cues:
+                        c["id"] = cue_counter
+                        c["start"] = round(c["start"] + current_time_offset, 3)
+                        c["end"] = round(c["end"] + current_time_offset, 3)
+                        c["start_formatted"] = format_vtt_timestamp(c["start"])
+                        c["end_formatted"] = format_vtt_timestamp(c["end"])
+                        all_cues.append(c)
+                        cue_counter += 1
+
+                    if chunk_cues:
+                        current_time_offset = max(current_time_offset + 600.0, chunk_cues[-1]["end"])
+                    else:
+                        current_time_offset += 600.0
+
+                shutil.rmtree(temp_dir, ignore_errors=True)
+                return all_cues, detected_lang
+
+        # Standard direct transcription on compressed audio
+        return transcribe_single_audio_file(client, audio_path)
+
+    finally:
+        for tf in temp_files_to_cleanup:
+            if tf and os.path.exists(tf):
+                try:
+                    os.remove(tf)
+                except Exception:
+                    pass
 
 
 # =========================================================
