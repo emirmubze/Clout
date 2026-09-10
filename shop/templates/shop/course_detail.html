@@ -729,10 +729,13 @@ body {
     display: none;
     align-items: center;
     justify-content: center;
-    padding: 20px;
-    background: rgba(2, 2, 2, 0.55);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    padding: clamp(8px, 2vh, 20px);
+    background: rgba(2, 2, 2, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
     transition: background 0.25s ease, backdrop-filter 0.25s ease;
 }
 
@@ -749,18 +752,21 @@ body {
 
 .checkout-popup {
     position: relative;
-    width: min(700px, calc(100vw - 20px));
-    height: min(700px, calc(100vh - 20px));
-    height: min(700px, calc(100dvh - 20px));
+    width: min(600px, 100%);
+    height: min(660px, calc(100vh - 20px));
+    height: min(660px, calc(100dvh - 20px));
+    max-height: 98vh;
+    max-height: 98dvh;
     background: transparent;
     border: none;
-    border-radius: 22px;
+    border-radius: 20px;
     overflow: hidden;
     box-shadow: none;
     animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: auto;
     transition: opacity 0.22s ease, transform 0.22s ease;
 }
 
@@ -776,7 +782,7 @@ body {
     border: 0;
     display: block;
     background: transparent;
-    border-radius: 22px;
+    border-radius: 20px;
 }
 
 /* =========================================================
@@ -810,10 +816,32 @@ body {
         font-size: 22px;
     }
 
+    .checkout-overlay {
+        padding: 6px;
+    }
+
     .checkout-popup {
-        height: calc(100vh - 20px);
-        height: calc(100dvh - 20px);
-        border-radius: var(--radius-md);
+        width: 100%;
+        height: calc(100vh - 12px);
+        height: calc(100dvh - 12px);
+        max-height: 100%;
+        border-radius: 14px;
+    }
+
+    .checkout-popup iframe {
+        border-radius: 14px;
+    }
+}
+
+@media (max-height: 560px) {
+    .checkout-overlay {
+        padding: 4px;
+    }
+
+    .checkout-popup {
+        height: calc(100vh - 8px);
+        height: calc(100dvh - 8px);
+        max-height: 100%;
     }
 }
 

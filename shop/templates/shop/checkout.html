@@ -66,7 +66,9 @@ html, body {
     background: transparent !important;
     color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
-    overflow-x: hidden;
+    width: 100%;
+    height: 100%;
+    min-height: 100%;
 }
 
 body.standalone {
@@ -79,36 +81,57 @@ body.standalone {
 
 .order-wrapper {
     width: 100%;
-    min-height: 100vh;
+    height: 100%;
+    min-height: 100%;
     min-height: -webkit-fill-available;
     min-height: 100svh;
     min-height: 100dvh;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 18px;
+    padding: clamp(6px, 1.5vh, 16px);
     box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
 .order-card {
-    width: min(720px, 95vw);
-    max-width: 720px;
-    max-height: 90vh;
-    margin: 0 auto;
+    width: 100%;
+    max-width: 580px;
+    max-height: 100%;
+    margin: auto;
     background: var(--bg-card);
-    border-radius: 20px;
+    border-radius: 18px;
     border: 1px solid var(--border-subtle);
     padding: 0;
     box-shadow: var(--shadow-card);
     position: relative;
-    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
     animation: cardAppear 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.order-card::-webkit-scrollbar {
+    width: 5px;
+}
+.order-card::-webkit-scrollbar-track {
+    background: transparent;
+}
+.order-card::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
 }
 
 @keyframes cardAppear {
     from {
         opacity: 0;
-        transform: translateY(12px) scale(0.98);
+        transform: translateY(10px) scale(0.98);
     }
     to {
         opacity: 1;
@@ -123,10 +146,13 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 18px 24px 14px;
+    padding: 12px 20px 10px;
     border-bottom: 1px solid var(--border-subtle);
-    margin-bottom: 0;
     background: var(--white);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    flex-shrink: 0;
 }
 
 .order-header-left {
@@ -139,28 +165,28 @@ body.standalone {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: var(--peach);
     color: var(--orange);
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .order-header h1 {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 800;
-    letter-spacing: -0.3px;
+    letter-spacing: -0.2px;
     color: var(--dark);
 }
 
 .close-btn {
-    width: 30px;
-    height: 30px;
+    width: 28px;
+    height: 28px;
     border: 1px solid var(--border-subtle);
     background: var(--off-white);
     border-radius: 50%;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 400;
     line-height: 1;
     cursor: pointer;
@@ -184,32 +210,33 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
-    padding: 12px 12px 11px;
+    gap: 12px;
+    padding: 9px 12px;
     border-radius: var(--radius-md);
     background: var(--off-white);
     border: 1px solid var(--border-subtle);
-    margin: 16px 24px 16px;
+    margin: 10px 20px 8px;
 }
 
 .product-left {
     display: flex;
     align-items: center;
-    gap: 14px;
+    gap: 12px;
+    min-width: 0;
 }
 
 .product-media {
-    width: 56px;
-    height: 56px;
+    width: 46px;
+    height: 46px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
+    border-radius: 9px;
     background: var(--white);
     border: 1px solid var(--border-subtle);
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(2, 2, 2, 0.04);
+    box-shadow: 0 2px 5px rgba(2, 2, 2, 0.04);
 }
 
 .product-image {
@@ -218,30 +245,38 @@ body.standalone {
     object-fit: cover;
 }
 
+.product-info {
+    min-width: 0;
+}
+
 .product-info h2 {
-    margin: 0 0 3px;
-    font-size: 15px;
+    margin: 0 0 2px;
+    font-size: 14.5px;
     font-weight: 800;
     color: var(--dark);
     letter-spacing: -0.2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .product-info p {
     margin: 0;
-    font-size: 12px;
+    font-size: 11.5px;
     font-weight: 600;
     color: var(--brand);
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
 }
 
 .product-price {
     text-align: right;
+    flex-shrink: 0;
 }
 
 .product-price span {
-    font-size: 17px;
+    font-size: 15.5px;
     font-weight: 800;
     color: var(--dark);
     font-family: "DM Sans", sans-serif;
@@ -251,8 +286,8 @@ body.standalone {
    COUNTRY / CURRENCY BOX
 ===================================================== */
 .currency-box {
-    margin: 0 24px 14px;
-    padding: 12px 12px 10px;
+    margin: 0 20px 8px;
+    padding: 8px 12px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     background: var(--white);
@@ -262,10 +297,10 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 11px;
+    margin-bottom: 6px;
+    font-size: 10.5px;
     font-weight: 700;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.7px;
     text-transform: uppercase;
     color: var(--text-secondary);
 }
@@ -277,8 +312,8 @@ body.standalone {
 
 .currency-selected {
     width: 100%;
-    min-height: 44px;
-    padding: 0 14px;
+    min-height: 38px;
+    padding: 0 12px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
     background: var(--off-white);
@@ -303,57 +338,63 @@ body.standalone {
 .selected-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     overflow: hidden;
+    min-width: 0;
 }
 
 .selected-flag {
-    font-size: 20px;
+    font-size: 18px;
     line-height: 1;
     display: inline-block;
+    flex-shrink: 0;
 }
 
 .selected-country {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 13px;
+    gap: 5px;
+    font-size: 12.5px;
     font-weight: 700;
     color: var(--dark);
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .selected-currency {
     color: var(--text-secondary);
     font-weight: 600;
-    font-size: 12px;
+    font-size: 11.5px;
+    flex-shrink: 0;
 }
 
 .currency-arrow {
-    width: 8px;
-    height: 8px;
+    width: 7px;
+    height: 7px;
     border-right: 2px solid var(--text-secondary);
     border-bottom: 2px solid var(--text-secondary);
     transform: rotate(45deg);
     margin-right: 2px;
-    margin-top: -3px;
+    margin-top: -2px;
     transition: transform 0.2s ease;
+    flex-shrink: 0;
 }
 
 .currency-selected.active .currency-arrow {
     transform: rotate(225deg);
-    margin-top: 3px;
+    margin-top: 2px;
 }
 
 .currency-dropdown {
     position: absolute;
     left: 0;
     right: 0;
-    top: calc(100% + 6px);
+    top: calc(100% + 4px);
     background: var(--white);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    box-shadow: 0 14px 35px -5px rgba(2, 2, 2, 0.15);
+    box-shadow: 0 12px 30px -5px rgba(2, 2, 2, 0.18);
     z-index: 1000;
     overflow: hidden;
     display: none;
@@ -361,7 +402,7 @@ body.standalone {
 }
 
 @keyframes dropdownOpen {
-    from { opacity: 0; transform: translateY(-6px); }
+    from { opacity: 0; transform: translateY(-4px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
@@ -370,20 +411,20 @@ body.standalone {
 }
 
 .currency-search {
-    padding: 10px 12px;
+    padding: 8px 10px;
     border-bottom: 1px solid var(--border-subtle);
     background: var(--off-white);
 }
 
 .currency-search input {
     width: 100%;
-    height: 36px;
-    padding: 0 12px;
+    height: 34px;
+    padding: 0 10px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
     outline: none;
     font-family: inherit;
-    font-size: 13px;
+    font-size: 12.5px;
     background: var(--white);
     color: var(--dark);
     transition: border-color 0.15s ease;
@@ -395,9 +436,9 @@ body.standalone {
 }
 
 .currency-options {
-    max-height: 220px;
+    max-height: 180px;
     overflow-y: auto;
-    padding: 6px;
+    padding: 4px;
 }
 
 .currency-options::-webkit-scrollbar {
@@ -415,12 +456,12 @@ body.standalone {
     width: 100%;
     border: 0;
     background: transparent;
-    padding: 8px 10px;
+    padding: 7px 8px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     text-align: left;
     transition: background 0.15s ease;
 }
@@ -434,8 +475,8 @@ body.standalone {
 }
 
 .option-flag {
-    width: 26px;
-    font-size: 18px;
+    width: 22px;
+    font-size: 16px;
     text-align: center;
     flex-shrink: 0;
 }
@@ -449,7 +490,7 @@ body.standalone {
 }
 
 .option-country {
-    font-size: 13px;
+    font-size: 12.5px;
     font-weight: 700;
     color: var(--dark);
     text-overflow: ellipsis;
@@ -464,7 +505,7 @@ body.standalone {
 
 .option-check {
     color: var(--brand);
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 800;
     display: none;
 }
@@ -480,37 +521,37 @@ body.standalone {
     background: var(--off-white);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    padding: 12px 14px 10px;
-    margin: 0 24px 12px;
+    padding: 10px 14px 8px;
+    margin: 0 20px 8px;
 }
 
 .summary-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
+    margin-bottom: 8px;
+    padding-bottom: 6px;
     border-bottom: 1px dashed var(--border-subtle);
 }
 
 .summary-title {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     letter-spacing: 0.5px;
     text-transform: uppercase;
     color: var(--text-secondary);
 }
 
-.summary-header span {
+.summary-header span:not(.summary-title) {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 8px;
-    border-radius: 6px;
+    padding: 2px 7px;
+    border-radius: 5px;
     background: var(--white);
     border: 1px solid var(--border-subtle);
     color: var(--brand);
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
 }
 
@@ -518,8 +559,8 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 8px 0;
-    font-size: 13px;
+    margin: 5px 0;
+    font-size: 12.5px;
     font-weight: 500;
     color: var(--text-secondary);
 }
@@ -540,8 +581,8 @@ body.standalone {
 
 .total-box {
     border-top: 1px solid var(--border-subtle);
-    margin-top: 10px;
-    padding-top: 10px;
+    margin-top: 8px;
+    padding-top: 8px;
 }
 
 .total-row {
@@ -551,10 +592,10 @@ body.standalone {
 }
 
 .total-label {
-    font-size: 16px;
+    font-size: 14.5px;
     font-weight: 800;
     color: var(--dark);
-    letter-spacing: -0.3px;
+    letter-spacing: -0.2px;
 }
 
 .total-price {
@@ -565,7 +606,7 @@ body.standalone {
 }
 
 .total-price strong {
-    font-size: 22px;
+    font-size: 19px;
     font-weight: 800;
     line-height: 1.1;
     color: var(--dark);
@@ -573,9 +614,9 @@ body.standalone {
 }
 
 .total-price small {
-    margin-top: 2px;
+    margin-top: 1px;
     color: var(--text-muted);
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 600;
 }
 
@@ -585,8 +626,8 @@ body.standalone {
 .terms {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    margin: 0 24px 12px;
+    gap: 8px;
+    margin: 0 20px 8px;
     cursor: pointer;
     user-select: none;
 }
@@ -594,14 +635,14 @@ body.standalone {
 .terms input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 17px;
-    height: 17px;
+    width: 16px;
+    height: 16px;
     border: 1.5px solid var(--border-hover);
     border-radius: 4px;
     outline: none;
     cursor: pointer;
     flex-shrink: 0;
-    margin-top: 2px;
+    margin-top: 1px;
     background: var(--white);
     display: grid;
     place-content: center;
@@ -617,13 +658,13 @@ body.standalone {
     content: "\f00c";
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
-    font-size: 10px;
+    font-size: 9.5px;
     color: var(--white);
 }
 
 .terms span {
-    font-size: 11.5px;
-    line-height: 1.4;
+    font-size: 11px;
+    line-height: 1.35;
     color: var(--text-secondary);
 }
 
@@ -641,16 +682,16 @@ body.standalone {
    BUY BUTTON
 ===================================================== */
 .buy-btn {
-    width: calc(100% - 48px);
-    height: 56px;
+    width: calc(100% - 40px);
+    height: 48px;
     border: 0;
-    border-radius: 12px;
+    border-radius: 11px;
     background: linear-gradient(135deg, #FF6611 0%, var(--orange) 100%);
     color: var(--white);
     font-family: "DM Sans", sans-serif;
-    font-size: 15.5px;
+    font-size: 15px;
     font-weight: 800;
-    letter-spacing: 0.05px;
+    letter-spacing: 0.1px;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -658,12 +699,13 @@ body.standalone {
     gap: 8px;
     box-shadow: 0 4px 14px var(--brand-glow);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    margin: 2px 24px 0;
+    margin: 2px 20px 0;
+    flex-shrink: 0;
 }
 
 .buy-btn:hover:not(:disabled) {
     transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(224, 79, 0, 0.35);
+    box-shadow: 0 6px 18px rgba(224, 79, 0, 0.35);
 }
 
 .buy-btn:active:not(:disabled) {
@@ -682,52 +724,114 @@ body.standalone {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    margin-top: 12px;
-    padding-bottom: 18px;
-    font-size: 11.5px;
+    margin-top: 8px;
+    padding-bottom: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--text-muted);
+    flex-shrink: 0;
 }
 
 .secure i {
     color: #16a34a;
-    font-size: 12px;
+    font-size: 11.5px;
 }
 
+/* =====================================================
+   RESPONSIVE MEDIA QUERIES
+===================================================== */
 @media (max-width: 480px) {
     .order-wrapper {
-        padding: 12px;
+        padding: 6px;
+    }
+
+    .order-card {
+        border-radius: 14px;
+        max-width: 100%;
     }
 
     .order-header {
-        padding: 16px 18px 12px;
+        padding: 10px 14px 8px;
     }
 
     .product,
     .currency-box,
     .summary-container,
     .terms {
-        margin-left: 16px;
-        margin-right: 16px;
+        margin-left: 12px;
+        margin-right: 12px;
+    }
+
+    .product {
+        margin-top: 8px;
+        margin-bottom: 6px;
+        padding: 8px 10px;
+    }
+
+    .currency-box {
+        margin-bottom: 6px;
+        padding: 7px 10px;
+    }
+
+    .summary-container {
+        margin-bottom: 6px;
+        padding: 8px 10px 6px;
+    }
+
+    .terms {
+        margin-bottom: 6px;
     }
 
     .buy-btn {
-        width: calc(100% - 32px);
-        margin-left: 16px;
-        margin-right: 16px;
+        width: calc(100% - 24px);
+        margin-left: 12px;
+        margin-right: 12px;
+        height: 46px;
+        font-size: 14.5px;
     }
 
     .order-header h1 {
-        font-size: 16px;
-    }
-    .product-info h2 {
-        font-size: 14px;
-    }
-    .product-price span {
         font-size: 15px;
     }
+    .product-info h2 {
+        font-size: 13.5px;
+    }
+    .product-price span {
+        font-size: 14.5px;
+    }
     .total-price strong {
-        font-size: 20px;
+        font-size: 18px;
+    }
+}
+
+@media (max-height: 560px) {
+    .order-wrapper {
+        padding: 4px;
+    }
+    .order-header {
+        padding: 8px 16px 6px;
+    }
+    .product,
+    .currency-box,
+    .summary-container,
+    .terms {
+        margin-top: 4px;
+        margin-bottom: 4px;
+    }
+    .product-media {
+        width: 36px;
+        height: 36px;
+    }
+    .currency-selected {
+        min-height: 34px;
+    }
+    .buy-btn {
+        height: 40px;
+        font-size: 14px;
+    }
+    .secure {
+        margin-top: 4px;
+        padding-bottom: 6px;
     }
 }
 </style>
