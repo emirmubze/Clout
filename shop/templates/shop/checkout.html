@@ -89,7 +89,7 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: clamp(6px, 1.5vh, 16px);
+    padding: clamp(10px, 2vw, 24px);
     box-sizing: border-box;
     overflow-y: auto;
     overflow-x: hidden;
@@ -98,14 +98,14 @@ body.standalone {
 
 .order-card {
     width: 100%;
-    max-width: 580px;
-    max-height: 100%;
+    max-width: 490px;
+    max-height: calc(100dvh - 20px);
     margin: auto;
     background: var(--bg-card);
-    border-radius: 18px;
+    border-radius: 20px;
     border: 1px solid var(--border-subtle);
     padding: 0;
-    box-shadow: var(--shadow-card);
+    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.12), 0 0 1px 1px rgba(0, 0, 0, 0.05);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -146,7 +146,7 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 20px 10px;
+    padding: 16px 22px 14px;
     border-bottom: 1px solid var(--border-subtle);
     background: var(--white);
     position: sticky;
@@ -174,19 +174,19 @@ body.standalone {
 }
 
 .order-header h1 {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 800;
     letter-spacing: -0.2px;
     color: var(--dark);
 }
 
 .close-btn {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
     border: 1px solid var(--border-subtle);
     background: var(--off-white);
     border-radius: 50%;
-    font-size: 17px;
+    font-size: 18px;
     font-weight: 400;
     line-height: 1;
     cursor: pointer;
@@ -211,11 +211,12 @@ body.standalone {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding: 9px 12px;
+    padding: 11px 14px;
     border-radius: var(--radius-md);
     background: var(--off-white);
     border: 1px solid var(--border-subtle);
-    margin: 10px 20px 8px;
+    margin: 14px 22px 10px;
+    flex-shrink: 0;
 }
 
 .product-left {
@@ -286,18 +287,19 @@ body.standalone {
    COUNTRY / CURRENCY BOX
 ===================================================== */
 .currency-box {
-    margin: 0 20px 8px;
-    padding: 8px 12px;
+    margin: 0 22px 10px;
+    padding: 10px 14px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     background: var(--white);
+    flex-shrink: 0;
 }
 
 .currency-label {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
+    margin-bottom: 7px;
     font-size: 10.5px;
     font-weight: 700;
     letter-spacing: 0.7px;
@@ -312,7 +314,7 @@ body.standalone {
 
 .currency-selected {
     width: 100%;
-    min-height: 38px;
+    min-height: 40px;
     padding: 0 12px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
@@ -521,16 +523,17 @@ body.standalone {
     background: var(--off-white);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    padding: 10px 14px 8px;
-    margin: 0 20px 8px;
+    padding: 12px 16px 10px;
+    margin: 0 22px 12px;
+    flex-shrink: 0;
 }
 
 .summary-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 8px;
-    padding-bottom: 6px;
+    margin-bottom: 9px;
+    padding-bottom: 7px;
     border-bottom: 1px dashed var(--border-subtle);
 }
 
@@ -559,8 +562,8 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 5px 0;
-    font-size: 12.5px;
+    margin: 6px 0;
+    font-size: 13px;
     font-weight: 500;
     color: var(--text-secondary);
 }
@@ -581,8 +584,8 @@ body.standalone {
 
 .total-box {
     border-top: 1px solid var(--border-subtle);
-    margin-top: 8px;
-    padding-top: 8px;
+    margin-top: 9px;
+    padding-top: 9px;
 }
 
 .total-row {
@@ -592,7 +595,7 @@ body.standalone {
 }
 
 .total-label {
-    font-size: 14.5px;
+    font-size: 15px;
     font-weight: 800;
     color: var(--dark);
     letter-spacing: -0.2px;
@@ -606,7 +609,7 @@ body.standalone {
 }
 
 .total-price strong {
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 800;
     line-height: 1.1;
     color: var(--dark);
@@ -626,17 +629,18 @@ body.standalone {
 .terms {
     display: flex;
     align-items: flex-start;
-    gap: 8px;
-    margin: 0 20px 8px;
+    gap: 9px;
+    margin: 0 22px 12px;
     cursor: pointer;
     user-select: none;
+    flex-shrink: 0;
 }
 
 .terms input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
+    width: 17px;
+    height: 17px;
     border: 1.5px solid var(--border-hover);
     border-radius: 4px;
     outline: none;
@@ -658,13 +662,13 @@ body.standalone {
     content: "\f00c";
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
-    font-size: 9.5px;
+    font-size: 10px;
     color: var(--white);
 }
 
 .terms span {
-    font-size: 11px;
-    line-height: 1.35;
+    font-size: 11.5px;
+    line-height: 1.4;
     color: var(--text-secondary);
 }
 
@@ -682,10 +686,10 @@ body.standalone {
    BUY BUTTON
 ===================================================== */
 .buy-btn {
-    width: calc(100% - 40px);
+    width: calc(100% - 44px);
     height: 48px;
     border: 0;
-    border-radius: 11px;
+    border-radius: 12px;
     background: linear-gradient(135deg, #FF6611 0%, var(--orange) 100%);
     color: var(--white);
     font-family: "DM Sans", sans-serif;
@@ -699,7 +703,7 @@ body.standalone {
     gap: 8px;
     box-shadow: 0 4px 14px var(--brand-glow);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    margin: 2px 20px 0;
+    margin: 0 22px 0;
     flex-shrink: 0;
 }
 
@@ -724,8 +728,8 @@ body.standalone {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    margin-top: 8px;
-    padding-bottom: 12px;
+    margin-top: 10px;
+    padding-bottom: 14px;
     font-size: 11px;
     font-weight: 600;
     color: var(--text-muted);
@@ -740,93 +744,164 @@ body.standalone {
 /* =====================================================
    RESPONSIVE MEDIA QUERIES
 ===================================================== */
-@media (max-width: 480px) {
+@media (max-width: 520px) {
     .order-wrapper {
-        padding: 6px;
+        padding: 8px 6px;
     }
 
     .order-card {
-        border-radius: 14px;
+        border-radius: 16px;
         max-width: 100%;
+        max-height: calc(100dvh - 12px);
     }
 
     .order-header {
-        padding: 10px 14px 8px;
+        padding: 13px 16px 11px;
     }
 
     .product,
     .currency-box,
     .summary-container,
     .terms {
-        margin-left: 12px;
-        margin-right: 12px;
+        margin-left: 14px;
+        margin-right: 14px;
     }
 
     .product {
-        margin-top: 8px;
-        margin-bottom: 6px;
-        padding: 8px 10px;
+        margin-top: 10px;
+        margin-bottom: 8px;
+        padding: 10px 12px;
     }
 
     .currency-box {
-        margin-bottom: 6px;
-        padding: 7px 10px;
+        margin-bottom: 8px;
+        padding: 8px 12px;
     }
 
     .summary-container {
-        margin-bottom: 6px;
-        padding: 8px 10px 6px;
+        margin-bottom: 10px;
+        padding: 10px 14px 8px;
     }
 
     .terms {
-        margin-bottom: 6px;
+        margin-bottom: 10px;
     }
 
     .buy-btn {
-        width: calc(100% - 24px);
-        margin-left: 12px;
-        margin-right: 12px;
+        width: calc(100% - 28px);
+        margin-left: 14px;
+        margin-right: 14px;
         height: 46px;
         font-size: 14.5px;
     }
 
     .order-header h1 {
-        font-size: 15px;
+        font-size: 16px;
     }
     .product-info h2 {
-        font-size: 13.5px;
+        font-size: 14px;
     }
     .product-price span {
-        font-size: 14.5px;
+        font-size: 15px;
     }
     .total-price strong {
-        font-size: 18px;
+        font-size: 18.5px;
+    }
+    .secure {
+        margin-top: 8px;
+        padding-bottom: 12px;
     }
 }
 
-@media (max-height: 560px) {
+@media (max-width: 360px) {
     .order-wrapper {
         padding: 4px;
     }
+    .order-card {
+        border-radius: 12px;
+    }
     .order-header {
-        padding: 8px 16px 6px;
+        padding: 10px 12px 8px;
     }
     .product,
     .currency-box,
     .summary-container,
     .terms {
-        margin-top: 4px;
-        margin-bottom: 4px;
+        margin-left: 10px;
+        margin-right: 10px;
+    }
+    .product {
+        padding: 8px 10px;
+        gap: 8px;
+    }
+    .product-media {
+        width: 38px;
+        height: 38px;
+    }
+    .product-info h2 {
+        font-size: 13px;
+    }
+    .product-price span {
+        font-size: 14px;
+    }
+    .currency-box {
+        padding: 7px 10px;
+    }
+    .summary-container {
+        padding: 8px 10px 6px;
+    }
+    .summary-row {
+        font-size: 12px;
+    }
+    .buy-btn {
+        width: calc(100% - 20px);
+        margin-left: 10px;
+        margin-right: 10px;
+        height: 44px;
+        font-size: 14px;
+    }
+}
+
+@media (max-height: 600px) {
+    .order-wrapper {
+        padding: 4px;
+        align-items: flex-start;
+    }
+    .order-card {
+        max-height: calc(100dvh - 8px);
+    }
+    .order-header {
+        padding: 8px 16px 6px;
+    }
+    .product {
+        margin-top: 6px;
+        margin-bottom: 5px;
+        padding: 7px 10px;
     }
     .product-media {
         width: 36px;
         height: 36px;
     }
+    .currency-box {
+        margin-bottom: 5px;
+        padding: 6px 10px;
+    }
     .currency-selected {
         min-height: 34px;
     }
+    .summary-container {
+        margin-bottom: 6px;
+        padding: 7px 12px 5px;
+    }
+    .summary-row {
+        margin: 3px 0;
+        font-size: 12px;
+    }
+    .terms {
+        margin-bottom: 6px;
+    }
     .buy-btn {
-        height: 40px;
+        height: 42px;
         font-size: 14px;
     }
     .secure {

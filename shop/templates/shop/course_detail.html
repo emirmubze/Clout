@@ -752,11 +752,11 @@ body {
 
 .checkout-popup {
     position: relative;
-    width: min(600px, 100%);
-    height: min(660px, calc(100vh - 20px));
-    height: min(660px, calc(100dvh - 20px));
-    max-height: 98vh;
-    max-height: 98dvh;
+    width: min(510px, calc(100vw - 24px));
+    height: min(630px, calc(100vh - 24px));
+    height: min(630px, calc(100dvh - 24px));
+    max-height: 96vh;
+    max-height: 96dvh;
     background: transparent;
     border: none;
     border-radius: 20px;
@@ -817,23 +817,24 @@ body {
     }
 
     .checkout-overlay {
-        padding: 6px;
+        padding: 8px;
     }
 
     .checkout-popup {
         width: 100%;
-        height: calc(100vh - 12px);
-        height: calc(100dvh - 12px);
+        max-width: 480px;
+        height: min(630px, calc(100vh - 16px));
+        height: min(630px, calc(100dvh - 16px));
         max-height: 100%;
-        border-radius: 14px;
+        border-radius: 16px;
     }
 
     .checkout-popup iframe {
-        border-radius: 14px;
+        border-radius: 16px;
     }
 }
 
-@media (max-height: 560px) {
+@media (max-height: 600px) {
     .checkout-overlay {
         padding: 4px;
     }
@@ -897,7 +898,7 @@ body {
         </div>
 
         <div class="course-meta">
-            <span>6 sections | 22 modules</span>
+            <span>6 modules | 16 lessons</span>
         </div>
 
         <!-- =================================================

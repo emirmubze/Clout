@@ -787,7 +787,7 @@ class UserAuthAndDashboardTests(TestCase):
         self.assertNotContains(response, 'class="course-intro"')
         self.assertNotContains(response, "This beginner-friendly program")
         self.assertNotContains(response, 'class="card-buy"')
-        self.assertContains(response, "6 sections | 22 modules")
+        self.assertContains(response, "6 modules | 16 lessons")
         self.assertContains(response, "Module 1:")
         self.assertContains(response, "AI Income Foundations The Landscape")
 

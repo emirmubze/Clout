@@ -3655,6 +3655,11 @@
                 lesson.querySelector(".editor-video-name").textContent = "Existing video attached";
             }
             renumberEditorLessons(module);
+            if (lessonData?.id && lessonData.subtitle_status === "processing") {
+                if (typeof window.startSubtitlePollingForLesson === "function") {
+                    window.startSubtitlePollingForLesson(lessonData.id);
+                }
+            }
         }
 
         function deleteEditorLesson(button) {
@@ -3727,6 +3732,9 @@
             renumberEditorModules();
             updateModuleCount();
             restoreAllModuleCollapseStates();
+            if (typeof window.checkAndStartSubtitlePolling === "function") {
+                window.checkAndStartSubtitlePolling();
+            }
         }
 
         async function saveCourse() {
@@ -4643,11 +4651,91 @@
         }
 
         /* =========================================================
-           SUBTITLE MANAGEMENT & CUE EDITOR JAVASCRIPT
+           SUBTITLE MANAGEMENT, REAL-TIME POLLING & CUE EDITOR JAVASCRIPT
         ========================================================= */
         let activeSubtitleManagerLessonId = null;
         let activeEditingSubtitleId = null;
         let activeEditingCues = [];
+        const activeSubtitlePollers = new Map();
+
+        window.startSubtitlePollingForLesson = function(lessonId) {
+            if (!lessonId) return;
+            const numId = Number(lessonId);
+            if (activeSubtitlePollers.has(numId)) return;
+
+            const pollInterval = setInterval(async () => {
+                try {
+                    const resp = await fetch(`/api/lessons/${numId}/subtitles/`);
+                    if (!resp.ok) return;
+                    const data = await resp.json();
+                    if (!data.success) return;
+
+                    const status = data.subtitle_status || "none";
+                    const subtitles = Array.isArray(data.subtitles) ? data.subtitles : [];
+                    const count = subtitles.length;
+
+                    // Update badge in module editor
+                    const badge = document.getElementById(`sub-badge-${numId}`);
+                    if (badge) {
+                        if (status === "ready" || count > 0) {
+                            badge.className = "sub-badge ready";
+                            badge.innerHTML = `<i class="fa-solid fa-closed-captioning"></i> ${count} Subtitle${count === 1 ? '' : 's'}`;
+                        } else if (status === "failed") {
+                            badge.className = "sub-badge failed";
+                            badge.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Subtitles Failed`;
+                        } else if (status === "processing") {
+                            badge.className = "sub-badge processing";
+                            badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generating AI Subtitles...`;
+                        } else {
+                            badge.className = "sub-badge none";
+                            badge.innerHTML = `<i class="fa-solid fa-closed-captioning"></i> No Subtitles`;
+                        }
+                    }
+
+                    // Ensure Manage Subtitles button exists if lesson now has subtitles
+                    const lessonElem = document.querySelector(`.editor-lesson[data-lesson-id="${numId}"]`);
+                    if (lessonElem) {
+                        const headerRight = lessonElem.querySelector(".editor-lesson-header-right");
+                        if (headerRight && !headerRight.querySelector(".sub-manage-btn")) {
+                            const titleInput = lessonElem.querySelector(".editor-lesson-title-input");
+                            const title = titleInput ? titleInput.value : "Lesson";
+                            const btn = document.createElement("button");
+                            btn.className = "sub-manage-btn";
+                            btn.type = "button";
+                            btn.dataset.lessonId = numId;
+                            btn.dataset.lessonTitle = title;
+                            btn.onclick = function() { window.openSubtitleManagerModal(numId, title); };
+                            btn.innerHTML = `<i class="fa-solid fa-closed-captioning"></i> Manage Subtitles`;
+                            headerRight.prepend(btn);
+                        }
+                    }
+
+                    // Refresh Subtitle Manager modal if currently open for this lesson
+                    if (activeSubtitleManagerLessonId && Number(activeSubtitleManagerLessonId) === numId) {
+                        await loadSubtitleManagerData(numId, false);
+                    }
+
+                    // Stop polling once finished
+                    if (status !== "processing") {
+                        clearInterval(pollInterval);
+                        activeSubtitlePollers.delete(numId);
+                    }
+                } catch (e) {
+                    console.warn("Subtitle poll check error for lesson", numId, e);
+                }
+            }, 2500);
+
+            activeSubtitlePollers.set(numId, pollInterval);
+        };
+
+        window.checkAndStartSubtitlePolling = function() {
+            document.querySelectorAll(".sub-badge.processing").forEach(badge => {
+                const idMatch = badge.id && badge.id.match(/^sub-badge-(\d+)$/);
+                if (idMatch) {
+                    window.startSubtitlePollingForLesson(idMatch[1]);
+                }
+            });
+        };
 
         window.openSubtitleManagerModal = async function(lessonId, lessonTitle) {
             activeSubtitleManagerLessonId = lessonId;
@@ -4660,7 +4748,7 @@
             if (bodyEl) bodyEl.innerHTML = `<div style="text-align:center; padding:30px; color:#64748B;"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px; margin-bottom:10px; display:block;"></i> Loading subtitles...</div>`;
             if (modal) modal.classList.add("open");
 
-            await loadSubtitleManagerData(lessonId);
+            await loadSubtitleManagerData(lessonId, true);
         };
 
         window.closeSubtitleManagerModal = function() {
@@ -4669,7 +4757,7 @@
             activeSubtitleManagerLessonId = null;
         };
 
-        async function loadSubtitleManagerData(lessonId) {
+        async function loadSubtitleManagerData(lessonId, showLoading = true) {
             const bodyEl = document.getElementById("subModalTracksList");
             const infoEl = document.getElementById("subModalInfoBanner");
             const retryBtn = document.getElementById("subModalRetryBtn");
@@ -4680,7 +4768,7 @@
                 const data = await resp.json();
 
                 if (!data.success) {
-                    bodyEl.innerHTML = `<div style="color:#DC2626; padding:20px; text-align:center;">${escapeHtml(data.message || "Failed to load subtitles")}</div>`;
+                    if (bodyEl && showLoading) bodyEl.innerHTML = `<div style="color:#DC2626; padding:20px; text-align:center;">${escapeHtml(data.message || "Failed to load subtitles")}</div>`;
                     return;
                 }
 
@@ -4689,92 +4777,106 @@
                 const detected = data.detected_language || "Auto-detect";
                 const error = data.error_message || "";
 
+                if (status === "processing") {
+                    window.startSubtitlePollingForLesson(lessonId);
+                }
+
                 let statusBadge = `<span class="sub-badge none">No Subtitles</span>`;
                 if (status === "ready") statusBadge = `<span class="sub-badge ready"><i class="fa-solid fa-check"></i> Ready</span>`;
                 if (status === "processing") statusBadge = `<span class="sub-badge processing"><i class="fa-solid fa-spinner fa-spin"></i> Generating in background...</span>`;
                 if (status === "failed") statusBadge = `<span class="sub-badge failed"><i class="fa-solid fa-triangle-exclamation"></i> Generation Failed</span>`;
 
-                infoEl.innerHTML = `
-                    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#F8FAFC; border:1px solid var(--border); border-radius:8px; padding:12px 16px; margin-bottom:18px;">
-                        <div>
-                            <div style="font-size:12px; color:#64748B; font-weight:600;">Spoken Language: <strong style="color:#0F172A;">${escapeHtml(detected)}</strong></div>
-                            <div style="margin-top:4px; font-size:12px;">Status: ${statusBadge}</div>
-                            ${error ? `<div style="margin-top:6px; color:#DC2626; font-size:11.5px; font-weight:600;"><i class="fa-solid fa-circle-exclamation"></i> ${escapeHtml(error)}</div>` : ""}
+                if (infoEl) {
+                    infoEl.innerHTML = `
+                        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; background:#F8FAFC; border:1px solid var(--border); border-radius:8px; padding:12px 16px; margin-bottom:18px;">
+                            <div>
+                                <div style="font-size:12px; color:#64748B; font-weight:600;">Spoken Language: <strong style="color:#0F172A;">${escapeHtml(detected)}</strong></div>
+                                <div style="margin-top:4px; font-size:12px;">Status: ${statusBadge}</div>
+                                ${error ? `<div style="margin-top:6px; color:#DC2626; font-size:11.5px; font-weight:600;"><i class="fa-solid fa-circle-exclamation"></i> ${escapeHtml(error)}</div>` : ""}
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                ${status === "failed" ? `
+                                    <button type="button" class="sub-manage-btn" style="background:#EA580C; color:#FFF; border-color:#EA580C;" onclick="regenerateLessonSubtitles(${lessonId})">
+                                        <i class="fa-solid fa-rotate-right"></i> Retry Generation
+                                    </button>
+                                    <button type="button" class="sub-action-btn" onclick="resetLessonSubtitles(${lessonId})">
+                                        <i class="fa-solid fa-xmark"></i> Clear Error
+                                    </button>
+                                ` : status === "none" ? `
+                                    <button type="button" class="sub-manage-btn" style="background:#EA580C; color:#FFF; border-color:#EA580C;" onclick="regenerateLessonSubtitles(${lessonId})">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Subtitles
+                                    </button>
+                                ` : `
+                                    <button type="button" class="sub-action-btn" onclick="regenerateLessonSubtitles(${lessonId})">
+                                        <i class="fa-solid fa-rotate-right"></i> Regenerate All
+                                    </button>
+                                `}
+                            </div>
                         </div>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            ${status === "failed" ? `
-                                <button type="button" class="sub-manage-btn" style="background:#EA580C; color:#FFF; border-color:#EA580C;" onclick="regenerateLessonSubtitles(${lessonId})">
-                                    <i class="fa-solid fa-rotate-right"></i> Retry Generation
-                                </button>
-                                <button type="button" class="sub-action-btn" onclick="resetLessonSubtitles(${lessonId})">
-                                    <i class="fa-solid fa-xmark"></i> Clear Error
-                                </button>
-                            ` : status === "none" ? `
-                                <button type="button" class="sub-manage-btn" style="background:#EA580C; color:#FFF; border-color:#EA580C;" onclick="regenerateLessonSubtitles(${lessonId})">
-                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate Subtitles
-                                </button>
-                            ` : `
-                                <button type="button" class="sub-action-btn" onclick="regenerateLessonSubtitles(${lessonId})">
-                                    <i class="fa-solid fa-rotate-right"></i> Regenerate All
-                                </button>
-                            `}
-                        </div>
-                    </div>
-                `;
+                    `;
+                }
 
                 // Tracks list
                 const subtitles = data.subtitles || [];
                 if (!subtitles.length) {
-                    bodyEl.innerHTML = `
-                        <div style="text-align:center; padding:32px 16px; border:1.5px dashed var(--border); border-radius:8px; background:#FAFAFA;">
-                            <i class="fa-solid fa-closed-captioning" style="font-size:32px; color:#94A3B8; margin-bottom:10px; display:block;"></i>
-                            <div style="font-weight:700; color:#0F172A; font-size:14px;">No subtitles generated yet</div>
-                            <div style="font-size:12px; color:#64748B; margin-top:4px; margin-bottom:14px;">Subtitles are automatically created with AI speech recognition when GROQ_API_KEY is configured, or you can generate them now.</div>
-                            <button type="button" class="sub-manage-btn" style="background:#EA580C; color:#FFF; border-color:#EA580C;" onclick="regenerateLessonSubtitles(${lessonId})">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Multilingual Subtitles
-                            </button>
-                        </div>
-                    `;
+                    if (bodyEl) {
+                        bodyEl.innerHTML = `
+                            <div style="text-align:center; padding:32px 16px; border:1.5px dashed var(--border); border-radius:8px; background:#FAFAFA;">
+                                <i class="fa-solid fa-closed-captioning" style="font-size:32px; color:#94A3B8; margin-bottom:10px; display:block;"></i>
+                                <div style="font-weight:700; color:#0F172A; font-size:14px;">${status === 'processing' ? 'Generating Subtitles...' : 'No subtitles generated yet'}</div>
+                                <div style="font-size:12px; color:#64748B; margin-top:4px; margin-bottom:14px;">
+                                    ${status === 'processing' ? 'AI speech recognition is processing video audio. New tracks will appear automatically.' : 'Subtitles are automatically created with AI speech recognition when GROQ_API_KEY is configured, or you can generate them now.'}
+                                </div>
+                                ${status !== 'processing' ? `
+                                    <button type="button" class="sub-manage-btn" style="background:#EA580C; color:#FFF; border-color:#EA580C;" onclick="regenerateLessonSubtitles(${lessonId})">
+                                        <i class="fa-solid fa-wand-magic-sparkles"></i> Generate AI Multilingual Subtitles
+                                    </button>
+                                ` : ''}
+                            </div>
+                        `;
+                    }
                     return;
                 }
 
-                bodyEl.innerHTML = subtitles.map(sub => {
-                    const isOrig = sub.is_original;
-                    const native = sub.native_name && sub.native_name !== sub.language_name ? ` (${escapeHtml(sub.native_name)})` : "";
-                    return `
-                        <div class="sub-track-card">
-                            <div class="sub-track-info">
-                                <span class="sub-lang-pill">${escapeHtml(sub.language_code)}</span>
-                                <div>
-                                    <div style="font-weight:700; font-size:13.5px; color:#0F172A;">
-                                        ${escapeHtml(sub.language_name)}${native}
-                                        ${isOrig ? `<span style="font-size:10.5px; background:#E0F2FE; color:#0369A1; padding:2px 6px; border-radius:4px; margin-left:6px; font-weight:700;">Original Audio</span>` : ""}
-                                    </div>
-                                    <div style="font-size:11.5px; color:#64748B; margin-top:2px;">
-                                        ${sub.cues_count} cues formatted
+                if (bodyEl) {
+                    bodyEl.innerHTML = subtitles.map(sub => {
+                        const isOrig = sub.is_original;
+                        const native = sub.native_name && sub.native_name !== sub.language_name ? ` (${escapeHtml(sub.native_name)})` : "";
+                        return `
+                            <div class="sub-track-card">
+                                <div class="sub-track-info">
+                                    <span class="sub-lang-pill">${escapeHtml(sub.language_code)}</span>
+                                    <div>
+                                        <div style="font-weight:700; font-size:13.5px; color:#0F172A;">
+                                            ${escapeHtml(sub.language_name)}${native}
+                                            ${isOrig ? `<span style="font-size:10.5px; background:#E0F2FE; color:#0369A1; padding:2px 6px; border-radius:4px; margin-left:6px; font-weight:700;">Original Audio</span>` : ""}
+                                        </div>
+                                        <div style="font-size:11.5px; color:#64748B; margin-top:2px;">
+                                            ${sub.cues_count} cues formatted
+                                        </div>
                                     </div>
                                 </div>
+                                <div class="sub-actions-group">
+                                    <button type="button" class="sub-action-btn edit-btn" onclick="openCueEditorModal(${sub.id})">
+                                        <i class="fa-solid fa-pen-to-square"></i> Edit & Timecode
+                                    </button>
+                                    <a href="${sub.vtt_url}" target="_blank" class="sub-action-btn" download title="Download WebVTT">
+                                        <i class="fa-solid fa-download"></i> .VTT
+                                    </a>
+                                    <a href="${sub.srt_url}" class="sub-action-btn" download title="Download SRT">
+                                        <i class="fa-solid fa-file-arrow-down"></i> .SRT
+                                    </a>
+                                    <button type="button" class="sub-action-btn delete-btn" onclick="deleteSubtitleTrack(${sub.id}, ${lessonId})" title="Remove language subtitle">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="sub-actions-group">
-                                <button type="button" class="sub-action-btn edit-btn" onclick="openCueEditorModal(${sub.id})">
-                                    <i class="fa-solid fa-pen-to-square"></i> Edit & Timecode
-                                </button>
-                                <a href="${sub.vtt_url}" target="_blank" class="sub-action-btn" download title="Download WebVTT">
-                                    <i class="fa-solid fa-download"></i> .VTT
-                                </a>
-                                <a href="${sub.srt_url}" class="sub-action-btn" download title="Download SRT">
-                                    <i class="fa-solid fa-file-arrow-down"></i> .SRT
-                                </a>
-                                <button type="button" class="sub-action-btn delete-btn" onclick="deleteSubtitleTrack(${sub.id}, ${lessonId})" title="Remove language subtitle">
-                                    <i class="fa-solid fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }).join("");
+                        `;
+                    }).join("");
+                }
 
             } catch (err) {
-                bodyEl.innerHTML = `<div style="color:#DC2626; padding:20px; text-align:center;">Network error loading subtitles.</div>`;
+                if (bodyEl && showLoading) bodyEl.innerHTML = `<div style="color:#DC2626; padding:20px; text-align:center;">Network error loading subtitles.</div>`;
             }
         }
 
@@ -4798,8 +4900,9 @@
                         badge.className = "sub-badge processing";
                         badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generating AI Subtitles...`;
                     }
-                    if (activeSubtitleManagerLessonId === lessonId) {
-                        await loadSubtitleManagerData(lessonId);
+                    window.startSubtitlePollingForLesson(lessonId);
+                    if (activeSubtitleManagerLessonId && Number(activeSubtitleManagerLessonId) === Number(lessonId)) {
+                        await loadSubtitleManagerData(lessonId, false);
                     }
                 } else {
                     showToast(data.message || "Failed to start generation.", true);
@@ -4813,6 +4916,10 @@
             const token = document.querySelector("input[name='csrfmiddlewaretoken']")?.value || "";
             try {
                 showToast("Resetting subtitle status...");
+                if (activeSubtitlePollers.has(Number(lessonId))) {
+                    clearInterval(activeSubtitlePollers.get(Number(lessonId)));
+                    activeSubtitlePollers.delete(Number(lessonId));
+                }
                 const resp = await fetch(`/api/admin/lessons/${lessonId}/reset-subtitles/`, {
                     method: "POST",
                     headers: {
@@ -4830,7 +4937,7 @@
                             ? `<i class="fa-solid fa-closed-captioning"></i> Subtitles Ready`
                             : `<i class="fa-solid fa-closed-captioning"></i> No Subtitles`;
                     }
-                    if (activeSubtitleManagerLessonId === lessonId) {
+                    if (activeSubtitleManagerLessonId && Number(activeSubtitleManagerLessonId) === Number(lessonId)) {
                         await loadSubtitleManagerData(lessonId);
                     }
                 } else {
@@ -4853,7 +4960,8 @@
             const token = document.querySelector("input[name='csrfmiddlewaretoken']")?.value || "";
             try {
                 showToast(`Generating subtitles for ${langCode.toUpperCase()}...`);
-                const resp = await fetch(`/api/admin/lessons/${activeSubtitleManagerLessonId}/add-subtitle-language/`, {
+                const lessonId = activeSubtitleManagerLessonId;
+                const resp = await fetch(`/api/admin/lessons/${lessonId}/add-subtitle-language/`, {
                     method: "POST",
                     headers: {
                         "X-CSRFToken": token,
@@ -4864,7 +4972,13 @@
                 const data = await resp.json();
                 if (data.success) {
                     showToast(data.message);
-                    setTimeout(() => loadSubtitleManagerData(activeSubtitleManagerLessonId), 1500);
+                    const badge = document.getElementById(`sub-badge-${lessonId}`);
+                    if (badge) {
+                        badge.className = "sub-badge processing";
+                        badge.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Generating AI Subtitles...`;
+                    }
+                    window.startSubtitlePollingForLesson(lessonId);
+                    setTimeout(() => loadSubtitleManagerData(lessonId, false), 1000);
                 } else {
                     showToast(data.message || "Failed adding language subtitle.", true);
                 }
@@ -4885,6 +4999,22 @@
                 if (data.success) {
                     showToast(data.message);
                     await loadSubtitleManagerData(lessonId);
+                    // Refresh badge count
+                    const pollResp = await fetch(`/api/lessons/${lessonId}/subtitles/`);
+                    if (pollResp.ok) {
+                        const pollData = await pollResp.json();
+                        const count = pollData.subtitles ? pollData.subtitles.length : 0;
+                        const badge = document.getElementById(`sub-badge-${lessonId}`);
+                        if (badge) {
+                            if (count > 0) {
+                                badge.className = "sub-badge ready";
+                                badge.innerHTML = `<i class="fa-solid fa-closed-captioning"></i> ${count} Subtitle${count === 1 ? '' : 's'}`;
+                            } else {
+                                badge.className = "sub-badge none";
+                                badge.innerHTML = `<i class="fa-solid fa-closed-captioning"></i> No Subtitles`;
+                            }
+                        }
+                    }
                 } else {
                     showToast(data.message || "Failed deleting subtitle.", true);
                 }

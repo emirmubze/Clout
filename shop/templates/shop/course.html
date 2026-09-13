@@ -2738,7 +2738,16 @@ video::cue {
         }
     }
 
+    let currentLoadedLessonId = null;
+    let subtitlePollTimer = null;
+
     async function loadLessonSubtitles(lessonId) {
+        currentLoadedLessonId = lessonId;
+        if (subtitlePollTimer) {
+            clearTimeout(subtitlePollTimer);
+            subtitlePollTimer = null;
+        }
+
         currentSubtitles = [];
         activeCueList = [];
         currentRenderedCueText = "";
@@ -2755,6 +2764,13 @@ video::cue {
             const data = await resp.json();
             if (data.success && Array.isArray(data.subtitles)) {
                 currentSubtitles = data.subtitles;
+            }
+            if (data.subtitle_status === "processing" && currentLoadedLessonId === lessonId) {
+                subtitlePollTimer = setTimeout(() => {
+                    if (currentLoadedLessonId === lessonId) {
+                        loadLessonSubtitles(lessonId);
+                    }
+                }, 3000);
             }
         } catch (err) {
             console.warn("Could not load subtitles for lesson:", err);
