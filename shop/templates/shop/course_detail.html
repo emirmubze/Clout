@@ -752,14 +752,14 @@ body {
 
 .checkout-popup {
     position: relative;
-    width: min(510px, calc(100vw - 24px));
-    height: min(630px, calc(100vh - 24px));
-    height: min(630px, calc(100dvh - 24px));
+    width: min(600px, calc(100vw - 28px));
+    height: min(700px, calc(100vh - 24px));
+    height: min(700px, calc(100dvh - 24px));
     max-height: 96vh;
     max-height: 96dvh;
     background: transparent;
     border: none;
-    border-radius: 20px;
+    border-radius: 22px;
     overflow: hidden;
     box-shadow: none;
     animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
@@ -782,7 +782,7 @@ body {
     border: 0;
     display: block;
     background: transparent;
-    border-radius: 20px;
+    border-radius: 22px;
 }
 
 /* =========================================================
@@ -800,7 +800,7 @@ body {
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
     .checkout-layout {
         width: calc(100% - 24px);
         margin: 16px auto 40px;
@@ -817,26 +817,43 @@ body {
     }
 
     .checkout-overlay {
-        padding: 8px;
+        padding: 8px 6px;
     }
 
     .checkout-popup {
         width: 100%;
-        max-width: 480px;
-        height: min(630px, calc(100vh - 16px));
-        height: min(630px, calc(100dvh - 16px));
+        max-width: 100%;
+        height: min(680px, calc(100vh - 12px));
+        height: min(680px, calc(100dvh - 12px));
         max-height: 100%;
-        border-radius: 16px;
+        border-radius: 18px;
     }
 
     .checkout-popup iframe {
-        border-radius: 16px;
+        border-radius: 18px;
     }
 }
 
-@media (max-height: 600px) {
+@media (max-width: 360px) {
     .checkout-overlay {
         padding: 4px;
+    }
+
+    .checkout-popup {
+        border-radius: 14px;
+        height: min(650px, calc(100vh - 8px));
+        height: min(650px, calc(100dvh - 8px));
+    }
+
+    .checkout-popup iframe {
+        border-radius: 14px;
+    }
+}
+
+@media (max-height: 640px) {
+    .checkout-overlay {
+        padding: 4px;
+        align-items: flex-start;
     }
 
     .checkout-popup {

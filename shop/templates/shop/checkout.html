@@ -52,7 +52,8 @@
     --radius-lg: 16px;
     --radius-md: 12px;
     --radius-sm: 8px;
-    --shadow-card: 0 10px 30px -5px rgba(2, 2, 2, 0.08), 0 0 1px 1px rgba(2, 2, 2, 0.05);
+    --shadow-card: 0 20px 50px -10px rgba(0, 0, 0, 0.15), 0 0 1px 1px rgba(0, 0, 0, 0.05);
+    --card-pad-x: 28px;
 }
 
 * {
@@ -89,7 +90,7 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: clamp(10px, 2vw, 24px);
+    padding: clamp(12px, 3vh, 32px) clamp(10px, 2vw, 24px);
     box-sizing: border-box;
     overflow-y: auto;
     overflow-x: hidden;
@@ -98,14 +99,14 @@ body.standalone {
 
 .order-card {
     width: 100%;
-    max-width: 490px;
-    max-height: calc(100dvh - 20px);
+    max-width: 580px;
+    max-height: calc(100dvh - 24px);
     margin: auto;
     background: var(--bg-card);
-    border-radius: 20px;
+    border-radius: 22px;
     border: 1px solid var(--border-subtle);
     padding: 0;
-    box-shadow: 0 16px 40px -8px rgba(0, 0, 0, 0.12), 0 0 1px 1px rgba(0, 0, 0, 0.05);
+    box-shadow: var(--shadow-card);
     position: relative;
     display: flex;
     flex-direction: column;
@@ -146,7 +147,7 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px 22px 14px;
+    padding: 20px var(--card-pad-x) 16px;
     border-bottom: 1px solid var(--border-subtle);
     background: var(--white);
     position: sticky;
@@ -174,19 +175,19 @@ body.standalone {
 }
 
 .order-header h1 {
-    font-size: 17px;
+    font-size: 18.5px;
     font-weight: 800;
     letter-spacing: -0.2px;
     color: var(--dark);
 }
 
 .close-btn {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
     border: 1px solid var(--border-subtle);
     background: var(--off-white);
     border-radius: 50%;
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 400;
     line-height: 1;
     cursor: pointer;
@@ -210,34 +211,34 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
-    padding: 11px 14px;
+    gap: 14px;
+    padding: 13px 16px;
     border-radius: var(--radius-md);
     background: var(--off-white);
     border: 1px solid var(--border-subtle);
-    margin: 14px 22px 10px;
+    margin: 16px var(--card-pad-x) 12px;
     flex-shrink: 0;
 }
 
 .product-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     min-width: 0;
 }
 
 .product-media {
-    width: 46px;
-    height: 46px;
+    width: 50px;
+    height: 50px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 9px;
+    border-radius: 10px;
     background: var(--white);
     border: 1px solid var(--border-subtle);
     overflow: hidden;
-    box-shadow: 0 2px 5px rgba(2, 2, 2, 0.04);
+    box-shadow: 0 2px 6px rgba(2, 2, 2, 0.05);
 }
 
 .product-image {
@@ -251,8 +252,8 @@ body.standalone {
 }
 
 .product-info h2 {
-    margin: 0 0 2px;
-    font-size: 14.5px;
+    margin: 0 0 3px;
+    font-size: 15px;
     font-weight: 800;
     color: var(--dark);
     letter-spacing: -0.2px;
@@ -263,7 +264,7 @@ body.standalone {
 
 .product-info p {
     margin: 0;
-    font-size: 11.5px;
+    font-size: 12px;
     font-weight: 600;
     color: var(--brand);
     display: flex;
@@ -277,7 +278,7 @@ body.standalone {
 }
 
 .product-price span {
-    font-size: 15.5px;
+    font-size: 16.5px;
     font-weight: 800;
     color: var(--dark);
     font-family: "DM Sans", sans-serif;
@@ -287,8 +288,8 @@ body.standalone {
    COUNTRY / CURRENCY BOX
 ===================================================== */
 .currency-box {
-    margin: 0 22px 10px;
-    padding: 10px 14px;
+    margin: 0 var(--card-pad-x) 12px;
+    padding: 12px 16px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     background: var(--white);
@@ -299,10 +300,10 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 7px;
-    font-size: 10.5px;
+    margin-bottom: 8px;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: 0.7px;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
     color: var(--text-secondary);
 }
@@ -314,8 +315,8 @@ body.standalone {
 
 .currency-selected {
     width: 100%;
-    min-height: 40px;
-    padding: 0 12px;
+    min-height: 44px;
+    padding: 0 14px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
     background: var(--off-white);
@@ -340,13 +341,13 @@ body.standalone {
 .selected-left {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     overflow: hidden;
     min-width: 0;
 }
 
 .selected-flag {
-    font-size: 18px;
+    font-size: 20px;
     line-height: 1;
     display: inline-block;
     flex-shrink: 0;
@@ -355,8 +356,8 @@ body.standalone {
 .selected-country {
     display: flex;
     align-items: center;
-    gap: 5px;
-    font-size: 12.5px;
+    gap: 6px;
+    font-size: 13.5px;
     font-weight: 700;
     color: var(--dark);
     white-space: nowrap;
@@ -367,7 +368,7 @@ body.standalone {
 .selected-currency {
     color: var(--text-secondary);
     font-weight: 600;
-    font-size: 11.5px;
+    font-size: 12px;
     flex-shrink: 0;
 }
 
@@ -396,7 +397,7 @@ body.standalone {
     background: var(--white);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    box-shadow: 0 12px 30px -5px rgba(2, 2, 2, 0.18);
+    box-shadow: 0 14px 35px -5px rgba(2, 2, 2, 0.18);
     z-index: 1000;
     overflow: hidden;
     display: none;
@@ -413,20 +414,20 @@ body.standalone {
 }
 
 .currency-search {
-    padding: 8px 10px;
+    padding: 10px 12px;
     border-bottom: 1px solid var(--border-subtle);
     background: var(--off-white);
 }
 
 .currency-search input {
     width: 100%;
-    height: 34px;
-    padding: 0 10px;
+    height: 36px;
+    padding: 0 12px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
     outline: none;
     font-family: inherit;
-    font-size: 12.5px;
+    font-size: 13px;
     background: var(--white);
     color: var(--dark);
     transition: border-color 0.15s ease;
@@ -438,9 +439,9 @@ body.standalone {
 }
 
 .currency-options {
-    max-height: 180px;
+    max-height: 200px;
     overflow-y: auto;
-    padding: 4px;
+    padding: 6px;
 }
 
 .currency-options::-webkit-scrollbar {
@@ -458,12 +459,12 @@ body.standalone {
     width: 100%;
     border: 0;
     background: transparent;
-    padding: 7px 8px;
+    padding: 8px 10px;
     border-radius: var(--radius-sm);
     cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     text-align: left;
     transition: background 0.15s ease;
 }
@@ -477,8 +478,8 @@ body.standalone {
 }
 
 .option-flag {
-    width: 22px;
-    font-size: 16px;
+    width: 24px;
+    font-size: 17px;
     text-align: center;
     flex-shrink: 0;
 }
@@ -492,7 +493,7 @@ body.standalone {
 }
 
 .option-country {
-    font-size: 12.5px;
+    font-size: 13px;
     font-weight: 700;
     color: var(--dark);
     text-overflow: ellipsis;
@@ -501,7 +502,7 @@ body.standalone {
 }
 
 .option-currency {
-    font-size: 11px;
+    font-size: 11.5px;
     color: var(--text-secondary);
 }
 
@@ -523,8 +524,8 @@ body.standalone {
     background: var(--off-white);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    padding: 12px 16px 10px;
-    margin: 0 22px 12px;
+    padding: 14px 18px 12px;
+    margin: 0 var(--card-pad-x) 14px;
     flex-shrink: 0;
 }
 
@@ -532,15 +533,15 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 9px;
-    padding-bottom: 7px;
+    margin-bottom: 10px;
+    padding-bottom: 8px;
     border-bottom: 1px dashed var(--border-subtle);
 }
 
 .summary-title {
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
     color: var(--text-secondary);
 }
@@ -549,12 +550,12 @@ body.standalone {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 2px 7px;
-    border-radius: 5px;
+    padding: 3px 8px;
+    border-radius: 6px;
     background: var(--white);
     border: 1px solid var(--border-subtle);
     color: var(--brand);
-    font-size: 10.5px;
+    font-size: 11px;
     font-weight: 700;
 }
 
@@ -562,8 +563,8 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 6px 0;
-    font-size: 13px;
+    margin: 7px 0;
+    font-size: 13.5px;
     font-weight: 500;
     color: var(--text-secondary);
 }
@@ -584,8 +585,8 @@ body.standalone {
 
 .total-box {
     border-top: 1px solid var(--border-subtle);
-    margin-top: 9px;
-    padding-top: 9px;
+    margin-top: 10px;
+    padding-top: 10px;
 }
 
 .total-row {
@@ -595,7 +596,7 @@ body.standalone {
 }
 
 .total-label {
-    font-size: 15px;
+    font-size: 15.5px;
     font-weight: 800;
     color: var(--dark);
     letter-spacing: -0.2px;
@@ -609,7 +610,7 @@ body.standalone {
 }
 
 .total-price strong {
-    font-size: 20px;
+    font-size: 22px;
     font-weight: 800;
     line-height: 1.1;
     color: var(--dark);
@@ -617,9 +618,9 @@ body.standalone {
 }
 
 .total-price small {
-    margin-top: 1px;
+    margin-top: 2px;
     color: var(--text-muted);
-    font-size: 9.5px;
+    font-size: 10px;
     font-weight: 600;
 }
 
@@ -629,8 +630,8 @@ body.standalone {
 .terms {
     display: flex;
     align-items: flex-start;
-    gap: 9px;
-    margin: 0 22px 12px;
+    gap: 10px;
+    margin: 0 var(--card-pad-x) 14px;
     cursor: pointer;
     user-select: none;
     flex-shrink: 0;
@@ -639,10 +640,10 @@ body.standalone {
 .terms input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 17px;
-    height: 17px;
+    width: 18px;
+    height: 18px;
     border: 1.5px solid var(--border-hover);
-    border-radius: 4px;
+    border-radius: 5px;
     outline: none;
     cursor: pointer;
     flex-shrink: 0;
@@ -667,8 +668,8 @@ body.standalone {
 }
 
 .terms span {
-    font-size: 11.5px;
-    line-height: 1.4;
+    font-size: 12px;
+    line-height: 1.45;
     color: var(--text-secondary);
 }
 
@@ -686,14 +687,14 @@ body.standalone {
    BUY BUTTON
 ===================================================== */
 .buy-btn {
-    width: calc(100% - 44px);
-    height: 48px;
+    width: calc(100% - (var(--card-pad-x) * 2));
+    height: 50px;
     border: 0;
     border-radius: 12px;
     background: linear-gradient(135deg, #FF6611 0%, var(--orange) 100%);
     color: var(--white);
     font-family: "DM Sans", sans-serif;
-    font-size: 15px;
+    font-size: 15.5px;
     font-weight: 800;
     letter-spacing: 0.1px;
     cursor: pointer;
@@ -703,7 +704,7 @@ body.standalone {
     gap: 8px;
     box-shadow: 0 4px 14px var(--brand-glow);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-    margin: 0 22px 0;
+    margin: 0 var(--card-pad-x) 0;
     flex-shrink: 0;
 }
 
@@ -728,9 +729,9 @@ body.standalone {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    margin-top: 10px;
-    padding-bottom: 14px;
-    font-size: 11px;
+    margin-top: 12px;
+    padding-bottom: 16px;
+    font-size: 11.5px;
     font-weight: 600;
     color: var(--text-muted);
     flex-shrink: 0;
@@ -738,13 +739,70 @@ body.standalone {
 
 .secure i {
     color: #16a34a;
-    font-size: 11.5px;
+    font-size: 12px;
 }
 
 /* =====================================================
    RESPONSIVE MEDIA QUERIES
 ===================================================== */
-@media (max-width: 520px) {
+@media (max-width: 640px) {
+    :root {
+        --card-pad-x: 20px;
+    }
+
+    .order-wrapper {
+        padding: 10px 8px;
+    }
+
+    .order-card {
+        border-radius: 18px;
+        max-width: 100%;
+        max-height: calc(100dvh - 16px);
+    }
+
+    .order-header {
+        padding: 16px var(--card-pad-x) 13px;
+    }
+
+    .order-header h1 {
+        font-size: 17px;
+    }
+
+    .product {
+        margin-top: 12px;
+        margin-bottom: 10px;
+        padding: 11px 14px;
+    }
+
+    .currency-box {
+        margin-bottom: 10px;
+        padding: 10px 14px;
+    }
+
+    .summary-container {
+        margin-bottom: 12px;
+        padding: 12px 15px 10px;
+    }
+
+    .terms {
+        margin-bottom: 12px;
+    }
+
+    .buy-btn {
+        height: 48px;
+        font-size: 15px;
+    }
+
+    .total-price strong {
+        font-size: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    :root {
+        --card-pad-x: 14px;
+    }
+
     .order-wrapper {
         padding: 8px 6px;
     }
@@ -756,154 +814,235 @@ body.standalone {
     }
 
     .order-header {
-        padding: 13px 16px 11px;
+        padding: 13px var(--card-pad-x) 11px;
     }
 
-    .product,
-    .currency-box,
-    .summary-container,
-    .terms {
-        margin-left: 14px;
-        margin-right: 14px;
+    .order-header h1 {
+        font-size: 16px;
+    }
+
+    .close-btn {
+        width: 28px;
+        height: 28px;
+        font-size: 17px;
     }
 
     .product {
         margin-top: 10px;
         margin-bottom: 8px;
         padding: 10px 12px;
+        gap: 10px;
+    }
+
+    .product-media {
+        width: 44px;
+        height: 44px;
+        border-radius: 8px;
+    }
+
+    .product-info h2 {
+        font-size: 13.5px;
+    }
+
+    .product-info p {
+        font-size: 11px;
+    }
+
+    .product-price span {
+        font-size: 14.5px;
     }
 
     .currency-box {
         margin-bottom: 8px;
-        padding: 8px 12px;
+        padding: 9px 12px;
+    }
+
+    .currency-selected {
+        min-height: 38px;
+        padding: 0 10px;
+    }
+
+    .selected-country {
+        font-size: 12.5px;
     }
 
     .summary-container {
         margin-bottom: 10px;
-        padding: 10px 14px 8px;
+        padding: 10px 12px 8px;
+    }
+
+    .summary-row {
+        font-size: 12.5px;
+        margin: 5px 0;
+    }
+
+    .total-label {
+        font-size: 14.5px;
+    }
+
+    .total-price strong {
+        font-size: 18.5px;
     }
 
     .terms {
         margin-bottom: 10px;
+        gap: 8px;
+    }
+
+    .terms span {
+        font-size: 11px;
+        line-height: 1.35;
     }
 
     .buy-btn {
-        width: calc(100% - 28px);
-        margin-left: 14px;
-        margin-right: 14px;
         height: 46px;
         font-size: 14.5px;
     }
 
-    .order-header h1 {
-        font-size: 16px;
-    }
-    .product-info h2 {
-        font-size: 14px;
-    }
-    .product-price span {
-        font-size: 15px;
-    }
-    .total-price strong {
-        font-size: 18.5px;
-    }
     .secure {
         margin-top: 8px;
         padding-bottom: 12px;
+        font-size: 10.5px;
     }
 }
 
 @media (max-width: 360px) {
+    :root {
+        --card-pad-x: 10px;
+    }
+
     .order-wrapper {
         padding: 4px;
     }
+
     .order-card {
         border-radius: 12px;
+        max-height: calc(100dvh - 8px);
     }
+
     .order-header {
-        padding: 10px 12px 8px;
+        padding: 10px var(--card-pad-x) 8px;
     }
-    .product,
-    .currency-box,
-    .summary-container,
-    .terms {
-        margin-left: 10px;
-        margin-right: 10px;
+
+    .order-header h1 {
+        font-size: 15px;
     }
+
     .product {
         padding: 8px 10px;
         gap: 8px;
     }
+
     .product-media {
         width: 38px;
         height: 38px;
     }
+
     .product-info h2 {
-        font-size: 13px;
+        font-size: 12.5px;
     }
+
+    .product-info p {
+        font-size: 10.5px;
+    }
+
     .product-price span {
-        font-size: 14px;
+        font-size: 13.5px;
     }
+
     .currency-box {
         padding: 7px 10px;
     }
+
+    .currency-selected {
+        min-height: 34px;
+        padding: 0 8px;
+    }
+
     .summary-container {
         padding: 8px 10px 6px;
     }
+
     .summary-row {
-        font-size: 12px;
+        font-size: 11.5px;
+        margin: 4px 0;
     }
+
+    .total-label {
+        font-size: 13.5px;
+    }
+
+    .total-price strong {
+        font-size: 17px;
+    }
+
+    .terms span {
+        font-size: 10.5px;
+    }
+
     .buy-btn {
-        width: calc(100% - 20px);
-        margin-left: 10px;
-        margin-right: 10px;
-        height: 44px;
-        font-size: 14px;
+        height: 42px;
+        font-size: 13.5px;
+    }
+
+    .secure {
+        font-size: 10px;
     }
 }
 
-@media (max-height: 600px) {
+@media (max-height: 640px) {
     .order-wrapper {
         padding: 4px;
         align-items: flex-start;
     }
+
     .order-card {
         max-height: calc(100dvh - 8px);
     }
+
     .order-header {
-        padding: 8px 16px 6px;
+        padding: 9px var(--card-pad-x) 7px;
     }
+
     .product {
-        margin-top: 6px;
+        margin-top: 7px;
         margin-bottom: 5px;
         padding: 7px 10px;
     }
+
     .product-media {
         width: 36px;
         height: 36px;
     }
+
     .currency-box {
         margin-bottom: 5px;
         padding: 6px 10px;
     }
+
     .currency-selected {
         min-height: 34px;
     }
+
     .summary-container {
         margin-bottom: 6px;
         padding: 7px 12px 5px;
     }
+
     .summary-row {
         margin: 3px 0;
         font-size: 12px;
     }
+
     .terms {
         margin-bottom: 6px;
     }
+
     .buy-btn {
         height: 42px;
         font-size: 14px;
     }
+
     .secure {
         margin-top: 4px;
         padding-bottom: 6px;
