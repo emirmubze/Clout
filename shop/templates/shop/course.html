@@ -1065,7 +1065,7 @@ button {
     justify-content: center;
     text-align: center;
     pointer-events: none;
-    z-index: 11;
+    z-index: 20;
     transition: bottom 0.2s ease;
 }
 
@@ -1079,8 +1079,9 @@ button {
     background: transparent !important;
     background-color: transparent !important;
     color: #ffffff;
-    font-size: 17.5px;
-    font-weight: 600;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Malayalam", "Noto Sans Devanagari", "Noto Sans Arabic", sans-serif;
+    font-size: 18.5px;
+    font-weight: 700;
     line-height: 1.45;
     letter-spacing: 0.2px;
     padding: 0;
@@ -1091,8 +1092,8 @@ button {
         1.5px -1.5px 0 #000,
         -1.5px 1.5px 0 #000,
         1.5px 1.5px 0 #000,
-        0 2px 5px rgba(0, 0, 0, 0.95),
-        0 0 8px rgba(0, 0, 0, 0.85);
+        0 2px 6px rgba(0, 0, 0, 0.95),
+        0 0 10px rgba(0, 0, 0, 0.9);
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -1102,17 +1103,27 @@ button {
     word-break: break-word;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.15s ease;
+    transition: opacity 0.12s ease;
 }
 
 .subtitle-cue-box.visible {
-    opacity: 1;
-    visibility: visible;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: inline-block !important;
+}
+
+.video-container:fullscreen .subtitle-cue-box,
+.video-container:-webkit-full-screen .subtitle-cue-box,
+.video-container:-moz-full-screen .subtitle-cue-box,
+.video-container:-ms-fullscreen .subtitle-cue-box,
+.video-container.is-fullscreen .subtitle-cue-box {
+    font-size: 24px;
+    letter-spacing: 0.25px;
 }
 
 @media (max-width: 640px) {
     .subtitle-cue-box {
-        font-size: 14.5px;
+        font-size: 15px;
         max-width: 95%;
         padding: 0;
     }
@@ -2789,7 +2800,7 @@ video::cue {
         }
 
         try {
-            const resp = await fetch(`/api/lessons/${lessonId}/subtitles/`);
+            const resp = await fetch(`/api/lessons/${lessonId}/subtitles/?_t=${Date.now()}`, { cache: "no-store" });
             const data = await resp.json();
             if (data.success && Array.isArray(data.subtitles)) {
                 currentSubtitles = data.subtitles;
@@ -2834,7 +2845,10 @@ video::cue {
         offOption.className = "subtitle-option" + (selectedSubtitleLang === "off" ? " active" : "");
         offOption.dataset.lang = "off";
         offOption.innerHTML = `<span>Off</span><i class="fa-solid fa-check check-mark"></i>`;
-        offOption.addEventListener("click", () => selectSubtitleLanguage("off"));
+        offOption.addEventListener("click", (e) => {
+            e.stopPropagation();
+            selectSubtitleLanguage("off");
+        });
         subtitleOptionsList.appendChild(offOption);
 
         // Language tracks
@@ -2844,7 +2858,10 @@ video::cue {
             opt.dataset.lang = sub.language_code;
             const nativeName = sub.native_name && sub.native_name !== sub.language_name ? ` (${sub.native_name})` : "";
             opt.innerHTML = `<span>${sub.language_name}${nativeName}</span><i class="fa-solid fa-check check-mark"></i>`;
-            opt.addEventListener("click", () => selectSubtitleLanguage(sub.language_code));
+            opt.addEventListener("click", (e) => {
+                e.stopPropagation();
+                selectSubtitleLanguage(sub.language_code);
+            });
             subtitleOptionsList.appendChild(opt);
         });
 
@@ -2946,6 +2963,11 @@ video::cue {
             opt.classList.toggle("active", opt.dataset.lang === langCode);
         });
 
+        // Close menu immediately so user can see player
+        if (subtitleMenu) {
+            subtitleMenu.classList.remove("open");
+        }
+
         if (langCode === "off") {
             activeCueList = [];
             currentRenderedCueText = "";
@@ -2969,15 +2991,33 @@ video::cue {
             }
             video.querySelectorAll("track").forEach(t => t.remove());
             if (ccButton) ccButton.classList.remove("active");
-            subtitleMenu.classList.remove("open");
             return;
         }
 
-        const track = currentSubtitles.find(s => s.language_code === langCode);
+        let track = currentSubtitles.find(s => s.language_code === langCode);
+
+        // If track is not found or has no cues in memory, fetch fresh from server
+        if (!track || !Array.isArray(track.cues) || track.cues.length === 0) {
+            if (currentLoadedLessonId) {
+                try {
+                    const resp = await fetch(`/api/lessons/${currentLoadedLessonId}/subtitles/?_t=${Date.now()}`, { cache: "no-store" });
+                    const data = await resp.json();
+                    if (data.success && Array.isArray(data.subtitles)) {
+                        currentSubtitles = data.subtitles;
+                        renderSubtitleOptions();
+                        track = currentSubtitles.find(s => s.language_code === langCode);
+                    }
+                } catch (e) {
+                    console.warn("Could not refresh subtitles:", e);
+                }
+            }
+        }
+
         if (track) {
             await applySubtitleTrack(track);
+        } else {
+            console.warn("Subtitle track not found for language:", langCode);
         }
-        subtitleMenu.classList.remove("open");
     }
 
     let subtitleRafId = null;
@@ -3001,15 +3041,15 @@ video::cue {
             cancelAnimationFrame(subtitleRafId);
             subtitleRafId = null;
         }
-        updateSubtitleDisplay();
+        updateSubtitleDisplay(true);
     }
 
     video.addEventListener("play", startSubtitleSyncLoop);
     video.addEventListener("playing", startSubtitleSyncLoop);
     video.addEventListener("pause", stopSubtitleSyncLoop);
     video.addEventListener("ended", stopSubtitleSyncLoop);
-    video.addEventListener("seeked", updateSubtitleDisplay);
-    video.addEventListener("seeking", updateSubtitleDisplay);
+    video.addEventListener("seeked", () => updateSubtitleDisplay(true));
+    video.addEventListener("seeking", () => updateSubtitleDisplay(true));
 
     async function applySubtitleTrack(track) {
         if (!track) return;
@@ -3018,7 +3058,12 @@ video::cue {
 
         // Instant in-memory loading if cues are already provided by the API
         if (Array.isArray(track.cues) && track.cues.length > 0) {
-            activeCueList = track.cues.slice();
+            activeCueList = track.cues.map(c => ({
+                id: c.id,
+                start: Number(c.start) || 0,
+                end: Number(c.end) || 0,
+                text: String(c.text || "").trim()
+            }));
         } else if (track.vtt_url) {
             activeCueList = await parseVttFromUrl(track.vtt_url);
         } else {
@@ -3026,14 +3071,14 @@ video::cue {
         }
 
         // Sort cues by start time for consistent binary search lookup
-        activeCueList.sort((a, b) => (Number(a.start) || 0) - (Number(b.start) || 0));
+        activeCueList.sort((a, b) => a.start - b.start);
 
         lastFoundCueIndex = -1;
         currentRenderedCueText = "";
 
         setupNativeTextTrack(track, activeCueList);
         syncSubtitleMode();
-        updateSubtitleDisplay();
+        updateSubtitleDisplay(true);
 
         if (!video.paused && !video.ended) {
             startSubtitleSyncLoop();
@@ -3043,7 +3088,18 @@ video::cue {
     function findActiveCue(curTime) {
         if (!activeCueList || !activeCueList.length) return null;
 
-        // Binary search for exact match or closest preceding cue
+        const isPaused = video.paused || video.ended;
+
+        // 1. Initial speech preview:
+        // When at or near the start (curTime <= 2.5s or curTime <= activeCueList[0].start + 0.8)
+        // ALWAYS return the first cue so the user sees the selected subtitle immediately upon clicking!
+        const firstStart = Number(activeCueList[0].start) || 0;
+        if (curTime <= Math.max(2.5, firstStart + 0.8)) {
+            lastFoundCueIndex = 0;
+            return activeCueList[0];
+        }
+
+        // 2. Binary search for exact active cue or closest preceding cue
         let low = 0;
         let high = activeCueList.length - 1;
         let candidateIdx = -1;
@@ -3051,10 +3107,12 @@ video::cue {
         while (low <= high) {
             const mid = (low + high) >> 1;
             const cue = activeCueList[mid];
-            if (curTime >= cue.start && curTime <= cue.end) {
+            const cStart = Number(cue.start) || 0;
+            const cEnd = Number(cue.end) || 0;
+            if (curTime >= cStart && curTime <= cEnd) {
                 lastFoundCueIndex = mid;
                 return cue;
-            } else if (curTime < cue.start) {
+            } else if (curTime < cStart) {
                 high = mid - 1;
             } else {
                 candidateIdx = mid;
@@ -3062,26 +3120,47 @@ video::cue {
             }
         }
 
-        // Smooth dialogue gap bridging (Hold / Linger):
-        // Whisper speech transcripts have natural 0.05s-0.5s micro-pauses between sentences.
-        // Holding the previous cue during these micro-pauses eliminates subtitle flickering/blinking.
+        // 3. Gap bridging:
         if (candidateIdx >= 0 && candidateIdx < activeCueList.length) {
             const prevCue = activeCueList[candidateIdx];
-            const gap = curTime - prevCue.end;
+            const prevEnd = Number(prevCue.end) || 0;
+            const gap = curTime - prevEnd;
             const nextCue = (candidateIdx + 1 < activeCueList.length) ? activeCueList[candidateIdx + 1] : null;
+            const nextStart = nextCue ? (Number(nextCue.start) || 0) : Infinity;
 
-            if (gap >= 0 && gap <= 0.65) {
-                if (!nextCue || (nextCue.start - prevCue.end) <= 0.85) {
+            if (isPaused) {
+                // When paused, maintain cue visibility for studying/reading
+                if (nextCue && Math.abs(curTime - nextStart) < Math.abs(curTime - prevEnd) && Math.abs(curTime - nextStart) <= 3.0) {
+                    lastFoundCueIndex = candidateIdx + 1;
+                    return nextCue;
+                }
+                if (gap >= 0 && gap <= 5.0) {
                     lastFoundCueIndex = candidateIdx;
                     return prevCue;
                 }
+            } else {
+                // Normal playback micro-pause bridging (up to 0.75s) to eliminate blinking
+                if (gap >= 0 && gap <= 0.75) {
+                    if (!nextCue || (nextStart - prevEnd) <= 1.0) {
+                        lastFoundCueIndex = candidateIdx;
+                        return prevCue;
+                    }
+                }
+            }
+        }
+
+        // 4. Edge case: within 2.5s before first cue
+        if (candidateIdx === -1 && activeCueList.length > 0) {
+            if (curTime < firstStart && (firstStart - curTime) <= 2.5) {
+                lastFoundCueIndex = 0;
+                return activeCueList[0];
             }
         }
 
         return null;
     }
 
-    function updateSubtitleDisplay() {
+    function updateSubtitleDisplay(force = false) {
         if (!subtitleOverlay) return;
         if (isPipActive()) {
             return; // In PiP mode, native TextTrack renders cues inside PiP window
@@ -3091,7 +3170,7 @@ video::cue {
         if (!box) return;
 
         if (selectedSubtitleLang === "off" || !activeCueList || !activeCueList.length) {
-            if (currentRenderedCueText !== "") {
+            if (currentRenderedCueText !== "" || box.classList.contains("visible")) {
                 box.classList.remove("visible");
                 box.textContent = "";
                 currentRenderedCueText = "";
@@ -3103,8 +3182,8 @@ video::cue {
         const activeCue = findActiveCue(curTime);
         const targetText = (activeCue && activeCue.text) ? String(activeCue.text).trim() : "";
 
-        // Avoid touching DOM if the displayed text hasn't changed
-        if (targetText === currentRenderedCueText) {
+        // Avoid touching DOM if the displayed text hasn't changed unless force is true
+        if (!force && targetText === currentRenderedCueText) {
             return;
         }
 

@@ -29,6 +29,7 @@ from django.template.loader import render_to_string
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.http import require_POST
+from django.views.decorators.cache import never_cache
 from django.urls import reverse, reverse_lazy
 from botocore.config import Config
 
@@ -2907,6 +2908,7 @@ def serve_subtitle_srt(request, subtitle_id):
     return response
 
 
+@never_cache
 def api_lesson_subtitles(request, lesson_id):
     """
     API returning available subtitle tracks for a lesson (for video player).
@@ -2916,7 +2918,7 @@ def api_lesson_subtitles(request, lesson_id):
     # Allow access if user is authenticated/staff or has course access
     subtitles = lesson.subtitles.filter(status="ready").order_by("-is_original", "language_name")
 
-    return JsonResponse({
+    response = JsonResponse({
         "success": True,
         "lesson_id": lesson.id,
         "lesson_title": lesson.title,
@@ -2939,6 +2941,11 @@ def api_lesson_subtitles(request, lesson_id):
             for sub in subtitles
         ],
     })
+    response["Cache-Control"] = "no-cache, no-store, must-revalidate, max-age=0"
+    response["Pragma"] = "no-cache"
+    response["Expires"] = "0"
+    response["Access-Control-Allow-Origin"] = "*"
+    return response
 
 
 @login_required(login_url="login")
