@@ -1094,14 +1094,12 @@ button {
     word-break: break-word;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(2px);
-    transition: opacity 0.12s ease, transform 0.12s ease;
+    transition: opacity 0.15s ease;
 }
 
 .subtitle-cue-box.visible {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
 }
 
 @media (max-width: 640px) {
@@ -2807,7 +2805,12 @@ video::cue {
             if (match) {
                 await applySubtitleTrack(match);
             } else {
-                if (ccButton) ccButton.classList.remove("active");
+                const fallbackSub = currentSubtitles.find(s => s.is_original) || currentSubtitles[0];
+                if (fallbackSub) {
+                    await applySubtitleTrack(fallbackSub);
+                } else if (ccButton) {
+                    ccButton.classList.remove("active");
+                }
             }
         } else {
             if (ccButton) ccButton.classList.remove("active");
@@ -2970,18 +2973,53 @@ video::cue {
         subtitleMenu.classList.remove("open");
     }
 
+    let subtitleRafId = null;
+
+    function startSubtitleSyncLoop() {
+        if (subtitleRafId) return;
+
+        function step() {
+            if (!video.paused && !video.ended) {
+                updateSubtitleDisplay();
+                subtitleRafId = requestAnimationFrame(step);
+            } else {
+                subtitleRafId = null;
+            }
+        }
+        subtitleRafId = requestAnimationFrame(step);
+    }
+
+    function stopSubtitleSyncLoop() {
+        if (subtitleRafId) {
+            cancelAnimationFrame(subtitleRafId);
+            subtitleRafId = null;
+        }
+        updateSubtitleDisplay();
+    }
+
+    video.addEventListener("play", startSubtitleSyncLoop);
+    video.addEventListener("playing", startSubtitleSyncLoop);
+    video.addEventListener("pause", stopSubtitleSyncLoop);
+    video.addEventListener("ended", stopSubtitleSyncLoop);
+    video.addEventListener("seeked", updateSubtitleDisplay);
+    video.addEventListener("seeking", updateSubtitleDisplay);
+
     async function applySubtitleTrack(track) {
+        if (!track) return;
         if (ccButton) ccButton.classList.add("active");
         video.querySelectorAll("track").forEach(t => t.remove());
 
         // Instant in-memory loading if cues are already provided by the API
         if (Array.isArray(track.cues) && track.cues.length > 0) {
-            activeCueList = track.cues;
+            activeCueList = track.cues.slice();
         } else if (track.vtt_url) {
             activeCueList = await parseVttFromUrl(track.vtt_url);
         } else {
             activeCueList = [];
         }
+
+        // Sort cues by start time for consistent binary search lookup
+        activeCueList.sort((a, b) => (Number(a.start) || 0) - (Number(b.start) || 0));
 
         lastFoundCueIndex = -1;
         currentRenderedCueText = "";
@@ -2989,45 +3027,45 @@ video::cue {
         setupNativeTextTrack(track, activeCueList);
         syncSubtitleMode();
         updateSubtitleDisplay();
+
+        if (!video.paused && !video.ended) {
+            startSubtitleSyncLoop();
+        }
     }
 
     function findActiveCue(curTime) {
         if (!activeCueList || !activeCueList.length) return null;
 
-        // 1. Direct match check at cached index
-        if (lastFoundCueIndex >= 0 && lastFoundCueIndex < activeCueList.length) {
-            const c = activeCueList[lastFoundCueIndex];
-            if (curTime >= c.start && curTime <= c.end) {
-                return c;
-            }
-            // Check consecutive next cue
-            if (lastFoundCueIndex + 1 < activeCueList.length) {
-                const nextC = activeCueList[lastFoundCueIndex + 1];
-                if (curTime >= nextC.start && curTime <= nextC.end) {
-                    lastFoundCueIndex = lastFoundCueIndex + 1;
-                    return nextC;
-                }
+        // Binary search for exact match or closest preceding cue
+        let low = 0;
+        let high = activeCueList.length - 1;
+        let candidateIdx = -1;
+
+        while (low <= high) {
+            const mid = (low + high) >> 1;
+            const cue = activeCueList[mid];
+            if (curTime >= cue.start && curTime <= cue.end) {
+                lastFoundCueIndex = mid;
+                return cue;
+            } else if (curTime < cue.start) {
+                high = mid - 1;
+            } else {
+                candidateIdx = mid;
+                low = mid + 1;
             }
         }
 
-        // 2. Full scan for direct match
-        for (let i = 0; i < activeCueList.length; i++) {
-            const c = activeCueList[i];
-            if (curTime >= c.start && curTime <= c.end) {
-                lastFoundCueIndex = i;
-                return c;
-            }
-        }
-
-        // 3. Smooth Gap Bridging:
-        // Whisper speech transcripts have natural 0.05s-0.35s micro-gaps between sentences.
-        // Holding the previous cue during these micro-pauses completely eliminates subtitle flickering/blinking.
-        if (lastFoundCueIndex >= 0 && lastFoundCueIndex < activeCueList.length) {
-            const prevCue = activeCueList[lastFoundCueIndex];
+        // Smooth dialogue gap bridging (Hold / Linger):
+        // Whisper speech transcripts have natural 0.05s-0.5s micro-pauses between sentences.
+        // Holding the previous cue during these micro-pauses eliminates subtitle flickering/blinking.
+        if (candidateIdx >= 0 && candidateIdx < activeCueList.length) {
+            const prevCue = activeCueList[candidateIdx];
             const gap = curTime - prevCue.end;
-            if (gap > 0 && gap <= 0.35) {
-                const nextCue = (lastFoundCueIndex + 1 < activeCueList.length) ? activeCueList[lastFoundCueIndex + 1] : null;
-                if (!nextCue || (nextCue.start - prevCue.end) <= 0.6) {
+            const nextCue = (candidateIdx + 1 < activeCueList.length) ? activeCueList[candidateIdx + 1] : null;
+
+            if (gap >= 0 && gap <= 0.65) {
+                if (!nextCue || (nextCue.start - prevCue.end) <= 0.85) {
+                    lastFoundCueIndex = candidateIdx;
                     return prevCue;
                 }
             }
@@ -3043,13 +3081,14 @@ video::cue {
         }
 
         const box = subtitleCueBox || document.getElementById("subtitleCueBox");
+        if (!box) return;
 
         if (selectedSubtitleLang === "off" || !activeCueList || !activeCueList.length) {
-            if (box && currentRenderedCueText !== "") {
+            if (currentRenderedCueText !== "") {
                 box.classList.remove("visible");
                 box.textContent = "";
+                currentRenderedCueText = "";
             }
-            currentRenderedCueText = "";
             return;
         }
 
@@ -3064,13 +3103,13 @@ video::cue {
 
         currentRenderedCueText = targetText;
 
-        if (box) {
-            if (targetText) {
-                box.textContent = targetText;
+        if (targetText) {
+            box.textContent = targetText;
+            if (!box.classList.contains("visible")) {
                 box.classList.add("visible");
-            } else {
-                box.classList.remove("visible");
             }
+        } else {
+            box.classList.remove("visible");
         }
     }
 

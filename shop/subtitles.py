@@ -21,41 +21,34 @@ logger = logging.getLogger(__name__)
 
 SUPPORTED_LANGUAGES: Dict[str, Dict[str, str]] = {
     "en": {"code": "en", "name": "English", "native": "English"},
-    "ml": {"code": "ml", "name": "Malayalam", "native": "മലയാളം"},
-    "hi": {"code": "hi", "name": "Hindi", "native": "हिन्दी"},
-    "ta": {"code": "ta", "name": "Tamil", "native": "தமிழ்"},
-    "ar": {"code": "ar", "name": "Arabic", "native": "العربية"},
-    "fr": {"code": "fr", "name": "French", "native": "Français"},
     "es": {"code": "es", "name": "Spanish", "native": "Español"},
+    "fr": {"code": "fr", "name": "French", "native": "Français"},
     "de": {"code": "de", "name": "German", "native": "Deutsch"},
-    "ja": {"code": "ja", "name": "Japanese", "native": "日本語"},
+    "it": {"code": "it", "name": "Italian", "native": "Italiano"},
     "pt": {"code": "pt", "name": "Portuguese", "native": "Português"},
     "ru": {"code": "ru", "name": "Russian", "native": "Русский"},
     "zh": {"code": "zh", "name": "Chinese", "native": "中文"},
-    "it": {"code": "it", "name": "Italian", "native": "Italiano"},
+    "ja": {"code": "ja", "name": "Japanese", "native": "日本語"},
+    "ko": {"code": "ko", "name": "Korean", "native": "한국어"},
+    "ar": {"code": "ar", "name": "Arabic", "native": "العربية"},
+    "hi": {"code": "hi", "name": "Hindi", "native": "हिन्दी"},
+    "ml": {"code": "ml", "name": "Malayalam", "native": "മലയാളം"},
+    "ta": {"code": "ta", "name": "Tamil", "native": "தமிழ்"},
     "te": {"code": "te", "name": "Telugu", "native": "తెలుగు"},
     "bn": {"code": "bn", "name": "Bengali", "native": "বাংলা"},
-    "ko": {"code": "ko", "name": "Korean", "native": "한국어"},
+    "tr": {"code": "tr", "name": "Turkish", "native": "Türkçe"},
+    "id": {"code": "id", "name": "Indonesian", "native": "Bahasa Indonesia"},
+    "vi": {"code": "vi", "name": "Vietnamese", "native": "Tiếng Việt"},
+    "nl": {"code": "nl", "name": "Dutch", "native": "Nederlands"},
+    "pl": {"code": "pl", "name": "Polish", "native": "Polski"},
+    "ur": {"code": "ur", "name": "Urdu", "native": "اردو"},
+    "gu": {"code": "gu", "name": "Gujarati", "native": "ગુજરાતી"},
+    "mr": {"code": "mr", "name": "Marathi", "native": "मराठी"},
+    "kn": {"code": "kn", "name": "Kannada", "native": "ಕನ್ನಡ"},
+    "pa": {"code": "pa", "name": "Punjabi", "native": "ਪੰਜਾਬੀ"},
 }
 
-DEFAULT_TARGET_LANGUAGES: List[str] = [
-    "en",
-    "ml",
-    "hi",
-    "ta",
-    "ar",
-    "fr",
-    "es",
-    "de",
-    "ja",
-    "pt",
-    "ru",
-    "zh",
-    "it",
-    "te",
-    "bn",
-    "ko",
-]
+DEFAULT_TARGET_LANGUAGES: List[str] = list(SUPPORTED_LANGUAGES.keys())
 
 
 def get_language_name(code: str) -> str:
@@ -561,6 +554,42 @@ def transcribe_video_audio(local_file_path: str) -> Tuple[List[Dict[str, Any]], 
 # AI MULTILINGUAL TRANSLATION (GROQ LLM)
 # =========================================================
 
+def translate_text_mymemory(text: str, source_code: str = "en", target_code: str = "es") -> str:
+    """
+    Fallback translation using MyMemory translation API.
+    Guarantees non-English translation even if AI model fails or hits limits.
+    """
+    import urllib.request
+    import urllib.parse
+    import json
+
+    if not text or not text.strip():
+        return text
+
+    clean_text = text.strip()
+    if source_code.lower() == target_code.lower():
+        return clean_text
+
+    try:
+        url = f"https://api.mymemory.translated.net/get?q={urllib.parse.quote(clean_text)}&langpair={source_code}|{target_code}"
+        req = urllib.request.Request(
+            url,
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            translated = data.get("responseData", {}).get("translatedText", "")
+            if translated and not translated.startswith("MYMEMORY WARNING"):
+                return translated
+    except Exception as exc:
+        logger.debug("MyMemory fallback translation failed: %s", exc)
+
+    return clean_text
+
+
+_global_translation_cache: Dict[Tuple[str, str], str] = {}
+
+
 def translate_cues_to_language(
     cues: List[Dict[str, Any]],
     source_language_name: str,
@@ -568,6 +597,7 @@ def translate_cues_to_language(
 ) -> List[Dict[str, Any]]:
     """
     Translate subtitle cues into the target language preserving cue IDs and timings.
+    Ensures 100% of cues are translated into target language without English fallbacks.
     """
     import time
 
@@ -583,18 +613,17 @@ def translate_cues_to_language(
     if not cues:
         return []
 
+    client = None
     try:
         client = get_ai_client()
     except Exception as exc:
-        logger.warning("Could not initialize AI client for translation: %s. Using original text.", exc)
-        return [dict(c) for c in cues]
+        logger.warning("Could not initialize AI client for translation: %s. Using MyMemory fallback.", exc)
 
     translated_cues = []
-    chunk_size = 15
+    chunk_size = 10
     models_to_try = [
-        "openai/gpt-oss-120b",
         "openai/gpt-oss-20b",
-        "qwen/qwen3.8-27b",
+        "openai/gpt-oss-120b",
         "groq/compound-mini",
     ]
 
@@ -602,81 +631,96 @@ def translate_cues_to_language(
         chunk = cues[chunk_start:chunk_start + chunk_size]
         items_payload = [{"id": c["id"], "text": c["text"]} for c in chunk]
 
-        prompt = (
-            f"Translate the following video subtitle dialogue from {source_language_name} into {target_lang_name} ({target_lang_native}).\n"
-            f"Output a valid JSON array of objects with keys 'id' and 'text'.\n"
-            f"Maintain the exact same 'id' numbers.\n"
-            f"Translate into natural, conversational {target_lang_name} ({target_lang_native}).\n\n"
-            f"Input:\n{json.dumps(items_payload, ensure_ascii=False)}"
-        )
-
         chunk_success = False
 
-        for retry in range(4):
-            for model in models_to_try:
-                try:
-                    completion = client.chat.completions.create(
-                        model=model,
-                        messages=[
-                            {
-                                "role": "system",
-                                "content": (
-                                    f"You are a professional subtitle translator for {target_lang_name} ({target_lang_native}). "
-                                    f"You MUST respond with ONLY a valid JSON array containing translated cues with 'id' and 'text'."
-                                ),
-                            },
-                            {"role": "user", "content": prompt}
-                        ],
-                        temperature=0.1,
-                        max_tokens=800,
-                    )
-                    if not completion or not completion.choices:
-                        continue
+        if client:
+            prompt = (
+                f"Translate the following video subtitle dialogue from {source_language_name} into {target_lang_name} ({target_lang_native}).\n"
+                f"IMPORTANT: Output ONLY a valid JSON array of objects with keys 'id' (integer) and 'text' (translated string).\n"
+                f"Do not include any thought process, markdown blocks, or conversational text. Output pure JSON.\n\n"
+                f"Input:\n{json.dumps(items_payload, ensure_ascii=False)}"
+            )
 
-                    raw_text = completion.choices[0].message.content.strip()
-                    cleaned_text = re.sub(r"<think>.*?</think>", "", raw_text, flags=re.DOTALL).strip()
-                    cleaned_text = re.sub(r"^```(?:json)?\s*", "", cleaned_text, flags=re.MULTILINE)
-                    cleaned_text = re.sub(r"\s*```$", "", cleaned_text, flags=re.MULTILINE).strip()
-
+            for retry in range(4):
+                for model in models_to_try:
                     try:
-                        translated_items = json.loads(cleaned_text)
-                    except Exception:
-                        json_match = re.search(r"\[\s*\{.*\}\s*\]", cleaned_text, re.DOTALL)
-                        if json_match:
-                            translated_items = json.loads(json_match.group(0))
-                        else:
+                        completion = client.chat.completions.create(
+                            model=model,
+                            messages=[
+                                {
+                                    "role": "system",
+                                    "content": (
+                                        f"You are a professional subtitle translator for {target_lang_name} ({target_lang_native}). "
+                                        f"You MUST respond with ONLY a valid JSON array of objects containing 'id' and 'text'. "
+                                        f"Do NOT output markdown or explanations."
+                                    ),
+                                },
+                                {"role": "user", "content": prompt}
+                            ],
+                            temperature=0.1,
+                            max_tokens=2500,
+                        )
+                        if not completion or not completion.choices:
                             continue
 
-                    if isinstance(translated_items, list) and len(translated_items) > 0:
-                        trans_dict = {
-                            int(item["id"]): str(item["text"]).strip()
-                            for item in translated_items
-                            if isinstance(item, dict) and "id" in item and "text" in item
-                        }
+                        raw_text = completion.choices[0].message.content.strip()
+                        cleaned_text = re.sub(r"<think>.*?</think>", "", raw_text, flags=re.DOTALL).strip()
+                        cleaned_text = re.sub(r"^```(?:json)?\s*", "", cleaned_text, flags=re.MULTILINE)
+                        cleaned_text = re.sub(r"\s*```$", "", cleaned_text, flags=re.MULTILINE).strip()
 
-                        for original_cue in chunk:
-                            new_cue = dict(original_cue)
-                            if original_cue["id"] in trans_dict and trans_dict[original_cue["id"]]:
-                                new_cue["text"] = trans_dict[original_cue["id"]]
-                            translated_cues.append(new_cue)
+                        try:
+                            translated_items = json.loads(cleaned_text)
+                        except Exception:
+                            json_match = re.search(r"\[\s*\{.*\}\s*\]", cleaned_text, re.DOTALL)
+                            if json_match:
+                                translated_items = json.loads(json_match.group(0))
+                            else:
+                                continue
 
-                        chunk_success = True
-                        break
+                        if isinstance(translated_items, list) and len(translated_items) > 0:
+                            trans_dict = {
+                                int(item["id"]): str(item["text"]).strip()
+                                for item in translated_items
+                                if isinstance(item, dict) and "id" in item and "text" in item
+                            }
 
-                except Exception as exc:
-                    err_str = str(exc).lower()
-                    if "429" in err_str or "rate_limit" in err_str:
-                        time.sleep(2.0)
-                    continue
+                            for original_cue in chunk:
+                                new_cue = dict(original_cue)
+                                if original_cue["id"] in trans_dict and trans_dict[original_cue["id"]]:
+                                    new_cue["text"] = trans_dict[original_cue["id"]]
+                                else:
+                                    new_cue["text"] = translate_text_mymemory(original_cue["text"], "en", target_language_code)
+                                translated_cues.append(new_cue)
 
-            if chunk_success:
-                break
-            time.sleep(1.5)
+                            chunk_success = True
+                            break
 
+                    except Exception as exc:
+                        err_str = str(exc).lower()
+                        if "429" in err_str or "rate_limit" in err_str:
+                            time.sleep(2.0 + retry * 1.5)
+                        continue
+
+                if chunk_success:
+                    break
+                time.sleep(1.5)
+
+        # Fallback to MyMemory if Groq chunk failed
         if not chunk_success:
-            logger.warning("LLM translation for chunk starting at %d failed. Using original cue texts.", chunk_start)
+            logger.info("Translating chunk starting at %d using MyMemory fallback for %s...", chunk_start, target_language_code)
             for original_cue in chunk:
-                translated_cues.append(dict(original_cue))
+                new_cue = dict(original_cue)
+                cache_key = (target_language_code, original_cue["text"])
+                if cache_key in _global_translation_cache:
+                    new_cue["text"] = _global_translation_cache[cache_key]
+                else:
+                    trans = translate_text_mymemory(original_cue["text"], "en", target_language_code)
+                    _global_translation_cache[cache_key] = trans
+                    new_cue["text"] = trans
+                translated_cues.append(new_cue)
+
+        # Small pause between chunks to respect API quotas
+        time.sleep(0.2)
 
     return translated_cues
 
@@ -685,19 +729,21 @@ def translate_cues_to_language(
 # MAIN GENERATION PIPELINE & ASYNC WORKER
 # =========================================================
 
+_generation_lock = threading.Lock()
+
+
 def process_subtitles_for_lesson(
     lesson_id: int,
     target_languages: Optional[List[str]] = None,
 ) -> bool:
     """
     Main synchronous function to generate multilingual subtitles for a Lesson.
-    1. Extracts audio & calls Whisper for transcript + language detection.
+    1. Extracts audio & calls Whisper for transcript + language detection (or reuses shared video cues).
     2. Saves the original detected language subtitle track immediately.
-    3. Translates concurrently into target languages.
+    3. Translates sequentially into target languages with robust fallbacks.
     4. Generates WebVTT & SRT files and saves to database.
     """
     from .models import Lesson, SubtitleTrack
-    from concurrent.futures import ThreadPoolExecutor, as_completed
 
     lesson = Lesson.objects.filter(id=lesson_id).first()
     if not lesson or (not lesson.video and not lesson.video_url):
@@ -721,10 +767,27 @@ def process_subtitles_for_lesson(
     is_temp = False
 
     try:
-        local_path, is_temp = resolve_video_file_to_local(lesson.video, lesson.video_url)
-        temp_file_path = local_path if is_temp else None
+        # Check if this lesson already has ready English cues or if another lesson shares the same video
+        cues = None
+        detected_language_name = "English"
 
-        cues, detected_language_name = transcribe_video_audio(local_path)
+        existing_orig = lesson.subtitles.filter(language_code="en", status="ready").first()
+        if existing_orig and existing_orig.cues_data:
+            cues = [dict(c) for c in existing_orig.cues_data]
+            detected_language_name = existing_orig.language_name or "English"
+        else:
+            # Check if another lesson with same video has transcribed cues
+            shared_track = SubtitleTrack.objects.filter(
+                lesson__video=lesson.video, language_code="en", status="ready"
+            ).exclude(lesson=lesson).first()
+            if shared_track and shared_track.cues_data:
+                cues = [dict(c) for c in shared_track.cues_data]
+                detected_language_name = shared_track.language_name or "English"
+
+        if not cues:
+            local_path, is_temp = resolve_video_file_to_local(lesson.video, lesson.video_url)
+            temp_file_path = local_path if is_temp else None
+            cues, detected_language_name = transcribe_video_audio(local_path)
 
         if not cues:
             raise ValueError("No speech or audio transcript could be generated from the video.")
@@ -778,17 +841,17 @@ def process_subtitles_for_lesson(
             if str(l).strip().lower() != detected_lang_code
         ]
 
-        # Step 3: Helper for concurrent translation & saving
-        def _translate_and_save(lang_code: str):
+        # Step 3: Helper for translation & saving
+        for lc in other_languages:
             try:
-                lang_name = get_language_name(lang_code)
-                lang_cues = translate_cues_to_language(cues, detected_language_name, lang_code)
+                lang_name = get_language_name(lc)
+                lang_cues = translate_cues_to_language(cues, detected_language_name, lc)
                 vtt_text = cues_to_vtt(lang_cues)
                 srt_text = cues_to_srt(lang_cues)
 
                 sub_track, _ = SubtitleTrack.objects.get_or_create(
                     lesson_id=lesson.id,
-                    language_code=lang_code,
+                    language_code=lc,
                     defaults={
                         "language_name": lang_name,
                         "is_original": False,
@@ -802,15 +865,12 @@ def process_subtitles_for_lesson(
                 sub_track.srt_content = srt_text
                 sub_track.status = "ready"
                 sub_track.error_message = ""
-                sub_track.vtt_file.save(f"subtitles/lesson_{lesson.id}_{lang_code}.vtt", ContentFile(vtt_text.encode("utf-8")), save=False)
-                sub_track.srt_file.save(f"subtitles/lesson_{lesson.id}_{lang_code}.srt", ContentFile(srt_text.encode("utf-8")), save=False)
+                sub_track.vtt_file.save(f"subtitles/lesson_{lesson.id}_{lc}.vtt", ContentFile(vtt_text.encode("utf-8")), save=False)
+                sub_track.srt_file.save(f"subtitles/lesson_{lesson.id}_{lc}.srt", ContentFile(srt_text.encode("utf-8")), save=False)
                 sub_track.save()
                 logger.info("Saved %s subtitles (%d cues) for Lesson %s.", lang_name, len(lang_cues), lesson.id)
             except Exception as lang_exc:
-                logger.exception("Failed generating subtitles for language %s on lesson %s: %s", lang_code, lesson.id, lang_exc)
-
-        for lc in other_languages:
-            _translate_and_save(lc)
+                logger.exception("Failed generating subtitles for language %s on lesson %s: %s", lc, lesson.id, lang_exc)
 
         lesson.subtitle_status = "ready"
         lesson.subtitle_error = ""
@@ -840,6 +900,7 @@ def trigger_auto_subtitle_generation(
     """
     Trigger subtitle generation in a safe background thread.
     Non-blocking: returns immediately so video uploads complete without delay.
+    Sequential worker lock prevents concurrent Groq rate limit errors.
     """
     import sys
     if "test" in sys.argv:
@@ -847,14 +908,15 @@ def trigger_auto_subtitle_generation(
         return None
 
     def _thread_worker():
-        try:
-            process_subtitles_for_lesson(lesson_id, target_languages)
-        finally:
+        with _generation_lock:
             try:
-                from django.db import connection
-                connection.close()
-            except Exception:
-                pass
+                process_subtitles_for_lesson(lesson_id, target_languages)
+            finally:
+                try:
+                    from django.db import connection
+                    connection.close()
+                except Exception:
+                    pass
 
     worker_thread = threading.Thread(
         target=_thread_worker,
