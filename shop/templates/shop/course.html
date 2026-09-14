@@ -966,26 +966,28 @@ button {
 }
 
 .cc-btn.active {
-    background: var(--brand-orange) !important;
-    border-color: var(--brand-orange) !important;
+    background: rgba(224, 79, 0, 0.2) !important;
+    border: 2px solid var(--brand-orange, #E04F00) !important;
     color: #ffffff !important;
+    box-shadow: 0 0 14px rgba(224, 79, 0, 0.45) !important;
 }
 
 .subtitle-menu {
     position: absolute;
-    bottom: 44px;
+    bottom: 48px;
     right: 0;
-    background: rgba(14, 16, 20, 0.96);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: var(--radius-md, 10px);
-    backdrop-filter: blur(12px);
+    background: rgba(12, 14, 18, 0.96);
+    border: 1.5px solid rgba(224, 79, 0, 0.45);
+    border-radius: var(--radius-md, 12px);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     display: none;
     flex-direction: column;
-    padding: 6px;
-    min-width: 175px;
-    max-height: 250px;
+    padding: 8px;
+    min-width: 190px;
+    max-height: 260px;
     overflow-y: auto;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.7), 0 0 16px rgba(224, 79, 0, 0.2);
     z-index: 25;
 }
 
@@ -1004,52 +1006,59 @@ button {
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    margin-bottom: 4px;
+    margin-bottom: 6px;
 }
 
 .subtitle-badge {
     background: rgba(224, 79, 0, 0.25);
     color: #ff7a29;
     font-size: 10px;
-    padding: 2px 6px;
+    padding: 2px 7px;
     border-radius: 10px;
     font-weight: 800;
+    border: 1px solid rgba(224, 79, 0, 0.4);
 }
 
 .subtitle-options-list {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
 }
 
 .subtitle-option {
-    padding: 7px 10px;
+    padding: 7px 11px;
     color: #e2e8f0;
     font-size: 12.5px;
     font-weight: 600;
     text-align: left;
-    border-radius: 6px;
+    border-radius: 7px;
+    border: 1.5px solid transparent;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: 8px;
-    transition: background 0.12s ease, color 0.12s ease;
+    transition: all 0.15s ease;
 }
 
 .subtitle-option:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(224, 79, 0, 0.12);
+    border-color: rgba(224, 79, 0, 0.4);
     color: #ffffff;
 }
 
 .subtitle-option.active {
-    background: var(--brand-orange);
+    background: rgba(224, 79, 0, 0.22);
+    border-color: var(--brand-orange, #E04F00);
     color: #ffffff;
+    font-weight: 700;
+    box-shadow: 0 0 10px rgba(224, 79, 0, 0.3);
 }
 
 .subtitle-option .check-mark {
     font-size: 11px;
     opacity: 0;
+    color: var(--brand-orange, #E04F00);
 }
 
 .subtitle-option.active .check-mark {
@@ -1058,7 +1067,7 @@ button {
 
 .video-subtitle-overlay {
     position: absolute;
-    bottom: 64px;
+    bottom: 68px;
     left: 4%;
     right: 4%;
     display: flex;
@@ -1074,19 +1083,19 @@ button {
 }
 
 .subtitle-cue-box {
-    display: inline-block;
-    max-width: 90%;
+    display: none;
+    max-width: 88%;
     background: transparent !important;
     background-color: transparent !important;
     color: #ffffff;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans", "Noto Sans Malayalam", "Noto Sans Devanagari", "Noto Sans Arabic", sans-serif;
-    font-size: 18.5px;
+    font-size: 18px;
     font-weight: 700;
     line-height: 1.45;
     letter-spacing: 0.2px;
-    padding: 0;
-    border-radius: 0;
-    border: none;
+    padding: 8px 22px;
+    border-radius: 12px;
+    border: 2px solid var(--brand-orange, #E04F00) !important;
     text-shadow:
         -1.5px -1.5px 0 #000,
         1.5px -1.5px 0 #000,
@@ -1094,7 +1103,7 @@ button {
         1.5px 1.5px 0 #000,
         0 2px 6px rgba(0, 0, 0, 0.95),
         0 0 10px rgba(0, 0, 0, 0.9);
-    box-shadow: none !important;
+    box-shadow: 0 0 18px rgba(224, 79, 0, 0.45), inset 0 0 8px rgba(224, 79, 0, 0.15), 0 4px 18px rgba(0, 0, 0, 0.5) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     pointer-events: none;
@@ -1103,13 +1112,16 @@ button {
     word-break: break-word;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.12s ease;
+    transform: scale(0.98);
+    transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
 .subtitle-cue-box.visible {
     opacity: 1 !important;
     visibility: visible !important;
     display: inline-block !important;
+    border: 2px solid var(--brand-orange, #E04F00) !important;
+    transform: scale(1);
 }
 
 .video-container:fullscreen .subtitle-cue-box,
@@ -1118,14 +1130,19 @@ button {
 .video-container:-ms-fullscreen .subtitle-cue-box,
 .video-container.is-fullscreen .subtitle-cue-box {
     font-size: 24px;
+    padding: 12px 28px;
+    border-radius: 16px;
+    border-width: 2.5px !important;
     letter-spacing: 0.25px;
 }
 
 @media (max-width: 640px) {
     .subtitle-cue-box {
-        font-size: 15px;
-        max-width: 95%;
-        padding: 0;
+        font-size: 14.5px;
+        max-width: 94%;
+        padding: 6px 14px;
+        border-radius: 9px;
+        border-width: 1.5px !important;
     }
 }
 
@@ -2701,8 +2718,23 @@ video::cue {
     if (ccButton) {
         ccButton.addEventListener("click", function(e) {
             e.stopPropagation();
-            subtitleMenu.classList.toggle("open");
-            speedMenu.classList.remove("open");
+            const isOpen = subtitleMenu.classList.contains("open");
+            if (!isOpen) {
+                subtitleMenu.classList.add("open");
+                speedMenu.classList.remove("open");
+                // If subtitles are currently off and tracks are available, automatically activate preferred or first language
+                if (selectedSubtitleLang === "off" && Array.isArray(currentSubtitles) && currentSubtitles.length > 0) {
+                    const savedLang = localStorage.getItem("clout_preferred_subtitle_lang");
+                    const targetSub = (savedLang && savedLang !== "off" && currentSubtitles.find(s => s.language_code === savedLang))
+                        || currentSubtitles.find(s => s.language_code === "en")
+                        || currentSubtitles[0];
+                    if (targetSub) {
+                        selectSubtitleLanguage(targetSub.language_code);
+                    }
+                }
+            } else {
+                subtitleMenu.classList.remove("open");
+            }
         });
     }
 
@@ -3091,10 +3123,10 @@ video::cue {
         const isPaused = video.paused || video.ended;
 
         // 1. Initial speech preview:
-        // When at or near the start (curTime <= 2.5s or curTime <= activeCueList[0].start + 0.8)
-        // ALWAYS return the first cue so the user sees the selected subtitle immediately upon clicking!
+        // If before first cue starts or paused near start, always show activeCueList[0]
         const firstStart = Number(activeCueList[0].start) || 0;
-        if (curTime <= Math.max(2.5, firstStart + 0.8)) {
+        const firstEnd = Number(activeCueList[0].end) || 2.5;
+        if (curTime < firstStart || (isPaused && curTime <= firstEnd)) {
             lastFoundCueIndex = 0;
             return activeCueList[0];
         }
