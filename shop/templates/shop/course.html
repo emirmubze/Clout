@@ -1075,19 +1075,27 @@ button {
 
 .subtitle-cue-box {
     display: inline-block;
-    max-width: 88%;
-    background: rgba(12, 14, 18, 0.88);
+    max-width: 90%;
+    background: transparent !important;
+    background-color: transparent !important;
     color: #ffffff;
-    font-size: 16.5px;
+    font-size: 17.5px;
     font-weight: 600;
     line-height: 1.45;
-    letter-spacing: 0.15px;
-    padding: 6px 14px;
-    border-radius: 7px;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
-    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    letter-spacing: 0.2px;
+    padding: 0;
+    border-radius: 0;
+    border: none;
+    text-shadow:
+        -1.5px -1.5px 0 #000,
+        1.5px -1.5px 0 #000,
+        -1.5px 1.5px 0 #000,
+        1.5px 1.5px 0 #000,
+        0 2px 5px rgba(0, 0, 0, 0.95),
+        0 0 8px rgba(0, 0, 0, 0.85);
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     pointer-events: none;
     user-select: none;
     white-space: pre-line;
@@ -1104,10 +1112,9 @@ button {
 
 @media (max-width: 640px) {
     .subtitle-cue-box {
-        font-size: 13.5px;
-        padding: 4px 10px;
-        max-width: 94%;
-        border-radius: 5px;
+        font-size: 14.5px;
+        max-width: 95%;
+        padding: 0;
     }
 }
 
