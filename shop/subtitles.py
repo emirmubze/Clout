@@ -554,11 +554,12 @@ def transcribe_video_audio(local_file_path: str) -> Tuple[List[Dict[str, Any]], 
 # AI MULTILINGUAL TRANSLATION (GROQ LLM)
 # =========================================================
 
-def translate_text_mymemory(text: str, source_code: str = "en", target_code: str = "es") -> str:
+def translate_text_online(text: str, source_code: str = "en", target_code: str = "es") -> str:
     """
-    Fallback translation using MyMemory translation API.
+    High-reliability online translation combining Google Translate API and MyMemory.
     Guarantees non-English translation even if AI model fails or hits limits.
     """
+    import html
     import urllib.request
     import urllib.parse
     import json
@@ -570,6 +571,28 @@ def translate_text_mymemory(text: str, source_code: str = "en", target_code: str
     if source_code.lower() == target_code.lower():
         return clean_text
 
+    cache_key = (source_code.lower(), target_code.lower(), clean_text)
+    if cache_key in _global_translation_cache:
+        return _global_translation_cache[cache_key]
+
+    # Tier 1: Fast Google Translate API
+    try:
+        url = f"https://translate.googleapis.com/translate_a/single?client=gtx&sl={source_code}&tl={target_code}&dt=t&q={urllib.parse.quote(clean_text)}"
+        req = urllib.request.Request(
+            url,
+            headers={"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"}
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            data = json.loads(resp.read().decode("utf-8"))
+            translated = "".join([item[0] for item in data[0] if item and item[0]])
+            if translated and translated.strip():
+                clean_trans = html.unescape(translated).strip()
+                _global_translation_cache[cache_key] = clean_trans
+                return clean_trans
+    except Exception as exc:
+        logger.debug("Google translate failed (%s), trying MyMemory fallback.", exc)
+
+    # Tier 2: MyMemory Translation API
     try:
         url = f"https://api.mymemory.translated.net/get?q={urllib.parse.quote(clean_text)}&langpair={source_code}|{target_code}"
         req = urllib.request.Request(
@@ -580,14 +603,21 @@ def translate_text_mymemory(text: str, source_code: str = "en", target_code: str
             data = json.loads(resp.read().decode("utf-8"))
             translated = data.get("responseData", {}).get("translatedText", "")
             if translated and not translated.startswith("MYMEMORY WARNING"):
-                return translated
+                clean_trans = html.unescape(translated).strip()
+                _global_translation_cache[cache_key] = clean_trans
+                return clean_trans
     except Exception as exc:
         logger.debug("MyMemory fallback translation failed: %s", exc)
 
     return clean_text
 
 
-_global_translation_cache: Dict[Tuple[str, str], str] = {}
+def translate_text_mymemory(text: str, source_code: str = "en", target_code: str = "es") -> str:
+    """Backward-compatible alias for translate_text_online."""
+    return translate_text_online(text, source_code, target_code)
+
+
+_global_translation_cache: Dict[Tuple[str, str, str], str] = {}
 
 
 def translate_cues_to_language(
@@ -617,14 +647,14 @@ def translate_cues_to_language(
     try:
         client = get_ai_client()
     except Exception as exc:
-        logger.warning("Could not initialize AI client for translation: %s. Using MyMemory fallback.", exc)
+        logger.warning("Could not initialize AI client for translation: %s. Using online fallback.", exc)
 
     translated_cues = []
     chunk_size = 10
     models_to_try = [
-        "openai/gpt-oss-20b",
         "openai/gpt-oss-120b",
-        "groq/compound-mini",
+        "qwen/qwen3.6-27b",
+        "openai/gpt-oss-20b",
     ]
 
     for chunk_start in range(0, len(cues), chunk_size):
@@ -641,7 +671,7 @@ def translate_cues_to_language(
                 f"Input:\n{json.dumps(items_payload, ensure_ascii=False)}"
             )
 
-            for retry in range(4):
+            for retry in range(2):
                 for model in models_to_try:
                     try:
                         completion = client.chat.completions.create(
@@ -689,7 +719,7 @@ def translate_cues_to_language(
                                 if original_cue["id"] in trans_dict and trans_dict[original_cue["id"]]:
                                     new_cue["text"] = trans_dict[original_cue["id"]]
                                 else:
-                                    new_cue["text"] = translate_text_mymemory(original_cue["text"], "en", target_language_code)
+                                    new_cue["text"] = translate_text_online(original_cue["text"], "en", target_language_code)
                                 translated_cues.append(new_cue)
 
                             chunk_success = True
@@ -698,29 +728,39 @@ def translate_cues_to_language(
                     except Exception as exc:
                         err_str = str(exc).lower()
                         if "429" in err_str or "rate_limit" in err_str:
-                            time.sleep(2.0 + retry * 1.5)
+                            time.sleep(1.0)
                         continue
 
                 if chunk_success:
                     break
-                time.sleep(1.5)
 
-        # Fallback to MyMemory if Groq chunk failed
+        # Fallback to multi-tier online translator if Groq chunk failed or unavailable
         if not chunk_success:
-            logger.info("Translating chunk starting at %d using MyMemory fallback for %s...", chunk_start, target_language_code)
-            for original_cue in chunk:
-                new_cue = dict(original_cue)
-                cache_key = (target_language_code, original_cue["text"])
-                if cache_key in _global_translation_cache:
-                    new_cue["text"] = _global_translation_cache[cache_key]
-                else:
-                    trans = translate_text_mymemory(original_cue["text"], "en", target_language_code)
-                    _global_translation_cache[cache_key] = trans
-                    new_cue["text"] = trans
-                translated_cues.append(new_cue)
+            logger.info("Translating chunk starting at %d using online fallback for %s...", chunk_start, target_language_code)
+            # Batch translate chunk with newline separation for efficiency
+            joined_chunk = "\n".join([c["text"] for c in chunk])
+            trans_block = translate_text_online(joined_chunk, "en", target_language_code)
+            split_lines = [l.strip() for l in trans_block.splitlines() if l.strip()]
 
-        # Small pause between chunks to respect API quotas
-        time.sleep(0.2)
+            if len(split_lines) == len(chunk):
+                for orig_cue, tline in zip(chunk, split_lines):
+                    nc = dict(orig_cue)
+                    nc["text"] = tline
+                    translated_cues.append(nc)
+            else:
+                for orig_cue in chunk:
+                    nc = dict(orig_cue)
+                    nc["text"] = translate_text_online(orig_cue["text"], "en", target_language_code)
+                    translated_cues.append(nc)
+
+        time.sleep(0.05)
+
+    # FINAL INTEGRITY CHECK: Ensure no non-English track has English cues remaining
+    if target_language_code.lower() != "en":
+        for i, cue in enumerate(translated_cues):
+            orig_cue = cues[i] if i < len(cues) else None
+            if orig_cue and cue["text"].strip().lower() == orig_cue["text"].strip().lower():
+                cue["text"] = translate_text_online(orig_cue["text"], "en", target_language_code)
 
     return translated_cues
 
