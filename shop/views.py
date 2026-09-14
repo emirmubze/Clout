@@ -2914,7 +2914,7 @@ def api_lesson_subtitles(request, lesson_id):
     lesson = get_object_or_404(Lesson, id=lesson_id)
 
     # Allow access if user is authenticated/staff or has course access
-    subtitles = lesson.subtitles.filter(status="ready").order_by("language_name")
+    subtitles = lesson.subtitles.filter(status="ready").order_by("-is_original", "language_name")
 
     return JsonResponse({
         "success": True,
@@ -2933,7 +2933,8 @@ def api_lesson_subtitles(request, lesson_id):
                 "is_original": sub.is_original,
                 "vtt_url": sub.vtt_public_url,
                 "srt_url": sub.srt_public_url,
-                "cues_count": len(sub.cues_data),
+                "cues_count": len(sub.cues_data or []),
+                "cues": sub.cues_data or [],
             }
             for sub in subtitles
         ],

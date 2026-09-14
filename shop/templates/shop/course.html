@@ -1059,8 +1059,8 @@ button {
 .video-subtitle-overlay {
     position: absolute;
     bottom: 64px;
-    left: 5%;
-    right: 5%;
+    left: 4%;
+    right: 4%;
     display: flex;
     justify-content: center;
     text-align: center;
@@ -1075,27 +1075,41 @@ button {
 
 .subtitle-cue-box {
     display: inline-block;
-    max-width: 90%;
-    background: transparent;
+    max-width: 88%;
+    background: rgba(12, 14, 18, 0.88);
     color: #ffffff;
-    font-size: 17px;
-    font-weight: 700;
+    font-size: 16.5px;
+    font-weight: 600;
     line-height: 1.45;
-    letter-spacing: 0.2px;
-    padding: 0;
-    border-radius: 0;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.95), 0 0 3px rgba(0, 0, 0, 0.95), 0 0 10px rgba(0, 0, 0, 0.85);
-    box-shadow: none;
+    letter-spacing: 0.15px;
+    padding: 6px 14px;
+    border-radius: 7px;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     pointer-events: none;
     user-select: none;
     white-space: pre-line;
     word-break: break-word;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(2px);
+    transition: opacity 0.12s ease, transform 0.12s ease;
+}
+
+.subtitle-cue-box.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
 }
 
 @media (max-width: 640px) {
     .subtitle-cue-box {
-        font-size: 14px;
-        padding: 0;
+        font-size: 13.5px;
+        padding: 4px 10px;
+        max-width: 94%;
+        border-radius: 5px;
     }
 }
 
@@ -1770,7 +1784,9 @@ video::cue {
 
                 <!-- Overlays -->
                 <div class="video-bottom-overlay"></div>
-                <div class="video-subtitle-overlay" id="subtitleOverlay"></div>
+                <div class="video-subtitle-overlay" id="subtitleOverlay">
+                    <div class="subtitle-cue-box" id="subtitleCueBox"></div>
+                </div>
 
                 <!-- Progress Bar -->
                 <div class="video-progress" id="progressArea">
@@ -2102,6 +2118,7 @@ video::cue {
     const subtitleOptionsList = document.getElementById("subtitleOptionsList");
     const subtitleCountBadge = document.getElementById("subtitleCountBadge");
     const subtitleOverlay = document.getElementById("subtitleOverlay");
+    const subtitleCueBox = document.getElementById("subtitleCueBox");
 
     const resumeButton = document.getElementById("resumeButton");
     const resumeText = document.getElementById("resumeText");
@@ -2128,6 +2145,7 @@ video::cue {
     let selectedSubtitleLang = localStorage.getItem("clout_preferred_subtitle_lang") || "off";
     let activeCueList = [];
     let currentRenderedCueText = "";
+    let lastFoundCueIndex = -1;
 
     /* =========================================================
        HELPERS: TIME FORMAT & EMBED DETECTION
@@ -2751,7 +2769,13 @@ video::cue {
         currentSubtitles = [];
         activeCueList = [];
         currentRenderedCueText = "";
-        if (subtitleOverlay) subtitleOverlay.innerHTML = "";
+        lastFoundCueIndex = -1;
+
+        const box = subtitleCueBox || document.getElementById("subtitleCueBox");
+        if (box) {
+            box.classList.remove("visible");
+            box.textContent = "";
+        }
         video.querySelectorAll("track").forEach(t => t.remove());
 
         if (!lessonId) {
@@ -2838,8 +2862,8 @@ video::cue {
                 nativeSubtitleTrack.mode = "disabled";
             } else {
                 // When in PiP mode, native track MUST be "showing" to render directly inside the OS PiP window
-                // When in normal player mode, mode is "hidden" so custom styled overlay renders cleanly
-                nativeSubtitleTrack.mode = inPip ? "showing" : "hidden";
+                // When in normal player mode, mode is "disabled" or "hidden" so custom styled overlay renders cleanly
+                nativeSubtitleTrack.mode = inPip ? "showing" : "disabled";
             }
         }
 
@@ -2847,15 +2871,19 @@ video::cue {
         if (video.textTracks && video.textTracks.length) {
             for (let i = 0; i < video.textTracks.length; i++) {
                 const t = video.textTracks[i];
-                if (t === nativeSubtitleTrack) continue;
+                if (t === nativeSubtitleTrack && inPip && hasActiveSub) continue;
                 t.mode = "disabled";
             }
         }
 
         // Handle DOM overlay visibility in PiP
+        const box = subtitleCueBox || document.getElementById("subtitleCueBox");
         if (subtitleOverlay) {
             if (inPip || !hasActiveSub) {
-                subtitleOverlay.innerHTML = "";
+                if (box) {
+                    box.classList.remove("visible");
+                    box.textContent = "";
+                }
                 currentRenderedCueText = "";
                 subtitleOverlay.style.visibility = inPip ? "hidden" : "visible";
             } else {
@@ -2911,8 +2939,14 @@ video::cue {
         if (langCode === "off") {
             activeCueList = [];
             currentRenderedCueText = "";
+            lastFoundCueIndex = -1;
+
+            const box = subtitleCueBox || document.getElementById("subtitleCueBox");
+            if (box) {
+                box.classList.remove("visible");
+                box.textContent = "";
+            }
             if (subtitleOverlay) {
-                subtitleOverlay.innerHTML = "";
                 subtitleOverlay.style.visibility = "visible";
             }
             if (nativeSubtitleTrack) {
@@ -2940,11 +2974,66 @@ video::cue {
         if (ccButton) ccButton.classList.add("active");
         video.querySelectorAll("track").forEach(t => t.remove());
 
-        activeCueList = await parseVttFromUrl(track.vtt_url);
+        // Instant in-memory loading if cues are already provided by the API
+        if (Array.isArray(track.cues) && track.cues.length > 0) {
+            activeCueList = track.cues;
+        } else if (track.vtt_url) {
+            activeCueList = await parseVttFromUrl(track.vtt_url);
+        } else {
+            activeCueList = [];
+        }
+
+        lastFoundCueIndex = -1;
         currentRenderedCueText = "";
 
         setupNativeTextTrack(track, activeCueList);
         syncSubtitleMode();
+        updateSubtitleDisplay();
+    }
+
+    function findActiveCue(curTime) {
+        if (!activeCueList || !activeCueList.length) return null;
+
+        // 1. Direct match check at cached index
+        if (lastFoundCueIndex >= 0 && lastFoundCueIndex < activeCueList.length) {
+            const c = activeCueList[lastFoundCueIndex];
+            if (curTime >= c.start && curTime <= c.end) {
+                return c;
+            }
+            // Check consecutive next cue
+            if (lastFoundCueIndex + 1 < activeCueList.length) {
+                const nextC = activeCueList[lastFoundCueIndex + 1];
+                if (curTime >= nextC.start && curTime <= nextC.end) {
+                    lastFoundCueIndex = lastFoundCueIndex + 1;
+                    return nextC;
+                }
+            }
+        }
+
+        // 2. Full scan for direct match
+        for (let i = 0; i < activeCueList.length; i++) {
+            const c = activeCueList[i];
+            if (curTime >= c.start && curTime <= c.end) {
+                lastFoundCueIndex = i;
+                return c;
+            }
+        }
+
+        // 3. Smooth Gap Bridging:
+        // Whisper speech transcripts have natural 0.05s-0.35s micro-gaps between sentences.
+        // Holding the previous cue during these micro-pauses completely eliminates subtitle flickering/blinking.
+        if (lastFoundCueIndex >= 0 && lastFoundCueIndex < activeCueList.length) {
+            const prevCue = activeCueList[lastFoundCueIndex];
+            const gap = curTime - prevCue.end;
+            if (gap > 0 && gap <= 0.35) {
+                const nextCue = (lastFoundCueIndex + 1 < activeCueList.length) ? activeCueList[lastFoundCueIndex + 1] : null;
+                if (!nextCue || (nextCue.start - prevCue.end) <= 0.6) {
+                    return prevCue;
+                }
+            }
+        }
+
+        return null;
     }
 
     function updateSubtitleDisplay() {
@@ -2952,29 +3041,36 @@ video::cue {
         if (isPipActive()) {
             return; // In PiP mode, native TextTrack renders cues inside PiP window
         }
+
+        const box = subtitleCueBox || document.getElementById("subtitleCueBox");
+
         if (selectedSubtitleLang === "off" || !activeCueList || !activeCueList.length) {
-            if (currentRenderedCueText !== "") {
-                subtitleOverlay.innerHTML = "";
-                currentRenderedCueText = "";
+            if (box && currentRenderedCueText !== "") {
+                box.classList.remove("visible");
+                box.textContent = "";
             }
+            currentRenderedCueText = "";
             return;
         }
 
         const curTime = video.currentTime;
-        const activeCue = activeCueList.find(c => curTime >= c.start && curTime <= c.end);
-        const targetText = (activeCue && activeCue.text) ? activeCue.text : "";
+        const activeCue = findActiveCue(curTime);
+        const targetText = (activeCue && activeCue.text) ? String(activeCue.text).trim() : "";
 
-        // If the cue text has not changed, avoid touching the DOM to prevent blinking
+        // Avoid touching DOM if the displayed text hasn't changed
         if (targetText === currentRenderedCueText) {
             return;
         }
 
         currentRenderedCueText = targetText;
 
-        if (targetText) {
-            subtitleOverlay.innerHTML = `<div class="subtitle-cue-box">${escapeHtml(targetText)}</div>`;
-        } else {
-            subtitleOverlay.innerHTML = "";
+        if (box) {
+            if (targetText) {
+                box.textContent = targetText;
+                box.classList.add("visible");
+            } else {
+                box.classList.remove("visible");
+            }
         }
     }
 

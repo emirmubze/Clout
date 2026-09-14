@@ -48,6 +48,13 @@ DEFAULT_TARGET_LANGUAGES: List[str] = [
     "es",
     "de",
     "ja",
+    "pt",
+    "ru",
+    "zh",
+    "it",
+    "te",
+    "bn",
+    "ko",
 ]
 
 
@@ -562,6 +569,8 @@ def translate_cues_to_language(
     """
     Translate subtitle cues into the target language preserving cue IDs and timings.
     """
+    import time
+
     target_lang_name = get_language_name(target_language_code)
     target_lang_native = SUPPORTED_LANGUAGES.get(target_language_code, {}).get("native", target_lang_name)
 
@@ -581,76 +590,91 @@ def translate_cues_to_language(
         return [dict(c) for c in cues]
 
     translated_cues = []
-    chunk_size = 50
+    chunk_size = 15
+    models_to_try = [
+        "openai/gpt-oss-120b",
+        "openai/gpt-oss-20b",
+        "qwen/qwen3.8-27b",
+        "groq/compound-mini",
+    ]
 
     for chunk_start in range(0, len(cues), chunk_size):
         chunk = cues[chunk_start:chunk_start + chunk_size]
         items_payload = [{"id": c["id"], "text": c["text"]} for c in chunk]
 
         prompt = (
-            f"You are a professional video subtitle and media translator. "
-            f"Translate the following subtitle cues accurately from {source_language_name} into {target_lang_name} ({target_lang_native}).\n\n"
-            f"CRITICAL RULES:\n"
-            f"1. Preserve the EXACT same cue 'id' numbers.\n"
-            f"2. Translate naturally and accurately for spoken video dialogue.\n"
-            f"3. Return ONLY a valid JSON array of objects with keys 'id' and 'text'.\n"
-            f"4. Do NOT wrap in markdown explanation, only raw JSON or ```json markdown block.\n\n"
-            f"Input Cues:\n{json.dumps(items_payload, ensure_ascii=False, indent=2)}"
+            f"Translate the following video subtitle dialogue from {source_language_name} into {target_lang_name} ({target_lang_native}).\n"
+            f"Output a valid JSON array of objects with keys 'id' and 'text'.\n"
+            f"Maintain the exact same 'id' numbers.\n"
+            f"Translate into natural, conversational {target_lang_name} ({target_lang_native}).\n\n"
+            f"Input:\n{json.dumps(items_payload, ensure_ascii=False)}"
         )
 
-        try:
-            models_to_try = [
-                "openai/gpt-oss-20b",
-                "groq/compound-mini",
-                "openai/gpt-oss-120b",
-                "llama-3.3-70b-versatile",
-                "llama-3.1-8b-instant",
-            ]
-            completion = None
-            for m in models_to_try:
+        chunk_success = False
+
+        for retry in range(4):
+            for model in models_to_try:
                 try:
                     completion = client.chat.completions.create(
-                        model=m,
+                        model=model,
                         messages=[
-                            {"role": "system", "content": f"You are an expert subtitle translator specialized in {target_lang_name}. Return valid JSON only."},
+                            {
+                                "role": "system",
+                                "content": (
+                                    f"You are a professional subtitle translator for {target_lang_name} ({target_lang_native}). "
+                                    f"You MUST respond with ONLY a valid JSON array containing translated cues with 'id' and 'text'."
+                                ),
+                            },
                             {"role": "user", "content": prompt}
                         ],
-                        temperature=0.2,
-                        max_tokens=4096,
+                        temperature=0.1,
+                        max_tokens=800,
                     )
-                    if completion and completion.choices:
+                    if not completion or not completion.choices:
+                        continue
+
+                    raw_text = completion.choices[0].message.content.strip()
+                    cleaned_text = re.sub(r"<think>.*?</think>", "", raw_text, flags=re.DOTALL).strip()
+                    cleaned_text = re.sub(r"^```(?:json)?\s*", "", cleaned_text, flags=re.MULTILINE)
+                    cleaned_text = re.sub(r"\s*```$", "", cleaned_text, flags=re.MULTILINE).strip()
+
+                    try:
+                        translated_items = json.loads(cleaned_text)
+                    except Exception:
+                        json_match = re.search(r"\[\s*\{.*\}\s*\]", cleaned_text, re.DOTALL)
+                        if json_match:
+                            translated_items = json.loads(json_match.group(0))
+                        else:
+                            continue
+
+                    if isinstance(translated_items, list) and len(translated_items) > 0:
+                        trans_dict = {
+                            int(item["id"]): str(item["text"]).strip()
+                            for item in translated_items
+                            if isinstance(item, dict) and "id" in item and "text" in item
+                        }
+
+                        for original_cue in chunk:
+                            new_cue = dict(original_cue)
+                            if original_cue["id"] in trans_dict and trans_dict[original_cue["id"]]:
+                                new_cue["text"] = trans_dict[original_cue["id"]]
+                            translated_cues.append(new_cue)
+
+                        chunk_success = True
                         break
-                except Exception:
+
+                except Exception as exc:
+                    err_str = str(exc).lower()
+                    if "429" in err_str or "rate_limit" in err_str:
+                        time.sleep(2.0)
                     continue
 
-            if not completion or not completion.choices:
-                raise RuntimeError(f"Could not translate to {target_lang_name} using available models.")
+            if chunk_success:
+                break
+            time.sleep(1.5)
 
-            raw_text = completion.choices[0].message.content.strip()
-
-            cleaned_text = re.sub(r"<think>.*?</think>", "", raw_text, flags=re.DOTALL).strip()
-            cleaned_text = re.sub(r"^```(?:json)?\s*", "", cleaned_text, flags=re.MULTILINE)
-            cleaned_text = re.sub(r"\s*```$", "", cleaned_text, flags=re.MULTILINE).strip()
-
-            try:
-                translated_items = json.loads(cleaned_text)
-            except Exception:
-                json_match = re.search(r"\[\s*\{.*\}\s*\]", cleaned_text, re.DOTALL)
-                if json_match:
-                    translated_items = json.loads(json_match.group(0))
-                else:
-                    raise
-
-            trans_dict = {int(item["id"]): str(item["text"]).strip() for item in translated_items if isinstance(item, dict) and "id" in item and "text" in item}
-
-            for original_cue in chunk:
-                new_cue = dict(original_cue)
-                if original_cue["id"] in trans_dict and trans_dict[original_cue["id"]]:
-                    new_cue["text"] = trans_dict[original_cue["id"]]
-                translated_cues.append(new_cue)
-
-        except Exception as exc:
-            logger.warning("LLM translation for chunk failed (%s). Falling back to original cue texts.", exc)
+        if not chunk_success:
+            logger.warning("LLM translation for chunk starting at %d failed. Using original cue texts.", chunk_start)
             for original_cue in chunk:
                 translated_cues.append(dict(original_cue))
 
