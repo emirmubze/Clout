@@ -3130,15 +3130,10 @@ video::cue {
     function findActiveCue(curTime) {
         if (!activeCueList || !activeCueList.length) return null;
 
-        const isPaused = video.paused || video.ended;
-
-        // 1. Initial speech preview:
-        // If before first cue starts or paused near start, always show activeCueList[0]
+        // 1. If playback time is before the very first cue, no subtitle
         const firstStart = Number(activeCueList[0].start) || 0;
-        const firstEnd = Number(activeCueList[0].end) || 2.5;
-        if (curTime < firstStart || (isPaused && curTime <= firstEnd)) {
-            lastFoundCueIndex = 0;
-            return activeCueList[0];
+        if (curTime < firstStart) {
+            return null;
         }
 
         // 2. Binary search for exact active cue or closest preceding cue
@@ -3162,7 +3157,7 @@ video::cue {
             }
         }
 
-        // 3. Gap bridging:
+        // 3. Dialogue gap bridging during active playback:
         if (candidateIdx >= 0 && candidateIdx < activeCueList.length) {
             const prevCue = activeCueList[candidateIdx];
             const prevEnd = Number(prevCue.end) || 0;
@@ -3170,36 +3165,17 @@ video::cue {
             const nextCue = (candidateIdx + 1 < activeCueList.length) ? activeCueList[candidateIdx + 1] : null;
             const nextStart = nextCue ? (Number(nextCue.start) || 0) : Infinity;
 
-            if (isPaused) {
-                // When paused, always keep cue visible for studying/reading
-                if (nextCue && Math.abs(curTime - nextStart) < Math.abs(curTime - prevEnd) && Math.abs(curTime - nextStart) <= 3.0) {
-                    lastFoundCueIndex = candidateIdx + 1;
-                    return nextCue;
-                }
-                lastFoundCueIndex = candidateIdx;
-                return prevCue;
-            } else {
-                // Flicker-Free Continuous Subtitles during playback:
-                // If next phrase begins within 2.2 seconds, hold prevCue seamlessly until nextCue starts.
-                // This guarantees zero flickering or blinking between sentences.
-                if (nextCue && (nextStart - prevEnd) <= 2.2) {
-                    if (curTime < nextStart) {
-                        lastFoundCueIndex = candidateIdx;
-                        return prevCue;
-                    }
-                } else if (gap >= 0 && gap <= 1.2) {
-                    // During longer pauses/silence (>2.2s), let prevCue linger for 1.2s to finish reading
+            // Flicker-Free Continuous Subtitles during playback:
+            // If next phrase begins within 2.2 seconds, hold prevCue seamlessly until nextCue starts.
+            if (nextCue && (nextStart - prevEnd) <= 2.2) {
+                if (curTime < nextStart) {
                     lastFoundCueIndex = candidateIdx;
                     return prevCue;
                 }
-            }
-        }
-
-        // 4. Edge case: within 2.5s before first cue
-        if (candidateIdx === -1 && activeCueList.length > 0) {
-            if (curTime < firstStart && (firstStart - curTime) <= 2.5) {
-                lastFoundCueIndex = 0;
-                return activeCueList[0];
+            } else if (gap >= 0 && gap <= 1.0) {
+                // During longer pauses/silence (>2.2s), let prevCue linger for 1.0s before fading
+                lastFoundCueIndex = candidateIdx;
+                return prevCue;
             }
         }
 
@@ -3215,7 +3191,8 @@ video::cue {
         const box = subtitleCueBox || document.getElementById("subtitleCueBox");
         if (!box) return;
 
-        if (selectedSubtitleLang === "off" || !activeCueList || !activeCueList.length) {
+        // Hide subtitles when paused, ended, subtitles switched off, or no cues available
+        if (video.paused || video.ended || selectedSubtitleLang === "off" || !activeCueList || !activeCueList.length) {
             if (currentRenderedCueText !== "" || box.classList.contains("visible")) {
                 box.classList.remove("visible");
                 box.textContent = "";
