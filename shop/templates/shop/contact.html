@@ -14,18 +14,16 @@
 <link rel="canonical" href="https://clout.courses/contact/">
 
 <!-- Favicon / Site Icon (Google Search, Browsers, iOS, PWA) -->
-<link rel="icon" type="image/png" href="/favicon.png">
-<link rel="apple-touch-icon" href="/favicon.png">
-<link rel="icon" type="image/png" sizes="512x512" href="{% static 'favicon-512x512.png' %}">
-<link rel="icon" type="image/png" sizes="192x192" href="{% static 'favicon-192x192.png' %}">
-<link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicon-48x48.png' %}">
-<link rel="icon" type="image/png" sizes="96x96" href="{% static 'favicon-96x96.png' %}">
-<link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}">
-<link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}">
-<link rel="icon" type="image/x-icon" href="/favicon.ico">
-<link rel="shortcut icon" href="/favicon.ico">
-<link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}">
-<link rel="manifest" href="{% static 'site.webmanifest' %}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon-32x32.png' %}?v=5">
+    <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon-16x16.png' %}?v=5">
+    <link rel="icon" type="image/png" sizes="48x48" href="{% static 'favicon-48x48.png' %}?v=5">
+    <link rel="icon" type="image/png" sizes="96x96" href="{% static 'favicon-96x96.png' %}?v=5">
+    <link rel="icon" type="image/png" sizes="192x192" href="{% static 'favicon-192x192.png' %}?v=5">
+    <link rel="icon" type="image/png" sizes="512x512" href="{% static 'favicon-512x512.png' %}?v=5">
+    <link rel="icon" type="image/png" href="/favicon.png?v=5">
+    <link rel="apple-touch-icon" sizes="180x180" href="{% static 'apple-touch-icon.png' %}?v=5">
+    <link rel="shortcut icon" href="/favicon.ico?v=5">
+    <link rel="manifest" href="{% static 'site.webmanifest' %}">
 
 <!-- Open Graph / Facebook -->
 <meta property="og:locale" content="en_US">
@@ -40,6 +38,8 @@
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Support & Contact — CLOUT">
+<link rel="image_src" href="https://clout.courses/static/og-image.png?v=3">
+<meta name="thumbnail" content="https://clout.courses/static/og-image.png?v=3">
 
 <!-- Twitter -->
 <meta name="twitter:card" content="summary_large_image">
@@ -139,12 +139,10 @@ body {
 }
 
 .logo-img {
-    height: 36px;
-    width: 36px;
-    border-radius: 50%;
-    object-fit: cover;
-    display: block;
-    box-shadow: 0 0 10px rgba(224, 79, 0, 0.2);
+    height: 28px;
+            width: auto;
+            object-fit: contain;
+            display: block;
 }
 
 .back-home {
@@ -426,7 +424,7 @@ body {
 <nav class="navbar">
     <div class="nav-container">
         <a href="{% url 'index' %}" class="logo" aria-label="CLOUT Home">
-            <img src="{% static 'logo-circle.png' %}" alt="CLOUT" class="logo-img">
+            <img src="{% static 'logo.png' %}" alt="CLOUT" class="logo-img">
         </a>
         <a href="{% url 'index' %}" class="back-home">
             <span>Home</span>
