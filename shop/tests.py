@@ -1385,8 +1385,8 @@ class SeoOptimizationTests(TestCase):
         self.assertContains(response, '<link rel="icon" type="image/png" sizes="48x48" href="/static/favicon-48x48.png">')
         self.assertContains(response, '<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">')
         self.assertContains(response, '<link rel="manifest" href="/static/site.webmanifest">')
-        self.assertContains(response, '<meta property="og:image" content="https://clout.courses/static/og-image.png?v=2">')
-        self.assertContains(response, '<meta name="twitter:image" content="https://clout.courses/static/og-image.png?v=2">')
+        self.assertContains(response, '<meta property="og:image" content="https://clout.courses/static/og-image.png?v=3">')
+        self.assertContains(response, '<meta name="twitter:image" content="https://clout.courses/static/og-image.png?v=3">')
 
 
 class SubtitleSystemTests(TestCase):

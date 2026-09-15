@@ -34,8 +34,8 @@
 <meta property="og:description" content="Have a question or need assistance with your CLOUT course? Contact us or connect with our AI assistant.">
 <meta property="og:url" content="https://clout.courses/contact/">
 <meta property="og:site_name" content="CLOUT">
-<meta property="og:image" content="https://clout.courses/static/og-image.png?v=2">
-<meta property="og:image:secure_url" content="https://clout.courses/static/og-image.png?v=2">
+<meta property="og:image" content="https://clout.courses/static/og-image.png?v=3">
+<meta property="og:image:secure_url" content="https://clout.courses/static/og-image.png?v=3">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -45,7 +45,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Support & Contact — CLOUT">
 <meta name="twitter:description" content="Have a question or need assistance with your CLOUT course? Contact us or connect with our AI assistant.">
-<meta name="twitter:image" content="https://clout.courses/static/og-image.png?v=2">
+<meta name="twitter:image" content="https://clout.courses/static/og-image.png?v=3">
 
 <!-- Schema.org JSON-LD -->
 <script type="application/ld+json">
@@ -139,10 +139,12 @@ body {
 }
 
 .logo-img {
-    height: 28px;
-    width: auto;
-    object-fit: contain;
+    height: 36px;
+    width: 36px;
+    border-radius: 50%;
+    object-fit: cover;
     display: block;
+    box-shadow: 0 0 10px rgba(224, 79, 0, 0.2);
 }
 
 .back-home {
@@ -424,7 +426,7 @@ body {
 <nav class="navbar">
     <div class="nav-container">
         <a href="{% url 'index' %}" class="logo" aria-label="CLOUT Home">
-            <img src="{% static 'logo.png' %}" alt="CLOUT" class="logo-img">
+            <img src="{% static 'logo-circle.png' %}" alt="CLOUT" class="logo-img">
         </a>
         <a href="{% url 'index' %}" class="back-home">
             <span>Home</span>

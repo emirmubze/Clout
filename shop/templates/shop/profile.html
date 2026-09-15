@@ -97,10 +97,12 @@ body {
 }
 
 .logo-img {
-    height: 28px;
-    width: auto;
-    object-fit: contain;
+    height: 36px;
+    width: 36px;
+    border-radius: 50%;
+    object-fit: cover;
     display: block;
+    box-shadow: 0 0 10px rgba(224, 79, 0, 0.2);
 }
 
 .back-home {
@@ -410,7 +412,7 @@ body {
 <nav class="navbar">
     <div class="nav-container">
         <a href="{% url 'index' %}" class="logo" aria-label="CLOUT Home">
-            <img src="{% static 'logo.png' %}" alt="CLOUT" class="logo-img">
+            <img src="{% static 'logo-circle.png' %}" alt="CLOUT" class="logo-img">
         </a>
         <a href="{% url 'index' %}" class="back-home">
             <span>Home</span>

@@ -26,8 +26,8 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="{% if course %}{{ course.title }}{% else %}Course Player{% endif %} — CLOUT">
 <meta property="og:description" content="Access and stream your CLOUT training modules, downloadable tools, and AI income lessons.">
-<meta property="og:image" content="https://clout.courses/static/og-image.png?v=2">
-<meta property="og:image:secure_url" content="https://clout.courses/static/og-image.png?v=2">
+<meta property="og:image" content="https://clout.courses/static/og-image.png?v=3">
+<meta property="og:image:secure_url" content="https://clout.courses/static/og-image.png?v=3">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -37,7 +37,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="{% if course %}{{ course.title }}{% else %}Course Player{% endif %} — CLOUT">
 <meta name="twitter:description" content="Access and stream your CLOUT training modules, downloadable tools, and AI income lessons.">
-<meta name="twitter:image" content="https://clout.courses/static/og-image.png?v=2">
+<meta name="twitter:image" content="https://clout.courses/static/og-image.png?v=3">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -138,10 +138,12 @@ button {
 }
 
 .logo-img {
-    height: 28px;
-    width: auto;
-    object-fit: contain;
+    height: 36px;
+    width: 36px;
+    border-radius: 50%;
+    object-fit: cover;
     display: block;
+    box-shadow: 0 0 10px rgba(224, 79, 0, 0.2);
 }
 
 .logo-badge {
@@ -1888,7 +1890,7 @@ video::cue {
 <header class="header">
     <div class="header-inner">
         <a href="{% url 'index' %}" class="logo" aria-label="CLOUT Home">
-            <img src="{% static 'logo.png' %}" alt="CLOUT" class="logo-img">
+            <img src="{% static 'logo-circle.png' %}" alt="CLOUT" class="logo-img">
         </a>
 
         <nav class="nav">
@@ -3019,27 +3021,25 @@ video::cue {
             const data = await resp.json();
             const isProcessing = data.subtitle_status === "processing";
 
-            if (data.success && Array.isArray(data.subtitles) && !isProcessing) {
+            if (data.success && Array.isArray(data.subtitles)) {
                 currentSubtitles = data.subtitles;
             } else {
                 currentSubtitles = [];
             }
 
             if (isProcessing && currentLoadedLessonId === lessonId) {
-                renderSubtitleOptions(true);
-                syncButtonActiveStates();
+                // Poll in background until complete, but keep UI clean with "Off" and available languages
                 subtitlePollTimer = setTimeout(() => {
                     if (currentLoadedLessonId === lessonId) {
                         loadLessonSubtitles(lessonId);
                     }
                 }, 2500);
-                return; // Do NOT show or play subtitles while still being generated
             }
         } catch (err) {
             console.warn("Could not load subtitles for lesson:", err);
         }
 
-        renderSubtitleOptions(false);
+        renderSubtitleOptions();
 
         if (selectedSubtitleLang && selectedSubtitleLang !== "off") {
             const match = currentSubtitles.find(s => s.language_code === selectedSubtitleLang);
@@ -3058,18 +3058,10 @@ video::cue {
         }
     }
 
-    function renderSubtitleOptions(isGenerating = false) {
+    function renderSubtitleOptions() {
         if (!subtitleOptionsList || !subtitleCountBadge) return;
         subtitleOptionsList.innerHTML = "";
-        subtitleCountBadge.textContent = isGenerating ? "..." : currentSubtitles.length;
-
-        if (isGenerating) {
-            const genMsg = document.createElement("div");
-            genMsg.style.cssText = "padding:10px; font-size:12px; color:#ff9800; display:flex; align-items:center; gap:8px; font-weight:600;";
-            genMsg.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <span>Generating subtitles...</span>`;
-            subtitleOptionsList.appendChild(genMsg);
-            return;
-        }
+        subtitleCountBadge.textContent = currentSubtitles.length;
 
         // "Off" option
         const offOption = document.createElement("div");
