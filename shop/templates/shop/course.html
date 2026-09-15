@@ -49,22 +49,22 @@
    VARIABLES & RESET
 ========================================================= */
 :root {
-    --brand-orange: #E04F00;
-    --brand-orange-hover: #ff5a00;
-    --brand-orange-light: #fff1e8;
-    --dark-bg: #0c0d0e;
-    --dark-card: #141618;
-    --page-bg: #FBF8F4;
-    --surface: #ffffff;
-    --text-primary: #111827;
-    --text-muted: #6b7280;
-    --border-color: #e5e7eb;
+    --brand-orange: #FF5500;
+    --brand-orange-hover: #ff6a1a;
+    --brand-orange-light: rgba(255, 85, 0, 0.14);
+    --dark-bg: #000000;
+    --dark-card: #101118;
+    --page-bg: #000000;
+    --surface: #101118;
+    --text-primary: #ffffff;
+    --text-muted: #94a3b8;
+    --border-color: rgba(255, 255, 255, 0.08);
     --font-main: "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    --radius-lg: 14px;
-    --radius-md: 10px;
+    --radius-lg: 12px;
+    --radius-md: 8px;
     --radius-sm: 6px;
-    --shadow-soft: 0 4px 20px rgba(0, 0, 0, 0.06);
-    --shadow-card: 0 10px 30px rgba(0, 0, 0, 0.12);
+    --shadow-soft: 0 4px 24px rgba(0, 0, 0, 0.4);
+    --shadow-card: 0 12px 40px rgba(0, 0, 0, 0.6);
 }
 
 * {
@@ -83,8 +83,8 @@ html, body {
 }
 
 body {
-    background: var(--page-bg);
-    color: var(--text-primary);
+    background: #000000;
+    color: #ffffff;
     font-family: var(--font-main);
     -webkit-font-smoothing: antialiased;
 }
@@ -1428,28 +1428,28 @@ video::cue {
    SIDEBAR
 ========================================================= */
 .sidebar {
-    position: relative;
-    top: 0;
-    background: var(--surface);
-    border: 1px solid var(--border-color);
+    position: sticky;
+    top: 80px;
+    background: #101118;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-lg);
     overflow: hidden;
-    box-shadow: var(--shadow-soft);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
-    max-height: none;
+    max-height: calc(100vh - 100px);
 }
 
 .sidebar-header {
-    padding: 20px;
-    border-bottom: 1px solid var(--border-color);
-    background: #faf9f7;
+    padding: 18px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    background: #141622;
 }
 
 .sidebar-header h2 {
-    font-size: 17px;
-    font-weight: 800;
-    color: var(--text-primary);
+    font-size: 16px;
+    font-weight: 700;
+    color: #ffffff;
     margin-bottom: 6px;
 }
 
@@ -1458,24 +1458,24 @@ video::cue {
     align-items: center;
     justify-content: space-between;
     font-size: 12px;
-    color: var(--text-muted);
+    color: #94a3b8;
     font-weight: 500;
     margin-bottom: 10px;
 }
 
 .course-progress-bar {
     width: 100%;
-    height: 6px;
-    background: #e5e7eb;
-    border-radius: 10px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
     overflow: hidden;
 }
 
 .course-progress-fill {
     height: 100%;
-    background: #16a34a;
+    background: #10b981;
     width: 0%;
-    border-radius: 10px;
+    border-radius: 6px;
     transition: width 0.3s ease;
 }
 
@@ -1489,15 +1489,15 @@ video::cue {
     width: 6px;
 }
 .modules-list::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: rgba(255, 255, 255, 0.02);
 }
 .modules-list::-webkit-scrollbar-thumb {
-    background: #d1d5db;
+    background: rgba(255, 255, 255, 0.16);
     border-radius: 4px;
 }
 
 .module {
-    border-bottom: 1px solid #f0f0f0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .module:last-child {
@@ -1505,22 +1505,22 @@ video::cue {
 }
 
 .module-header {
-    padding: 14px 18px;
+    padding: 13px 18px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
-    background: #ffffff;
+    background: #12141c;
     transition: background 0.15s ease;
 }
 
 .module-header:hover {
-    background: #fafaf9;
+    background: #171a25;
 }
 
 .module.open .module-header {
-    background: #fbf8f4;
-    border-bottom: 1px solid #f0ede6;
+    background: #151824;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .module-left {
@@ -1537,8 +1537,8 @@ video::cue {
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-sm);
-    background: var(--brand-orange-light);
-    color: var(--brand-orange);
+    background: rgba(255, 85, 0, 0.15);
+    color: #FF5500;
     font-size: 11px;
     font-weight: 800;
 }
@@ -1548,9 +1548,9 @@ video::cue {
 }
 
 .module-name {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--text-primary);
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #ffffff;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -1558,15 +1558,15 @@ video::cue {
 
 .module-lessons-count {
     font-size: 11px;
-    color: var(--text-muted);
+    color: #8b949e;
     font-weight: 500;
 }
 
 .module-arrow {
     width: 8px;
     height: 8px;
-    border-right: 2px solid #9ca3af;
-    border-bottom: 2px solid #9ca3af;
+    border-right: 2px solid #8b949e;
+    border-bottom: 2px solid #8b949e;
     transform: rotate(45deg);
     transition: transform 0.2s ease;
     flex-shrink: 0;
@@ -1578,7 +1578,7 @@ video::cue {
 
 .lessons {
     display: none;
-    background: #ffffff;
+    background: #0d0e14;
 }
 
 .module.open .lessons {
@@ -1588,28 +1588,29 @@ video::cue {
 .module-empty-state {
     padding: 14px 18px;
     font-size: 12.5px;
-    color: var(--text-muted);
+    color: #8b949e;
     font-style: italic;
     display: flex;
     align-items: center;
     gap: 8px;
-    background: #fafaf9;
+    background: #0d0e14;
 }
 
 .module-empty-state i {
     font-size: 13px;
-    color: #94a3b8;
+    color: #8b949e;
 }
 
 .lesson {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 18px;
-    border-bottom: 1px solid #f5f5f5;
+    padding: 11px 16px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     cursor: pointer;
     transition: background 0.15s ease;
     position: relative;
+    background: #0d0e14;
 }
 
 .lesson:last-child {
@@ -1617,19 +1618,19 @@ video::cue {
 }
 
 .lesson:hover {
-    background: #faf8f5;
+    background: #161822;
 }
 
 .lesson.active {
-    background: #fff3eb;
-    border-left: 3px solid var(--brand-orange);
+    background: rgba(255, 85, 0, 0.12);
+    border-left: 3px solid #FF5500;
 }
 
 .lesson-thumb {
     width: 64px;
-    height: 40px;
-    border-radius: 6px;
-    background: #e5e7eb;
+    height: 38px;
+    border-radius: 4px;
+    background: #1e202a;
     overflow: hidden;
     flex-shrink: 0;
     position: relative;
@@ -1637,7 +1638,7 @@ video::cue {
     align-items: center;
     justify-content: center;
     color: #9ca3af;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .lesson-thumb img {
@@ -1670,9 +1671,9 @@ video::cue {
 }
 
 .lesson-title {
-    font-size: 13.5px;
-    font-weight: 600;
-    color: #1e293b;
+    font-size: 13px;
+    font-weight: 500;
+    color: #e2e8f0;
     line-height: 1.35;
     white-space: normal;
     word-wrap: break-word;
@@ -1680,7 +1681,7 @@ video::cue {
 }
 
 .lesson.active .lesson-title {
-    color: #c2410c;
+    color: #FF5500;
     font-weight: 700;
 }
 
@@ -1689,13 +1690,13 @@ video::cue {
     align-items: center;
     gap: 6px;
     font-size: 11px;
-    color: var(--text-muted);
+    color: #8b949e;
     margin-top: 3px;
 }
 
 .lesson-check {
     font-size: 14px;
-    color: #16a34a;
+    color: #10b981;
     margin-left: auto;
     flex-shrink: 0;
     opacity: 0;
@@ -1881,16 +1882,16 @@ video::cue {
 }
 
 /* =========================================================
-   CRUNCHYROLL MOBILE VIDEO PLAYER UI & OVERLAYS
+   UNIFIED THEATER STREAMING PLAYER UI & OVERLAYS (ALL DEVICES)
 ========================================================= */
 .mobile-player-overlay {
-    display: none;
+    display: flex !important;
     position: absolute;
     inset: 0;
     z-index: 45;
     flex-direction: column;
     justify-content: space-between;
-    background: linear-gradient(180deg, rgba(0,0,0,0.72) 0%, rgba(0,0,0,0.08) 35%, rgba(0,0,0,0.08) 65%, rgba(0,0,0,0.85) 100%);
+    background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.1) 32%, rgba(0,0,0,0.1) 68%, rgba(0,0,0,0.88) 100%);
     opacity: 1;
     pointer-events: none;
     transition: opacity 0.22s ease;
@@ -1908,12 +1909,14 @@ video::cue {
     padding: 10px 14px;
     pointer-events: auto;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .mobile-top-actions {
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 4px;
 }
 
 .mobile-top-btn {
@@ -1923,31 +1926,40 @@ video::cue {
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    font-size: 17px;
+    font-size: 16px;
     background: transparent;
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    transition: transform 0.12s ease, background 0.12s ease;
+    transition: transform 0.12s ease, background 0.15s ease;
     -webkit-tap-highlight-color: transparent;
 }
 
-.mobile-top-btn:active {
+.mobile-top-btn:hover {
     background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.05);
+}
+
+.mobile-top-btn:active {
+    background: rgba(255, 255, 255, 0.25);
     transform: scale(0.92);
 }
 
+/* Center Transport Controls (Rewind 10, Play/Pause, Forward 10) */
 .mobile-center-controls {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 38px;
+    gap: clamp(18px, 6vw, 44px);
     pointer-events: auto;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 100%;
+    width: auto;
+    max-width: 90%;
+    box-sizing: border-box;
+    z-index: 2;
 }
 
 .mobile-center-seek-btn {
@@ -1957,50 +1969,66 @@ video::cue {
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    background: transparent;
+    background: rgba(0, 0, 0, 0.25);
     border: none;
     border-radius: 50%;
     cursor: pointer;
-    transition: transform 0.12s ease;
+    flex-shrink: 0;
+    transition: transform 0.12s ease, background 0.15s ease;
     -webkit-tap-highlight-color: transparent;
 }
 
+.mobile-center-seek-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: scale(1.06);
+}
+
 .mobile-center-seek-btn:active {
-    transform: scale(0.9);
+    transform: scale(0.92);
 }
 
 .mobile-seek-svg {
-    width: 44px;
-    height: 44px;
+    width: 42px;
+    height: 42px;
     display: block;
 }
 
 .mobile-center-play-btn {
-    width: 62px;
-    height: 62px;
+    width: 64px;
+    height: 64px;
     display: flex;
     align-items: center;
     justify-content: center;
     color: #ffffff;
-    font-size: 34px;
-    background: transparent;
-    border: none;
+    font-size: 30px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
     cursor: pointer;
-    transition: transform 0.12s ease;
+    flex-shrink: 0;
+    transition: transform 0.12s ease, background 0.15s ease, border-color 0.15s ease;
     -webkit-tap-highlight-color: transparent;
 }
 
+.mobile-center-play-btn:hover {
+    background: rgba(255, 85, 0, 0.35);
+    border-color: #FF5500;
+    transform: scale(1.06);
+}
+
 .mobile-center-play-btn:active {
-    transform: scale(0.9);
+    transform: scale(0.92);
 }
 
 .mobile-bottom-timeline {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 6px 14px 10px;
+    padding: 6px 14px 12px;
     pointer-events: auto;
     width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .mobile-time-display {
@@ -2015,7 +2043,7 @@ video::cue {
 
 .mobile-scrubber-wrap {
     flex: 1;
-    height: 24px;
+    height: 26px;
     display: flex;
     align-items: center;
     position: relative;
@@ -2030,6 +2058,11 @@ video::cue {
     border-radius: 2px;
     position: relative;
     pointer-events: none;
+    transition: height 0.15s ease;
+}
+
+.mobile-scrubber-wrap:hover .mobile-scrubber-track {
+    height: 5px;
 }
 
 .mobile-scrubber-buffered {
@@ -2066,42 +2099,55 @@ video::cue {
     transition: transform 0.1s ease;
 }
 
+.mobile-scrubber-wrap:hover .mobile-scrubber-thumb {
+    transform: translate(-50%, -50%) scale(1.25);
+}
+
 .mobile-scrubber-wrap.dragging .mobile-scrubber-thumb {
-    transform: translate(-50%, -50%) scale(1.3);
+    transform: translate(-50%, -50%) scale(1.35);
 }
 
 /* =========================================================
-   MOBILE BELOW PLAYER DETAILS (IMAGE 1)
+   UNIFIED LESSON STREAMING DETAILS (ALL DEVICES)
 ========================================================= */
 .mobile-details-container {
-    display: none;
+    display: block !important;
     background: #000000;
-    padding: 14px 16px 40px;
+    padding: 18px 4px 40px;
     color: #ffffff;
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .mobile-series-title {
     color: #FF5500;
     font-size: 11.5px;
     font-weight: 700;
-    letter-spacing: 0.6px;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
-    margin-bottom: 5px;
+    margin-bottom: 6px;
 }
 
 .mobile-episode-title {
     color: #ffffff;
-    font-size: 19px;
+    font-size: 22px;
     font-weight: 700;
-    line-height: 1.25;
-    margin-bottom: 8px;
+    line-height: 1.3;
+    margin-bottom: 10px;
+    word-break: break-word;
+    overflow-wrap: anywhere;
 }
 
 .mobile-meta-badges {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 18px;
     font-size: 12px;
     color: #94a3b8;
 }
@@ -2112,7 +2158,7 @@ video::cue {
     font-size: 10.5px;
     font-weight: 800;
     font-style: italic;
-    padding: 1.5px 6px;
+    padding: 2px 7px;
     border-radius: 4px;
     letter-spacing: 0.3px;
 }
@@ -2126,12 +2172,23 @@ video::cue {
     font-weight: 500;
 }
 
+.tag#lessonLabel {
+    background: rgba(255, 85, 0, 0.14);
+    color: #FF5500;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.5px;
+}
+
+/* Action Bar */
 .mobile-action-bar {
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: 24px;
-    margin-bottom: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 18px;
     padding: 4px 0;
 }
 
@@ -2139,52 +2196,83 @@ video::cue {
     display: inline-flex;
     align-items: center;
     gap: 7px;
-    color: #ffffff;
-    font-size: 13.5px;
+    color: #e2e8f0;
+    font-size: 13px;
     font-weight: 600;
-    background: transparent;
-    border: none;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     cursor: pointer;
-    padding: 6px 4px;
-    border-radius: 6px;
-    transition: color 0.15s ease, transform 0.1s ease;
+    padding: 7px 14px;
+    border-radius: 20px;
+    transition: all 0.15s ease;
     -webkit-tap-highlight-color: transparent;
+    text-decoration: none;
 }
 
 .mobile-action-btn i {
-    font-size: 17px;
+    font-size: 15px;
+}
+
+.mobile-action-btn:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.18);
 }
 
 .mobile-action-btn:active {
-    transform: scale(0.92);
+    transform: scale(0.95);
 }
 
 .mobile-action-btn.active-liked {
     color: #FF5500;
+    border-color: rgba(255, 85, 0, 0.4);
+    background: rgba(255, 85, 0, 0.15);
 }
 
 .mobile-action-btn.active-disliked {
     color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.15);
+}
+
+.mobile-action-btn.active-watched {
+    color: #10b981 !important;
+    border-color: rgba(16, 185, 129, 0.4) !important;
+    background: rgba(16, 185, 129, 0.15) !important;
 }
 
 .mobile-synopsis-wrap {
     margin-bottom: 18px;
+    max-width: 100%;
 }
 
 .mobile-synopsis-text {
-    font-size: 13px;
-    line-height: 1.48;
+    font-size: 14px;
+    line-height: 1.6;
     color: #9ca3af;
     display: -webkit-box;
-    -webkit-line-clamp: 2;
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
     transition: all 0.2s ease;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    max-width: 100%;
 }
 
 .mobile-synopsis-wrap.expanded .mobile-synopsis-text {
     -webkit-line-clamp: unset;
     display: block;
+}
+
+.mobile-synopsis-text a,
+.lesson-desc-link {
+    color: #FF5500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 600;
+    word-break: break-all;
+    overflow-wrap: anywhere;
 }
 
 .mobile-read-more-btn {
@@ -2194,15 +2282,19 @@ video::cue {
     background: transparent;
     border: none;
     cursor: pointer;
-    margin-top: 4px;
+    margin-top: 6px;
     padding: 0;
     display: inline-block;
+}
+
+.mobile-read-more-btn:hover {
+    text-decoration: underline;
 }
 
 .mobile-divider {
     height: 1px;
     background: rgba(255, 255, 255, 0.08);
-    margin: 18px 0;
+    margin: 20px 0;
 }
 
 .mobile-next-section {
@@ -2219,23 +2311,28 @@ video::cue {
 .mobile-next-card {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 8px;
-    padding: 7px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    padding: 8px 12px;
     cursor: pointer;
     transition: background 0.15s ease, border-color 0.15s ease;
 }
 
-.mobile-next-card:active {
+.mobile-next-card:hover {
     background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 85, 0, 0.35);
+}
+
+.mobile-next-card:active {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .mobile-next-thumb-wrap {
     width: 105px;
     height: 59px;
-    border-radius: 5px;
+    border-radius: 6px;
     position: relative;
     overflow: hidden;
     background: #181920;
@@ -2260,6 +2357,12 @@ video::cue {
     justify-content: center;
     color: #ffffff;
     font-size: 13px;
+    opacity: 0.8;
+    transition: opacity 0.15s ease;
+}
+
+.mobile-next-card:hover .mobile-next-play-overlay {
+    opacity: 1;
 }
 
 .mobile-next-duration {
@@ -2304,31 +2407,42 @@ video::cue {
     font-size: 16px;
     background: transparent;
     border: none;
+    border-radius: 50%;
     cursor: pointer;
     flex-shrink: 0;
+    transition: color 0.15s ease, background 0.15s ease;
+}
+
+.mobile-next-download-btn:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .mobile-all-episodes-btn {
-    display: block;
+    display: none;
     width: 100%;
     text-align: center;
     color: #FF5500;
-    font-size: 13.5px;
+    font-size: 14px;
     font-weight: 700;
     padding: 14px 0 6px;
     background: transparent;
     border: none;
     cursor: pointer;
-    letter-spacing: 0.2px;
+    letter-spacing: 0.3px;
+}
+
+.mobile-all-episodes-btn:hover {
+    text-decoration: underline;
 }
 
 /* =========================================================
-   BOTTOM SHEET MODALS (IMAGE 2)
+   BOTTOM SHEET / DESKTOP MODALS
 ========================================================= */
 .mobile-bottom-sheet-backdrop {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.72);
+    background: rgba(0, 0, 0, 0.75);
     backdrop-filter: blur(4px);
     -webkit-backdrop-filter: blur(4px);
     z-index: 998;
@@ -2347,7 +2461,7 @@ video::cue {
     left: 0;
     right: 0;
     bottom: 0;
-    background: #1a1c24;
+    background: #161822;
     border-radius: 20px 20px 0 0;
     z-index: 999;
     max-height: 85vh;
@@ -2375,7 +2489,7 @@ video::cue {
 .sheet-header {
     padding: 0 20px 14px;
     text-align: center;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     position: relative;
     flex-shrink: 0;
 }
@@ -2408,7 +2522,12 @@ video::cue {
     font-size: 14px;
     background: transparent;
     border: none;
+    border-radius: 50%;
     cursor: pointer;
+}
+
+.sheet-back-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .sheet-content {
@@ -2432,8 +2551,12 @@ video::cue {
     -webkit-tap-highlight-color: transparent;
 }
 
+.sheet-clickable:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
 .sheet-clickable:active {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .sheet-row-label {
@@ -2515,8 +2638,12 @@ video::cue {
     -webkit-tap-highlight-color: transparent;
 }
 
+.sheet-option:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
 .sheet-option:active {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .sheet-option .check-icon {
@@ -2534,7 +2661,7 @@ video::cue {
     display: block;
 }
 
-/* All Episodes Drawer in Bottom Sheet */
+/* All Lessons Drawer in Bottom Sheet */
 .sheet-module-header {
     padding: 12px 20px 6px;
     font-size: 11.5px;
@@ -2554,8 +2681,12 @@ video::cue {
     -webkit-tap-highlight-color: transparent;
 }
 
+.sheet-lesson-card:hover {
+    background: rgba(255, 255, 255, 0.04);
+}
+
 .sheet-lesson-card:active {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .sheet-lesson-card.active {
@@ -2635,16 +2766,53 @@ video::cue {
     opacity: 1;
 }
 
+/* Desktop Centered Modal for Playback Settings */
+@media (min-width: 769px) {
+    .mobile-bottom-sheet {
+        left: 50% !important;
+        right: auto !important;
+        top: 50% !important;
+        bottom: auto !important;
+        transform: translate(-50%, -50%) scale(0.95) !important;
+        width: 440px !important;
+        max-width: calc(100vw - 32px) !important;
+        border-radius: 16px !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8) !important;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease, transform 0.2s ease !important;
+    }
+    .mobile-bottom-sheet.visible {
+        transform: translate(-50%, -50%) scale(1) !important;
+        opacity: 1 !important;
+        pointer-events: auto !important;
+    }
+    .sheet-drag-handle {
+        display: none !important;
+    }
+    .sheet-header {
+        padding: 16px 20px 14px !important;
+    }
+}
+
 /* =========================================================
    RESPONSIVE SWITCHING (MOBILE vs DESKTOP)
 ========================================================= */
+.desktop-only,
+.video-controls,
+.video-progress,
+.center-play-btn {
+    display: none !important;
+}
+
 @media (max-width: 768px) {
     body {
         background: #000000 !important;
         color: #ffffff !important;
     }
     .header {
-        background: #090a0f !important;
+        background: #08090e !important;
         border-bottom: 1px solid rgba(255,255,255,0.08) !important;
         height: 52px !important;
         padding: 0 16px !important;
@@ -2674,17 +2842,13 @@ video::cue {
         max-height: calc(100svh - 52px);
         background: #000000 !important;
     }
-    .desktop-only,
-    .sidebar,
-    .video-controls,
-    .video-progress,
-    .center-play-btn {
+    .sidebar {
         display: none !important;
     }
-    .mobile-player-overlay {
-        display: flex !important;
-    }
     .mobile-details-container {
+        padding: 14px 16px 40px !important;
+    }
+    .mobile-all-episodes-btn {
         display: block !important;
     }
 }
@@ -2787,7 +2951,7 @@ video::cue {
                             <i class="fa-solid fa-chevron-down"></i>
                         </button>
                         <div class="mobile-top-actions">
-                            <button class="mobile-top-btn" id="mobileNextBtn" type="button" title="Next Episode" aria-label="Next Lesson">
+                            <button class="mobile-top-btn" id="mobileNextBtn" type="button" title="Next Lesson" aria-label="Next Lesson">
                                 <i class="fa-solid fa-forward-step"></i>
                             </button>
                             <button class="mobile-top-btn" id="mobilePipBtn" type="button" title="Picture in Picture" aria-label="Picture in Picture">
@@ -2795,6 +2959,9 @@ video::cue {
                             </button>
                             <button class="mobile-top-btn" id="mobileCastBtn" type="button" title="Cast / AirPlay" aria-label="Cast / AirPlay">
                                 <i class="fa-solid fa-tv"></i>
+                            </button>
+                            <button class="mobile-top-btn" id="mobileVolumeBtn" type="button" title="Mute / Unmute" aria-label="Mute / Unmute">
+                                <i class="fa-solid fa-volume-high" id="mobileVolumeIcon"></i>
                             </button>
                             <button class="mobile-top-btn" id="mobileSettingsBtn" type="button" title="Playback Settings" aria-label="Playback Settings">
                                 <i class="fa-solid fa-gear"></i>
@@ -2989,35 +3156,7 @@ video::cue {
             </div>
         </div>
 
-        <!-- Lesson Details (Desktop) -->
-        <div class="lesson-info desktop-only">
-            <div class="lesson-info-header">
-                <span class="tag" id="lessonLabel">
-                    <span>COURSE CONTENT</span>
-                </span>
-
-                <div class="lesson-actions">
-                    <button class="action-btn action-btn-secondary" id="markWatchedBtn" type="button">
-                        <i class="fa-regular fa-circle-check"></i>
-                        <span>Mark Completed</span>
-                    </button>
-                    <button class="action-btn action-btn-primary" id="nextLessonBtn" type="button">
-                        <span>Next Lesson</span>
-                        <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </div>
-            </div>
-
-            <h1 id="lessonTitle">
-                Welcome to your course
-            </h1>
-
-            <p id="lessonDescription">
-                Select a lesson from the course content to begin learning.
-            </p>
-        </div>
-
-        <!-- Crunchyroll Style Mobile Details Section (Screenshot 1) -->
+        <!-- Unified Lesson Streaming Details (All Devices) -->
         <div class="mobile-details-container" id="mobileDetailsContainer">
             <div class="mobile-series-title" id="mobileSeriesTitle">
                 {% if course %}{{ course.title|upper }}{% else %}CLOUT TRAINING{% endif %}
@@ -3026,14 +3165,20 @@ video::cue {
             <h1 class="mobile-episode-title" id="mobileEpisodeTitle">
                 Loading lesson...
             </h1>
+            <!-- Hidden alias for legacy JS references -->
+            <span id="lessonTitle" style="display:none;"></span>
 
             <div class="mobile-meta-badges">
                 <span class="mobile-badge-rating">A</span>
                 <span class="mobile-meta-dot">•</span>
                 <span class="mobile-meta-dubsub">Dub | Sub</span>
+                <span class="mobile-meta-dot">•</span>
+                <span class="tag" id="lessonLabel">
+                    <span>COURSE CONTENT</span>
+                </span>
             </div>
 
-            <!-- Mobile Action Bar (Likes, Dislikes, Download, More) -->
+            <!-- Action Bar (Likes, Dislikes, Mark Completed, Next Lesson, Download, More) -->
             <div class="mobile-action-bar">
                 <button class="mobile-action-btn" id="mobileLikeBtn" type="button" aria-label="Like this lesson">
                     <i class="fa-regular fa-thumbs-up" id="likeIcon"></i>
@@ -3043,30 +3188,41 @@ video::cue {
                     <i class="fa-regular fa-thumbs-down" id="dislikeIcon"></i>
                     <span id="dislikeCount">336</span>
                 </button>
+                <button class="mobile-action-btn" id="markWatchedBtn" type="button" title="Mark Completed" aria-label="Mark Completed">
+                    <i class="fa-regular fa-circle-check" id="markWatchedIcon"></i>
+                    <span id="markWatchedText">Mark Done</span>
+                </button>
+                <button class="mobile-action-btn" id="nextLessonBtn" type="button" title="Next Lesson" aria-label="Next Lesson">
+                    <i class="fa-solid fa-forward-step"></i>
+                    <span>Next</span>
+                </button>
                 <a class="mobile-action-btn" id="mobileDownloadBtn" href="#" download title="Download Lesson Video" aria-label="Download Video">
                     <i class="fa-solid fa-arrow-down-to-line"></i>
+                    <span>Download</span>
                 </a>
                 <button class="mobile-action-btn" id="mobileMoreBtn" type="button" title="More options" aria-label="More options">
                     <i class="fa-solid fa-ellipsis-vertical"></i>
                 </button>
             </div>
 
-            <!-- Mobile Synopsis with Read More -->
+            <!-- Synopsis with Clickable Links and Read More -->
             <div class="mobile-synopsis-wrap" id="mobileSynopsisWrap">
                 <div class="mobile-synopsis-text" id="mobileSynopsisText">
                     Select a lesson from the course content to begin learning.
                 </div>
+                <!-- Hidden alias for legacy JS references -->
+                <p id="lessonDescription" style="display:none;"></p>
                 <button class="mobile-read-more-btn" id="mobileReadMoreBtn" type="button">Read More</button>
             </div>
 
             <div class="mobile-divider"></div>
 
-            <!-- Next Episode Section -->
+            <!-- Next Lesson Section -->
             <div class="mobile-next-section">
-                <div class="mobile-next-header">Next Episode</div>
+                <div class="mobile-next-header">Next Lesson</div>
                 <div class="mobile-next-card" id="mobileNextCard">
                     <div class="mobile-next-thumb-wrap">
-                        <img id="mobileNextThumb" src="{% static 'logo.png' %}" alt="Next Episode Thumbnail">
+                        <img id="mobileNextThumb" src="{% static 'logo.png' %}" alt="Next Lesson Thumbnail">
                         <div class="mobile-next-play-overlay">
                             <i class="fa-solid fa-play"></i>
                         </div>
@@ -3082,9 +3238,9 @@ video::cue {
                 </div>
             </div>
 
-            <!-- All Episodes Trigger -->
+            <!-- All Lessons Trigger (Shown on Mobile / Tablet) -->
             <button class="mobile-all-episodes-btn" id="mobileAllEpisodesBtn" type="button">
-                All Episodes
+                All Lessons
             </button>
         </div>
     </section>
@@ -3314,12 +3470,12 @@ video::cue {
     </div>
 </div>
 
-<!-- 6. All Episodes Drawer Bottom Sheet -->
+<!-- 6. All Lessons Drawer Bottom Sheet -->
 <div class="mobile-bottom-sheet" id="allEpisodesSheet" role="dialog" aria-modal="true">
     <div class="sheet-drag-handle"></div>
     <div class="sheet-header sheet-header-with-back">
         <button class="sheet-back-btn" id="allEpisodesBackBtn" type="button" aria-label="Back"><i class="fa-solid fa-chevron-left"></i></button>
-        <h3>All Episodes</h3>
+        <h3>All Lessons & Modules</h3>
     </div>
     <div class="sheet-content" id="sheetAllEpisodesContent"></div>
 </div>
@@ -3406,6 +3562,10 @@ video::cue {
     const mobileSettingsBtn = document.getElementById("mobileSettingsBtn");
     const mobileFullscreenBtn = document.getElementById("mobileFullscreenBtn");
     const mobileFullscreenIcon = document.getElementById("mobileFullscreenIcon");
+    const mobileVolumeBtn = document.getElementById("mobileVolumeBtn");
+    const mobileVolumeIcon = document.getElementById("mobileVolumeIcon");
+    const markWatchedIcon = document.getElementById("markWatchedIcon");
+    const markWatchedText = document.getElementById("markWatchedText");
 
     const mobileRewindBtn = document.getElementById("mobileRewindBtn");
     const mobileCenterPlayBtn = document.getElementById("mobileCenterPlayBtn");
@@ -3895,12 +4055,29 @@ video::cue {
         nextLessonBtn.addEventListener("click", triggerNextLesson);
     }
 
-    markWatchedBtn.addEventListener("click", function() {
-        if (currentLessonElement) {
-            currentLessonElement.classList.toggle("watched");
-            saveCourseProgress();
+    function updateWatchedButtonVisual() {
+        if (!markWatchedBtn) return;
+        const isWatched = currentLessonElement && currentLessonElement.classList.contains("watched");
+        if (isWatched) {
+            markWatchedBtn.classList.add("active-watched");
+            if (markWatchedIcon) markWatchedIcon.className = "fa-solid fa-circle-check";
+            if (markWatchedText) markWatchedText.textContent = "Completed";
+        } else {
+            markWatchedBtn.classList.remove("active-watched");
+            if (markWatchedIcon) markWatchedIcon.className = "fa-regular fa-circle-check";
+            if (markWatchedText) markWatchedText.textContent = "Mark Done";
         }
-    });
+    }
+
+    if (markWatchedBtn) {
+        markWatchedBtn.addEventListener("click", function() {
+            if (currentLessonElement) {
+                currentLessonElement.classList.toggle("watched");
+                updateWatchedButtonVisual();
+                saveCourseProgress();
+            }
+        });
+    }
 
     /* =========================================================
        PROGRESS SCRUBBER & TOOLTIP
@@ -4090,6 +4267,18 @@ video::cue {
                 video.remote.prompt().catch(() => {});
             } else {
                 showToast("Screen Cast / AirPlay: Ready to stream");
+            }
+        });
+    }
+
+    if (mobileVolumeBtn) {
+        mobileVolumeBtn.addEventListener("click", function(e) {
+            e.stopPropagation();
+            if (video.muted || video.volume === 0) {
+                setVolume(lastVolume > 0 ? lastVolume : 0.8);
+            } else {
+                lastVolume = video.volume;
+                setVolume(0);
             }
         });
     }
@@ -4472,6 +4661,16 @@ video::cue {
         if (fullscreenIcon) fullscreenIcon.className = isFs ? "fa-solid fa-compress" : "fa-solid fa-expand";
         if (mobileFullscreenIcon) mobileFullscreenIcon.className = isFs ? "fa-solid fa-compress" : "fa-solid fa-expand";
         if (volumeButton) volumeButton.classList.toggle("active", video.muted || video.volume === 0);
+        if (mobileVolumeBtn) mobileVolumeBtn.classList.toggle("active", video.muted || video.volume === 0);
+        if (mobileVolumeIcon) {
+            if (video.muted || video.volume === 0) {
+                mobileVolumeIcon.className = "fa-solid fa-volume-xmark";
+            } else if (video.volume < 0.5) {
+                mobileVolumeIcon.className = "fa-solid fa-volume-low";
+            } else {
+                mobileVolumeIcon.className = "fa-solid fa-volume-high";
+            }
+        }
         if (speedButton) speedButton.classList.toggle("active", (speedMenu && speedMenu.classList.contains("open")) || video.playbackRate !== 1);
         if (ccButton) ccButton.classList.toggle("active", selectedSubtitleLang !== "off" && activeCueList.length > 0);
 
@@ -5427,6 +5626,7 @@ video::cue {
 
         updateMobileLikes(lessonId || title);
         updateMobileNextCard();
+        updateWatchedButtonVisual();
 
         // Reset progress bar visual (Desktop & Mobile)
         progressFill.style.width = "0%";
@@ -5475,6 +5675,7 @@ video::cue {
             }
         } catch (e) {}
         saveCourseProgress();
+        updateWatchedButtonVisual();
     }
 
     /* =========================================================
