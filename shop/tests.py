@@ -1365,6 +1365,16 @@ class SeoOptimizationTests(TestCase):
         response_json = self.client.get("/manifest.json")
         self.assertEqual(response_json.status_code, 200)
 
+        # Root og-image.png
+        response_og = self.client.get("/og-image.png")
+        self.assertEqual(response_og.status_code, 200)
+        self.assertIn("image/png", response_og["Content-Type"])
+
+        # Root og-image-square.png
+        response_og_sq = self.client.get("/og-image-square.png")
+        self.assertEqual(response_og_sq.status_code, 200)
+        self.assertIn("image/png", response_og_sq["Content-Type"])
+
     def test_homepage_favicon_tags(self):
         response = self.client.get(reverse("index"))
         self.assertEqual(response.status_code, 200)
@@ -1375,6 +1385,8 @@ class SeoOptimizationTests(TestCase):
         self.assertContains(response, '<link rel="icon" type="image/png" sizes="48x48" href="/static/favicon-48x48.png">')
         self.assertContains(response, '<link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">')
         self.assertContains(response, '<link rel="manifest" href="/static/site.webmanifest">')
+        self.assertContains(response, '<meta property="og:image" content="https://clout.courses/static/og-image.png?v=2">')
+        self.assertContains(response, '<meta name="twitter:image" content="https://clout.courses/static/og-image.png?v=2">')
 
 
 class SubtitleSystemTests(TestCase):

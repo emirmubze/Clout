@@ -14,6 +14,8 @@ from shop.views import (
     favicon_png,
     apple_touch_icon,
     site_webmanifest,
+    og_image,
+    og_image_square,
 )
 
 
@@ -35,6 +37,8 @@ urlpatterns = [
     path("sitemap.xml", sitemap_xml, name="root_sitemap_xml"),
     path("favicon.ico", favicon_ico, name="root_favicon_ico"),
     path("favicon.png", favicon_png, name="root_favicon_png"),
+    path("og-image.png", og_image, name="root_og_image"),
+    path("og-image-square.png", og_image_square, name="root_og_image_square"),
     path("apple-touch-icon.png", apple_touch_icon, name="root_apple_touch_icon"),
     path("apple-touch-icon-precomposed.png", apple_touch_icon, name="root_apple_touch_icon_precomposed"),
     path("site.webmanifest", site_webmanifest, name="root_site_webmanifest"),

@@ -336,6 +336,16 @@ urlpatterns = [
         name="favicon_png"
     ),
     path(
+        "og-image.png",
+        views.og_image,
+        name="og_image"
+    ),
+    path(
+        "og-image-square.png",
+        views.og_image_square,
+        name="og_image_square"
+    ),
+    path(
         "apple-touch-icon.png",
         views.apple_touch_icon,
         name="apple_touch_icon"

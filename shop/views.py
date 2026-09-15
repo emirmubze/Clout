@@ -2845,6 +2845,30 @@ def site_webmanifest(request):
     raise Http404("Manifest not found")
 
 
+def og_image(request):
+    for candidate in [
+        settings.BASE_DIR / "shop" / "static" / "og-image.png",
+        settings.STATIC_ROOT / "og-image.png",
+    ]:
+        if os.path.exists(candidate):
+            response = FileResponse(open(candidate, "rb"), content_type="image/png")
+            response["Cache-Control"] = "public, max-age=86400"
+            return response
+    raise Http404("OG image not found")
+
+
+def og_image_square(request):
+    for candidate in [
+        settings.BASE_DIR / "shop" / "static" / "og-image-square.png",
+        settings.STATIC_ROOT / "og-image-square.png",
+    ]:
+        if os.path.exists(candidate):
+            response = FileResponse(open(candidate, "rb"), content_type="image/png")
+            response["Cache-Control"] = "public, max-age=86400"
+            return response
+    raise Http404("OG square image not found")
+
+
 # =========================================================
 # SUBTITLE SERVING & REST APIs
 # =========================================================
