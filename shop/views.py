@@ -2915,8 +2915,12 @@ def api_lesson_subtitles(request, lesson_id):
     """
     lesson = get_object_or_404(Lesson, id=lesson_id)
 
-    # Allow access if user is authenticated/staff or has course access
-    subtitles = lesson.subtitles.filter(status="ready").order_by("-is_original", "language_name")
+    # Do not return or display subtitles while they are still being generated
+    if lesson.subtitle_status == "processing":
+        subtitles = []
+    else:
+        # Allow access if user is authenticated/staff or has course access
+        subtitles = lesson.subtitles.filter(status="ready").order_by("-is_original", "language_name")
 
     response = JsonResponse({
         "success": True,
