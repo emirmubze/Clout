@@ -1233,10 +1233,12 @@ body {
             const frame = document.getElementById('checkoutFrame');
             if (frame && frame.contentWindow) {
                 try {
+                    frame.contentWindow.postMessage({ type: 'openModal' }, '*');
                     frame.contentWindow.postMessage({ type: 'triggerResize' }, '*');
                 } catch (e) {}
                 setTimeout(() => {
                     try {
+                        frame.contentWindow.postMessage({ type: 'openModal' }, '*');
                         frame.contentWindow.postMessage({ type: 'triggerResize' }, '*');
                     } catch (e) {}
                 }, 60);

@@ -1808,8 +1808,20 @@ window.addEventListener('message', function (event) {
     if (isAllowedOrigin) {
         if (event.data?.type === 'resetPaymentButton') resetPaymentButton();
         if (event.data?.type === 'triggerResize') syncModalHeight();
+        if (event.data?.type === 'openModal') {
+            const terms = $('termsCheck');
+            if (terms) terms.checked = true;
+            checkTerms();
+            syncModalHeight();
+        }
     }
 });
+
+// Ensure terms checkbox is checked by default
+const termsCheckEl = $('termsCheck');
+if (termsCheckEl) {
+    termsCheckEl.checked = true;
+}
 
 // India / INR is selected by default.
 renderCountries();
