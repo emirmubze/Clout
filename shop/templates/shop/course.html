@@ -1399,7 +1399,8 @@ video::cue {
     margin-bottom: 12px;
 }
 
-.lesson-info p {
+.lesson-info p,
+.lesson-description {
     font-size: 15px;
     color: var(--text-muted);
     line-height: 1.7;
@@ -1408,6 +1409,7 @@ video::cue {
 }
 
 .lesson-info p a,
+.lesson-description a,
 .lesson-desc-link {
     color: var(--brand-orange, #ea580c);
     text-decoration: underline;
@@ -1418,10 +1420,82 @@ video::cue {
 }
 
 .lesson-info p a:hover,
+.lesson-description a:hover,
 .lesson-desc-link:hover {
     color: #c2410c;
     opacity: 0.85;
     text-decoration: underline;
+}
+
+/* =========================================================
+   COLLAPSIBLE LESSON DESCRIPTION
+========================================================= */
+.lesson-description-container {
+    position: relative;
+    width: 100%;
+}
+
+.lesson-description-wrapper {
+    position: relative;
+    overflow: hidden;
+    transition: max-height 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.lesson-description-wrapper.is-collapsed {
+    max-height: 82px; /* Roughly 3 lines */
+}
+
+.lesson-description-wrapper.is-expanded {
+    max-height: none;
+}
+
+/* Gradient fade at bottom when collapsed */
+.lesson-description-fade {
+    display: none;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 38px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.85) 60%, var(--surface, #ffffff) 100%);
+    pointer-events: none;
+}
+
+.lesson-description-wrapper.is-collapsed .lesson-description-fade {
+    display: block;
+}
+
+/* Read More / Read Less Toggle Button */
+.lesson-description-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    padding: 4px 10px 4px 0;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--brand-orange, #E04F00);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: color 0.15s ease, transform 0.15s ease;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.lesson-description-toggle:hover {
+    color: var(--brand-orange-hover, #ff5a00);
+}
+
+.lesson-description-toggle .toggle-icon {
+    font-size: 11px;
+    transition: transform 0.2s ease;
+}
+
+.lesson-description-toggle:focus-visible {
+    outline: 2px solid var(--brand-orange);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
 }
 
 /* =========================================================
@@ -2137,9 +2211,18 @@ video::cue {
                 Welcome to your course
             </h1>
 
-            <p id="lessonDescription">
-                Select a lesson from the course content to begin learning.
-            </p>
+            <div class="lesson-description-container" id="lessonDescriptionContainer">
+                <div class="lesson-description-wrapper is-collapsed" id="lessonDescriptionWrapper">
+                    <div class="lesson-description" id="lessonDescription">
+                        Select a lesson from the course content to begin learning.
+                    </div>
+                    <div class="lesson-description-fade" id="lessonDescriptionFade" aria-hidden="true"></div>
+                </div>
+                <button type="button" class="lesson-description-toggle" id="lessonDescriptionToggle" aria-expanded="false" aria-controls="lessonDescription" style="display: none;">
+                    <span class="toggle-text">Read More</span>
+                    <i class="fa-solid fa-chevron-down toggle-icon" aria-hidden="true"></i>
+                </button>
+            </div>
         </div>
     </section>
 
@@ -2308,6 +2391,9 @@ video::cue {
     const playerLessonName = document.getElementById("playerLessonName");
     const lessonTitle = document.getElementById("lessonTitle");
     const lessonDescription = document.getElementById("lessonDescription");
+    const lessonDescriptionContainer = document.getElementById("lessonDescriptionContainer");
+    const lessonDescriptionWrapper = document.getElementById("lessonDescriptionWrapper");
+    const lessonDescriptionToggle = document.getElementById("lessonDescriptionToggle");
     const lessonLabel = document.getElementById("lessonLabel");
 
     const rippleLeft = document.getElementById("rippleLeft");
@@ -3693,6 +3779,77 @@ video::cue {
     };
 
     /* =========================================================
+       COLLAPSIBLE LESSON DESCRIPTION
+    ========================================================= */
+    const COLLAPSED_DESC_HEIGHT = 82;
+    let isDescriptionExpanded = false;
+
+    function updateLessonDescriptionCollapsible(resetToCollapsed = true) {
+        if (!lessonDescription || !lessonDescriptionWrapper || !lessonDescriptionToggle) return;
+
+        if (resetToCollapsed) {
+            isDescriptionExpanded = false;
+        }
+
+        requestAnimationFrame(() => {
+            const fullHeight = lessonDescription.offsetHeight || lessonDescription.scrollHeight;
+            const needsCollapsible = fullHeight > (COLLAPSED_DESC_HEIGHT + 16);
+
+            if (needsCollapsible) {
+                lessonDescriptionToggle.style.display = "inline-flex";
+                const toggleText = lessonDescriptionToggle.querySelector(".toggle-text");
+                const toggleIcon = lessonDescriptionToggle.querySelector(".toggle-icon");
+
+                if (isDescriptionExpanded) {
+                    lessonDescriptionWrapper.classList.remove("is-collapsed");
+                    lessonDescriptionWrapper.classList.add("is-expanded");
+                    lessonDescriptionToggle.setAttribute("aria-expanded", "true");
+                    if (toggleText) toggleText.textContent = "Read Less";
+                    if (toggleIcon) {
+                        toggleIcon.classList.remove("fa-chevron-down");
+                        toggleIcon.classList.add("fa-chevron-up");
+                    }
+                } else {
+                    lessonDescriptionWrapper.classList.add("is-collapsed");
+                    lessonDescriptionWrapper.classList.remove("is-expanded");
+                    lessonDescriptionToggle.setAttribute("aria-expanded", "false");
+                    if (toggleText) toggleText.textContent = "Read More";
+                    if (toggleIcon) {
+                        toggleIcon.classList.remove("fa-chevron-up");
+                        toggleIcon.classList.add("fa-chevron-down");
+                    }
+                }
+            } else {
+                lessonDescriptionToggle.style.display = "none";
+                lessonDescriptionWrapper.classList.remove("is-collapsed");
+                lessonDescriptionWrapper.classList.remove("is-expanded");
+            }
+        });
+    }
+
+    if (lessonDescriptionToggle) {
+        lessonDescriptionToggle.addEventListener("click", function() {
+            isDescriptionExpanded = !isDescriptionExpanded;
+            updateLessonDescriptionCollapsible(false);
+
+            if (!isDescriptionExpanded && lessonDescriptionContainer) {
+                const rect = lessonDescriptionContainer.getBoundingClientRect();
+                if (rect.top < 70) {
+                    lessonDescriptionContainer.scrollIntoView({ behavior: "smooth", block: "nearest" });
+                }
+            }
+        });
+    }
+
+    let descResizeTimer = null;
+    window.addEventListener("resize", function() {
+        clearTimeout(descResizeTimer);
+        descResizeTimer = setTimeout(function() {
+            updateLessonDescriptionCollapsible(false);
+        }, 150);
+    });
+
+    /* =========================================================
        SELECT LESSON
     ========================================================= */
     window.selectLesson = function(lesson) {
@@ -3724,6 +3881,7 @@ video::cue {
         if (playerLessonName) playerLessonName.textContent = title;
         if (lessonTitle) lessonTitle.textContent = title;
         if (lessonDescription) lessonDescription.innerHTML = formatDescriptionWithLinks(description);
+        updateLessonDescriptionCollapsible(true);
         if (lessonLabel && lessonLabel.querySelector("span")) lessonLabel.querySelector("span").textContent = label;
 
         // Reset progress bar visual
@@ -3783,6 +3941,7 @@ video::cue {
         videoEmptyState.classList.add("visible");
         lessonTitle.textContent = "Welcome to your course";
         lessonDescription.innerHTML = formatDescriptionWithLinks("No lessons have been published yet. Please check back later.");
+        updateLessonDescriptionCollapsible(true);
     }
 
     showControls();
