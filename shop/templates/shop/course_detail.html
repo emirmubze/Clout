@@ -757,9 +757,9 @@ body {
 
 .checkout-popup {
     position: relative;
-    width: min(760px, calc(100vw - 28px));
-    height: min(740px, calc(100vh - 24px));
-    height: min(740px, calc(100dvh - 24px));
+    width: min(760px, calc(100vw - 32px));
+    height: min(740px, calc(100vh - 28px));
+    height: min(740px, calc(100dvh - 28px));
     max-height: 96vh;
     max-height: 96dvh;
     background: transparent;
@@ -791,8 +791,21 @@ body {
 }
 
 /* =========================================================
-   RESPONSIVE
+   RESPONSIVE (LAPTOP, TABLET, MOBILE)
 ========================================================= */
+@media (min-width: 641px) and (max-width: 1024px) {
+    .checkout-popup {
+        width: min(700px, calc(100vw - 36px));
+        height: min(720px, calc(100vh - 28px));
+        height: min(720px, calc(100dvh - 28px));
+        border-radius: 20px;
+    }
+
+    .checkout-popup iframe {
+        border-radius: 20px;
+    }
+}
+
 @media (max-width: 960px) {
     .checkout-layout {
         grid-template-columns: 1fr;
@@ -828,8 +841,8 @@ body {
     .checkout-popup {
         width: 100%;
         max-width: 100%;
-        height: min(680px, calc(100vh - 12px));
-        height: min(680px, calc(100dvh - 12px));
+        height: min(700px, calc(100vh - 12px));
+        height: min(700px, calc(100dvh - 12px));
         max-height: 100%;
         border-radius: 18px;
     }
@@ -846,8 +859,8 @@ body {
 
     .checkout-popup {
         border-radius: 14px;
-        height: min(650px, calc(100vh - 8px));
-        height: min(650px, calc(100dvh - 8px));
+        height: calc(100vh - 8px);
+        height: calc(100dvh - 8px);
     }
 
     .checkout-popup iframe {
