@@ -1233,79 +1233,79 @@ button {
 
 .subtitle-cue-box {
     display: inline-block !important;
-    max-width: 90%;
-    background: transparent !important;
-    background-color: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    border-radius: 0 !important;
+    max-width: 88%;
+    background: rgba(12, 12, 16, 0.88) !important;
+    background-color: rgba(12, 12, 16, 0.88) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6) !important;
+    padding: 6px 16px !important;
+    border-radius: 8px !important;
     color: #ffffff !important;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    font-size: 20px;
-    font-weight: 500;
-    line-height: 1.4;
+    font-size: 19px;
+    font-weight: 600;
+    line-height: 1.45;
     letter-spacing: 0.2px;
-    -webkit-text-stroke: 0 !important;
-    text-stroke: 0 !important;
-    text-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.9),
-        0 2px 4px rgba(0, 0, 0, 0.85),
-        0 0 2px rgba(0, 0, 0, 0.9);
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
     pointer-events: none;
     user-select: none;
     white-space: pre-line;
     word-break: break-word;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.15s ease-in-out;
-    will-change: opacity;
+    transition: opacity 0.15s ease-in-out, transform 0.15s ease-in-out;
+    transform: translateY(2px);
+    will-change: opacity, transform;
 }
 
 .subtitle-cue-box.visible {
     opacity: 1 !important;
     visibility: visible !important;
+    transform: translateY(0) !important;
 }
 
 .video-container:fullscreen .subtitle-cue-box,
 .video-container.is-fullscreen .subtitle-cue-box {
     font-size: 26px;
+    padding: 8px 22px !important;
+    border-radius: 10px !important;
     letter-spacing: 0.25px;
 }
 
 .video-container:-webkit-full-screen .subtitle-cue-box {
     font-size: 26px;
+    padding: 8px 22px !important;
+    border-radius: 10px !important;
     letter-spacing: 0.25px;
 }
 
 @media (max-width: 640px) {
     .subtitle-cue-box {
-        font-size: 15.5px;
-        max-width: 95%;
+        font-size: 14.5px;
+        max-width: 94%;
+        padding: 5px 12px !important;
+        border-radius: 6px !important;
     }
     .video-container:fullscreen .subtitle-cue-box,
     .video-container.is-fullscreen .subtitle-cue-box,
     .video-container:-webkit-full-screen .subtitle-cue-box {
-        font-size: 20px;
+        font-size: 19px;
+        padding: 6px 16px !important;
     }
 }
 
 /* Native Video Cue styling for Picture-in-Picture (PiP) and native player */
 video::cue {
-    background-color: transparent !important;
-    background: transparent !important;
+    background-color: rgba(12, 12, 16, 0.88) !important;
+    background: rgba(12, 12, 16, 0.88) !important;
     color: #ffffff !important;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
     font-size: 18px !important;
-    font-weight: 500 !important;
+    font-weight: 600 !important;
     line-height: 1.4 !important;
-    text-shadow:
-        0 1px 2px rgba(0, 0, 0, 0.9),
-        0 2px 4px rgba(0, 0, 0, 0.85),
-        0 0 2px rgba(0, 0, 0, 0.9) !important;
-    border-radius: 0 !important;
+    border-radius: 6px !important;
 }
 
 /* Controls Hide State */
@@ -3134,23 +3134,9 @@ video::cue {
     if (ccButton) {
         ccButton.addEventListener("click", function(e) {
             e.stopPropagation();
-            const isOpen = subtitleMenu.classList.contains("open");
-            if (!isOpen) {
-                subtitleMenu.classList.add("open");
-                speedMenu.classList.remove("open");
-                // If subtitles are currently off and tracks are available, automatically activate preferred or first language
-                if (selectedSubtitleLang === "off" && Array.isArray(currentSubtitles) && currentSubtitles.length > 0) {
-                    const savedLang = localStorage.getItem("clout_preferred_subtitle_lang");
-                    const targetSub = (savedLang && savedLang !== "off" && currentSubtitles.find(s => s.language_code === savedLang))
-                        || currentSubtitles.find(s => s.language_code === "en")
-                        || currentSubtitles[0];
-                    if (targetSub) {
-                        selectSubtitleLanguage(targetSub.language_code);
-                    }
-                }
-            } else {
-                subtitleMenu.classList.remove("open");
-            }
+            subtitleMenu.classList.toggle("open");
+            speedMenu.classList.remove("open");
+            syncButtonActiveStates();
         });
     }
 
@@ -3379,18 +3365,32 @@ video::cue {
 
     function setupNativeTextTrack(trackInfo, cues) {
         try {
-            if (!nativeSubtitleTrack || nativeSubtitleTrack.label !== trackInfo.language_name) {
-                if (video.addTextTrack) {
-                    nativeSubtitleTrack = video.addTextTrack("subtitles", trackInfo.language_name, trackInfo.language_code);
+            // Purge existing cues from all native tracks so no stale cues linger
+            if (video.textTracks && video.textTracks.length) {
+                for (let i = 0; i < video.textTracks.length; i++) {
+                    const t = video.textTracks[i];
+                    if (t.cues) {
+                        const oldCues = Array.from(t.cues);
+                        for (let j = 0; j < oldCues.length; j++) {
+                            try { t.removeCue(oldCues[j]); } catch (e) {}
+                        }
+                    }
+                    t.mode = "disabled";
                 }
             }
 
-            if (nativeSubtitleTrack) {
-                const existingCues = Array.from(nativeSubtitleTrack.cues || []);
-                existingCues.forEach(c => {
-                    try { nativeSubtitleTrack.removeCue(c); } catch (e) {}
-                });
+            // Reuse track 0 if present, or add text track
+            if (video.textTracks && video.textTracks.length > 0) {
+                nativeSubtitleTrack = video.textTracks[0];
+                try {
+                    nativeSubtitleTrack.label = trackInfo.language_name;
+                    nativeSubtitleTrack.language = trackInfo.language_code;
+                } catch (e) {}
+            } else if (video.addTextTrack) {
+                nativeSubtitleTrack = video.addTextTrack("subtitles", trackInfo.language_name, trackInfo.language_code);
+            }
 
+            if (nativeSubtitleTrack && Array.isArray(cues)) {
                 cues.forEach(c => {
                     try {
                         let cueObj = null;
@@ -3402,13 +3402,11 @@ video::cue {
                         if (cueObj) {
                             nativeSubtitleTrack.addCue(cueObj);
                         }
-                    } catch (cueErr) {
-                        console.warn("Could not add native cue:", cueErr);
-                    }
+                    } catch (cueErr) {}
                 });
             }
         } catch (err) {
-            console.warn("Could not setup native TextTrack for PiP:", err);
+            console.warn("Could not setup native TextTrack:", err);
         }
     }
 
@@ -3433,6 +3431,7 @@ video::cue {
             const box = subtitleCueBox || document.getElementById("subtitleCueBox");
             if (box) {
                 box.classList.remove("visible");
+                box.textContent = "";
             }
             if (subtitleOverlay) {
                 subtitleOverlay.style.visibility = "visible";
@@ -3460,7 +3459,7 @@ video::cue {
                     const data = await resp.json();
                     if (data.success && Array.isArray(data.subtitles)) {
                         currentSubtitles = data.subtitles;
-                        renderSubtitleOptions(false);
+                        renderSubtitleOptions();
                         track = currentSubtitles.find(s => s.language_code === langCode);
                     }
                 } catch (e) {
@@ -3551,6 +3550,12 @@ video::cue {
 
         const firstStart = Number(activeCueList[0].start) || 0;
         if (curTime < firstStart) {
+            // Display first cue if at start or close to speech beginning so user immediately sees selected language
+            if (curTime <= 0.5 || firstStart - curTime <= 3.0) {
+                lastFoundCueIndex = 0;
+                currentActiveCue = activeCueList[0];
+                return activeCueList[0];
+            }
             currentActiveCue = null;
             return null;
         }
@@ -3623,6 +3628,7 @@ video::cue {
         if (video.ended || selectedSubtitleLang === "off" || !activeCueList || !activeCueList.length) {
             if (currentRenderedCueText !== "" || box.classList.contains("visible")) {
                 box.classList.remove("visible");
+                box.textContent = "";
                 currentRenderedCueText = "";
             }
             return;
@@ -3648,6 +3654,7 @@ video::cue {
             }
         } else {
             box.classList.remove("visible");
+            box.textContent = "";
         }
     }
 

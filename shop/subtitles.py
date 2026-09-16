@@ -652,9 +652,8 @@ def translate_cues_to_language(
     translated_cues = []
     chunk_size = 10
     models_to_try = [
+        "qwen/qwen3.8-27b",
         "openai/gpt-oss-120b",
-        "qwen/qwen3.6-27b",
-        "openai/gpt-oss-20b",
     ]
 
     for chunk_start in range(0, len(cues), chunk_size):

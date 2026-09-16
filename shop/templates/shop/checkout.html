@@ -60,8 +60,8 @@
     box-sizing: border-box;
 }
 
-html, body {
-    font-family: "DM Sans", sans-serif;
+html, body, button, input, select, textarea {
+    font-family: "DM Sans", sans-serif !important;
     background: transparent !important;
     color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
@@ -355,6 +355,7 @@ body.standalone {
     display: flex;
     align-items: center;
     gap: 6px;
+    font-family: "DM Sans", sans-serif !important;
     font-size: 13.5px;
     font-weight: 700;
     color: var(--dark);
@@ -364,6 +365,7 @@ body.standalone {
 }
 
 .selected-currency {
+    font-family: "DM Sans", sans-serif !important;
     color: var(--text-secondary);
     font-weight: 600;
     font-size: 12px;
@@ -424,7 +426,7 @@ body.standalone {
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
     outline: none;
-    font-family: inherit;
+    font-family: "DM Sans", sans-serif !important;
     font-size: 13px;
     background: var(--white);
     color: var(--dark);
@@ -465,6 +467,7 @@ body.standalone {
     gap: 10px;
     text-align: left;
     transition: background 0.15s ease;
+    font-family: "DM Sans", sans-serif !important;
 }
 
 .currency-option:hover {
@@ -488,9 +491,11 @@ body.standalone {
     flex-direction: column;
     gap: 1px;
     overflow: hidden;
+    font-family: "DM Sans", sans-serif !important;
 }
 
 .option-country {
+    font-family: "DM Sans", sans-serif !important;
     font-size: 13px;
     font-weight: 700;
     color: var(--dark);
@@ -500,6 +505,7 @@ body.standalone {
 }
 
 .option-currency {
+    font-family: "DM Sans", sans-serif !important;
     font-size: 11.5px;
     color: var(--text-secondary);
 }
@@ -691,7 +697,7 @@ body.standalone {
     border-radius: 12px;
     background: linear-gradient(135deg, #FF6611 0%, var(--orange) 100%);
     color: var(--white);
-    font-family: "DM Sans", sans-serif;
+    font-family: "DM Sans", sans-serif !important;
     font-size: 15.5px;
     font-weight: 800;
     letter-spacing: 0.1px;
