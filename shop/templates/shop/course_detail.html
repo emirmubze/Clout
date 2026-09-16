@@ -757,8 +757,8 @@ body {
 
 .checkout-popup {
     position: relative;
-    width: min(560px, calc(100vw - 32px));
-    height: clamp(620px, 84vh, 720px);
+    width: min(620px, calc(100vw - 32px));
+    height: min(520px, calc(100dvh - 24px));
     max-height: calc(100vh - 24px);
     max-height: calc(100dvh - 24px);
     background: #ffffff;
@@ -807,8 +807,8 @@ body {
 ========================================================= */
 @media (min-width: 641px) and (max-width: 1024px) {
     .checkout-popup {
-        width: min(480px, calc(100vw - 32px));
-        height: clamp(580px, 82vh, 680px);
+        width: min(500px, calc(100vw - 32px));
+        height: min(530px, calc(100dvh - 24px));
         max-height: calc(100vh - 24px);
         max-height: calc(100dvh - 24px);
         border-radius: 22px;
@@ -1244,8 +1244,18 @@ body {
             const frame = document.getElementById('checkoutFrame');
             if (frame && frame.contentWindow) {
                 try {
-                    frame.contentWindow.postMessage({ type: 'triggerResize' }, window.location.origin);
+                    frame.contentWindow.postMessage({ type: 'triggerResize' }, '*');
                 } catch (e) {}
+                setTimeout(() => {
+                    try {
+                        frame.contentWindow.postMessage({ type: 'triggerResize' }, '*');
+                    } catch (e) {}
+                }, 60);
+                setTimeout(() => {
+                    try {
+                        frame.contentWindow.postMessage({ type: 'triggerResize' }, '*');
+                    } catch (e) {}
+                }, 180);
             }
         }
 
@@ -1325,7 +1335,11 @@ body {
         }
 
         window.addEventListener('message', function (event) {
-            if (event.origin !== window.location.origin) return;
+            const isAllowedOrigin = event.origin === window.location.origin ||
+                event.origin.indexOf('127.0.0.1') !== -1 ||
+                event.origin.indexOf('localhost') !== -1;
+            if (!isAllowedOrigin) return;
+
             if (event.data?.type === 'checkoutResize' && typeof event.data.height === 'number') {
                 const popup = document.querySelector('.checkout-popup');
                 if (popup && event.data.height > 200) {
