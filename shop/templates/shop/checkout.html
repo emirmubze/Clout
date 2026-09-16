@@ -93,21 +93,34 @@ body:not(.standalone) {
     background: transparent !important;
 }
 
+body:not(.standalone) html,
+body:not(.standalone) body {
+    height: auto !important;
+    min-height: auto !important;
+    background: transparent !important;
+    overflow: hidden !important;
+}
+
 body:not(.standalone) .order-wrapper {
-    padding: 0;
-    overflow: hidden;
-    height: 100%;
-    min-height: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
+    display: block !important;
+    overflow: visible !important;
 }
 
 body:not(.standalone) .order-card {
-    width: 100%;
-    max-width: 100%;
-    height: 100%;
-    max-height: 100%;
-    border-radius: 24px;
-    border: none;
-    box-shadow: none;
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    min-height: auto !important;
+    max-height: none !important;
+    border-radius: 24px !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    overflow: visible !important;
 }
 
 .order-wrapper {
@@ -861,7 +874,7 @@ body:not(.standalone) .order-card {
     }
 
     body:not(.standalone) .order-card {
-        border-radius: 20px;
+        border-radius: 20px !important;
     }
 
     .order-wrapper {
@@ -873,8 +886,8 @@ body:not(.standalone) .order-card {
         border-radius: 20px;
         max-width: 100%;
         width: 100%;
-        height: 100%;
-        max-height: 100%;
+        height: auto;
+        max-height: calc(100dvh - 16px);
         border: 1px solid var(--border-subtle);
         box-shadow: var(--shadow-card);
     }
@@ -1760,8 +1773,9 @@ if (window.parent === window) {
 }
 
 window.addEventListener('message', function (event) {
-    if (event.origin === window.location.origin && event.data?.type === 'resetPaymentButton') {
-        resetPaymentButton();
+    if (event.origin === window.location.origin) {
+        if (event.data?.type === 'resetPaymentButton') resetPaymentButton();
+        if (event.data?.type === 'triggerResize') syncModalHeight();
     }
 });
 
