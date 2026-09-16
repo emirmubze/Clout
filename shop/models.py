@@ -613,3 +613,55 @@ class Order(models.Model):
             f"{self.product_name} - "
             f"{self.razorpay_order_id}"
         )
+
+
+class PromotionalBanner(models.Model):
+    title = models.CharField(
+        max_length=200,
+        blank=True,
+        default="",
+        help_text="Optional banner title or alt text",
+    )
+    image = models.ImageField(
+        upload_to="promotional_banners/",
+        null=True,
+        blank=True,
+        help_text="Banner image file",
+    )
+    image_url = models.URLField(
+        blank=True,
+        default="",
+        help_text="Direct image URL if hosted externally or via CDN",
+    )
+    link_url = models.URLField(
+        max_length=500,
+        blank=True,
+        default="",
+        help_text="Destination URL when banner is clicked",
+    )
+    order = models.PositiveIntegerField(
+        default=0,
+        help_text="Display order (lower numbers show first)",
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Whether this banner is visible to users",
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+    )
+
+    class Meta:
+        ordering = ["order", "-created_at"]
+        verbose_name = "Promotional Banner"
+        verbose_name_plural = "Promotional Banners"
+
+    def __str__(self):
+        return self.title or f"Banner #{self.pk}"
+
+    @property
+    def image_public_url(self):
+        return _public_file_url(self.image, self.image_url)

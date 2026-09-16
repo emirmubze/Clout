@@ -2968,6 +2968,20 @@
                 {% endif %}
             </a>
 
+            <a href="#promotional-banners" class="sidebar-link">
+                <span class="sidebar-link-inner">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                        <line x1="8" y1="21" x2="16" y2="21"></line>
+                        <line x1="12" y1="17" x2="12" y2="21"></line>
+                    </svg>
+                    <span>Promo Banners</span>
+                </span>
+                {% if banner_count %}
+                <span class="sidebar-counter" style="background: #5B45FF;">{{ banner_count }}</span>
+                {% endif %}
+            </a>
+
             <div class="sidebar-section-title">System</div>
 
             <a href="/admin/" class="sidebar-link" target="_blank">
@@ -3733,6 +3747,182 @@
                 </div>
             </section>
 
+            <!-- =====================================================
+                 PROMOTIONAL BANNERS PANEL
+            ====================================================== -->
+            <section class="panel" id="promotional-banners">
+                <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <div>
+                        <h2 class="panel-title" style="margin: 0;">Promotional Banners</h2>
+                        <p class="panel-subtitle" style="margin-top: 4px;">Upload & manage promotional carousel banners displayed on the course player page.</p>
+                    </div>
+                    <button type="button" class="btn btn-primary" onclick="toggleBannerAddCard(true)" style="display: inline-flex; align-items: center; gap: 8px;">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        <span>Add New Banner</span>
+                    </button>
+                </div>
+
+                <!-- Add Banner Card / Form -->
+                <div class="card" id="bannerAddCard" style="margin-bottom: 24px; display: none; border: 1px solid rgba(255,255,255,0.12); background: #141618;">
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding: 16px 20px;">
+                        <h3 style="font-size: 16px; font-weight: 700; color: var(--text-main); margin: 0;">Upload Promotional Banner</h3>
+                        <button type="button" class="btn btn-sm btn-ghost" onclick="toggleBannerAddCard(false)" style="padding: 4px 8px;">✕ Close</button>
+                    </div>
+                    <div class="card-body" style="padding: 20px;">
+                        <form id="addBannerForm" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; align-items: start;">
+                                <!-- Left: Image selector & preview -->
+                                <div>
+                                    <label style="display: block; font-size: 13px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">
+                                        Banner Image *
+                                    </label>
+                                    <div class="banner-upload-dropzone" id="bannerDropzone" onclick="document.getElementById('bannerImageInput').click();" style="border: 2px dashed var(--border); border-radius: 12px; padding: 24px 16px; text-align: center; cursor: pointer; background: rgba(255,255,255,0.02); transition: all 0.2s ease;">
+                                        <input type="file" id="bannerImageInput" name="image" accept="image/*" style="display: none;" onchange="handleBannerImagePreview(this)">
+                                        <div id="bannerDropzonePlaceholder">
+                                            <svg viewBox="0 0 24 24" width="36" height="36" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 10px; display: block;">
+                                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                                <polyline points="21 15 16 10 5 21"></polyline>
+                                            </svg>
+                                            <div style="font-size: 14px; font-weight: 600; color: var(--text-main);">Click to select image</div>
+                                            <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">PNG, JPG, WebP, GIF (widescreen recommended)</div>
+                                        </div>
+                                        <div id="bannerDropzonePreview" style="display: none;">
+                                            <img id="bannerPreviewImg" src="" alt="Banner Preview" style="width: 100%; max-height: 180px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border);">
+                                            <div style="font-size: 12px; color: var(--primary); margin-top: 8px; font-weight: 600;">Click to choose different image</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right: Details & Destination URL -->
+                                <div>
+                                    <div class="modal-form-group">
+                                        <label for="bannerLinkUrl" style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">Destination Click URL *</label>
+                                        <input type="url" id="bannerLinkUrl" name="link_url" placeholder="https://example.com/special-deal" required style="width: 100%; height: 40px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 12px; background: rgba(255,255,255,0.04); color: #fff; box-sizing: border-box;">
+                                        <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px; display: block;">Users will be redirected here when they click the banner.</small>
+                                    </div>
+
+                                    <div class="modal-form-group" style="margin-top: 14px;">
+                                        <label for="bannerTitle" style="display: block; font-size: 12.5px; font-weight: 700; color: var(--text-main); margin-bottom: 6px;">Banner Title / Label (Optional)</label>
+                                        <input type="text" id="bannerTitle" name="title" placeholder="e.g. 50% Off AI Tools Bundle" style="width: 100%; height: 40px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 12px; background: rgba(255,255,255,0.04); color: #fff; box-sizing: border-box;">
+                                    </div>
+
+                                    <div style="display: flex; gap: 16px; align-items: center; margin-top: 14px;">
+                                        <div style="flex: 1;">
+                                            <label for="bannerOrder" style="display: block; font-size: 12px; font-weight: 700; color: var(--text-main); margin-bottom: 4px;">Display Order</label>
+                                            <input type="number" id="bannerOrder" name="order" value="1" min="0" style="width: 100%; height: 38px; border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 0 10px; background: rgba(255,255,255,0.04); color: #fff; box-sizing: border-box;">
+                                        </div>
+                                        <div style="flex: 1; padding-top: 18px;">
+                                            <label class="modal-checkbox-label">
+                                                <input type="checkbox" name="is_active" value="true" checked>
+                                                <span>Active / Visible</span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div style="margin-top: 22px; display: flex; justify-content: flex-end; gap: 10px;">
+                                        <button type="button" class="btn btn-ghost" onclick="toggleBannerAddCard(false)">Cancel</button>
+                                        <button type="submit" class="btn btn-primary" id="saveBannerBtn">Publish Banner</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Banners List / Table -->
+                <div class="card" style="border: 1px solid rgba(255,255,255,0.08); background: #141618;">
+                    <div class="table-responsive">
+                        <table class="data-table" id="bannersTable" style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border); text-align: left;">
+                                    <th style="padding: 14px 16px; width: 70px; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Order</th>
+                                    <th style="padding: 14px 16px; width: 170px; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Banner Image</th>
+                                    <th style="padding: 14px 16px; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Title & Destination Link</th>
+                                    <th style="padding: 14px 16px; width: 100px; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Status</th>
+                                    <th style="padding: 14px 16px; width: 110px; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Created</th>
+                                    <th style="padding: 14px 16px; width: 140px; text-align: right; font-size: 12px; color: var(--text-muted); text-transform: uppercase;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="bannerListBody">
+                                {% for banner in promotional_banners %}
+                                <tr id="banner-row-{{ banner.id }}" data-id="{{ banner.id }}" style="border-bottom: 1px solid var(--border);">
+                                    <td style="padding: 14px 16px;">
+                                        <div style="display: flex; align-items: center; gap: 6px;">
+                                            <span style="font-weight: 700; font-size: 13px; color: var(--text-main);">#{{ banner.order }}</span>
+                                            <div style="display: flex; flex-direction: column; gap: 2px;">
+                                                <button type="button" onclick="reorderBanner({{ banner.id }}, 'up')" title="Move Up" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0; line-height: 1; font-size: 11px;">▲</button>
+                                                <button type="button" onclick="reorderBanner({{ banner.id }}, 'down')" title="Move Down" style="background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 0; line-height: 1; font-size: 11px;">▼</button>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <div style="width: 150px; height: 58px; border-radius: 8px; overflow: hidden; background: #000; border: 1px solid var(--border);">
+                                            <img src="{{ banner.image_public_url }}" alt="{{ banner.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                        </div>
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        <div style="font-weight: 600; color: var(--text-main); font-size: 13.5px; margin-bottom: 4px;">
+                                            {{ banner.title|default:"(Untitled Banner)" }}
+                                        </div>
+                                        {% if banner.link_url %}
+                                        <a href="{{ banner.link_url }}" target="_blank" rel="noopener noreferrer" style="color: var(--primary); font-size: 12px; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; word-break: break-all;">
+                                            <span>{{ banner.link_url|truncatechars:48 }}</span>
+                                            <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                                <polyline points="15 3 21 3 21 9"></polyline>
+                                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                                            </svg>
+                                        </a>
+                                        {% else %}
+                                        <span style="color: var(--text-muted); font-size: 12px;">No link specified</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 14px 16px;">
+                                        {% if banner.is_active %}
+                                        <span class="badge" style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;">Active</span>
+                                        {% else %}
+                                        <span class="badge" style="background: rgba(255, 255, 255, 0.08); color: var(--text-muted); padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;">Inactive</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="padding: 14px 16px; color: var(--text-muted); font-size: 12px;">
+                                        {{ banner.created_at|date:"M d, Y" }}
+                                    </td>
+                                    <td style="padding: 14px 16px; text-align: right;">
+                                        <div style="display: flex; gap: 6px; justify-content: flex-end;">
+                                            <button type="button" class="btn btn-sm btn-ghost" onclick="openEditBannerModal({{ banner.id }}, '{{ banner.title|escapejs }}', '{{ banner.link_url|escapejs }}', {{ banner.order }}, {{ banner.is_active|yesno:'true,false' }}, '{{ banner.image_public_url|escapejs }}')" style="padding: 4px 10px; font-size: 12px;">
+                                                Edit
+                                            </button>
+                                            <button type="button" class="btn btn-sm" onclick="deleteBanner({{ banner.id }}, '{{ banner.title|escapejs }}')" style="padding: 4px 10px; font-size: 12px; background: rgba(239, 68, 68, 0.15); color: #EF4444; border: 1px solid rgba(239, 68, 68, 0.3);">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr id="noBannersRow">
+                                    <td colspan="6" style="text-align: center; padding: 48px 24px; color: var(--text-muted);">
+                                        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin: 0 auto 12px; opacity: 0.4; display: block;">
+                                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                                        </svg>
+                                        <div style="font-size: 15px; font-weight: 600; color: var(--text-main); margin-bottom: 4px;">No Promotional Banners Added Yet</div>
+                                        <div style="font-size: 13px;">Upload images with destination URLs to display them in the course player carousel.</div>
+                                        <button type="button" class="btn btn-primary" onclick="toggleBannerAddCard(true)" style="margin-top: 16px;">+ Add Your First Banner</button>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
         </main>
     </div>
 
@@ -3786,6 +3976,55 @@
                 <div class="user-modal-footer">
                     <button type="button" class="modal-cancel-btn" id="cancelAddUserBtn">Cancel</button>
                     <button type="submit" class="modal-submit-btn" id="submitAddUserBtn">Create User</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- =====================================================
+         EDIT BANNER MODAL DIALOG
+    ====================================================== -->
+    <div class="user-modal-overlay" id="editBannerModal" style="display: none;">
+        <div class="user-modal-box" style="max-width: 520px;">
+            <div class="user-modal-header">
+                <h3 class="user-modal-title">Edit Promotional Banner</h3>
+                <button type="button" class="user-modal-close-btn" onclick="closeEditBannerModal()">&times;</button>
+            </div>
+            <form id="editBannerForm" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" id="editBannerId" name="banner_id">
+                <div class="user-modal-body">
+                    <div style="margin-bottom: 16px; text-align: center;">
+                        <img id="editBannerCurrentImg" src="" alt="Current Banner" style="max-width: 100%; max-height: 120px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border);">
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="editBannerImage">Replace Image (Optional)</label>
+                        <input type="file" id="editBannerImage" name="image" accept="image/*">
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="editBannerLinkUrl">Destination Click URL *</label>
+                        <input type="url" id="editBannerLinkUrl" name="link_url" required placeholder="https://...">
+                    </div>
+                    <div class="modal-form-group">
+                        <label for="editBannerTitle">Banner Title / Label</label>
+                        <input type="text" id="editBannerTitle" name="title" placeholder="e.g. Special Offer">
+                    </div>
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <div style="flex: 1;" class="modal-form-group">
+                            <label for="editBannerOrder">Display Order</label>
+                            <input type="number" id="editBannerOrder" name="order" min="0">
+                        </div>
+                        <div style="flex: 1; padding-top: 14px;">
+                            <label class="modal-checkbox-label">
+                                <input type="checkbox" id="editBannerActive" name="is_active" value="true">
+                                <span>Active / Visible</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="user-modal-footer">
+                    <button type="button" class="modal-cancel-btn" onclick="closeEditBannerModal()">Cancel</button>
+                    <button type="submit" class="modal-submit-btn" id="submitEditBannerBtn">Save Changes</button>
                 </div>
             </form>
         </div>
@@ -5771,6 +6010,189 @@
                 showToast("Error updating languages config.", true);
             }
         };
+
+        /* =========================================================
+           PROMOTIONAL BANNERS MANAGEMENT SCRIPT
+        ========================================================= */
+        window.toggleBannerAddCard = function(show) {
+            const card = document.getElementById("bannerAddCard");
+            if (!card) return;
+            card.style.display = show ? "block" : "none";
+            if (show) {
+                card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+            }
+        };
+
+        window.handleBannerImagePreview = function(input) {
+            const previewWrap = document.getElementById("bannerDropzonePreview");
+            const previewImg = document.getElementById("bannerPreviewImg");
+            const placeholder = document.getElementById("bannerDropzonePlaceholder");
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    if (previewImg) previewImg.src = e.target.result;
+                    if (previewWrap) previewWrap.style.display = "block";
+                    if (placeholder) placeholder.style.display = "none";
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        };
+
+        window.openEditBannerModal = function(id, title, linkUrl, order, isActive, imageUrl) {
+            document.getElementById("editBannerId").value = id;
+            document.getElementById("editBannerTitle").value = title || "";
+            document.getElementById("editBannerLinkUrl").value = linkUrl || "";
+            document.getElementById("editBannerOrder").value = order || 0;
+            document.getElementById("editBannerActive").checked = !!isActive;
+            const imgEl = document.getElementById("editBannerCurrentImg");
+            if (imgEl && imageUrl) {
+                imgEl.src = imageUrl;
+                imgEl.style.display = "inline-block";
+            }
+            document.getElementById("editBannerImage").value = "";
+            document.getElementById("editBannerModal").style.display = "flex";
+        };
+
+        window.closeEditBannerModal = function() {
+            document.getElementById("editBannerModal").style.display = "none";
+        };
+
+        window.deleteBanner = async function(id, title) {
+            const name = title || `Banner #${id}`;
+            if (!confirm(`Are you sure you want to delete "${name}"?`)) {
+                return;
+            }
+            try {
+                const csrfInput = document.querySelector("input[name='csrfmiddlewaretoken']");
+                const resp = await fetch(`/admin-banner-delete/${id}/`, {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfInput ? csrfInput.value : "",
+                        "X-Requested-With": "XMLHttpRequest"
+                    }
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast(data.message || "Banner deleted successfully.");
+                    const row = document.getElementById(`banner-row-${id}`);
+                    if (row) row.remove();
+                    const tbody = document.getElementById("bannerListBody");
+                    if (tbody && tbody.querySelectorAll("tr").length === 0) {
+                        window.location.reload();
+                    }
+                } else {
+                    showToast(data.message || "Failed to delete banner.", true);
+                }
+            } catch (err) {
+                showToast("Network error deleting banner.", true);
+            }
+        };
+
+        window.reorderBanner = async function(id, direction) {
+            try {
+                const csrfInput = document.querySelector("input[name='csrfmiddlewaretoken']");
+                const formData = new FormData();
+                formData.append("banner_id", id);
+                formData.append("direction", direction);
+                const resp = await fetch("{% url 'admin_banner_reorder' %}", {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrfInput ? csrfInput.value : "",
+                        "X-Requested-With": "XMLHttpRequest"
+                    },
+                    body: formData
+                });
+                const data = await resp.json();
+                if (data.success) {
+                    showToast("Banner reordered.");
+                    window.location.reload();
+                } else {
+                    showToast(data.message || "Could not reorder.", true);
+                }
+            } catch (err) {
+                showToast("Network error reordering banner.", true);
+            }
+        };
+
+        const addBannerForm = document.getElementById("addBannerForm");
+        if (addBannerForm) {
+            addBannerForm.addEventListener("submit", async function(e) {
+                e.preventDefault();
+                const saveBtn = document.getElementById("saveBannerBtn");
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = "Uploading...";
+                }
+                try {
+                    const formData = new FormData(addBannerForm);
+                    const resp = await fetch("{% url 'admin_banner_add' %}", {
+                        method: "POST",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
+                        body: formData
+                    });
+                    const data = await resp.json();
+                    if (data.success) {
+                        showToast("Promotional banner added successfully!");
+                        window.location.reload();
+                    } else {
+                        showToast(data.message || "Failed to add banner.", true);
+                        if (saveBtn) {
+                            saveBtn.disabled = false;
+                            saveBtn.textContent = "Publish Banner";
+                        }
+                    }
+                } catch (err) {
+                    showToast("Network error creating banner.", true);
+                    if (saveBtn) {
+                        saveBtn.disabled = false;
+                        saveBtn.textContent = "Publish Banner";
+                    }
+                }
+            });
+        }
+
+        const editBannerForm = document.getElementById("editBannerForm");
+        if (editBannerForm) {
+            editBannerForm.addEventListener("submit", async function(e) {
+                e.preventDefault();
+                const id = document.getElementById("editBannerId").value;
+                const submitBtn = document.getElementById("submitEditBannerBtn");
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = "Saving...";
+                }
+                try {
+                    const formData = new FormData(editBannerForm);
+                    const resp = await fetch(`/admin-banner-edit/${id}/`, {
+                        method: "POST",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
+                        },
+                        body: formData
+                    });
+                    const data = await resp.json();
+                    if (data.success) {
+                        showToast("Banner updated successfully!");
+                        closeEditBannerModal();
+                        window.location.reload();
+                    } else {
+                        showToast(data.message || "Failed updating banner.", true);
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = "Save Changes";
+                        }
+                    }
+                } catch (err) {
+                    showToast("Network error updating banner.", true);
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "Save Changes";
+                    }
+                }
+            });
+        }
 
     })();
     </script>

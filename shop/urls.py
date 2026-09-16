@@ -123,6 +123,30 @@ urlpatterns = [
     ),
 
     path(
+        "admin-banner-add/",
+        views.admin_banner_add,
+        name="admin_banner_add"
+    ),
+
+    path(
+        "admin-banner-edit/<int:banner_id>/",
+        views.admin_banner_edit,
+        name="admin_banner_edit"
+    ),
+
+    path(
+        "admin-banner-delete/<int:banner_id>/",
+        views.admin_banner_delete,
+        name="admin_banner_delete"
+    ),
+
+    path(
+        "admin-banner-reorder/",
+        views.admin_banner_reorder,
+        name="admin_banner_reorder"
+    ),
+
+    path(
         "lesson-video/<int:lesson_id>/",
         views.serve_lesson_video,
         name="serve_lesson_video"

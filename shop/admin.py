@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import Order, CustomUser, Course, ContactMessage, Module
+from django.utils.html import format_html
+from .models import Order, CustomUser, Course, ContactMessage, Module, PromotionalBanner
 
 
 class CustomUserAdmin(BaseUserAdmin):
@@ -66,3 +67,24 @@ class ContactMessageAdmin(admin.ModelAdmin):
         ('Status', {'fields': ('is_read',)}),
         ('Timestamps', {'fields': ('created_at',)}),
     )
+
+
+@admin.register(PromotionalBanner)
+class PromotionalBannerAdmin(admin.ModelAdmin):
+    list_display = ('title', 'thumbnail_preview', 'link_url', 'order', 'is_active', 'created_at')
+    list_editable = ('order', 'is_active')
+    list_filter = ('is_active', 'created_at')
+    search_fields = ('title', 'link_url')
+    readonly_fields = ('created_at', 'updated_at', 'thumbnail_preview')
+    fieldsets = (
+        ('Banner Info', {'fields': ('title', 'link_url', 'order', 'is_active')}),
+        ('Image', {'fields': ('image', 'image_url', 'thumbnail_preview')}),
+        ('Timestamps', {'fields': ('created_at', 'updated_at')}),
+    )
+
+    def thumbnail_preview(self, obj):
+        url = obj.image_public_url
+        if url:
+            return format_html('<img src="{}" style="max-height: 48px; max-width: 120px; border-radius: 4px; object-fit: cover;" />', url)
+        return "-"
+    thumbnail_preview.short_description = "Preview"

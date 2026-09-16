@@ -35,7 +35,7 @@ from botocore.config import Config
 
 from .models import (
     Order, CustomUser, ContactMessage, Course, Module, Lesson,
-    SubtitleTrack, SubtitleSetting, _public_file_url
+    SubtitleTrack, SubtitleSetting, _public_file_url, PromotionalBanner
 )
 from .auth_api import revoke_api_sessions
 from .forms import RegistrationForm, CourseForm
@@ -322,12 +322,17 @@ def course(request):
                 course=course_obj
             ).prefetch_related("lessons").order_by("order")
 
+        promotional_banners = PromotionalBanner.objects.filter(
+            is_active=True
+        ).order_by("order", "-created_at")
+
         return render(
             request,
             "shop/course.html",
             {
                 "course": course_obj,
-                "modules": modules
+                "modules": modules,
+                "promotional_banners": promotional_banners,
             }
         )
 
@@ -352,12 +357,17 @@ def course(request):
                     course=course_obj
                 ).prefetch_related("lessons").order_by("order")
 
+            promotional_banners = PromotionalBanner.objects.filter(
+                is_active=True
+            ).order_by("order", "-created_at")
+
             return render(
                 request,
                 "shop/course.html",
                 {
                     "course": course_obj,
-                    "modules": modules
+                    "modules": modules,
+                    "promotional_banners": promotional_banners,
                 }
             )
 
@@ -698,6 +708,8 @@ def admin_dashboard(request):
             "selected_user": selected_user,
             "chat_messages": chat_messages,
             "contact_count": ContactMessage.objects.count(),
+            "promotional_banners": PromotionalBanner.objects.all().order_by("order", "-created_at"),
+            "banner_count": PromotionalBanner.objects.count(),
             "supported_languages": list(SUPPORTED_LANGUAGES.values()),
             "active_target_languages": get_active_target_languages(),
             "use_s3": getattr(settings, "USE_S3", False),
@@ -1519,6 +1531,181 @@ def admin_user_delete(request, user_id):
         "message": f"User @{username} deleted successfully.",
         "user_id": user_id
     })
+
+
+# =========================================================
+# PROMOTIONAL BANNER ADMIN ENDPOINTS
+# AJAX = NO PAGE RELOAD
+# =========================================================
+
+@login_required(login_url="login")
+def admin_banner_add(request):
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+
+    if request.method != "POST":
+        return JsonResponse({"success": False, "message": "POST method required."}, status=405)
+
+    link_url = (request.POST.get("link_url") or "").strip()
+    title = (request.POST.get("title") or "").strip()
+    order_raw = request.POST.get("order")
+    is_active = request.POST.get("is_active") in ("true", "1", "on", True)
+    image_file = request.FILES.get("image")
+    image_url = (request.POST.get("image_url") or "").strip()
+
+    if not image_file and not image_url:
+        return JsonResponse({"success": False, "message": "Please select a banner image or provide an image URL."}, status=400)
+
+    try:
+        order = int(order_raw) if order_raw is not None and str(order_raw).strip() != "" else 0
+    except (ValueError, TypeError):
+        order = 0
+
+    if order == 0:
+        from django.db.models import Max
+        max_order = PromotionalBanner.objects.aggregate(Max("order"))["order__max"] or 0
+        order = max_order + 1
+
+    banner = PromotionalBanner(
+        title=title,
+        link_url=link_url,
+        order=order,
+        is_active=is_active,
+        image=image_file,
+        image_url=image_url,
+    )
+    banner.save()
+
+    return JsonResponse({
+        "success": True,
+        "message": "Promotional banner created successfully.",
+        "banner": {
+            "id": banner.id,
+            "title": banner.title,
+            "link_url": banner.link_url,
+            "order": banner.order,
+            "is_active": banner.is_active,
+            "image_url": banner.image_public_url,
+            "created_at": banner.created_at.strftime("%b %d, %Y"),
+        }
+    })
+
+
+@login_required(login_url="login")
+def admin_banner_edit(request, banner_id):
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+
+    banner = get_object_or_404(PromotionalBanner, id=banner_id)
+
+    if request.method != "POST":
+        return JsonResponse({"success": False, "message": "POST method required."}, status=405)
+
+    title = request.POST.get("title")
+    if title is not None:
+        banner.title = title.strip()
+
+    link_url = request.POST.get("link_url")
+    if link_url is not None:
+        banner.link_url = link_url.strip()
+
+    order_raw = request.POST.get("order")
+    if order_raw is not None and str(order_raw).strip() != "":
+        try:
+            banner.order = int(order_raw)
+        except (ValueError, TypeError):
+            pass
+
+    if "is_active" in request.POST:
+        banner.is_active = request.POST.get("is_active") in ("true", "1", "on", True)
+
+    if "image" in request.FILES:
+        banner.image = request.FILES["image"]
+
+    image_url = request.POST.get("image_url")
+    if image_url is not None and image_url.strip():
+        banner.image_url = image_url.strip()
+
+    banner.save()
+
+    return JsonResponse({
+        "success": True,
+        "message": "Banner updated successfully.",
+        "banner": {
+            "id": banner.id,
+            "title": banner.title,
+            "link_url": banner.link_url,
+            "order": banner.order,
+            "is_active": banner.is_active,
+            "image_url": banner.image_public_url,
+        }
+    })
+
+
+@login_required(login_url="login")
+@require_POST
+def admin_banner_delete(request, banner_id):
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+
+    banner = get_object_or_404(PromotionalBanner, id=banner_id)
+    banner_title = banner.title or f"Banner #{banner.id}"
+    banner.delete()
+
+    return JsonResponse({
+        "success": True,
+        "message": f"{banner_title} deleted successfully.",
+        "banner_id": banner_id,
+    })
+
+
+@login_required(login_url="login")
+@require_POST
+def admin_banner_reorder(request):
+    if not request.user.is_staff:
+        return JsonResponse({"success": False, "message": "Permission denied."}, status=403)
+
+    direction = request.POST.get("direction")
+    banner_id = request.POST.get("banner_id")
+
+    if banner_id and direction in ("up", "down"):
+        try:
+            current_banner = PromotionalBanner.objects.get(id=int(banner_id))
+            all_banners = list(PromotionalBanner.objects.all().order_by("order", "id"))
+            idx = next((i for i, b in enumerate(all_banners) if b.id == current_banner.id), None)
+            if idx is not None:
+                swap_idx = idx - 1 if direction == "up" else idx + 1
+                if 0 <= swap_idx < len(all_banners):
+                    target_banner = all_banners[swap_idx]
+                    current_order = current_banner.order
+                    target_order = target_banner.order
+                    if current_order == target_order:
+                        for i, b in enumerate(all_banners):
+                            b.order = i
+                            b.save(update_fields=["order"])
+                        all_banners[idx].order, all_banners[swap_idx].order = swap_idx, idx
+                        all_banners[idx].save(update_fields=["order"])
+                        all_banners[swap_idx].save(update_fields=["order"])
+                    else:
+                        current_banner.order = target_order
+                        target_banner.order = current_order
+                        current_banner.save(update_fields=["order"])
+                        target_banner.save(update_fields=["order"])
+                    return JsonResponse({"success": True, "message": "Banner reordered successfully."})
+        except Exception as e:
+            return JsonResponse({"success": False, "message": str(e)}, status=400)
+
+    try:
+        raw_body = json.loads(request.body or "{}") if request.content_type == "application/json" else {}
+        order_list = raw_body.get("order") or request.POST.getlist("order[]")
+        if order_list:
+            for new_idx, b_id in enumerate(order_list):
+                PromotionalBanner.objects.filter(id=int(b_id)).update(order=new_idx)
+            return JsonResponse({"success": True, "message": "Banners reordered successfully."})
+    except Exception as e:
+        return JsonResponse({"success": False, "message": str(e)}, status=400)
+
+    return JsonResponse({"success": False, "message": "Invalid reorder parameters."}, status=400)
 
 
 # =========================================================
