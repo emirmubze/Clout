@@ -649,7 +649,7 @@ def translate_cues_with_gemini(
 
     BATCH_SIZE = 200
     all_translated: List[Dict[str, Any]] = []
-    models = ["gemini-2.0-flash", "gemini-1.5-flash"]
+    models = ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
 
     for b_start in range(0, len(cues), BATCH_SIZE):
         batch = cues[b_start:b_start + BATCH_SIZE]

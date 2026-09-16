@@ -227,7 +227,7 @@ def ai_chat(request):
 
     # Priority 1: Google Gemini (fast, high concurrency, generous token limits)
     if gemini_key:
-        for model_name in ["gemini-2.0-flash", "gemini-1.5-flash"]:
+        for model_name in ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]:
             try:
                 gemini_url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
                 gemini_payload = {
