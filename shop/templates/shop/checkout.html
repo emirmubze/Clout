@@ -51,7 +51,7 @@
     --radius-md: 12px;
     --radius-sm: 8px;
     --shadow-card: 0 20px 50px -10px rgba(0, 0, 0, 0.15), 0 0 1px 1px rgba(0, 0, 0, 0.05);
-    --card-pad-x: clamp(16px, 3.2vw, 32px);
+    --card-pad-x: 22px;
 }
 
 * {
@@ -66,8 +66,8 @@ html, body {
     color: var(--text-primary);
     -webkit-font-smoothing: antialiased;
     width: 100%;
-    height: 100%;
-    min-height: 100%;
+    height: auto;
+    min-height: auto;
     scrollbar-width: none !important;
     -ms-overflow-style: none !important;
 }
@@ -100,17 +100,13 @@ body.standalone {
     min-height: -webkit-fill-available;
     min-height: 100svh;
     min-height: 100dvh;
+    height: 100%;
 }
 
 body:not(.standalone) {
     background: transparent !important;
-}
-
-body:not(.standalone) html,
-body:not(.standalone) body {
     height: auto !important;
     min-height: auto !important;
-    background: transparent !important;
     overflow: hidden !important;
 }
 
@@ -137,8 +133,8 @@ body:not(.standalone) .order-card {
 }
 
 body:not(.standalone) .secure {
-    margin-top: 10px !important;
-    padding-bottom: 16px !important;
+    margin-top: 6px !important;
+    padding-bottom: 8px !important;
 }
 
 .order-wrapper {
@@ -205,7 +201,7 @@ body:not(.standalone) .secure {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px var(--card-pad-x) 12px;
+    padding: 12px var(--card-pad-x) 10px;
     border-bottom: 1px solid var(--border-subtle);
     background: var(--white);
     position: sticky;
@@ -217,15 +213,15 @@ body:not(.standalone) .secure {
 .order-header-left {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .secure-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 26px;
-    height: 26px;
+    width: 24px;
+    height: 24px;
     border-radius: 50%;
     background: var(--peach);
     color: var(--orange);
@@ -233,19 +229,19 @@ body:not(.standalone) .secure {
 }
 
 .order-header h1 {
-    font-size: 18px;
+    font-size: 16.5px;
     font-weight: 800;
     letter-spacing: -0.2px;
     color: var(--dark);
 }
 
 .close-btn {
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border: 1px solid var(--border-subtle);
     background: var(--off-white);
     border-radius: 50%;
-    font-size: 18px;
+    font-size: 16px;
     font-weight: 400;
     line-height: 1;
     cursor: pointer;
@@ -269,30 +265,30 @@ body:not(.standalone) .secure {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 14px;
-    padding: 11px 16px;
+    gap: 12px;
+    padding: 8px 14px;
     border-radius: var(--radius-md);
     background: var(--off-white);
     border: 1px solid var(--border-subtle);
-    margin: 12px var(--card-pad-x) 10px;
+    margin: 8px var(--card-pad-x) 6px;
     flex-shrink: 0;
 }
 
 .product-left {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     min-width: 0;
 }
 
 .product-media {
-    width: 44px;
-    height: 44px;
+    width: 38px;
+    height: 38px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
+    border-radius: 8px;
     background: linear-gradient(135deg, #FFF0E6 0%, #FFE2D1 100%);
     border: 1px solid rgba(224, 79, 0, 0.15);
     overflow: hidden;
@@ -312,8 +308,8 @@ body:not(.standalone) .secure {
 }
 
 .product-info h2 {
-    margin: 0 0 3px;
-    font-size: 15px;
+    margin: 0 0 2px;
+    font-size: 14px;
     font-weight: 800;
     color: var(--dark);
     letter-spacing: -0.2px;
@@ -324,7 +320,7 @@ body:not(.standalone) .secure {
 
 .product-info p {
     margin: 0;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
     color: var(--brand);
     display: flex;
@@ -338,7 +334,7 @@ body:not(.standalone) .secure {
 }
 
 .product-price span {
-    font-size: 16.5px;
+    font-size: 15.5px;
     font-weight: 800;
     color: var(--dark);
     font-family: "DM Sans", sans-serif;
@@ -348,8 +344,8 @@ body:not(.standalone) .secure {
    COUNTRY / CURRENCY BOX
 ===================================================== */
 .currency-box {
-    margin: 0 var(--card-pad-x) 10px;
-    padding: 9px 16px;
+    margin: 0 var(--card-pad-x) 6px;
+    padding: 6px 14px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     background: var(--white);
@@ -360,8 +356,8 @@ body:not(.standalone) .secure {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
-    font-size: 11px;
+    margin-bottom: 3px;
+    font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.8px;
     text-transform: uppercase;
@@ -375,8 +371,8 @@ body:not(.standalone) .secure {
 
 .currency-selected {
     width: 100%;
-    min-height: 40px;
-    padding: 0 14px;
+    min-height: 34px;
+    padding: 0 10px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
     background: var(--off-white);
@@ -590,8 +586,8 @@ body:not(.standalone) .secure {
     background: var(--off-white);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    padding: 11px 16px 9px;
-    margin: 0 var(--card-pad-x) 11px;
+    padding: 7px 14px 6px;
+    margin: 0 var(--card-pad-x) 7px;
     flex-shrink: 0;
 }
 
@@ -599,13 +595,13 @@ body:not(.standalone) .secure {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 7px;
-    padding-bottom: 6px;
+    margin-bottom: 4px;
+    padding-bottom: 3px;
     border-bottom: 1px dashed var(--border-subtle);
 }
 
 .summary-title {
-    font-size: 11px;
+    font-size: 10.5px;
     font-weight: 700;
     letter-spacing: 0.6px;
     text-transform: uppercase;
@@ -616,12 +612,12 @@ body:not(.standalone) .secure {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 8px;
-    border-radius: 6px;
+    padding: 2px 6px;
+    border-radius: 4px;
     background: var(--white);
     border: 1px solid var(--border-subtle);
     color: var(--brand);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 700;
 }
 
@@ -629,8 +625,8 @@ body:not(.standalone) .secure {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 4px 0;
-    font-size: 13px;
+    margin: 2px 0;
+    font-size: 12px;
     font-weight: 500;
     color: var(--text-secondary);
 }
@@ -651,8 +647,8 @@ body:not(.standalone) .secure {
 
 .total-box {
     border-top: 1px solid var(--border-subtle);
-    margin-top: 7px;
-    padding-top: 7px;
+    margin-top: 5px;
+    padding-top: 4px;
 }
 
 .total-row {
@@ -662,7 +658,7 @@ body:not(.standalone) .secure {
 }
 
 .total-label {
-    font-size: 15.5px;
+    font-size: 14.5px;
     font-weight: 800;
     color: var(--dark);
     letter-spacing: -0.2px;
@@ -676,7 +672,7 @@ body:not(.standalone) .secure {
 }
 
 .total-price strong {
-    font-size: 21px;
+    font-size: 18.5px;
     font-weight: 800;
     line-height: 1.1;
     color: var(--dark);
@@ -684,9 +680,9 @@ body:not(.standalone) .secure {
 }
 
 .total-price small {
-    margin-top: 2px;
+    margin-top: 1px;
     color: var(--text-muted);
-    font-size: 10px;
+    font-size: 9.5px;
     font-weight: 600;
 }
 
@@ -696,8 +692,8 @@ body:not(.standalone) .secure {
 .terms {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    margin: 0 var(--card-pad-x) 10px;
+    gap: 8px;
+    margin: 0 var(--card-pad-x) 7px;
     cursor: pointer;
     user-select: none;
     flex-shrink: 0;
@@ -706,14 +702,14 @@ body:not(.standalone) .secure {
 .terms input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
+    width: 15px;
+    height: 15px;
     border: 1.5px solid var(--border-hover);
     border-radius: 4px;
     outline: none;
     cursor: pointer;
     flex-shrink: 0;
-    margin-top: 2px;
+    margin-top: 1px;
     background: var(--white);
     display: grid;
     place-content: center;
@@ -729,13 +725,13 @@ body:not(.standalone) .secure {
     content: "\f00c";
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
-    font-size: 8.5px;
+    font-size: 8px;
     color: var(--white);
 }
 
 .terms span {
-    font-size: 11.5px;
-    line-height: 1.45;
+    font-size: 11px;
+    line-height: 1.35;
     color: var(--text-secondary);
 }
 
@@ -751,13 +747,13 @@ body:not(.standalone) .secure {
 
 .buy-btn {
     width: calc(100% - (var(--card-pad-x) * 2));
-    height: 46px;
+    height: 38px;
     border: 0;
-    border-radius: 12px;
+    border-radius: 10px;
     background: linear-gradient(135deg, #FF6611 0%, var(--orange) 100%);
     color: var(--white);
     font-family: "DM Sans", sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 800;
     letter-spacing: 0.1px;
     cursor: pointer;
@@ -783,7 +779,7 @@ body:not(.standalone) .secure {
     font-style: normal !important;
     display: inline-block;
     line-height: 1;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .buy-btn:hover:not(:disabled) {
@@ -816,24 +812,24 @@ body:not(.standalone) .secure {
     font-style: normal !important;
     display: inline-block;
     line-height: 1;
-    font-size: 14px;
+    font-size: 13px;
 }
 
 .secure {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    margin-top: 10px;
-    padding-bottom: 16px;
-    font-size: 11px;
+    gap: 5px;
+    margin-top: 6px;
+    padding-bottom: 8px;
+    font-size: 10.5px;
     color: var(--text-muted);
     flex-shrink: 0;
 }
 
 .secure i {
     color: #16a34a;
-    font-size: 12px;
+    font-size: 11px;
 }
 
 /* =====================================================
