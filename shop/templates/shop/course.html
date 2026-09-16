@@ -1302,8 +1302,18 @@ button {
     }
 }
 
-/* Native Video Cue styling for Picture-in-Picture (PiP) and native player */
+/* Prevent native browser video::cue from colliding with custom HTML subtitle overlay */
 video::cue {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+/* Only display native cue when the video is detached in Picture-in-Picture */
+video:picture-in-picture::cue {
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
     background-color: transparent !important;
     background: transparent !important;
     color: #ffffff !important;
@@ -3342,26 +3352,18 @@ video::cue {
 
     function syncSubtitleMode() {
         const inPip = isPipActive();
-        const isNativeVideoFullscreen = !!(document.fullscreenElement === video || document.webkitFullscreenElement === video);
         const hasActiveSub = selectedSubtitleLang !== "off" && activeCueList && activeCueList.length > 0;
 
-        // Sync native TextTrack mode
-        if (nativeSubtitleTrack) {
-            if (!hasActiveSub) {
-                nativeSubtitleTrack.mode = "disabled";
-            } else {
-                // When in PiP mode or native <video> fullscreen, native track MUST be "showing"
-                // When in normal player or container fullscreen mode, mode is "disabled" so custom overlay renders cleanly
-                nativeSubtitleTrack.mode = (inPip || isNativeVideoFullscreen) ? "showing" : "disabled";
-            }
-        }
-
-        // Disable any other inactive tracks on video element
+        // In normal player and fullscreen modes, native text tracks MUST be disabled
+        // so that the browser native player does not paint duplicate/conflicting subtitles over the custom overlay
         if (video.textTracks && video.textTracks.length) {
             for (let i = 0; i < video.textTracks.length; i++) {
                 const t = video.textTracks[i];
-                if (t === nativeSubtitleTrack && (inPip || isNativeVideoFullscreen) && hasActiveSub) continue;
-                t.mode = "disabled";
+                if (inPip && t === nativeSubtitleTrack && hasActiveSub) {
+                    t.mode = "showing";
+                } else {
+                    t.mode = "disabled";
+                }
             }
         }
 
@@ -3550,18 +3552,10 @@ video::cue {
         currentRenderedCueText = "";
         currentActiveCue = null;
 
-        // Native track element for iOS Safari and hardware fullscreen
-        if (track.vtt_url) {
-            try {
-                const trackEl = document.createElement("track");
-                trackEl.kind = "subtitles";
-                trackEl.label = track.language_name || "Subtitles";
-                trackEl.srclang = track.language_code || "en";
-                trackEl.src = track.vtt_url;
-                trackEl.default = true;
-                video.appendChild(trackEl);
-            } catch (e) {}
-        }
+        video.querySelectorAll("track").forEach(t => {
+            try { t.mode = "disabled"; } catch (e) {}
+            t.remove();
+        });
 
         setupNativeTextTrack(track, activeCueList);
         syncSubtitleMode();
