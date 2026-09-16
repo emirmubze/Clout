@@ -71,7 +71,14 @@ html, body {
 }
 
 button, input, select, textarea {
-    font-family: "DM Sans", sans-serif !important;
+    font-family: "DM Sans", sans-serif;
+}
+
+/* Ensure FontAwesome icons always render correctly and are never overridden by font resets */
+i.fa-solid, i.fa-brands, i.fa-regular, i[class*="fa-"], [class*="fa-"] {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
 }
 
 body.standalone {
@@ -713,10 +720,19 @@ body.standalone {
     flex-shrink: 0;
 }
 
-.buy-btn span,
-.buy-btn i {
+.buy-btn span {
     color: var(--white);
     font-family: "DM Sans", sans-serif;
+}
+
+.buy-btn i {
+    color: var(--white) !important;
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    display: inline-block;
+    line-height: 1;
+    font-size: 13.5px;
 }
 
 .buy-btn:hover:not(:disabled) {
@@ -737,9 +753,19 @@ body.standalone {
     transform: none !important;
 }
 
-.buy-btn:disabled span,
+.buy-btn:disabled span {
+    color: var(--white) !important;
+    font-family: "DM Sans", sans-serif;
+}
+
 .buy-btn:disabled i {
     color: var(--white) !important;
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    font-style: normal !important;
+    display: inline-block;
+    line-height: 1;
+    font-size: 13.5px;
 }
 
 .secure {
