@@ -647,7 +647,7 @@ def translate_cues_with_gemini(
     target_lang_name = get_language_name(target_language_code)
     target_lang_native = SUPPORTED_LANGUAGES.get(target_language_code, {}).get("native", target_lang_name)
 
-    BATCH_SIZE = 200
+    BATCH_SIZE = 40
     all_translated: List[Dict[str, Any]] = []
     models = ["gemini-3.6-flash", "gemini-flash-latest", "gemini-3.5-flash", "gemini-2.0-flash", "gemini-1.5-flash"]
 
