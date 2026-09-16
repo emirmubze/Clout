@@ -1015,31 +1015,50 @@
         .user-pagination-center {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .user-page-arrow-btn {
-            width: 34px;
-            height: 34px;
+            width: 36px;
+            height: 36px;
             border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
+            border-radius: 8px;
             background: #FFFFFF;
-            color: var(--text-main);
+            color: #475569;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: var(--transition);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            transition: all 0.15s ease;
+            user-select: none;
+            padding: 0;
+            flex-shrink: 0;
         }
 
-        .user-page-arrow-btn:disabled {
-            opacity: 0.4;
-            cursor: not-allowed;
+        .user-page-arrow-btn svg {
+            display: block;
+            flex-shrink: 0;
+            transition: transform 0.15s ease;
         }
 
         .user-page-arrow-btn:not(:disabled):hover {
             background: #F8FAFC;
             border-color: #CBD5E1;
+            color: var(--primary);
+        }
+
+        .user-page-arrow-btn:not(:disabled):active {
+            transform: scale(0.96);
+        }
+
+        .user-page-arrow-btn:disabled {
+            background: #F8FAFC;
+            border-color: #E2E8F0;
+            color: #CBD5E1;
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.75;
         }
 
         .user-page-numbers {
@@ -1049,31 +1068,42 @@
         }
 
         .user-page-num-btn {
-            width: 34px;
-            height: 34px;
+            min-width: 36px;
+            height: 36px;
+            padding: 0 10px;
             border: 1px solid var(--border);
-            border-radius: var(--radius-sm);
+            border-radius: 8px;
             background: #FFFFFF;
-            color: var(--text-main);
-            font-size: 13.5px;
+            color: #475569;
+            font-size: 13px;
             font-weight: 700;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
-            transition: var(--transition);
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            transition: all 0.15s ease;
             font-family: inherit;
+            user-select: none;
+            flex-shrink: 0;
         }
 
-        .user-page-num-btn:hover {
-            background: #F8FAFC;
+        .user-page-num-btn:hover:not(.active) {
+            background: #FFF7ED;
+            border-color: #FFEDD5;
+            color: var(--primary);
+        }
+
+        .user-page-num-btn:active:not(.active) {
+            transform: scale(0.96);
         }
 
         .user-page-num-btn.active {
             background: var(--primary);
             color: #FFFFFF;
             border-color: var(--primary);
-            box-shadow: 0 2px 6px rgba(234, 88, 12, 0.25);
+            box-shadow: 0 2px 8px rgba(234, 88, 12, 0.35);
+            cursor: default;
         }
 
         .user-per-page-select {
@@ -3644,11 +3674,19 @@
                     </div>
 
                     <div class="user-pagination-center">
-                        <button type="button" class="user-page-arrow-btn" id="userPagePrevBtn" title="Previous Page">&lt;</button>
+                        <button type="button" class="user-page-arrow-btn" id="userPagePrevBtn" title="Previous Page" aria-label="Previous Page">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="15 18 9 12 15 6"></polyline>
+                            </svg>
+                        </button>
                         <div class="user-page-numbers" id="userPageNumbers">
                             <button type="button" class="user-page-num-btn active">1</button>
                         </div>
-                        <button type="button" class="user-page-arrow-btn" id="userPageNextBtn" title="Next Page">&gt;</button>
+                        <button type="button" class="user-page-arrow-btn" id="userPageNextBtn" title="Next Page" aria-label="Next Page">
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                        </button>
                     </div>
 
                     <div>
