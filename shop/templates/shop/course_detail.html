@@ -758,9 +758,9 @@ body {
 .checkout-popup {
     position: relative;
     width: min(640px, calc(100vw - 32px));
-    height: 520px;
-    max-height: calc(100vh - 28px);
-    max-height: calc(100dvh - 28px);
+    height: clamp(620px, 84vh, 730px);
+    max-height: calc(100vh - 24px);
+    max-height: calc(100dvh - 24px);
     background: #ffffff;
     border: 1px solid rgba(0, 0, 0, 0.08);
     border-radius: 24px;
@@ -808,7 +808,7 @@ body {
 @media (min-width: 641px) and (max-width: 1024px) {
     .checkout-popup {
         width: min(600px, calc(100vw - 32px));
-        height: 520px;
+        height: clamp(580px, 82vh, 680px);
         max-height: calc(100vh - 24px);
         max-height: calc(100dvh - 24px);
         border-radius: 22px;
@@ -852,9 +852,9 @@ body {
     }
 
     .checkout-popup {
-        width: min(500px, 100%);
+        width: min(520px, 100%);
         max-width: 100%;
-        height: 520px;
+        height: min(640px, calc(100dvh - 20px));
         max-height: calc(100vh - 16px);
         max-height: calc(100dvh - 16px);
         border-radius: 20px;
@@ -872,7 +872,7 @@ body {
 
     .checkout-popup {
         border-radius: 16px;
-        height: 500px;
+        height: min(560px, calc(100dvh - 12px));
         max-height: calc(100vh - 12px);
         max-height: calc(100dvh - 12px);
     }

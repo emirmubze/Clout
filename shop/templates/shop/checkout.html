@@ -200,7 +200,7 @@ body:not(.standalone) .order-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 22px var(--card-pad-x) 18px;
+    padding: clamp(24px, 3.2vh, 32px) var(--card-pad-x) clamp(20px, 2.6vh, 26px);
     border-bottom: 1px solid var(--border-subtle);
     background: var(--white);
     position: sticky;
@@ -228,19 +228,19 @@ body:not(.standalone) .order-card {
 }
 
 .order-header h1 {
-    font-size: 18.5px;
+    font-size: clamp(19px, 2.2vh, 21px);
     font-weight: 800;
     letter-spacing: -0.2px;
     color: var(--dark);
 }
 
 .close-btn {
-    width: 32px;
-    height: 32px;
+    width: clamp(34px, 4vh, 38px);
+    height: clamp(34px, 4vh, 38px);
     border: 1px solid var(--border-subtle);
     background: var(--off-white);
     border-radius: 50%;
-    font-size: 19px;
+    font-size: 20px;
     font-weight: 400;
     line-height: 1;
     cursor: pointer;
@@ -265,11 +265,11 @@ body:not(.standalone) .order-card {
     align-items: center;
     justify-content: space-between;
     gap: 14px;
-    padding: 15px 18px;
+    padding: clamp(16px, 2.4vh, 22px) clamp(18px, 2.5vw, 24px);
     border-radius: var(--radius-md);
     background: var(--off-white);
     border: 1px solid var(--border-subtle);
-    margin: 18px var(--card-pad-x) 14px;
+    margin: clamp(20px, 2.8vh, 28px) var(--card-pad-x) clamp(16px, 2.2vh, 22px);
     flex-shrink: 0;
 }
 
@@ -281,8 +281,8 @@ body:not(.standalone) .order-card {
 }
 
 .product-media {
-    width: 50px;
-    height: 50px;
+    width: clamp(52px, 6.5vh, 58px);
+    height: clamp(52px, 6.5vh, 58px);
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -307,8 +307,8 @@ body:not(.standalone) .order-card {
 }
 
 .product-info h2 {
-    margin: 0 0 3px;
-    font-size: 15px;
+    margin: 0 0 4px;
+    font-size: clamp(15.5px, 1.9vh, 17px);
     font-weight: 800;
     color: var(--dark);
     letter-spacing: -0.2px;
@@ -319,7 +319,7 @@ body:not(.standalone) .order-card {
 
 .product-info p {
     margin: 0;
-    font-size: 12px;
+    font-size: clamp(12px, 1.4vh, 13px);
     font-weight: 600;
     color: var(--brand);
     display: flex;
@@ -333,7 +333,7 @@ body:not(.standalone) .order-card {
 }
 
 .product-price span {
-    font-size: 16.5px;
+    font-size: clamp(17px, 2.2vh, 19.5px);
     font-weight: 800;
     color: var(--dark);
     font-family: "DM Sans", sans-serif;
@@ -343,8 +343,8 @@ body:not(.standalone) .order-card {
    COUNTRY / CURRENCY BOX
 ===================================================== */
 .currency-box {
-    margin: 0 var(--card-pad-x) 14px;
-    padding: 14px 18px;
+    margin: 0 var(--card-pad-x) clamp(16px, 2.2vh, 22px);
+    padding: clamp(16px, 2.2vh, 20px) clamp(18px, 2.5vw, 24px);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     background: var(--white);
@@ -355,8 +355,8 @@ body:not(.standalone) .order-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 8px;
-    font-size: 11px;
+    margin-bottom: 10px;
+    font-size: 11.5px;
     font-weight: 700;
     letter-spacing: 0.8px;
     text-transform: uppercase;
@@ -370,8 +370,8 @@ body:not(.standalone) .order-card {
 
 .currency-selected {
     width: 100%;
-    min-height: 44px;
-    padding: 0 14px;
+    min-height: clamp(48px, 5.5vh, 54px);
+    padding: 0 16px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-sm);
     background: var(--off-white);
@@ -585,8 +585,8 @@ body:not(.standalone) .order-card {
     background: var(--off-white);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    padding: 16px 20px 14px;
-    margin: 0 var(--card-pad-x) 16px;
+    padding: clamp(18px, 2.6vh, 24px) clamp(20px, 2.8vw, 26px) clamp(16px, 2.2vh, 22px);
+    margin: 0 var(--card-pad-x) clamp(18px, 2.6vh, 26px);
     flex-shrink: 0;
 }
 
@@ -594,8 +594,8 @@ body:not(.standalone) .order-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 10px;
-    padding-bottom: 8px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
     border-bottom: 1px dashed var(--border-subtle);
 }
 
@@ -611,12 +611,12 @@ body:not(.standalone) .order-card {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    padding: 3px 8px;
+    padding: 4px 9px;
     border-radius: 6px;
     background: var(--white);
     border: 1px solid var(--border-subtle);
     color: var(--brand);
-    font-size: 11px;
+    font-size: 11.5px;
     font-weight: 700;
 }
 
@@ -624,8 +624,8 @@ body:not(.standalone) .order-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin: 7px 0;
-    font-size: 13.5px;
+    margin: clamp(8px, 1.2vh, 12px) 0;
+    font-size: clamp(13.5px, 1.6vh, 14.5px);
     font-weight: 500;
     color: var(--text-secondary);
 }
@@ -646,8 +646,8 @@ body:not(.standalone) .order-card {
 
 .total-box {
     border-top: 1px solid var(--border-subtle);
-    margin-top: 10px;
-    padding-top: 10px;
+    margin-top: clamp(12px, 1.6vh, 16px);
+    padding-top: clamp(12px, 1.6vh, 16px);
 }
 
 .total-row {
@@ -657,7 +657,7 @@ body:not(.standalone) .order-card {
 }
 
 .total-label {
-    font-size: 15.5px;
+    font-size: clamp(16px, 2vh, 18px);
     font-weight: 800;
     color: var(--dark);
     letter-spacing: -0.2px;
@@ -671,7 +671,7 @@ body:not(.standalone) .order-card {
 }
 
 .total-price strong {
-    font-size: 22px;
+    font-size: clamp(23px, 3vh, 27px);
     font-weight: 800;
     line-height: 1.1;
     color: var(--dark);
@@ -679,9 +679,9 @@ body:not(.standalone) .order-card {
 }
 
 .total-price small {
-    margin-top: 2px;
+    margin-top: 3px;
     color: var(--text-muted);
-    font-size: 10px;
+    font-size: 10.5px;
     font-weight: 600;
 }
 
@@ -691,8 +691,8 @@ body:not(.standalone) .order-card {
 .terms {
     display: flex;
     align-items: flex-start;
-    gap: 10px;
-    margin: 0 var(--card-pad-x) 16px;
+    gap: 12px;
+    margin: 0 var(--card-pad-x) clamp(18px, 2.6vh, 24px);
     cursor: pointer;
     user-select: none;
     flex-shrink: 0;
@@ -701,10 +701,10 @@ body:not(.standalone) .order-card {
 .terms input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     border: 1.5px solid var(--border-hover);
-    border-radius: 5px;
+    border-radius: 6px;
     outline: none;
     cursor: pointer;
     flex-shrink: 0;
@@ -729,8 +729,8 @@ body:not(.standalone) .order-card {
 }
 
 .terms span {
-    font-size: 12px;
-    line-height: 1.45;
+    font-size: clamp(12px, 1.4vh, 13px);
+    line-height: 1.5;
     color: var(--text-secondary);
 }
 
@@ -746,20 +746,20 @@ body:not(.standalone) .order-card {
 
 .buy-btn {
     width: calc(100% - (var(--card-pad-x) * 2));
-    height: 52px;
+    height: clamp(54px, 6.8vh, 62px);
     border: 0;
-    border-radius: 12px;
+    border-radius: 14px;
     background: linear-gradient(135deg, #FF6611 0%, var(--orange) 100%);
     color: var(--white);
     font-family: "DM Sans", sans-serif;
-    font-size: 16px;
+    font-size: clamp(16px, 2vh, 17.5px);
     font-weight: 800;
     letter-spacing: 0.1px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 9px;
     box-shadow: 0 4px 14px var(--brand-glow);
     transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     margin: 0 var(--card-pad-x) 0;
@@ -778,7 +778,7 @@ body:not(.standalone) .order-card {
     font-style: normal !important;
     display: inline-block;
     line-height: 1;
-    font-size: 13.5px;
+    font-size: 14px;
 }
 
 .buy-btn:hover:not(:disabled) {
@@ -811,7 +811,7 @@ body:not(.standalone) .order-card {
     font-style: normal !important;
     display: inline-block;
     line-height: 1;
-    font-size: 13.5px;
+    font-size: 14px;
 }
 
 .secure {
@@ -819,9 +819,9 @@ body:not(.standalone) .order-card {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    margin-top: 14px;
-    padding-bottom: 22px;
-    font-size: 11.5px;
+    margin-top: clamp(16px, 2.2vh, 22px);
+    padding-bottom: clamp(26px, 3.5vh, 34px);
+    font-size: clamp(11.5px, 1.4vh, 12.5px);
     color: var(--text-muted);
     flex-shrink: 0;
 }
@@ -838,48 +838,65 @@ body:not(.standalone) .order-card {
 /* Tablets & Small Laptops (641px - 1024px) */
 @media (min-width: 641px) and (max-width: 1024px) {
     :root {
-        --card-pad-x: 26px;
+        --card-pad-x: 28px;
     }
 
     .order-card {
-        max-width: min(700px, calc(100vw - 32px));
-        border-radius: 20px;
+        max-width: min(640px, calc(100vw - 32px));
+        border-radius: 22px;
     }
 
     .order-header {
-        padding: 18px var(--card-pad-x) 14px;
+        padding: 22px var(--card-pad-x) 18px;
     }
 
     .order-header h1 {
-        font-size: 18px;
+        font-size: 19px;
     }
 
     .product {
-        margin-top: 14px;
-        margin-bottom: 12px;
-        padding: 13px 16px;
+        margin-top: 18px;
+        margin-bottom: 14px;
+        padding: 16px 20px;
     }
 
     .currency-box {
-        margin-bottom: 12px;
-        padding: 11px 16px;
+        margin-bottom: 14px;
+        padding: 15px 20px;
+    }
+
+    .currency-selected {
+        min-height: 48px;
     }
 
     .summary-container {
-        margin-bottom: 14px;
-        padding: 14px 18px 12px;
+        margin-bottom: 16px;
+        padding: 16px 22px 14px;
+    }
+
+    .summary-row {
+        margin: 8px 0;
+    }
+
+    .terms {
+        margin-bottom: 16px;
     }
 
     .buy-btn {
-        height: 52px;
-        font-size: 15.5px;
+        height: 56px;
+        font-size: 16.5px;
+    }
+
+    .secure {
+        margin-top: 15px;
+        padding-bottom: 26px;
     }
 }
 
 /* Mobile Devices & Phablets (<= 640px) */
 @media (max-width: 640px) {
     :root {
-        --card-pad-x: 20px;
+        --card-pad-x: 22px;
     }
 
     body:not(.standalone) .order-card {
@@ -902,7 +919,86 @@ body:not(.standalone) .order-card {
     }
 
     .order-header {
-        padding: 18px var(--card-pad-x) 15px;
+        padding: 20px var(--card-pad-x) 16px;
+    }
+
+    .order-header h1 {
+        font-size: 18px;
+    }
+
+    .close-btn {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+        font-size: 19px;
+    }
+
+    .product {
+        margin-top: 16px;
+        margin-bottom: 13px;
+        padding: 15px 18px;
+    }
+
+    .product-media {
+        width: 50px;
+        height: 50px;
+    }
+
+    .currency-box {
+        margin-bottom: 13px;
+        padding: 14px 18px;
+    }
+
+    .currency-selected {
+        min-height: 46px;
+    }
+
+    .summary-container {
+        margin-bottom: 15px;
+        padding: 16px 20px 14px;
+    }
+
+    .summary-row {
+        margin: 8px 0;
+        font-size: 13.5px;
+    }
+
+    .terms {
+        margin-bottom: 15px;
+        gap: 11px;
+    }
+
+    .terms span {
+        font-size: 12px;
+        line-height: 1.45;
+    }
+
+    .buy-btn {
+        height: 54px;
+        font-size: 16px;
+        border-radius: 12px;
+    }
+
+    .total-price strong {
+        font-size: 22px;
+    }
+
+    .secure {
+        margin-top: 14px;
+        padding-bottom: 24px;
+        font-size: 11.5px;
+    }
+}
+
+/* Compact Mobile (<= 480px) */
+@media (max-width: 480px) {
+    :root {
+        --card-pad-x: 18px;
+    }
+
+    .order-header {
+        padding: 18px var(--card-pad-x) 14px;
     }
 
     .order-header h1 {
@@ -921,6 +1017,25 @@ body:not(.standalone) .order-card {
         margin-top: 14px;
         margin-bottom: 12px;
         padding: 13px 16px;
+        gap: 12px;
+    }
+
+    .product-media {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+    }
+
+    .product-info h2 {
+        font-size: 14.5px;
+    }
+
+    .product-info p {
+        font-size: 12px;
+    }
+
+    .product-price span {
+        font-size: 16px;
     }
 
     .currency-box {
@@ -928,9 +1043,31 @@ body:not(.standalone) .order-card {
         padding: 12px 16px;
     }
 
+    .currency-selected {
+        min-height: 44px;
+        padding: 0 12px;
+    }
+
+    .selected-country {
+        font-size: 13px;
+    }
+
     .summary-container {
         margin-bottom: 14px;
         padding: 14px 18px 12px;
+    }
+
+    .summary-row {
+        font-size: 13px;
+        margin: 7px 0;
+    }
+
+    .total-label {
+        font-size: 15px;
+    }
+
+    .total-price strong {
+        font-size: 21px;
     }
 
     .terms {
@@ -946,117 +1083,11 @@ body:not(.standalone) .order-card {
     .buy-btn {
         height: 52px;
         font-size: 15.5px;
-        border-radius: 12px;
-    }
-
-    .total-price strong {
-        font-size: 21px;
     }
 
     .secure {
-        margin-top: 12px;
-        padding-bottom: 20px;
-        font-size: 11px;
-    }
-}
-
-/* Compact Mobile (<= 480px) */
-@media (max-width: 480px) {
-    :root {
-        --card-pad-x: 16px;
-    }
-
-    .order-header {
-        padding: 16px var(--card-pad-x) 14px;
-    }
-
-    .order-header h1 {
-        font-size: 17px;
-    }
-
-    .close-btn {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
-        min-height: 34px;
-        font-size: 18px;
-    }
-
-    .product {
         margin-top: 13px;
-        margin-bottom: 11px;
-        padding: 12px 15px;
-        gap: 12px;
-    }
-
-    .product-media {
-        width: 46px;
-        height: 46px;
-        border-radius: 10px;
-    }
-
-    .product-info h2 {
-        font-size: 14px;
-    }
-
-    .product-info p {
-        font-size: 11.5px;
-    }
-
-    .product-price span {
-        font-size: 15.5px;
-    }
-
-    .currency-box {
-        margin-bottom: 11px;
-        padding: 11px 15px;
-    }
-
-    .currency-selected {
-        min-height: 40px;
-        padding: 0 10px;
-    }
-
-    .selected-country {
-        font-size: 13px;
-    }
-
-    .summary-container {
-        margin-bottom: 13px;
-        padding: 13px 16px 11px;
-    }
-
-    .summary-row {
-        font-size: 13px;
-        margin: 6px 0;
-    }
-
-    .total-label {
-        font-size: 15px;
-    }
-
-    .total-price strong {
-        font-size: 20px;
-    }
-
-    .terms {
-        margin-bottom: 13px;
-        gap: 9px;
-    }
-
-    .terms span {
-        font-size: 11.5px;
-        line-height: 1.4;
-    }
-
-    .buy-btn {
-        height: 50px;
-        font-size: 15px;
-    }
-
-    .secure {
-        margin-top: 11px;
-        padding-bottom: 18px;
+        padding-bottom: 22px;
         font-size: 11px;
     }
 }
