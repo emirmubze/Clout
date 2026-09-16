@@ -134,7 +134,7 @@ body:not(.standalone) .order-card {
 
 body:not(.standalone) .secure {
     margin-top: 5px !important;
-    padding-bottom: 6px !important;
+    padding-bottom: 8px !important;
 }
 
 .order-wrapper {
@@ -839,58 +839,12 @@ body:not(.standalone) .secure {
 /* Tablets & Small Laptops (641px - 1024px) */
 @media (min-width: 641px) and (max-width: 1024px) {
     :root {
-        --card-pad-x: 28px;
+        --card-pad-x: 20px;
     }
 
     .order-card {
-        max-width: min(480px, calc(100vw - 32px));
+        max-width: min(620px, calc(100vw - 32px));
         border-radius: 22px;
-    }
-
-    .order-header {
-        padding: 22px var(--card-pad-x) 18px;
-    }
-
-    .order-header h1 {
-        font-size: 19px;
-    }
-
-    .product {
-        margin-top: 18px;
-        margin-bottom: 14px;
-        padding: 16px 20px;
-    }
-
-    .currency-box {
-        margin-bottom: 14px;
-        padding: 15px 20px;
-    }
-
-    .currency-selected {
-        min-height: 48px;
-    }
-
-    .summary-container {
-        margin-bottom: 16px;
-        padding: 16px 22px 14px;
-    }
-
-    .summary-row {
-        margin: 8px 0;
-    }
-
-    .terms {
-        margin-bottom: 16px;
-    }
-
-    .buy-btn {
-        height: 56px;
-        font-size: 16.5px;
-    }
-
-    .secure {
-        margin-top: 15px;
-        padding-bottom: 26px;
     }
 }
 
@@ -1855,8 +1809,24 @@ loadExchangeRates();
 function syncModalHeight() {
     if (window.parent !== window) {
         const card = document.querySelector('.order-card');
+        const secure = document.querySelector('.secure');
         if (card) {
-            const height = Math.ceil(card.getBoundingClientRect().height) + 2;
+            let contentHeight = card.offsetHeight;
+            if (secure) {
+                const cardRect = card.getBoundingClientRect();
+                const secureRect = secure.getBoundingClientRect();
+                const calculated = Math.ceil(secureRect.bottom - cardRect.top) + 2;
+                if (calculated > contentHeight) {
+                    contentHeight = calculated;
+                }
+            }
+            const height = Math.ceil(Math.max(
+                contentHeight,
+                card.scrollHeight,
+                card.getBoundingClientRect().height,
+                document.body.scrollHeight,
+                document.documentElement.scrollHeight
+            )) + 2;
             try {
                 window.parent.postMessage({ type: 'checkoutResize', height: height }, '*');
             } catch (e) {}
