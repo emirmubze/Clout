@@ -136,6 +136,11 @@ body:not(.standalone) .order-card {
     overflow: visible !important;
 }
 
+body:not(.standalone) .secure {
+    margin-top: 16px !important;
+    padding-bottom: 26px !important;
+}
+
 .order-wrapper {
     width: 100%;
     height: 100%;
@@ -155,7 +160,7 @@ body:not(.standalone) .order-card {
 
 .order-card {
     width: 100%;
-    max-width: 520px;
+    max-width: 560px;
     height: auto;
     max-height: calc(100dvh - 24px);
     margin: auto;
@@ -701,14 +706,14 @@ body:not(.standalone) .order-card {
 .terms input[type="checkbox"] {
     appearance: none;
     -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 16px;
+    height: 16px;
     border: 1.5px solid var(--border-hover);
-    border-radius: 6px;
+    border-radius: 4px;
     outline: none;
     cursor: pointer;
     flex-shrink: 0;
-    margin-top: 1px;
+    margin-top: 2px;
     background: var(--white);
     display: grid;
     place-content: center;
@@ -724,7 +729,7 @@ body:not(.standalone) .order-card {
     content: "\f00c";
     font-family: "Font Awesome 6 Free";
     font-weight: 900;
-    font-size: 10px;
+    font-size: 8.5px;
     color: var(--white);
 }
 
@@ -1172,57 +1177,57 @@ body:not(.standalone) .order-card {
     }
 }
 
-/* Short Screens & Mobile Landscape (<= 640px height) */
+/* Short Screens & Mobile Landscape (<= 640px height) (Standalone page only) */
 @media (max-height: 640px) {
-    .order-wrapper {
+    body.standalone .order-wrapper {
         padding: 0;
         align-items: flex-start;
     }
 
-    .order-card {
+    body.standalone .order-card {
         max-height: 100%;
         border-radius: 0;
     }
 
-    .order-header {
+    body.standalone .order-header {
         padding: 9px var(--card-pad-x) 7px;
     }
 
-    .product {
+    body.standalone .product {
         margin-top: 6px;
         margin-bottom: 5px;
         padding: 7px 10px;
     }
 
-    .product-media {
+    body.standalone .product-media {
         width: 36px;
         height: 36px;
     }
 
-    .currency-box {
+    body.standalone .currency-box {
         margin-bottom: 5px;
         padding: 6px 10px;
     }
 
-    .summary-container {
+    body.standalone .summary-container {
         margin-bottom: 6px;
         padding: 7px 10px 5px;
     }
 
-    .summary-row {
+    body.standalone .summary-row {
         margin: 3px 0;
     }
 
-    .terms {
+    body.standalone .terms {
         margin-bottom: 6px;
     }
 
-    .buy-btn {
+    body.standalone .buy-btn {
         height: 42px;
         margin-top: 4px;
     }
 
-    .secure {
+    body.standalone .secure {
         margin-top: 4px;
         padding-bottom: 8px;
     }
@@ -1852,7 +1857,7 @@ function syncModalHeight() {
     if (window.parent !== window) {
         const card = document.querySelector('.order-card');
         if (card) {
-            const height = Math.ceil(card.getBoundingClientRect().height);
+            const height = Math.ceil(card.getBoundingClientRect().height) + 4;
             try {
                 window.parent.postMessage({ type: 'checkoutResize', height: height }, '*');
             } catch (e) {}
