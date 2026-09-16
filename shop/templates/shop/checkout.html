@@ -851,7 +851,7 @@ body:not(.standalone) .secure {
 /* Mobile Devices & Phablets (<= 640px) */
 @media (max-width: 640px) {
     :root {
-        --card-pad-x: 22px;
+        --card-pad-x: 18px;
     }
 
     body:not(.standalone) .order-card {
@@ -859,7 +859,7 @@ body:not(.standalone) .secure {
     }
 
     .order-wrapper {
-        padding: 0;
+        padding: 10px 8px;
         align-items: center;
     }
 
@@ -874,160 +874,58 @@ body:not(.standalone) .secure {
     }
 
     .order-header {
-        padding: 20px var(--card-pad-x) 16px;
+        padding: 14px var(--card-pad-x) 11px;
     }
 
     .order-header h1 {
-        font-size: 18px;
+        font-size: 17px;
     }
 
     .close-btn {
-        width: 36px;
-        height: 36px;
-        min-width: 36px;
-        min-height: 36px;
-        font-size: 19px;
+        width: 32px;
+        height: 32px;
+        min-width: 32px;
+        min-height: 32px;
+        font-size: 17px;
     }
 
     .product {
-        margin-top: 16px;
-        margin-bottom: 13px;
-        padding: 15px 18px;
+        margin-top: 11px;
+        margin-bottom: 9px;
+        padding: 10px 14px;
     }
 
     .product-media {
-        width: 50px;
-        height: 50px;
-    }
-
-    .currency-box {
-        margin-bottom: 13px;
-        padding: 14px 18px;
-    }
-
-    .currency-selected {
-        min-height: 46px;
-    }
-
-    .summary-container {
-        margin-bottom: 15px;
-        padding: 16px 20px 14px;
-    }
-
-    .summary-row {
-        margin: 8px 0;
-        font-size: 13.5px;
-    }
-
-    .terms {
-        margin-bottom: 15px;
-        gap: 11px;
-    }
-
-    .terms span {
-        font-size: 12px;
-        line-height: 1.45;
-    }
-
-    .buy-btn {
-        height: 54px;
-        font-size: 16px;
-        border-radius: 12px;
-    }
-
-    .total-price strong {
-        font-size: 22px;
-    }
-
-    .secure {
-        margin-top: 14px;
-        padding-bottom: 24px;
-        font-size: 11.5px;
-    }
-}
-
-/* Compact Mobile (<= 480px) */
-@media (max-width: 480px) {
-    :root {
-        --card-pad-x: 18px;
-    }
-
-    .order-header {
-        padding: 18px var(--card-pad-x) 14px;
-    }
-
-    .order-header h1 {
-        font-size: 17.5px;
-    }
-
-    .close-btn {
-        width: 34px;
-        height: 34px;
-        min-width: 34px;
-        min-height: 34px;
-        font-size: 18px;
-    }
-
-    .product {
-        margin-top: 14px;
-        margin-bottom: 12px;
-        padding: 13px 16px;
-        gap: 12px;
-    }
-
-    .product-media {
-        width: 48px;
-        height: 48px;
-        border-radius: 10px;
+        width: 44px;
+        height: 44px;
     }
 
     .product-info h2 {
-        font-size: 14.5px;
-    }
-
-    .product-info p {
-        font-size: 12px;
-    }
-
-    .product-price span {
-        font-size: 16px;
+        font-size: 14px;
     }
 
     .currency-box {
-        margin-bottom: 12px;
-        padding: 12px 16px;
+        margin-bottom: 9px;
+        padding: 10px 14px;
     }
 
     .currency-selected {
-        min-height: 44px;
-        padding: 0 12px;
-    }
-
-    .selected-country {
-        font-size: 13px;
+        min-height: 40px;
     }
 
     .summary-container {
-        margin-bottom: 14px;
-        padding: 14px 18px 12px;
+        margin-bottom: 10px;
+        padding: 12px 16px 10px;
     }
 
     .summary-row {
+        margin: 5px 0;
         font-size: 13px;
-        margin: 7px 0;
-    }
-
-    .total-label {
-        font-size: 15px;
-    }
-
-    .total-price strong {
-        font-size: 21px;
     }
 
     .terms {
-        margin-bottom: 14px;
-        gap: 10px;
+        margin-bottom: 11px;
+        gap: 9px;
     }
 
     .terms span {
@@ -1036,14 +934,130 @@ body:not(.standalone) .secure {
     }
 
     .buy-btn {
-        height: 52px;
+        height: 48px;
         font-size: 15.5px;
+        border-radius: 11px;
+    }
+
+    .total-price strong {
+        font-size: 20px;
     }
 
     .secure {
-        margin-top: 13px;
-        padding-bottom: 22px;
+        margin-top: 8px;
+        padding-bottom: 12px;
         font-size: 11px;
+    }
+
+    body:not(.standalone) .secure {
+        margin-top: 8px !important;
+        padding-bottom: 12px !important;
+    }
+}
+
+/* Compact Mobile (<= 480px) */
+@media (max-width: 480px) {
+    :root {
+        --card-pad-x: 16px;
+    }
+
+    .order-header {
+        padding: 13px var(--card-pad-x) 10px;
+    }
+
+    .order-header h1 {
+        font-size: 16.5px;
+    }
+
+    .close-btn {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+        font-size: 16px;
+    }
+
+    .product {
+        margin-top: 9px;
+        margin-bottom: 8px;
+        padding: 9px 12px;
+        gap: 10px;
+    }
+
+    .product-media {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+    }
+
+    .product-info h2 {
+        font-size: 13.5px;
+    }
+
+    .product-info p {
+        font-size: 11px;
+    }
+
+    .product-price span {
+        font-size: 15px;
+    }
+
+    .currency-box {
+        margin-bottom: 8px;
+        padding: 8px 12px;
+    }
+
+    .currency-selected {
+        min-height: 36px;
+        padding: 0 10px;
+    }
+
+    .selected-country {
+        font-size: 12.5px;
+    }
+
+    .summary-container {
+        margin-bottom: 9px;
+        padding: 10px 14px 8px;
+    }
+
+    .summary-row {
+        font-size: 12px;
+        margin: 4px 0;
+    }
+
+    .total-label {
+        font-size: 14px;
+    }
+
+    .total-price strong {
+        font-size: 19px;
+    }
+
+    .terms {
+        margin-bottom: 9px;
+        gap: 8px;
+    }
+
+    .terms span {
+        font-size: 10.5px;
+        line-height: 1.35;
+    }
+
+    .buy-btn {
+        height: 44px;
+        font-size: 14.5px;
+    }
+
+    .secure {
+        margin-top: 7px;
+        padding-bottom: 10px;
+        font-size: 10.5px;
+    }
+
+    body:not(.standalone) .secure {
+        margin-top: 7px !important;
+        padding-bottom: 10px !important;
     }
 }
 
@@ -1811,22 +1825,16 @@ function syncModalHeight() {
         const card = document.querySelector('.order-card');
         const secure = document.querySelector('.secure');
         if (card) {
-            let contentHeight = card.offsetHeight;
+            let height = Math.ceil(card.getBoundingClientRect().height);
             if (secure) {
                 const cardRect = card.getBoundingClientRect();
                 const secureRect = secure.getBoundingClientRect();
-                const calculated = Math.ceil(secureRect.bottom - cardRect.top) + 2;
-                if (calculated > contentHeight) {
-                    contentHeight = calculated;
+                const calculated = Math.ceil(secureRect.bottom - cardRect.top);
+                if (calculated > height) {
+                    height = calculated;
                 }
             }
-            const height = Math.ceil(Math.max(
-                contentHeight,
-                card.scrollHeight,
-                card.getBoundingClientRect().height,
-                document.body.scrollHeight,
-                document.documentElement.scrollHeight
-            )) + 2;
+            height = Math.max(height, card.scrollHeight, card.offsetHeight) + 2;
             try {
                 window.parent.postMessage({ type: 'checkoutResize', height: height }, '*');
             } catch (e) {}

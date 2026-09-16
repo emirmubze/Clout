@@ -848,15 +848,16 @@ body {
     }
 
     .checkout-overlay {
-        padding: 10px 8px;
+        padding: 12px 10px;
     }
 
     .checkout-popup {
         width: min(440px, 100%);
         max-width: 100%;
-        height: min(640px, calc(100dvh - 20px));
-        max-height: calc(100vh - 16px);
-        max-height: calc(100dvh - 16px);
+        height: auto;
+        min-height: 280px;
+        max-height: calc(100vh - 20px);
+        max-height: calc(100dvh - 20px);
         border-radius: 20px;
     }
 
@@ -872,26 +873,14 @@ body {
 
     .checkout-popup {
         border-radius: 16px;
-        height: min(560px, calc(100dvh - 12px));
+        height: auto;
+        min-height: 260px;
         max-height: calc(100vh - 12px);
         max-height: calc(100dvh - 12px);
     }
 
     .checkout-popup iframe {
         border-radius: 16px;
-    }
-}
-
-@media (max-height: 640px) {
-    .checkout-overlay {
-        padding: 4px;
-        align-items: flex-start;
-    }
-
-    .checkout-popup {
-        height: calc(100vh - 8px);
-        height: calc(100dvh - 8px);
-        max-height: 100%;
     }
 }
 
@@ -1342,8 +1331,9 @@ body {
 
             if (event.data?.type === 'checkoutResize' && typeof event.data.height === 'number') {
                 const popup = document.querySelector('.checkout-popup');
-                if (popup && event.data.height > 200) {
-                    const maxH = window.innerHeight - 24;
+                if (popup && event.data.height > 150) {
+                    const isMobile = window.innerWidth <= 640;
+                    const maxH = window.innerHeight - (isMobile ? 16 : 24);
                     popup.style.height = Math.min(event.data.height, maxH) + 'px';
                 }
             } else if (event.data?.type === 'closeCheckout') {
