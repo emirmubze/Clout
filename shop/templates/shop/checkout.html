@@ -108,7 +108,8 @@ body.standalone {
 
 .order-card {
     width: 100%;
-    max-width: 740px;
+    max-width: 520px;
+    height: auto;
     max-height: calc(100dvh - 24px);
     margin: auto;
     background: var(--bg-card);
@@ -243,16 +244,18 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
-    background: var(--white);
-    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    background: linear-gradient(135deg, #FFF0E6 0%, #FFE2D1 100%);
+    border: 1px solid rgba(224, 79, 0, 0.15);
     overflow: hidden;
-    box-shadow: 0 2px 6px rgba(2, 2, 2, 0.05);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
+.product-media picture,
 .product-image {
     width: 100%;
     height: 100%;
+    display: block;
     object-fit: cover;
 }
 
@@ -838,29 +841,17 @@ body.standalone {
     }
 
     .order-wrapper {
-        padding: 0;
-        overflow: hidden;
+        padding: 8px 6px;
+        align-items: center;
     }
 
     .order-card {
-        border-radius: 18px;
+        border-radius: 20px;
         max-width: 100%;
         width: 100%;
-        height: 100%;
-        max-height: 100%;
-        border: none;
-        box-shadow: none;
-    }
-
-    body.standalone .order-wrapper {
-        padding: 10px 8px;
-        overflow-y: auto;
-    }
-
-    body.standalone .order-card {
-        border: 1px solid var(--border-subtle);
-        max-height: calc(100dvh - 16px);
         height: auto;
+        max-height: calc(100dvh - 16px);
+        border: 1px solid var(--border-subtle);
         box-shadow: var(--shadow-card);
     }
 
@@ -1186,7 +1177,11 @@ body.standalone {
         <div class="product">
             <div class="product-left">
                 <div class="product-media">
-                    <img class="product-image" src="{% static 'bag.png' %}" alt="THE BAG CODE">
+                    <picture>
+                        <source srcset="{% static 'bag-thumb.webp' %}" type="image/webp">
+                        <source srcset="{% static 'bag-thumb.png' %}" type="image/png">
+                        <img class="product-image" src="{% static 'bag.png' %}" alt="THE BAG CODE" loading="eager" decoding="async">
+                    </picture>
                 </div>
 
                 <div class="product-info">
@@ -1744,6 +1739,24 @@ window.addEventListener('message', function (event) {
 renderCountries();
 selectCountry(currentCountry);
 loadExchangeRates();
+
+function syncModalHeight() {
+    if (window.parent !== window) {
+        const card = document.querySelector('.order-card');
+        if (card) {
+            const height = Math.ceil(card.getBoundingClientRect().height);
+            try {
+                window.parent.postMessage({ type: 'checkoutResize', height: height }, '*');
+            } catch (e) {}
+        }
+    }
+}
+window.addEventListener('load', () => setTimeout(syncModalHeight, 60));
+window.addEventListener('resize', syncModalHeight);
+if (typeof ResizeObserver !== 'undefined') {
+    const cardEl = document.querySelector('.order-card');
+    if (cardEl) new ResizeObserver(syncModalHeight).observe(cardEl);
+}
 </script>
 
 </body>

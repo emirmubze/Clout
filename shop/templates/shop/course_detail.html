@@ -757,11 +757,11 @@ body {
 
 .checkout-popup {
     position: relative;
-    width: min(760px, calc(100vw - 32px));
-    height: min(740px, calc(100vh - 28px));
-    height: min(740px, calc(100dvh - 28px));
-    max-height: 96vh;
-    max-height: 96dvh;
+    width: min(520px, calc(100vw - 28px));
+    height: min(545px, calc(100vh - 24px));
+    height: min(545px, calc(100dvh - 24px));
+    max-height: 94vh;
+    max-height: 94dvh;
     background: transparent;
     border: none;
     border-radius: 22px;
@@ -772,7 +772,7 @@ body {
     align-items: center;
     justify-content: center;
     margin: auto;
-    transition: opacity 0.22s ease, transform 0.22s ease;
+    transition: opacity 0.22s ease, transform 0.22s ease, height 0.15s ease;
 }
 
 .checkout-overlay.in-razorpay .checkout-popup {
@@ -795,9 +795,9 @@ body {
 ========================================================= */
 @media (min-width: 641px) and (max-width: 1024px) {
     .checkout-popup {
-        width: min(700px, calc(100vw - 36px));
-        height: min(720px, calc(100vh - 28px));
-        height: min(720px, calc(100dvh - 28px));
+        width: min(520px, calc(100vw - 32px));
+        height: min(545px, calc(100vh - 24px));
+        height: min(545px, calc(100dvh - 24px));
         border-radius: 20px;
     }
 
@@ -839,11 +839,12 @@ body {
     }
 
     .checkout-popup {
-        width: 100%;
+        width: min(500px, 100%);
         max-width: 100%;
-        height: min(700px, calc(100vh - 12px));
-        height: min(700px, calc(100dvh - 12px));
-        max-height: 100%;
+        height: min(545px, calc(100vh - 12px));
+        height: min(545px, calc(100dvh - 12px));
+        max-height: 96vh;
+        max-height: 96dvh;
         border-radius: 18px;
     }
 
@@ -859,8 +860,8 @@ body {
 
     .checkout-popup {
         border-radius: 14px;
-        height: calc(100vh - 8px);
-        height: calc(100dvh - 8px);
+        height: min(530px, calc(100vh - 8px));
+        height: min(530px, calc(100dvh - 8px));
     }
 
     .checkout-popup iframe {
@@ -1306,7 +1307,13 @@ body {
 
         window.addEventListener('message', function (event) {
             if (event.origin !== window.location.origin) return;
-            if (event.data?.type === 'closeCheckout') {
+            if (event.data?.type === 'checkoutResize' && typeof event.data.height === 'number') {
+                const popup = document.querySelector('.checkout-popup');
+                if (popup && event.data.height > 200) {
+                    const maxH = window.innerHeight - 24;
+                    popup.style.height = Math.min(event.data.height + 2, maxH) + 'px';
+                }
+            } else if (event.data?.type === 'closeCheckout') {
                 closeCheckout();
             } else if (event.data?.type === 'openRazorpay') {
                 const rzpOpts = Object.assign({}, event.data.options);
