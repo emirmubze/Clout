@@ -41,13 +41,14 @@
     --dark: #0E0E0E;
     --dark-gray: #383838;
     --white: #FFFFFF;
+    --warm-white: #FFDFD8;
 
     --brand-orange: #FF5500;
     --brand-orange-hover: #ff6b1a;
     --brand-orange-light: rgba(255, 85, 0, 0.12);
     --brand-orange-glow: rgba(255, 85, 0, 0.35);
 
-    --bg-canvas: var(--black);
+    --bg-canvas: var(--warm-white);
     --bg-surface: var(--black);
     --bg-surface-elevated: var(--black);
     --bg-surface-card: var(--black);
@@ -158,30 +159,6 @@ button {
     font-weight: bold;
 }
 
-.header-breadcrumbs {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 12.5px;
-    color: var(--text-secondary);
-    min-width: 0;
-}
-
-.header-breadcrumb-item {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.header-breadcrumb-item.active {
-    color: var(--text-primary);
-    font-weight: 600;
-}
-
-.header-breadcrumb-sep {
-    color: var(--text-muted);
-    font-size: 11px;
-}
 
 .header-nav-actions {
     display: flex;
@@ -738,6 +715,7 @@ button {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    box-shadow: var(--shadow-cinema);
 }
 
 .lesson-eyebrow {
@@ -1587,11 +1565,6 @@ button {
             <span class="brand-logo-text">CLOUT</span>
         </a>
 
-        <div class="header-breadcrumbs">
-            <span class="header-breadcrumb-item">{% if course %}{{ course.title }}{% else %}CLOUT AI Masterclass{% endif %}</span>
-            <span class="header-breadcrumb-sep"><i class="fa-solid fa-chevron-right"></i></span>
-            <span class="header-breadcrumb-item active" id="headerLessonName">Loading...</span>
-        </div>
 
         <nav class="header-nav-actions">
             <a href="{% url 'index' %}" class="header-btn" title="Return to Dashboard">
