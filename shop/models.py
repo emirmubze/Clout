@@ -1,8 +1,33 @@
+import re
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
 from django.templatetags.static import static
 from urllib.parse import quote
+
+
+def format_phone_for_razorpay(phone_number):
+    """
+    Format a phone number to Razorpay Checkout's expected format.
+    - Preserves leading '+' for international E.164 formats (e.g., '+919876543210').
+    - Removes spaces, hyphens, parentheses, and any non-digit characters.
+    - Normalizes 11-digit numbers with leading '0' (common in India) to 10 digits.
+    - Returns an empty string if no valid digits exist.
+    """
+    if not phone_number:
+        return ""
+    raw = str(phone_number).strip()
+    if not raw:
+        return ""
+    has_plus = raw.startswith("+")
+    digits = re.sub(r"\D", "", raw)
+    if not digits:
+        return ""
+    if has_plus:
+        return f"+{digits}"
+    if len(digits) == 11 and digits.startswith("0"):
+        digits = digits[1:]
+    return digits
 
 
 def _public_file_url(file_field, explicit_url=""):
@@ -123,6 +148,20 @@ class CustomUser(AbstractUser):
             safe="",
         )
         return f"{url}{separator}v={cache_version}"
+
+    @property
+    def display_name(self):
+        name = (self.name or "").strip()
+        if name:
+            return name
+        full_name = self.get_full_name().strip()
+        if full_name:
+            return full_name
+        return self.username or ""
+
+    @property
+    def razorpay_contact(self):
+        return format_phone_for_razorpay(self.phone_number)
 
     def __str__(self):
         return self.username

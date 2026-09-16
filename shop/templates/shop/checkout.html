@@ -1629,6 +1629,33 @@ function startPayment() {
 
             const logoUrl = window.location.origin + "{% static 'logo.png' %}";
 
+            // Prefill user details if authenticated
+            const prefill = {};
+            const serverPrefill = (data && data.prefill && typeof data.prefill === 'object') ? data.prefill : {};
+
+            const prefillName = (serverPrefill.name || '{{ prefill_name|default:request.user.display_name|default:request.user.name|default:request.user.username|default:""|escapejs }}').trim();
+            const prefillEmail = (serverPrefill.email || '{{ prefill_email|default:request.user.email|default:""|escapejs }}').trim();
+            const rawContact = (serverPrefill.contact || '{{ prefill_contact|default:request.user.razorpay_contact|default:""|escapejs }}').trim();
+
+            let prefillContact = '';
+            if (rawContact) {
+                const hasPlus = rawContact.startsWith('+');
+                const digits = rawContact.replace(/\D/g, '');
+                if (digits) {
+                    if (hasPlus) {
+                        prefillContact = '+' + digits;
+                    } else if (digits.length === 11 && digits.startsWith('0')) {
+                        prefillContact = digits.slice(1);
+                    } else {
+                        prefillContact = digits;
+                    }
+                }
+            }
+
+            if (prefillName) prefill.name = prefillName;
+            if (prefillEmail) prefill.email = prefillEmail;
+            if (prefillContact) prefill.contact = prefillContact;
+
             const razorpayOptions = {
                 key: data.key,
                 amount: data.amount,
@@ -1637,10 +1664,7 @@ function startPayment() {
                 description: 'The AI Income Playbook • Lifetime Access',
                 image: logoUrl,
                 order_id: data.order_id,
-                prefill: {
-                    name: '{{ request.user.name|escapejs }}',
-                    email: '{{ request.user.email|escapejs }}'
-                },
+                prefill: prefill,
                 notes: {
                     product: 'The AI Income Playbook',
                     platform: 'Clout',

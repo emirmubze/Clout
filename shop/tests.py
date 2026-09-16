@@ -12,7 +12,7 @@ from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
-from .models import CustomUser, ContactMessage, Course, Module, Lesson, Order
+from .models import CustomUser, ContactMessage, Course, Module, Lesson, Order, format_phone_for_razorpay
 
 
 class UserAuthAndDashboardTests(TestCase):
@@ -1850,6 +1850,165 @@ class DataPersistenceTests(TestCase):
         self.assertEqual(lesson_clean.display_title, "Lesson 1: Introduction")
         self.assertEqual(lesson_url.display_title, "Lesson 2: Course1")
         self.assertEqual(lesson_empty.display_title, "Lesson 3")
+
+
+class RazorpayPrefillAndCheckoutFlowTests(TestCase):
+    def setUp(self):
+        self.client = Client()
+        self.user = CustomUser.objects.create_user(
+            username="testcustomer",
+            email="customer@clout.test",
+            password="SecureCustomerPass123!",
+            name="Rahul Sharma",
+            phone_number="+91 9876543210",
+        )
+
+    def test_format_phone_for_razorpay(self):
+        self.assertEqual(format_phone_for_razorpay("+91 9876543210"), "+919876543210")
+        self.assertEqual(format_phone_for_razorpay("+91-9876-543210"), "+919876543210")
+        self.assertEqual(format_phone_for_razorpay("9876543210"), "9876543210")
+        self.assertEqual(format_phone_for_razorpay("09876543210"), "9876543210")
+        self.assertEqual(format_phone_for_razorpay("+1 (415) 555-2671"), "+14155552671")
+        self.assertEqual(format_phone_for_razorpay(""), "")
+        self.assertEqual(format_phone_for_razorpay(None), "")
+        self.assertEqual(format_phone_for_razorpay("no-digits"), "")
+
+    def test_custom_user_display_name_and_razorpay_contact(self):
+        self.assertEqual(self.user.display_name, "Rahul Sharma")
+        self.assertEqual(self.user.razorpay_contact, "+919876543210")
+
+        user_no_name = CustomUser.objects.create_user(
+            username="nonameuser",
+            email="noname@clout.test",
+            password="SecurePass123!",
+            first_name="Priya",
+            last_name="Nair",
+            phone_number="9876501234",
+        )
+        self.assertEqual(user_no_name.display_name, "Priya Nair")
+        self.assertEqual(user_no_name.razorpay_contact, "9876501234")
+
+        user_username_only = CustomUser.objects.create_user(
+            username="simpleuser",
+            email="simple@clout.test",
+            password="SecurePass123!",
+        )
+        self.assertEqual(user_username_only.display_name, "simpleuser")
+        self.assertEqual(user_username_only.razorpay_contact, "")
+
+    def test_checkout_view_context_prefill_authenticated(self):
+        self.client.login(username="testcustomer", password="SecureCustomerPass123!")
+        response = self.client.get(reverse("checkout"))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.context["prefill_name"], "Rahul Sharma")
+        self.assertEqual(response.context["prefill_email"], "customer@clout.test")
+        self.assertEqual(response.context["prefill_contact"], "+919876543210")
+        self.assertContains(response, "prefillName")
+        self.assertContains(response, "prefillContact")
+
+    @override_settings(RAZORPAY_KEY_ID="rzp_test_key", RAZORPAY_KEY_SECRET="rzp_test_secret")
+    @patch("razorpay.Client")
+    def test_create_order_returns_prefill_for_authenticated_user(self, mock_razorpay_client):
+        self.client.login(username="testcustomer", password="SecureCustomerPass123!")
+        mock_instance = mock_razorpay_client.return_value
+        mock_instance.order.create.return_value = {"id": "order_prefill_123"}
+
+        response = self.client.post(
+            reverse("create_order"),
+            {
+                "currency": "USD",
+                "amount": "18.82",
+                "country_code": "US",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["order_id"], "order_prefill_123")
+
+        prefill = data.get("prefill", {})
+        self.assertEqual(prefill.get("name"), "Rahul Sharma")
+        self.assertEqual(prefill.get("email"), "customer@clout.test")
+        self.assertEqual(prefill.get("contact"), "+919876543210")
+
+        # Verify order notes passed to Razorpay
+        call_args = mock_instance.order.create.call_args[0][0]
+        notes = call_args.get("notes", {})
+        self.assertEqual(notes.get("email"), "customer@clout.test")
+        self.assertEqual(notes.get("phone"), "+919876543210")
+        self.assertEqual(notes.get("user_id"), str(self.user.id))
+
+    @override_settings(RAZORPAY_KEY_ID="rzp_test_key", RAZORPAY_KEY_SECRET="rzp_test_secret")
+    @patch("razorpay.Client")
+    def test_complete_login_buy_now_verify_payment_flow(self, mock_razorpay_client):
+        # 1. Setup Student
+        student = CustomUser.objects.create_user(
+            username="student_e2e",
+            email="student_e2e@clout.test",
+            name="Aditya Verma",
+            phone_number="+91 9123456789",
+            password="StudentPass123!",
+        )
+        self.assertFalse(student.course_access_approved)
+        self.assertFalse(student.has_paid)
+
+        # 2. Website Login
+        logged_in = self.client.login(username="student_e2e", password="StudentPass123!")
+        self.assertTrue(logged_in)
+
+        # 3. Buy Now -> create_order API
+        mock_instance = mock_razorpay_client.return_value
+        mock_instance.order.create.return_value = {"id": "order_e2e_student_999"}
+        mock_instance.utility.verify_payment_signature.return_value = True
+
+        order_res = self.client.post(
+            reverse("create_order"),
+            {
+                "currency": "USD",
+                "amount": "18.82",
+                "country_code": "US",
+            },
+        )
+        self.assertEqual(order_res.status_code, 200)
+        order_data = order_res.json()
+        self.assertTrue(order_data["success"])
+        self.assertEqual(order_data["order_id"], "order_e2e_student_999")
+
+        # 4. Verify Razorpay Checkout prefill matches student account
+        prefill = order_data["prefill"]
+        self.assertEqual(prefill["name"], "Aditya Verma")
+        self.assertEqual(prefill["email"], "student_e2e@clout.test")
+        self.assertEqual(prefill["contact"], "+919123456789")
+
+        # 5. Payment Verification
+        verify_res = self.client.post(
+            reverse("verify_payment"),
+            {
+                "razorpay_order_id": "order_e2e_student_999",
+                "razorpay_payment_id": "pay_e2e_student_123",
+                "razorpay_signature": "valid_mocked_signature_abc",
+            },
+        )
+        self.assertEqual(verify_res.status_code, 200)
+        verify_data = verify_res.json()
+        self.assertTrue(verify_data["success"])
+        self.assertEqual(verify_data["redirect_url"], "/payment-success/")
+
+        # 6. Order Saved and Paid
+        order = Order.objects.get(razorpay_order_id="order_e2e_student_999")
+        self.assertTrue(order.paid)
+        self.assertEqual(order.razorpay_payment_id, "pay_e2e_student_123")
+        self.assertEqual(order.user, student)
+
+        # 7. Course Access Granted
+        student.refresh_from_db()
+        self.assertTrue(student.course_access_approved)
+        self.assertTrue(student.has_paid)
+
+        # 8. Access Course Page
+        course_res = self.client.get(reverse("course"))
+        self.assertEqual(course_res.status_code, 200)
+
 
 
 

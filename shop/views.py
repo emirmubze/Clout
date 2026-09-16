@@ -35,7 +35,8 @@ from botocore.config import Config
 
 from .models import (
     Order, CustomUser, ContactMessage, Course, Module, Lesson,
-    SubtitleTrack, SubtitleSetting, _public_file_url, PromotionalBanner
+    SubtitleTrack, SubtitleSetting, _public_file_url, PromotionalBanner,
+    format_phone_for_razorpay
 )
 from .auth_api import revoke_api_sessions
 from .forms import RegistrationForm, CourseForm
@@ -2377,6 +2378,15 @@ def profile(request):
 
 @login_required(login_url="login")
 def checkout(request):
+    user = request.user if getattr(request, "user", None) and request.user.is_authenticated else None
+    prefill_name = ""
+    prefill_email = ""
+    prefill_contact = ""
+
+    if user:
+        prefill_name = getattr(user, "display_name", "") or (getattr(user, "name", "") or "").strip() or getattr(user, "username", "") or ""
+        prefill_email = (getattr(user, "email", "") or "").strip()
+        prefill_contact = getattr(user, "razorpay_contact", "") or format_phone_for_razorpay(getattr(user, "phone_number", ""))
 
     return render(
         request,
@@ -2393,6 +2403,15 @@ def checkout(request):
 
             "currency":
                 "USD",
+
+            "prefill_name":
+                prefill_name,
+
+            "prefill_email":
+                prefill_email,
+
+            "prefill_contact":
+                prefill_contact,
         }
     )
 
@@ -2459,16 +2478,39 @@ def create_order(request):
     charge_amount = amount
     charge_minor_amount = minor_amount
 
+    prefill = {}
+    order_notes = {
+        "platform": "Clout",
+        "product": "The AI Income Playbook",
+    }
+
+    if getattr(request, "user", None) and request.user.is_authenticated:
+        user_name = getattr(request.user, "display_name", "") or (getattr(request.user, "name", "") or "").strip() or getattr(request.user, "username", "") or ""
+        user_email = (getattr(request.user, "email", "") or "").strip()
+        user_contact = getattr(request.user, "razorpay_contact", "") or format_phone_for_razorpay(getattr(request.user, "phone_number", ""))
+
+        if user_name:
+            prefill["name"] = user_name
+        if user_email:
+            prefill["email"] = user_email
+            order_notes["email"] = user_email
+        if user_contact:
+            prefill["contact"] = user_contact
+            order_notes["phone"] = user_contact
+
+        order_notes["user_id"] = str(request.user.id)
+
+    order_payload = {
+        "amount": charge_minor_amount,
+        "currency": charge_currency,
+        "receipt": f"clout-{request.user.id}-{uuid.uuid4().hex[:12]}",
+        "payment_capture": 1,
+        "notes": order_notes,
+    }
+
     # Attempt 1: Try creating the order with the selected currency
     try:
-        rp = client.order.create(
-            {
-                "amount": charge_minor_amount,
-                "currency": charge_currency,
-                "receipt": f"clout-{request.user.id}-{uuid.uuid4().hex[:12]}",
-                "payment_capture": 1
-            }
-        )
+        rp = client.order.create(order_payload)
     except Exception as exc:
         logger.warning(
             "Razorpay order creation with currency %s failed (%s). Attempting INR fallback.",
@@ -2481,14 +2523,14 @@ def create_order(request):
                 charge_currency = "INR"
                 charge_amount = inr_amount
                 charge_minor_amount = int(inr_amount * 100)
-                rp = client.order.create(
-                    {
-                        "amount": charge_minor_amount,
-                        "currency": charge_currency,
-                        "receipt": f"clout-{request.user.id}-{uuid.uuid4().hex[:12]}",
-                        "payment_capture": 1
-                    }
-                )
+                fallback_payload = {
+                    "amount": charge_minor_amount,
+                    "currency": charge_currency,
+                    "receipt": f"clout-{request.user.id}-{uuid.uuid4().hex[:12]}",
+                    "payment_capture": 1,
+                    "notes": order_notes,
+                }
+                rp = client.order.create(fallback_payload)
             except Exception:
                 logger.exception("Razorpay INR fallback order creation failed")
                 return JsonResponse(
@@ -2524,6 +2566,7 @@ def create_order(request):
         "order_id": rp["id"],
         "amount": charge_minor_amount,
         "currency": charge_currency,
+        "prefill": prefill,
     }
     if currency != charge_currency:
         response_data["display_currency"] = currency
