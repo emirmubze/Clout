@@ -51,7 +51,7 @@
     --radius-md: 12px;
     --radius-sm: 8px;
     --shadow-card: 0 20px 50px -10px rgba(0, 0, 0, 0.15), 0 0 1px 1px rgba(0, 0, 0, 0.05);
-    --card-pad-x: clamp(24px, 3.5vw, 34px);
+    --card-pad-x: 32px;
 }
 
 * {
@@ -89,6 +89,27 @@ body.standalone {
     min-height: 100dvh;
 }
 
+body:not(.standalone) {
+    background: transparent !important;
+}
+
+@media (min-width: 641px) {
+    body:not(.standalone) .order-wrapper {
+        padding: 0;
+        overflow: hidden;
+    }
+
+    body:not(.standalone) .order-card {
+        width: 100%;
+        max-width: 100%;
+        height: 100%;
+        max-height: 100%;
+        border-radius: 24px;
+        border: none;
+        box-shadow: none;
+    }
+}
+
 .order-wrapper {
     width: 100%;
     height: 100%;
@@ -108,7 +129,7 @@ body.standalone {
 
 .order-card {
     width: 100%;
-    max-width: 520px;
+    max-width: 620px;
     height: auto;
     max-height: calc(100dvh - 24px);
     margin: auto;
@@ -157,7 +178,7 @@ body.standalone {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 20px var(--card-pad-x) 16px;
+    padding: 22px var(--card-pad-x) 18px;
     border-bottom: 1px solid var(--border-subtle);
     background: var(--white);
     position: sticky;
@@ -222,11 +243,11 @@ body.standalone {
     align-items: center;
     justify-content: space-between;
     gap: 14px;
-    padding: 13px 16px;
+    padding: 15px 18px;
     border-radius: var(--radius-md);
     background: var(--off-white);
     border: 1px solid var(--border-subtle);
-    margin: 16px var(--card-pad-x) 12px;
+    margin: 18px var(--card-pad-x) 14px;
     flex-shrink: 0;
 }
 
@@ -300,8 +321,8 @@ body.standalone {
    COUNTRY / CURRENCY BOX
 ===================================================== */
 .currency-box {
-    margin: 0 var(--card-pad-x) 12px;
-    padding: 12px 16px;
+    margin: 0 var(--card-pad-x) 14px;
+    padding: 14px 18px;
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
     background: var(--white);
@@ -542,8 +563,8 @@ body.standalone {
     background: var(--off-white);
     border: 1px solid var(--border-subtle);
     border-radius: var(--radius-md);
-    padding: 14px 18px 12px;
-    margin: 0 var(--card-pad-x) 14px;
+    padding: 16px 20px 14px;
+    margin: 0 var(--card-pad-x) 16px;
     flex-shrink: 0;
 }
 
@@ -649,7 +670,7 @@ body.standalone {
     display: flex;
     align-items: flex-start;
     gap: 10px;
-    margin: 0 var(--card-pad-x) 14px;
+    margin: 0 var(--card-pad-x) 16px;
     cursor: pointer;
     user-select: none;
     flex-shrink: 0;
@@ -703,13 +724,13 @@ body.standalone {
 
 .buy-btn {
     width: calc(100% - (var(--card-pad-x) * 2));
-    height: 50px;
+    height: 52px;
     border: 0;
     border-radius: 12px;
     background: linear-gradient(135deg, #FF6611 0%, var(--orange) 100%);
     color: var(--white);
     font-family: "DM Sans", sans-serif;
-    font-size: 15.5px;
+    font-size: 16px;
     font-weight: 800;
     letter-spacing: 0.1px;
     cursor: pointer;
@@ -776,10 +797,9 @@ body.standalone {
     align-items: center;
     justify-content: center;
     gap: 6px;
-    margin-top: 12px;
-    padding-bottom: 16px;
+    margin-top: 14px;
+    padding-bottom: 22px;
     font-size: 11.5px;
-    font-weight: 600;
     color: var(--text-muted);
     flex-shrink: 0;
 }
