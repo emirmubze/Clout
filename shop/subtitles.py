@@ -208,8 +208,15 @@ def vtt_to_cues(vtt_text: str) -> List[Dict[str, Any]]:
 
 
 # =========================================================
-# AI CLIENT & SPEECH-TO-TEXT (GROQ WHISPER)
+# AI CLIENTS & API KEYS (GEMINI & GROQ)
 # =========================================================
+
+def get_gemini_api_key() -> str:
+    key = os.getenv("GEMINI_API_KEY", "").strip()
+    if not key and hasattr(settings, "GEMINI_API_KEY"):
+        key = str(settings.GEMINI_API_KEY).strip()
+    return key
+
 
 def get_groq_api_key() -> str:
     key = os.getenv("GROQ_API_KEY", "").strip()
@@ -620,6 +627,107 @@ def translate_text_mymemory(text: str, source_code: str = "en", target_code: str
 _global_translation_cache: Dict[Tuple[str, str, str], str] = {}
 
 
+def translate_cues_with_gemini(
+    cues: List[Dict[str, Any]],
+    source_language_name: str,
+    target_language_code: str,
+) -> Optional[List[Dict[str, Any]]]:
+    """
+    High-speed, 1-shot multilingual translation using Google Gemini (gemini-2.0-flash / gemini-1.5-flash).
+    Leverages Gemini's 1M context window and native JSON mode to translate all cues in a single API call.
+    """
+    gemini_key = get_gemini_api_key()
+    if not gemini_key or not cues:
+        return None
+
+    import urllib.request
+    import json
+    import time
+
+    target_lang_name = get_language_name(target_language_code)
+    target_lang_native = SUPPORTED_LANGUAGES.get(target_language_code, {}).get("native", target_lang_name)
+
+    BATCH_SIZE = 200
+    all_translated: List[Dict[str, Any]] = []
+    models = ["gemini-2.0-flash", "gemini-1.5-flash"]
+
+    for b_start in range(0, len(cues), BATCH_SIZE):
+        batch = cues[b_start:b_start + BATCH_SIZE]
+        payload = [{"id": c["id"], "text": c["text"]} for c in batch]
+
+        prompt = (
+            f"You are an expert subtitle translator. Translate the following video dialogue from {source_language_name} into {target_lang_name} ({target_lang_native}).\n"
+            f"Maintain natural speech flow, accurate phrasing, and matching tone for each subtitle line.\n"
+            f"Output MUST be a valid JSON array of objects with keys 'id' (integer matching input id) and 'text' (translated subtitle string).\n\n"
+            f"Input:\n{json.dumps(payload, ensure_ascii=False)}"
+        )
+
+        batch_success = False
+
+        for model_name in models:
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/{model_name}:generateContent?key={gemini_key}"
+            req_data = {
+                "contents": [
+                    {
+                        "role": "user",
+                        "parts": [{"text": prompt}]
+                    }
+                ],
+                "generationConfig": {
+                    "responseMimeType": "application/json",
+                    "temperature": 0.1,
+                    "maxOutputTokens": 8192
+                }
+            }
+
+            try:
+                req = urllib.request.Request(
+                    url,
+                    data=json.dumps(req_data).encode("utf-8"),
+                    headers={"Content-Type": "application/json"},
+                    method="POST"
+                )
+                with urllib.request.urlopen(req, timeout=40) as resp:
+                    resp_json = json.loads(resp.read().decode("utf-8"))
+
+                candidates = resp_json.get("candidates", [])
+                if not candidates:
+                    continue
+
+                part_text = candidates[0].get("content", {}).get("parts", [{}])[0].get("text", "").strip()
+                if not part_text:
+                    continue
+
+                translated_items = json.loads(part_text)
+                if isinstance(translated_items, list) and len(translated_items) > 0:
+                    trans_dict = {
+                        int(item["id"]): str(item["text"]).strip()
+                        for item in translated_items
+                        if isinstance(item, dict) and "id" in item and "text" in item
+                    }
+
+                    for original_cue in batch:
+                        nc = dict(original_cue)
+                        nc["text"] = trans_dict.get(original_cue["id"], original_cue["text"])
+                        all_translated.append(nc)
+
+                    batch_success = True
+                    break
+
+            except Exception as e:
+                logger.warning("Gemini (%s) translation attempt failed for %s: %s", model_name, target_language_code, e)
+                time.sleep(1)
+
+        if not batch_success:
+            logger.warning("Gemini batch %d failed, falling back to Groq/online translator", b_start)
+            return None
+
+    if len(all_translated) == len(cues):
+        return all_translated
+
+    return None
+
+
 def translate_cues_to_language(
     cues: List[Dict[str, Any]],
     source_language_name: str,
@@ -643,6 +751,14 @@ def translate_cues_to_language(
     if not cues:
         return []
 
+    # Priority 1: Google Gemini (high-speed, 1M context window, 1-shot translation)
+    if get_gemini_api_key():
+        gemini_result = translate_cues_with_gemini(cues, source_language_name, target_language_code)
+        if gemini_result and len(gemini_result) == len(cues):
+            return gemini_result
+        logger.warning("Gemini translation not available or incomplete for %s; trying Groq...", target_language_code)
+
+    # Priority 2: Groq LLM
     client = None
     try:
         client = get_ai_client()
@@ -789,9 +905,8 @@ def process_subtitles_for_lesson(
         logger.warning("Lesson %s does not exist or has no video attached.", lesson_id)
         return False
 
-    api_key = get_groq_api_key()
-    if not api_key:
-        logger.info("GROQ_API_KEY is not configured. Skipping automated subtitle generation for Lesson %s.", lesson_id)
+    if not get_gemini_api_key() and not get_groq_api_key():
+        logger.info("Neither GEMINI_API_KEY nor GROQ_API_KEY is configured. Skipping automated subtitle generation for Lesson %s.", lesson_id)
         has_ready = lesson.subtitles.filter(status="ready").exists()
         lesson.subtitle_status = "ready" if has_ready else "none"
         lesson.subtitle_error = ""

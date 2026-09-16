@@ -580,13 +580,18 @@ RAZORPAY_KEY_SECRET = os.getenv(
 
 
 # =========================================================
-# GROQ
+# AI CONFIGURATION (GEMINI & GROQ)
 # =========================================================
+
+GEMINI_API_KEY = os.getenv(
+    "GEMINI_API_KEY",
+    "",
+).strip()
 
 GROQ_API_KEY = os.getenv(
     "GROQ_API_KEY",
     "",
-)
+).strip()
 
 
 # =========================================================
