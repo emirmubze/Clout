@@ -1566,46 +1566,6 @@ video::cue {
     transform: scale(1.015);
 }
 
-/* Navigation arrows */
-.promo-nav-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: rgba(14, 14, 14, 0.6);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    backdrop-filter: blur(8px);
-    opacity: 0;
-    transition: opacity 0.25s ease, background 0.2s ease, transform 0.2s ease;
-    user-select: none;
-}
-
-.promo-prev-btn {
-    left: 12px;
-}
-
-.promo-next-btn {
-    right: 12px;
-}
-
-.promo-carousel:hover .promo-nav-btn {
-    opacity: 1;
-}
-
-.promo-nav-btn:hover {
-    background: var(--brand-orange, #E04F00);
-    border-color: var(--brand-orange, #E04F00);
-    transform: translateY(-50%) scale(1.08);
-}
-
 /* Navigation dots */
 .promo-dots {
     position: absolute;
@@ -2400,14 +2360,6 @@ video::cue {
                 </div>
 
                 {% if promotional_banners|length > 1 %}
-                <!-- Navigation Arrows -->
-                <button type="button" class="promo-nav-btn promo-prev-btn" id="promoPrevBtn" aria-label="Previous banner">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                <button type="button" class="promo-nav-btn promo-next-btn" id="promoNextBtn" aria-label="Next banner">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </button>
-
                 <!-- Navigation Dots -->
                 <div class="promo-dots" id="promoDots">
                     {% for banner in promotional_banners %}
@@ -4160,8 +4112,6 @@ video::cue {
         }
 
         const dots = carousel.querySelectorAll(".promo-dot");
-        const prevBtn = document.getElementById("promoPrevBtn");
-        const nextBtn = document.getElementById("promoNextBtn");
 
         let currentIndex = 0;
         let autoplayTimer = null;
@@ -4203,24 +4153,6 @@ video::cue {
                 clearInterval(autoplayTimer);
                 autoplayTimer = null;
             }
-        }
-
-        if (nextBtn) {
-            nextBtn.addEventListener("click", function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                nextSlide();
-                startAutoplay();
-            });
-        }
-
-        if (prevBtn) {
-            prevBtn.addEventListener("click", function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                prevSlide();
-                startAutoplay();
-            });
         }
 
         dots.forEach((dot) => {

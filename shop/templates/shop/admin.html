@@ -1717,7 +1717,9 @@
 
         .editor-thumbnail-box {
             width: 100%;
-            height: 120px;
+            aspect-ratio: 16 / 9;
+            height: auto;
+            min-height: 70px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -2781,112 +2783,275 @@
                 justify-content: center;
             }
 
-            /* Course Module Editor */
+            /* Course Module Editor - Preserving Desktop Structure on Mobile */
             .module-manager {
-                padding: 12px;
+                padding: 16px 12px;
             }
 
             .module-manager-header {
-                flex-direction: column;
-                align-items: flex-start !important;
-                gap: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 10px;
+                margin-bottom: 18px;
+            }
+
+            .module-manager-header h3 {
+                font-size: 17px;
+            }
+
+            .module-manager-header p {
+                font-size: 12px;
             }
 
             .sub-header-config-btn {
-                width: 100%;
-                justify-content: center;
-                font-size: 12px;
+                width: auto;
+                justify-content: flex-start;
+                font-size: 11.5px;
+                padding: 6px 12px;
             }
 
+            .module-editor {
+                margin-bottom: 16px;
+            }
+
+            /* Module Header: Keep horizontal single-row layout like desktop */
             .module-editor-header {
-                padding: 10px 12px;
-                flex-wrap: wrap;
-                gap: 8px;
-                min-height: auto;
+                padding: 12px 14px;
+                min-height: 52px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                flex-wrap: nowrap;
             }
 
             .module-editor-left {
-                flex: 1 1 100%;
-                flex-wrap: wrap;
-                gap: 6px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex: 1;
+                min-width: 0;
+                flex-wrap: nowrap;
             }
 
             .module-editor-number {
-                font-size: 10px;
-                padding: 4px 8px;
+                font-size: 11px;
+                font-weight: 800;
+                padding: 5px 9px;
+                flex-shrink: 0;
+                white-space: nowrap;
+                border-radius: 6px;
+                letter-spacing: 0.3px;
             }
 
             .module-title-input {
-                width: 100%;
-                max-width: 100%;
+                flex: 1;
+                min-width: 0;
+                width: auto;
+                max-width: none;
                 font-size: 13.5px;
+                font-weight: 700;
+                padding: 6px 8px;
             }
 
             .module-editor-actions {
-                width: 100%;
-                justify-content: flex-end;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                flex-shrink: 0;
+                width: auto;
+            }
+
+            .editor-icon-btn {
+                width: 32px;
+                height: 32px;
+                flex-shrink: 0;
+                font-size: 14px;
             }
 
             .module-editor-body {
-                padding: 10px;
+                padding: 14px 12px;
             }
 
+            .editor-lesson {
+                margin-bottom: 14px;
+            }
+
+            /* Lesson Header: Keep horizontal single-row layout like desktop */
             .editor-lesson-header {
-                flex-direction: column;
-                align-items: flex-start;
+                padding: 10px 14px;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
                 gap: 8px;
-                padding: 10px 12px;
+                flex-wrap: nowrap;
+                overflow-x: auto;
+                scrollbar-width: none;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .editor-lesson-header::-webkit-scrollbar {
+                display: none;
+            }
+
+            .editor-lesson-header-left {
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-shrink: 0;
+                flex-wrap: nowrap;
+            }
+
+            .editor-lesson-header-left strong {
+                font-size: 12.5px;
+                white-space: nowrap;
+            }
+
+            .editor-lesson-header-left .sub-badge {
+                font-size: 10.5px;
+                padding: 3px 7px;
+                white-space: nowrap;
+                flex-shrink: 0;
             }
 
             .editor-lesson-header-right {
-                width: 100%;
-                justify-content: space-between;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-shrink: 0;
+                flex-wrap: nowrap;
+                width: auto;
             }
 
+            .sub-manage-btn {
+                font-size: 11px;
+                padding: 4px 8px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            .editor-lesson-delete {
+                font-size: 11.5px;
+                padding: 4px 6px;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+
+            /* Lesson Content: Preserve 2-column side-by-side desktop layout */
             .editor-lesson-content {
-                grid-template-columns: 1fr !important;
-                padding: 12px;
-                gap: 12px;
+                display: grid;
+                grid-template-columns: clamp(110px, 30%, 180px) 1fr;
+                padding: 14px 12px;
+                gap: 14px;
+                min-width: 0;
             }
 
             .editor-thumbnail-box {
-                max-width: 200px;
-                margin: 0 auto;
+                width: 100%;
+                aspect-ratio: 16 / 9;
+                height: auto;
+                max-width: none;
+                margin: 0;
             }
 
+            .editor-form-row {
+                display: grid;
+                gap: 12px;
+                min-width: 0;
+            }
+
+            .editor-form-group {
+                min-width: 0;
+            }
+
+            .editor-form-group label {
+                font-size: 12px;
+                margin-bottom: 5px;
+                font-weight: 700;
+            }
+
+            .editor-form-group input,
+            .editor-form-group textarea {
+                font-size: 12.5px;
+                padding: 8px 10px;
+            }
+
+            .editor-form-group textarea {
+                min-height: 60px;
+            }
+
+            /* Video Row: Keep button and status inline side-by-side like desktop */
             .editor-video-row {
-                flex-direction: column;
-                align-items: stretch;
-                gap: 6px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                flex-wrap: nowrap;
+                min-width: 0;
             }
 
             .editor-video-button {
-                text-align: center;
-                width: 100%;
-                justify-content: center;
-                font-size: 12px;
+                display: inline-flex;
+                align-items: center;
+                gap: 5px;
+                padding: 6px 12px;
+                font-size: 11.5px;
+                font-weight: 700;
+                width: auto;
+                flex-shrink: 0;
+                text-align: left;
+                white-space: nowrap;
+                cursor: pointer;
             }
 
             .editor-video-name {
-                max-width: 100%;
+                font-size: 11.5px;
+                color: var(--text-muted);
+                white-space: nowrap;
                 overflow: hidden;
                 text-overflow: ellipsis;
-                white-space: nowrap;
-                font-size: 11px;
+                flex: 1;
+                min-width: 0;
             }
 
+            /* Module Actions Bar: Keep horizontal right-aligned like desktop */
             .module-actions-bar {
-                flex-direction: column;
-                gap: 8px;
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                justify-content: flex-end;
+                gap: 10px;
+                margin-top: 18px;
+                padding-top: 16px;
             }
 
             .module-actions-bar button {
-                width: 100%;
+                width: auto;
+            }
+
+            .cancel-btn {
+                padding: 9px 16px;
+                font-size: 12.5px;
+            }
+
+            .save-btn {
+                padding: 9px 18px;
+                font-size: 12.5px;
             }
 
             .add-module-btn {
                 width: 100%;
                 justify-content: center;
+                padding: 12px;
+                font-size: 13px;
+            }
+
+            .editor-add-lesson {
+                width: 100%;
+                justify-content: center;
+                padding: 10px;
+                font-size: 12.5px;
             }
 
             /* Buyer Growth Analytics */
