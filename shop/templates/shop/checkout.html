@@ -51,7 +51,7 @@
     --radius-md: 12px;
     --radius-sm: 8px;
     --shadow-card: 0 20px 50px -10px rgba(0, 0, 0, 0.15), 0 0 1px 1px rgba(0, 0, 0, 0.05);
-    --card-pad-x: 28px;
+    --card-pad-x: clamp(24px, 3.5vw, 34px);
 }
 
 * {
@@ -108,7 +108,7 @@ body.standalone {
 
 .order-card {
     width: 100%;
-    max-width: 580px;
+    max-width: 740px;
     max-height: calc(100dvh - 24px);
     margin: auto;
     background: var(--bg-card);
