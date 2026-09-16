@@ -26,6 +26,7 @@ services:
 
       - key: DJANGO_SECRET_KEY
         generateValue: true
+        sync: false
 
       - key: PERSISTENT_DATA_DIR
         value: /var/data

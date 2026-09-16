@@ -1266,7 +1266,7 @@ button {
     word-break: break-word;
     opacity: 0;
     visibility: hidden;
-    transition: opacity 0.12s ease-in-out;
+    transition: none !important;
     will-change: opacity;
 }
 
@@ -3550,6 +3550,19 @@ video::cue {
         currentRenderedCueText = "";
         currentActiveCue = null;
 
+        // Native track element for iOS Safari and hardware fullscreen
+        if (track.vtt_url) {
+            try {
+                const trackEl = document.createElement("track");
+                trackEl.kind = "subtitles";
+                trackEl.label = track.language_name || "Subtitles";
+                trackEl.srclang = track.language_code || "en";
+                trackEl.src = track.vtt_url;
+                trackEl.default = true;
+                video.appendChild(trackEl);
+            } catch (e) {}
+        }
+
         setupNativeTextTrack(track, activeCueList);
         syncSubtitleMode();
         syncButtonActiveStates();
@@ -3568,12 +3581,6 @@ video::cue {
 
         const firstStart = Number(activeCueList[0].start) || 0;
         if (curTime < firstStart) {
-            // Display first cue if at start or close to speech beginning so user immediately sees selected language
-            if (curTime <= 0.5 || firstStart - curTime <= 3.0) {
-                lastFoundCueIndex = 0;
-                currentActiveCue = activeCueList[0];
-                return activeCueList[0];
-            }
             currentActiveCue = null;
             return null;
         }
@@ -3706,10 +3713,13 @@ video::cue {
         const videoRatio = video.videoWidth / video.videoHeight;
         const containerRatio = cWidth / cHeight;
 
-        if (containerRatio >= videoRatio) {
+        let blackBarBottom = 0;
+        if (containerRatio < videoRatio) {
             const renderedHeight = cWidth / videoRatio;
-            const blackBarHeight = Math.max(0, (cHeight - renderedHeight) / 2);
-            subtitleOverlay.style.setProperty("--video-bottom-offset", `${Math.round(blackBarHeight)}px`);
+            blackBarBottom = Math.max(0, (cHeight - renderedHeight) / 2);
+        }
+        if (blackBarBottom > 0) {
+            subtitleOverlay.style.setProperty("--video-bottom-offset", `${Math.round(blackBarBottom)}px`);
         } else {
             subtitleOverlay.style.removeProperty("--video-bottom-offset");
         }
@@ -3872,7 +3882,13 @@ video::cue {
                 break;
             case "c":
                 e.preventDefault();
-                if (ccButton) ccButton.click();
+                if (selectedSubtitleLang !== "off") {
+                    selectSubtitleLanguage("off");
+                } else {
+                    const preferred = localStorage.getItem("clout_preferred_subtitle_lang") || "en";
+                    const targetLang = (preferred !== "off") ? preferred : "en";
+                    selectSubtitleLanguage(targetLang);
+                }
                 break;
             case "f":
                 e.preventDefault();

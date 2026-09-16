@@ -3406,8 +3406,7 @@
     const aiChatForm = document.getElementById("aiChatForm");
     const aiSendButton = document.getElementById("aiSendButton");
     const aiTyping = document.getElementById("aiTyping");
-    const aiMainButton = document.getElementById("aiMainButton");
-    const aiCsrfToken = document.querySelector("#aiChatForm input[name=csrfmiddlewaretoken]").value;
+    const aiCsrfToken = document.querySelector("#aiChatForm input[name=csrfmiddlewaretoken]")?.value || document.querySelector("input[name=csrfmiddlewaretoken]")?.value || "";
 
     function updateAssistantButtonColors() {
       const buttonBounds = aiMainButton.getBoundingClientRect();

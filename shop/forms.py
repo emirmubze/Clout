@@ -70,7 +70,8 @@ class RegistrationForm(UserCreationForm):
         return email
 
     def clean_phone_number(self):
-        phone_number = " ".join(self.cleaned_data["phone_number"].split())
+        raw_phone = str(self.cleaned_data.get("phone_number") or "").strip()
+        phone_number = " ".join(raw_phone.split())
         phone_parts = phone_number.split(" ")
         digits = "".join(phone_parts).replace("+", "", 1)
 
@@ -78,15 +79,21 @@ class RegistrationForm(UserCreationForm):
         if len(digits) >= 6 and len(set(digits)) <= 1:
             raise forms.ValidationError("Enter a valid phone number.")
 
-        international = (
+        international_spaced = (
             len(phone_parts) == 2
             and re.fullmatch(r"\+\d{1,4}", phone_parts[0])
             and re.fullmatch(r"\d{6,14}", phone_parts[1])
             and digits.isdigit()
             and 7 <= len(digits) <= 15
         )
+        international_compact = (
+            len(phone_parts) == 1
+            and re.fullmatch(r"\+\d{7,15}", phone_number)
+            and digits.isdigit()
+        )
         local = len(phone_parts) == 1 and re.fullmatch(r"\d{6,15}", phone_number)
-        if not international and not local:
+
+        if not international_spaced and not international_compact and not local:
             raise forms.ValidationError("Enter a valid phone number.")
         if CustomUser.objects.filter(phone_number__iexact=phone_number).exists():
             raise forms.ValidationError("This phone number is already in use.")

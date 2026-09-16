@@ -30,7 +30,19 @@ def _public_file_url(file_field, explicit_url=""):
         return f"https://{target.lstrip('/')}"
 
     file_name = target.lstrip("/")
-    for prefix in ("course_videos/", "lesson_thumbnails/", "course_images/", "course_intro_videos/", "avatars/", "subtitles/"):
+    for prefix in (
+        "course_videos/",
+        "lesson_thumbnails/",
+        "course_images/",
+        "course_intro_videos/",
+        "avatars/",
+        "subtitles/",
+        "profiles/",
+        "contact_images/",
+        "contact_videos/",
+        "course_thumbnails/",
+        "promotional_banners/",
+    ):
         if prefix in file_name:
             file_name = file_name[file_name.index(prefix):]
             break
@@ -148,14 +160,14 @@ class AuthSession(models.Model):
 class ContactMessage(models.Model):
     sender = models.ForeignKey(
         CustomUser,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="contact_messages",
         null=True,
         blank=True,
     )
     recipient = models.ForeignKey(
         CustomUser,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         related_name="received_messages",
         null=True,
         blank=True,
@@ -551,7 +563,7 @@ class SubtitleSetting(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(
         CustomUser,
-        on_delete=models.CASCADE,
+        on_delete=models.SET_NULL,
         null=True,
         blank=True,
     )

@@ -1,4 +1,5 @@
 import os
+import sys
 
 from pathlib import Path
 
@@ -251,7 +252,7 @@ elif DB_HOST:
             "ENGINE": DB_ENGINE or "django.db.backends.postgresql",
             "NAME": DB_NAME or "clout",
             "USER": os.getenv("DB_USER", "postgres").strip() or "postgres",
-            "PASSWORD": os.getenv("DB_PASSWORD", "Mubashir@66"),
+            "PASSWORD": os.getenv("DB_PASSWORD", ""),
             "HOST": DB_HOST,
             "PORT": os.getenv("DB_PORT", "5432").strip() or "5432",
             "CONN_MAX_AGE": int(os.getenv("DB_CONN_MAX_AGE", "600")),
@@ -260,6 +261,14 @@ elif DB_HOST:
         }
     }
 else:
+    # In production with DEBUG=False, alert if DATABASE_URL is missing during live web service execution
+    is_building = any(cmd in sys.argv for cmd in ("collectstatic", "check", "test", "makemigrations"))
+    if not DEBUG and not is_building and not os.getenv("ALLOW_SQLITE_IN_PROD"):
+        import logging
+        logging.getLogger(__name__).critical(
+            "WARNING: DATABASE_URL is not set in production. Please configure your persistent PostgreSQL connection string."
+        )
+
     sqlite_path = os.getenv("SQLITE_PATH", "").strip()
     if sqlite_path:
         db_path = Path(sqlite_path)

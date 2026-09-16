@@ -63,7 +63,7 @@ def user_has_course_access(user):
     if not user or not getattr(user, "is_authenticated", False):
         return False
 
-    if getattr(user, "is_superuser", False):
+    if getattr(user, "is_superuser", False) or getattr(user, "is_staff", False):
         return True
 
     return (
@@ -264,7 +264,7 @@ def ai_chat(request):
 
     # Priority 2: Groq Fallback
     if not answer and groq_key:
-        groq_models = ["openai/gpt-oss-120b", "qwen/qwen3.8-27b", "groq/compound-mini"]
+        groq_models = ["llama-3.3-70b-versatile", "llama-3.1-8b-instant", "mixtral-8x7b-32768"]
         for g_model in groq_models:
             request_body = json.dumps({
                 "model": g_model,
@@ -447,7 +447,7 @@ def contact(request):
                 return JsonResponse({
                     "id": message_obj.id,
                     "message": message_obj.message,
-                    "image_url": message_obj.image.url if message_obj.image else "",
+                    "image_url": message_obj.image_url if message_obj.image else "",
                     "video_url": reverse("message_video", args=[message_obj.id]) if message_obj.video else "",
                     "created_at": message_obj.created_at.strftime("%d %b, %H:%M"),
                 })
@@ -505,7 +505,7 @@ def contact(request):
                 {
                     "id": message.id,
                     "message": message.message or "",
-                    "image_url": message.image.url if message.image else "",
+                    "image_url": message.image_url if message.image else "",
                     "video_url": reverse("message_video", args=[message.id]) if message.video else "",
                     "created_at": message.created_at.strftime("%d %b, %H:%M"),
                 }
@@ -622,7 +622,7 @@ def admin_dashboard(request):
                     "id": message.id,
                     "message": message.message or "",
                     "sender_is_admin": message.sender_is_admin,
-                    "image_url": message.image.url if message.image else "",
+                    "image_url": message.image_url if message.image else "",
                     "video_url": reverse("message_video", args=[message.id]) if message.video else "",
                     "created_at": message.created_at.strftime("%H:%M"),
                 }
@@ -675,9 +675,7 @@ def admin_dashboard(request):
             id=selected_course_id
         ).first()
 
-    courses = Course.objects.filter(
-        is_active=True
-    ).order_by(
+    courses = Course.objects.all().order_by(
         "id"
     )
 
@@ -1125,7 +1123,7 @@ def _clean_r2_key(raw_key):
     key = str(raw_key).strip()
     if "://" in key:
         key = key.split("://", 1)[1]
-    for prefix in ("course_videos/", "lesson_thumbnails/", "course_images/", "course_intro_videos/", "avatars/", "subtitles/"):
+    for prefix in ("course_videos/", "lesson_thumbnails/", "course_images/", "course_intro_videos/", "avatars/", "subtitles/", "profiles/", "contact_images/", "contact_videos/", "course_thumbnails/", "promotional_banners/"):
         if prefix in key:
             key = key[key.index(prefix):]
             break
@@ -1533,7 +1531,7 @@ def admin_user_add(request):
             "phone_number": user.phone_number or "",
             "has_paid": user.has_paid,
             "course_access_approved": user.course_access_approved,
-            "profile_image_url": user.profile_image.url if user.profile_image else "",
+            "profile_image_url": user.profile_image_url if user.profile_image else "",
         }
     })
 
@@ -1842,7 +1840,7 @@ def admin_send_message(
                     ),
 
                     "image": (
-                        message_obj.image.url
+                        message_obj.image_url
                         if message_obj.image
                         else ""
                     ),
@@ -2323,6 +2321,21 @@ def profile(request):
             return redirect("index")
 
         else:
+            cropped_data = request.POST.get("cropped_image_data", "").strip()
+            if cropped_data and "," in cropped_data:
+                import base64
+                from django.core.files.base import ContentFile
+                try:
+                    format, imgstr = cropped_data.split(";base64,")
+                    ext = format.split("/")[-1] if "/" in format else "jpg"
+                    if ext.lower() not in ["jpg", "jpeg", "png", "webp"]:
+                        ext = "jpg"
+                    data = base64.b64decode(imgstr)
+                    file_name = f"profile_{request.user.id}_{uuid.uuid4().hex[:8]}.{ext}"
+                    request.user.profile_image.save(file_name, ContentFile(data), save=True)
+                    return redirect("index")
+                except Exception:
+                    logger.exception("Failed to save cropped profile image")
 
             form = ProfileImageForm(
                 request.POST,
@@ -2757,50 +2770,6 @@ def forgot_password(request):
             | (Q(phone_number__iexact=identifier) if identifier else Q(pk=None))
             | (Q(phone_number__iexact=clean_phone) if clean_phone else Q(pk=None))
         ).first()
-
-        if user is None and identifier:
-            admin_username = (
-                os.getenv("ADMIN_USERNAME", "").strip()
-                or getattr(settings, "ADMIN_USERNAME", "").strip()
-                or "mubze"
-            )
-            admin_email = (
-                os.getenv("ADMIN_EMAIL", "").strip().lower()
-                or getattr(settings, "ADMIN_EMAIL", "").strip().lower()
-                or "emirmubze@gmail.com"
-            )
-            admin_password = (
-                os.getenv("ADMIN_PASSWORD", "").strip()
-                or getattr(settings, "ADMIN_PASSWORD", "").strip()
-                or "Mubashir@66"
-            )
-            known_admins = {
-                admin_username.lower(): (admin_username, admin_email, admin_password),
-                admin_email.lower(): (admin_username, admin_email, admin_password),
-                "mubze": ("mubze", "emirmubze@gmail.com", "Mubashir@66"),
-                "emirmubze@gmail.com": ("mubze", "emirmubze@gmail.com", "Mubashir@66"),
-                "mubashir": ("mubashir", "mubashirmonu58346@gmail.com", "Mubashir@66"),
-                "mubashirmonu58346@gmail.com": ("mubashir", "mubashirmonu58346@gmail.com", "Mubashir@66"),
-            }
-            ident_lower = identifier.lower()
-            if ident_lower in known_admins:
-                target_user_name, target_user_email, expected_pwd = known_admins[ident_lower]
-                user, _ = CustomUser.objects.get_or_create(
-                    username=target_user_name,
-                    defaults={
-                        "email": target_user_email,
-                        "is_active": True,
-                        "is_staff": True,
-                        "is_superuser": True,
-                    },
-                )
-                user.email = target_user_email
-                user.is_active = True
-                user.is_staff = True
-                user.is_superuser = True
-                if not user.check_password(expected_pwd):
-                    user.set_password(expected_pwd)
-                user.save()
 
         if not user or not user.is_active or not user.email:
             return render(

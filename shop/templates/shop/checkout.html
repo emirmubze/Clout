@@ -1645,9 +1645,20 @@ function verifyPayment(payment) {
 
 function closeOrder() {
     if (window.parent !== window) {
-        window.parent.postMessage({ type: 'closeCheckout' }, window.location.origin);
+        try {
+            window.parent.postMessage({ type: 'closeCheckout' }, '*');
+        } catch (e) {
+            window.parent.postMessage({ type: 'closeCheckout' }, window.location.origin);
+        }
+    } else {
+        if (window.history.length > 1) {
+            window.history.back();
+        } else {
+            window.location.href = '/';
+        }
     }
 }
+
 
 document.addEventListener('click', event => {
     const box = $('currencySelect');

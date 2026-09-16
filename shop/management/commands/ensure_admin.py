@@ -33,24 +33,26 @@ class Command(BaseCommand):
         created = user is None
         if created:
             user = CustomUser(username=username, email=email)
+            user.set_password(password)
+        elif not user.has_usable_password():
+            user.set_password(password)
 
         user.username = username
         user.email = email
         user.is_active = True
         user.is_staff = True
         user.is_superuser = True
-        user.set_password(password)
         user.save()
 
-        # Also ensure mubashir account is active/staff if present
+        # Also ensure mubashir account is active/staff if present without resetting password
         mubashir_user = CustomUser.objects.filter(username__iexact="mubashir").first()
         if mubashir_user:
             mubashir_user.is_active = True
             mubashir_user.is_staff = True
             mubashir_user.is_superuser = True
-            if not mubashir_user.check_password("Mubashir@66"):
-                mubashir_user.set_password("Mubashir@66")
+            if not mubashir_user.has_usable_password():
+                mubashir_user.set_password(password)
             mubashir_user.save()
 
-        action = "Created" if created else "Repaired"
+        action = "Created" if created else "Verified"
         self.stdout.write(self.style.SUCCESS(f"{action} admin account: {username} ({email})"))
