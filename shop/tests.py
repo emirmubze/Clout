@@ -2010,6 +2010,281 @@ class RazorpayPrefillAndCheckoutFlowTests(TestCase):
         self.assertEqual(course_res.status_code, 200)
 
 
+class AdminExcelExportTests(TestCase):
+    def setUp(self):
+        self.admin = CustomUser.objects.create_user(
+            username="testadmin",
+            email="testadmin@example.com",
+            password="AdminPass123!",
+            name="Admin Officer",
+            is_staff=True,
+            is_superuser=True,
+        )
+        self.regular_user = CustomUser.objects.create_user(
+            username="regularuser",
+            email="regular@example.com",
+            password="UserPass123!",
+            name="Regular Student",
+        )
+
+    def test_export_endpoints_require_staff_permission(self):
+        # 1. Unauthenticated request redirects to login
+        response = self.client.get(reverse("admin_export_users", args=["paid"]))
+        self.assertEqual(response.status_code, 302)
+        self.assertIn("/login/", response.url)
+
+        # 2. Authenticated non-staff request is rejected (redirects to index)
+        self.client.force_login(self.regular_user)
+        response = self.client.get(reverse("admin_export_users", args=["paid"]))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, reverse("index"))
+
+        # 3. Staff user can access endpoint
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("admin_export_users", args=["all"]))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response["Content-Type"],
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+
+    def test_export_paid_users_contains_only_verified_paid_users(self):
+        import openpyxl
+        import io
+
+        paid_user = CustomUser.objects.create_user(
+            username="paidstudent",
+            email="paidstudent@example.com",
+            password="StrongPass123!",
+            name="Paid Student",
+            phone_number="+919876543210",
+            course_access_approved=True,
+        )
+        Order.objects.create(
+            user=paid_user,
+            product_name="The AI Income Playbook",
+            amount=4999.00,
+            currency="INR",
+            razorpay_order_id="order_paid_12345",
+            razorpay_payment_id="pay_paid_67890",
+            razorpay_signature="sig_abc_123",
+            paid=True,
+        )
+
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("admin_export_users", args=["paid"]))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("paid_users_", response["Content-Disposition"])
+        self.assertTrue(response["Content-Disposition"].endswith('.xlsx"'))
+
+        wb = openpyxl.load_workbook(io.BytesIO(response.content))
+        ws = wb.active
+        self.assertEqual(ws.title, "Paid Users")
+
+        # Verify headers
+        expected_headers = [
+            "User ID",
+            "Full Name",
+            "Email",
+            "Phone Number",
+            "Registration Date",
+            "Payment Status",
+            "Payment Amount",
+            "Currency",
+            "Razorpay Order ID",
+            "Razorpay Payment ID",
+            "Payment Date",
+            "Course Access Status",
+        ]
+        headers = [cell.value for cell in ws[1]]
+        self.assertEqual(headers, expected_headers)
+
+        # Header formatting
+        self.assertTrue(ws["A1"].font.bold)
+        self.assertEqual(ws.freeze_panes, "A2")
+        self.assertIsNotNone(ws.auto_filter.ref)
+
+        # Verify data rows (only 1 paid user)
+        rows = list(ws.iter_rows(min_row=2, values_only=True))
+        self.assertEqual(len(rows), 1)
+
+        row = rows[0]
+        self.assertEqual(row[0], paid_user.id)
+        self.assertEqual(row[1], "Paid Student")
+        self.assertEqual(row[2], "paidstudent@example.com")
+        self.assertEqual(row[3], "+919876543210")
+        self.assertEqual(row[5], "PAID")
+        self.assertEqual(row[6], 4999.00)
+        self.assertEqual(row[7], "INR")
+        self.assertEqual(row[8], "order_paid_12345")
+        self.assertEqual(row[9], "pay_paid_67890")
+        self.assertEqual(row[11], "APPROVED")
+
+    def test_export_unpaid_users_contains_only_unpaid_users(self):
+        import openpyxl
+        import io
+
+        unpaid_user = CustomUser.objects.create_user(
+            username="unpaidstudent",
+            email="unpaidstudent@example.com",
+            password="StrongPass123!",
+            name="Unpaid Student",
+            phone_number="+918888888888",
+            course_access_approved=False,
+        )
+
+        paid_user = CustomUser.objects.create_user(
+            username="paidstudent2",
+            email="paidstudent2@example.com",
+            password="StrongPass123!",
+            name="Paid Student 2",
+        )
+        Order.objects.create(
+            user=paid_user,
+            product_name="The AI Income Playbook",
+            amount=99.00,
+            currency="USD",
+            razorpay_order_id="order_paid_222",
+            razorpay_payment_id="pay_paid_222",
+            paid=True,
+        )
+
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("admin_export_users", args=["unpaid"]))
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("unpaid_users_", response["Content-Disposition"])
+
+        wb = openpyxl.load_workbook(io.BytesIO(response.content))
+        ws = wb.active
+        self.assertEqual(ws.title, "Unpaid Users")
+
+        expected_headers = [
+            "User ID",
+            "Full Name",
+            "Email",
+            "Phone Number",
+            "Registration Date",
+            "Payment Status",
+            "Course Access Status",
+        ]
+        headers = [cell.value for cell in ws[1]]
+        self.assertEqual(headers, expected_headers)
+
+        # Both self.admin, self.regular_user, and unpaid_user are unpaid (no Order.paid=True)
+        # paid_user must NOT be in this sheet
+        rows = list(ws.iter_rows(min_row=2, values_only=True))
+        user_ids_in_export = [r[0] for r in rows]
+
+        self.assertIn(unpaid_user.id, user_ids_in_export)
+        self.assertNotIn(paid_user.id, user_ids_in_export)
+
+        # Verify unpaid student row
+        unpaid_row = next(r for r in rows if r[0] == unpaid_user.id)
+        self.assertEqual(unpaid_row[1], "Unpaid Student")
+        self.assertEqual(unpaid_row[2], "unpaidstudent@example.com")
+        self.assertEqual(unpaid_row[5], "UNPAID")
+        self.assertEqual(unpaid_row[6], "NOT APPROVED")
+
+    def test_export_all_users_contains_both_paid_and_unpaid(self):
+        import openpyxl
+        import io
+
+        paid_user = CustomUser.objects.create_user(
+            username="all_paid_user",
+            email="all_paid@example.com",
+            password="StrongPass123!",
+            name="All Paid User",
+        )
+        Order.objects.create(
+            user=paid_user,
+            product_name="Course",
+            amount=50.00,
+            currency="USD",
+            razorpay_order_id="order_all_paid",
+            razorpay_payment_id="pay_all_paid",
+            paid=True,
+        )
+
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("admin_export_users", args=["all"]))
+        self.assertEqual(response.status_code, 200)
+
+        wb = openpyxl.load_workbook(io.BytesIO(response.content))
+        ws = wb.active
+        rows = list(ws.iter_rows(min_row=2, values_only=True))
+        user_map = {r[0]: r for r in rows}
+
+        self.assertIn(paid_user.id, user_map)
+        self.assertIn(self.regular_user.id, user_map)
+
+        paid_row = user_map[paid_user.id]
+        self.assertEqual(paid_row[5], "PAID")
+        self.assertEqual(paid_row[6], 50.00)
+        self.assertEqual(paid_row[8], "order_all_paid")
+
+        unpaid_row = user_map[self.regular_user.id]
+        self.assertEqual(unpaid_row[5], "UNPAID")
+        self.assertEqual(unpaid_row[6], "N/A")
+        self.assertEqual(unpaid_row[8], "N/A")
+
+    def test_manually_approved_user_remains_unpaid(self):
+        import openpyxl
+        import io
+
+        # User has course_access_approved=True manually, but has NOT paid
+        approved_user = CustomUser.objects.create_user(
+            username="manualapproved",
+            email="manual@example.com",
+            password="StrongPass123!",
+            name="Manual Approved",
+            course_access_approved=True,
+        )
+
+        self.client.force_login(self.admin)
+
+        # 1. Check in 'all' export
+        all_res = self.client.get(reverse("admin_export_users", args=["all"]))
+        wb = openpyxl.load_workbook(io.BytesIO(all_res.content))
+        ws = wb.active
+        rows = list(ws.iter_rows(min_row=2, values_only=True))
+        row = next(r for r in rows if r[0] == approved_user.id)
+
+        # Strict separation: Payment Status is UNPAID, Course Access is APPROVED
+        self.assertEqual(row[5], "UNPAID")
+        self.assertEqual(row[11], "APPROVED")
+
+        # 2. Check in 'paid' export: must NOT be present
+        paid_res = self.client.get(reverse("admin_export_users", args=["paid"]))
+        # Since there are no paid users, it will handle empty
+        self.assertEqual(paid_res.status_code, 302)
+
+    def test_empty_results_handling_redirects_with_message(self):
+        from django.contrib.messages import get_messages
+
+        # No users have paid yet
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("admin_export_users", args=["paid"]))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("admin_dashboard"))
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), "No paid users found.")
+
+    def test_admin_dashboard_renders_export_buttons(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(reverse("admin_dashboard"))
+        self.assertEqual(response.status_code, 200)
+
+        # Check all 3 buttons are rendered
+        self.assertContains(response, reverse("admin_export_users", args=["paid"]))
+        self.assertContains(response, reverse("admin_export_users", args=["unpaid"]))
+        self.assertContains(response, reverse("admin_export_users", args=["all"]))
+        self.assertContains(response, "Export Paid Users")
+        self.assertContains(response, "Export Unpaid Users")
+        self.assertContains(response, "Export All Users")
+
+
 
 
 

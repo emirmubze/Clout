@@ -11,6 +11,7 @@ from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
 from django.conf import settings
+from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.tokens import default_token_generator
@@ -51,6 +52,7 @@ from .subtitles import (
     cues_to_srt,
     format_vtt_timestamp,
 )
+from .exports import export_users_to_bytes
 
 
 logger = logging.getLogger(__name__)
@@ -751,6 +753,66 @@ def admin_dashboard(request):
             "use_s3": getattr(settings, "USE_S3", False),
         }
     )
+
+
+# =========================================================
+# ADMIN EXCEL EXPORTS
+# =========================================================
+
+@login_required(login_url="login")
+def admin_export_users(request, export_type):
+    """
+    Generate and download an Excel (.xlsx) file of users:
+    - 'paid': Only verified successful payments (Order.paid=True).
+    - 'unpaid': Registered users without verified successful payments.
+    - 'all': All registered users.
+    Strictly staff-only. Streams in-memory for Render compatibility.
+    """
+    if not request.user.is_staff:
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse(
+                {"success": False, "message": "Permission denied."},
+                status=403
+            )
+        return redirect("index")
+
+    export_type_clean = (export_type or "").strip().lower()
+    if export_type_clean not in ("paid", "unpaid", "all"):
+        messages.error(request, f"Invalid export type: {export_type}")
+        return redirect("admin_dashboard")
+
+    try:
+        data, count, filename = export_users_to_bytes(export_type_clean)
+    except Exception as exc:
+        logger.exception("Error generating Excel export for %s", export_type_clean)
+        messages.error(request, f"Export failed: {str(exc)}")
+        return redirect("admin_dashboard")
+
+    if count == 0:
+        if export_type_clean == "paid":
+            msg = "No paid users found."
+        elif export_type_clean == "unpaid":
+            msg = "No unpaid users found."
+        else:
+            msg = "No registered users found."
+
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return JsonResponse(
+                {"success": False, "message": msg, "count": 0}
+            )
+
+        messages.warning(request, msg)
+        return redirect("admin_dashboard")
+
+    response = HttpResponse(
+        data,
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
+    response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response["Pragma"] = "no-cache"
+    response["Expires"] = "0"
+    return response
 
 
 # =========================================================

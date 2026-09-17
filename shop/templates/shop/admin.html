@@ -356,6 +356,154 @@
         }
 
         /* =====================================================
+           ADMIN EXCEL EXPORT TOOLBAR
+        ====================================================== */
+        .admin-export-toolbar {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            box-shadow: var(--shadow-sm);
+            flex-wrap: wrap;
+        }
+
+        .admin-export-toolbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .admin-export-icon-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            background: var(--green-light);
+            color: var(--green-dark);
+            padding: 6px 12px;
+            border-radius: var(--radius-full);
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.2px;
+            border: 1px solid rgba(16, 185, 129, 0.25);
+        }
+
+        .admin-export-toolbar-desc {
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .admin-export-toolbar-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-excel-export {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #059669;
+            color: #FFFFFF !important;
+            font-family: var(--body-font);
+            font-size: 13.5px;
+            font-weight: 600;
+            padding: 9px 16px;
+            border-radius: var(--radius-md);
+            text-decoration: none;
+            border: 1px solid #047857;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05), 0 2px 4px rgba(5, 150, 105, 0.15);
+            transition: var(--transition);
+            cursor: pointer;
+            white-space: nowrap;
+            user-select: none;
+        }
+
+        .btn-excel-export:hover {
+            background: #047857;
+            border-color: #065F46;
+            color: #FFFFFF !important;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(5, 150, 105, 0.28);
+        }
+
+        .btn-excel-export:active {
+            transform: translateY(0);
+            background: #065F46;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-excel-export-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0.92;
+        }
+
+        /* Notification Banners */
+        .admin-messages-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .admin-alert-banner {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 18px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: var(--shadow-xs);
+        }
+
+        .admin-alert-banner.alert-warning {
+            background: #FFFBEB;
+            border: 1px solid #FCD34D;
+            color: #92400E;
+        }
+
+        .admin-alert-banner.alert-error {
+            background: #FEF2F2;
+            border: 1px solid #FCA5A5;
+            color: #991B1B;
+        }
+
+        .admin-alert-banner.alert-info,
+        .admin-alert-banner.alert-success {
+            background: #ECFDF5;
+            border: 1px solid #6EE7B7;
+            color: #065F46;
+        }
+
+        .admin-alert-content {
+            flex: 1;
+        }
+
+        .admin-alert-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            line-height: 1;
+            color: inherit;
+            cursor: pointer;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .admin-alert-close:hover {
+            opacity: 1;
+        }
+
+        /* =====================================================
            STAT CARDS
         ====================================================== */
         .stats-grid {
@@ -3309,6 +3457,104 @@
              MAIN CONTENT
         ================================================== -->
         <main class="content" id="dashboard">
+
+            <!-- System Messages / Notifications -->
+            {% if messages %}
+            <div class="admin-messages-container" id="adminMessagesContainer">
+                {% for message in messages %}
+                <div class="admin-alert-banner alert-{{ message.tags|default:'info' }}" role="alert">
+                    <div class="admin-alert-icon">
+                        {% if message.tags == 'error' or message.tags == 'warning' %}
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                        {% else %}
+                        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="9 11 12 14 22 4"></polyline>
+                        </svg>
+                        {% endif %}
+                    </div>
+                    <div class="admin-alert-content">{{ message }}</div>
+                    <button type="button" class="admin-alert-close" onclick="this.parentElement.remove()" aria-label="Close notification">&times;</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- =====================================================
+                 EXCEL USER EXPORTS TOOLBAR (VERY TOP OF ADMIN DASHBOARD)
+            ====================================================== -->
+            <section class="admin-export-toolbar" aria-label="Excel Export Toolbar">
+                <div class="admin-export-toolbar-left">
+                    <div class="admin-export-icon-pill">
+                        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                            <line x1="8" y1="13" x2="16" y2="13"></line>
+                            <line x1="8" y1="17" x2="16" y2="17"></line>
+                            <polyline points="10 9 9 9 8 9"></polyline>
+                        </svg>
+                        <span>Excel Reports</span>
+                    </div>
+                    <span class="admin-export-toolbar-desc">Export verified financial and student records directly to Excel.</span>
+                </div>
+
+                <div class="admin-export-toolbar-actions">
+                    <!-- 1. Export Paid Users -->
+                    <a
+                        href="{% url 'admin_export_users' 'paid' %}"
+                        class="btn-excel-export"
+                        id="btnExportPaidUsers"
+                        title="Download verified paid users (.xlsx)"
+                    >
+                        <span class="btn-excel-export-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </span>
+                        <span>Export Paid Users</span>
+                    </a>
+
+                    <!-- 2. Export Unpaid Users -->
+                    <a
+                        href="{% url 'admin_export_users' 'unpaid' %}"
+                        class="btn-excel-export"
+                        id="btnExportUnpaidUsers"
+                        title="Download unpaid registered users (.xlsx)"
+                    >
+                        <span class="btn-excel-export-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </span>
+                        <span>Export Unpaid Users</span>
+                    </a>
+
+                    <!-- 3. Export All Users -->
+                    <a
+                        href="{% url 'admin_export_users' 'all' %}"
+                        class="btn-excel-export"
+                        id="btnExportAllUsers"
+                        title="Download all registered users (.xlsx)"
+                    >
+                        <span class="btn-excel-export-icon">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                        </span>
+                        <span>Export All Users</span>
+                    </a>
+                </div>
+            </section>
 
             <!-- Metric Stat Cards -->
             <section class="stats-grid">

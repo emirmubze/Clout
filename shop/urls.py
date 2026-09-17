@@ -93,6 +93,12 @@ urlpatterns = [
     ),
 
     path(
+        "admin-export-users/<str:export_type>/",
+        views.admin_export_users,
+        name="admin_export_users"
+    ),
+
+    path(
         "admin-course-add/",
         views.admin_course_add,
         name="admin_course_add"
