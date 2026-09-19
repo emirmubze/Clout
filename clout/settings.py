@@ -88,6 +88,11 @@ CSRF_TRUSTED_ORIGINS = list(dict.fromkeys([
 ]))
 CSRF_TRUSTED_ORIGINS = [origin for origin in CSRF_TRUSTED_ORIGINS if origin]
 
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_PATH = "/"
+CSRF_FAILURE_VIEW = "shop.views.csrf_failure_view"
+
 
 # =========================================================
 # APPLICATIONS
@@ -630,3 +635,6 @@ if not DEBUG:
 
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    SECURE_SSL_REDIRECT = (
+        os.getenv("SECURE_SSL_REDIRECT", "True").lower() == "true"
+    )

@@ -31,6 +31,8 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.http import require_POST
 from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.utils.decorators import method_decorator
 from django.urls import reverse, reverse_lazy
 from botocore.config import Config
 
@@ -105,6 +107,8 @@ def revoke_user_sessions(user, keep_session_key=None):
             session.delete()
 
 
+@method_decorator(never_cache, name="dispatch")
+@method_decorator(ensure_csrf_cookie, name="dispatch")
 class SingleDeviceLoginView(LoginView):
 
     def get_success_url(self):
@@ -1934,6 +1938,8 @@ def admin_send_message(
 # REGISTER
 # =========================================================
 
+@never_cache
+@ensure_csrf_cookie
 def register_view(request):
 
     if request.user.is_authenticated:
@@ -3523,3 +3529,32 @@ def api_admin_languages_config(request):
         "all_languages": list(SUPPORTED_LANGUAGES.values()),
         "active_languages": get_active_target_languages(),
     })
+
+
+# =========================================================
+# CSRF ERROR RECOVERY
+# =========================================================
+
+@never_cache
+def csrf_failure_view(request, reason=""):
+    """
+    Gracefully handle CSRF verification failures:
+    - If submitting login or register, redirect back with a fresh session/cookie
+      and display a friendly notification rather than a technical 403 screen.
+    - Otherwise render a sleek, branded 403 page.
+    """
+    path = (getattr(request, "path", "") or "").lower()
+
+    if "login" in path:
+        return redirect(f"{reverse('login')}?session_expired=1")
+    if "register" in path:
+        return redirect(f"{reverse('register')}?session_expired=1")
+
+    return render(
+        request,
+        "shop/403_csrf.html",
+        {
+            "reason": reason,
+        },
+        status=403,
+    )

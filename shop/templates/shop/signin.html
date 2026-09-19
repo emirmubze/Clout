@@ -443,9 +443,15 @@ body {
             <p class="card-subtitle">Sign in to continue to your Clout account</p>
         </div>
 
-        <form id="signinForm" method="POST">
+        <form id="signinForm" method="POST" action="{% url 'login' %}">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ next }}">
+
+            {% if request.GET.session_expired %}
+                <div class="form-error" role="alert">
+                    <p>Your session timed out. Please enter your credentials to log in.</p>
+                </div>
+            {% endif %}
 
             {% if form.non_field_errors %}
                 <div class="form-error" role="alert">
@@ -531,6 +537,13 @@ togglePassword.addEventListener("click", function () {
     passwordInput.type = isPassword ? "text" : "password";
     eyeIcon.className = isPassword ? "fa-solid fa-eye-slash" : "fa-solid fa-eye";
     this.setAttribute("aria-label", isPassword ? "Hide password" : "Show password");
+});
+
+// If restored from browser bfcache on mobile, refresh to get fresh CSRF cookies
+window.addEventListener("pageshow", function (event) {
+    if (event.persisted) {
+        window.location.reload();
+    }
 });
 </script>
 
