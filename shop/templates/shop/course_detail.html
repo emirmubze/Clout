@@ -1090,13 +1090,13 @@ body {
         </div>
 
         <!-- COUPON -->
-        <div class="coupon-row" id="detailCouponRow" role="button" tabindex="0">
+        <div class="coupon-row" role="button" tabindex="0">
             <div class="coupon-row-left">
                 <i class="fa-solid fa-tag"></i>
-                <span id="detailCouponLabel">Coupon Code</span>
+                <span>Coupon Code</span>
             </div>
 
-            <span class="coupon-arrow" id="detailCouponArrow">
+            <span class="coupon-arrow">
                 <i class="fa-solid fa-chevron-right" style="font-size:11px"></i>
             </span>
         </div>
@@ -1106,20 +1106,20 @@ body {
 
             <div class="order-line">
                 <span>Subtotal</span>
-                <span id="detailSubtotal">$18.00</span>
+                <span>$18.00</span>
             </div>
 
-            <div class="order-line discount" id="detailDiscountRow">
+            <div class="order-line discount">
                 <span>
                     Discount
-                    <span class="discount-tag" id="detailDiscountTag">Save 64%</span>
+                    <span class="discount-tag">Save 64%</span>
                 </span>
-                <span id="detailDiscountVal">- $32.00</span>
+                <span>- $32.00</span>
             </div>
 
-            <div class="order-line" id="detailTaxRow">
+            <div class="order-line">
                 <span>Tax</span>
-                <span id="detailTaxVal">$0.82</span>
+                <span>$0.82</span>
             </div>
 
         </div>
@@ -1132,7 +1132,7 @@ body {
         <!-- TOTAL -->
         <div class="order-total">
             <span>Total</span>
-            <span id="detailTotalVal">$18.82</span>
+            <span>$18.82</span>
         </div>
 
         <!-- CONTINUE -->
@@ -1225,61 +1225,6 @@ body {
             document.body.style.overflow = '';
         }
 
-        let activeCoupon = null;
-
-        function applyCoupon(code) {
-            activeCoupon = code;
-            const subtotalEl = document.getElementById('detailSubtotal');
-            const discountTagEl = document.getElementById('detailDiscountTag');
-            const discountValEl = document.getElementById('detailDiscountVal');
-            const taxEl = document.getElementById('detailTaxVal');
-            const totalEl = document.getElementById('detailTotalVal');
-            const couponLabelEl = document.getElementById('detailCouponLabel');
-            const couponRow = document.getElementById('detailCouponRow');
-
-            if (code === 'MUBZE10') {
-                if (couponLabelEl) {
-                    couponLabelEl.innerHTML = 'Coupon: <strong style="color:#16a34a">MUBZE10</strong> <span style="font-size:11px;font-weight:700;color:#16a34a;margin-left:4px;">(₹1 Applied)</span>';
-                }
-                if (couponRow) {
-                    couponRow.style.borderColor = '#16a34a';
-                    couponRow.style.background = '#f0fdf4';
-                }
-                if (subtotalEl) subtotalEl.textContent = '₹1.00';
-                if (discountTagEl) discountTagEl.textContent = 'MUBZE10 Deal';
-                if (discountValEl) discountValEl.textContent = 'Special (₹1 Base)';
-                if (taxEl) taxEl.textContent = '₹0.00';
-                if (totalEl) totalEl.textContent = '₹1.00';
-            } else if (code === 'ALWXZ') {
-                if (couponLabelEl) {
-                    couponLabelEl.innerHTML = 'Coupon: <strong style="color:#16a34a">ALWXZ</strong> <span style="font-size:11px;font-weight:700;color:#16a34a;margin-left:4px;">(64% Off)</span>';
-                }
-                if (subtotalEl) subtotalEl.textContent = '$18.00';
-                if (discountTagEl) discountTagEl.textContent = 'Save 64%';
-                if (discountValEl) discountValEl.textContent = '- $32.00';
-                if (taxEl) taxEl.textContent = '$0.82';
-                if (totalEl) totalEl.textContent = '$18.82';
-            }
-
-            const frame = document.getElementById('checkoutFrame');
-            if (frame) {
-                try {
-                    const currentUrl = new URL(frame.src || '{% url "checkout" %}', window.location.origin);
-                    if (code) {
-                        currentUrl.searchParams.set('coupon', code);
-                    } else {
-                        currentUrl.searchParams.delete('coupon');
-                    }
-                    if (frame.src !== currentUrl.toString()) {
-                        frame.src = currentUrl.toString();
-                    }
-                    if (frame.contentWindow) {
-                        frame.contentWindow.postMessage({ type: 'applyCoupon', code: code }, '*');
-                    }
-                } catch (e) {}
-            }
-        }
-
         function openCheckout() {
             closeCoupon();
             checkoutOverlay.classList.add('is-open');
@@ -1287,28 +1232,13 @@ body {
             document.body.style.overflow = 'hidden';
             const frame = document.getElementById('checkoutFrame');
             if (frame && frame.contentWindow) {
-                if (activeCoupon) {
-                    try {
-                        const currentUrl = new URL(frame.src || '{% url "checkout" %}', window.location.origin);
-                        currentUrl.searchParams.set('coupon', activeCoupon);
-                        if (frame.src !== currentUrl.toString()) {
-                            frame.src = currentUrl.toString();
-                        }
-                    } catch (e) {}
-                }
                 try {
-                    frame.contentWindow.postMessage({ type: 'openModal', coupon: activeCoupon }, '*');
-                    if (activeCoupon) {
-                        frame.contentWindow.postMessage({ type: 'applyCoupon', code: activeCoupon }, '*');
-                    }
+                    frame.contentWindow.postMessage({ type: 'openModal' }, '*');
                     frame.contentWindow.postMessage({ type: 'triggerResize' }, '*');
                 } catch (e) {}
                 setTimeout(() => {
                     try {
-                        frame.contentWindow.postMessage({ type: 'openModal', coupon: activeCoupon }, '*');
-                        if (activeCoupon) {
-                            frame.contentWindow.postMessage({ type: 'applyCoupon', code: activeCoupon }, '*');
-                        }
+                        frame.contentWindow.postMessage({ type: 'openModal' }, '*');
                         frame.contentWindow.postMessage({ type: 'triggerResize' }, '*');
                     } catch (e) {}
                 }, 60);
@@ -1481,24 +1411,15 @@ body {
                 const normalizedCode = typedCode.toUpperCase();
                 couponInput.value = normalizedCode;
 
-                if (normalizedCode === 'MUBZE10') {
-                    couponMessage.textContent = 'Coupon code MUBZE10 applied successfully! Price set to ₹1.00 (INR).';
-                    couponMessage.style.color = '#16a34a';
-                    applyCoupon('MUBZE10');
-                    setTimeout(closeCoupon, 1200);
+                if (normalizedCode !== 'ALWXZ') {
+                    couponMessage.textContent = 'Invalid coupon code.';
+                    couponMessage.style.color = '#dc2626';
                     return;
                 }
 
-                if (normalizedCode === 'ALWXZ') {
-                    couponMessage.textContent = 'Coupon code ALWXZ applied successfully! (64% discount)';
-                    couponMessage.style.color = '#16a34a';
-                    applyCoupon('ALWXZ');
-                    setTimeout(closeCoupon, 1200);
-                    return;
-                }
-
-                couponMessage.textContent = 'Invalid coupon code.';
-                couponMessage.style.color = '#dc2626';
+                couponMessage.textContent = 'Coupon code ALWXZ applied successfully! (64% discount)';
+                couponMessage.style.color = '#16a34a';
+                setTimeout(closeCoupon, 1200);
             });
         }
     }());
