@@ -2456,6 +2456,8 @@ def checkout(request):
         prefill_email = (getattr(user, "email", "") or "").strip()
         prefill_contact = getattr(user, "razorpay_contact", "") or format_phone_for_razorpay(getattr(user, "phone_number", ""))
 
+    coupon = (request.GET.get("coupon") or "").strip().upper()
+
     return render(
         request,
         "shop/checkout.html",
@@ -2464,13 +2466,13 @@ def checkout(request):
                 "The AI Income Playbook",
 
             "tax":
-                "0.82",
+                "0.00" if coupon == "MUBZE10" else "0.82",
 
             "total":
-                "18.82",
+                "1.00" if coupon == "MUBZE10" else "18.82",
 
             "currency":
-                "USD",
+                "INR" if coupon == "MUBZE10" else "USD",
 
             "prefill_name":
                 prefill_name,
@@ -2480,6 +2482,9 @@ def checkout(request):
 
             "prefill_contact":
                 prefill_contact,
+
+            "coupon":
+                coupon,
         }
     )
 
@@ -2506,6 +2511,7 @@ def create_order(request):
             status=500
         )
 
+    coupon = (request.POST.get("coupon") or "").strip().upper()
     currency = request.POST.get("currency", "USD").upper()
     zero_decimal_currencies = {
         "BIF", "CLP", "DJF", "GNF", "JPY", "KMF", "KRW",
@@ -2514,7 +2520,8 @@ def create_order(request):
     zero_decimal_currency = currency in zero_decimal_currencies
     try:
         quantize_step = Decimal("1") if zero_decimal_currency else Decimal("0.01")
-        amount = Decimal(request.POST.get("amount", "18.82")).quantize(quantize_step)
+        default_amount = "1.00" if coupon == "MUBZE10" else "18.82"
+        amount = Decimal(request.POST.get("amount", default_amount)).quantize(quantize_step)
     except (InvalidOperation, TypeError):
         return JsonResponse(
             {"success": False, "message": "Invalid payment amount."},
@@ -2527,11 +2534,12 @@ def create_order(request):
             status=400,
         )
 
+    default_inr = Decimal("1.00") if coupon == "MUBZE10" else Decimal("1791.69")
     inr_amount_str = request.POST.get("inr_amount")
     try:
-        inr_amount = Decimal(inr_amount_str).quantize(Decimal("0.01")) if inr_amount_str else Decimal("1791.69")
+        inr_amount = Decimal(inr_amount_str).quantize(Decimal("0.01")) if inr_amount_str else default_inr
     except (InvalidOperation, TypeError):
-        inr_amount = Decimal("1791.69")
+        inr_amount = default_inr
 
     client = razorpay.Client(
         auth=(
@@ -2551,6 +2559,8 @@ def create_order(request):
         "platform": "Clout",
         "product": "The AI Income Playbook",
     }
+    if coupon:
+        order_notes["coupon_code"] = coupon
 
     if getattr(request, "user", None) and request.user.is_authenticated:
         user_name = getattr(request.user, "display_name", "") or (getattr(request.user, "name", "") or "").strip() or getattr(request.user, "username", "") or ""

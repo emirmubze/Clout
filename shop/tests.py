@@ -1289,6 +1289,76 @@ class CheckoutCurrencyTests(TestCase):
         self.assertEqual(order.currency, "INR")
         self.assertEqual(float(order.amount), 1791.69)
 
+    def test_checkout_with_mubze10_coupon_renders_inr_pricing(self):
+        response = self.client.get(reverse("checkout") + "?coupon=MUBZE10")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "MUBZE10")
+        self.assertContains(response, "1.00")
+        self.assertContains(response, "INR")
+
+    @override_settings(RAZORPAY_KEY_ID="rzp_test_key", RAZORPAY_KEY_SECRET="rzp_test_secret")
+    @patch("razorpay.Client")
+    def test_create_order_with_mubze10_coupon_inr(self, mock_razorpay_client):
+        mock_instance = mock_razorpay_client.return_value
+        mock_instance.order.create.return_value = {"id": "order_mubze10_inr_1"}
+
+        response = self.client.post(
+            reverse("create_order"),
+            {
+                "currency": "INR",
+                "amount": "1.00",
+                "inr_amount": "1.00",
+                "country_code": "IN",
+                "coupon": "MUBZE10",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["currency"], "INR")
+        self.assertEqual(data["amount"], 100)  # 100 paise = 1 INR
+        self.assertEqual(data["order_id"], "order_mubze10_inr_1")
+
+        order = Order.objects.get(razorpay_order_id="order_mubze10_inr_1")
+        self.assertEqual(order.currency, "INR")
+        self.assertEqual(float(order.amount), 1.00)
+
+        # Verify order notes passed to Razorpay
+        call_args = mock_instance.order.create.call_args[0][0]
+        self.assertEqual(call_args["notes"]["coupon_code"], "MUBZE10")
+
+    @override_settings(RAZORPAY_KEY_ID="rzp_test_key", RAZORPAY_KEY_SECRET="rzp_test_secret")
+    @patch("razorpay.Client")
+    def test_create_order_with_mubze10_coupon_international_currency(self, mock_razorpay_client):
+        mock_instance = mock_razorpay_client.return_value
+        mock_instance.order.create.return_value = {"id": "order_mubze10_usd_1"}
+
+        response = self.client.post(
+            reverse("create_order"),
+            {
+                "currency": "USD",
+                "amount": "0.01",
+                "inr_amount": "1.00",
+                "country_code": "US",
+                "coupon": "MUBZE10",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertTrue(data["success"])
+        self.assertEqual(data["currency"], "USD")
+        self.assertEqual(data["amount"], 1)  # 1 cent
+        self.assertEqual(data["order_id"], "order_mubze10_usd_1")
+
+        order = Order.objects.get(razorpay_order_id="order_mubze10_usd_1")
+        self.assertEqual(order.currency, "USD")
+        self.assertEqual(float(order.amount), 0.01)
+
+    def test_course_detail_contains_mubze10_coupon(self):
+        response = self.client.get(reverse("course_detail"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "MUBZE10")
+
 
 class SeoOptimizationTests(TestCase):
     def test_robots_txt(self):
