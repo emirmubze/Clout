@@ -2464,13 +2464,13 @@ def checkout(request):
                 "The AI Income Playbook",
 
             "tax":
-                "0.82",
+                "80.03",
 
             "total":
-                "18.82",
+                "1844.03",
 
             "currency":
-                "USD",
+                "INR",
 
             "prefill_name":
                 prefill_name,
@@ -2506,7 +2506,7 @@ def create_order(request):
             status=500
         )
 
-    currency = request.POST.get("currency", "USD").upper()
+    currency = request.POST.get("currency", "INR").upper()
     zero_decimal_currencies = {
         "BIF", "CLP", "DJF", "GNF", "JPY", "KMF", "KRW",
         "MGA", "PYG", "RWF", "UGX", "VND", "VUV", "XAF", "XOF", "XPF"
@@ -2514,7 +2514,7 @@ def create_order(request):
     zero_decimal_currency = currency in zero_decimal_currencies
     try:
         quantize_step = Decimal("1") if zero_decimal_currency else Decimal("0.01")
-        amount = Decimal(request.POST.get("amount", "18.82")).quantize(quantize_step)
+        amount = Decimal(request.POST.get("amount", "1844.03")).quantize(quantize_step)
     except (InvalidOperation, TypeError):
         return JsonResponse(
             {"success": False, "message": "Invalid payment amount."},
@@ -2529,9 +2529,9 @@ def create_order(request):
 
     inr_amount_str = request.POST.get("inr_amount")
     try:
-        inr_amount = Decimal(inr_amount_str).quantize(Decimal("0.01")) if inr_amount_str else Decimal("1791.69")
+        inr_amount = Decimal(inr_amount_str).quantize(Decimal("0.01")) if inr_amount_str else Decimal("1844.03")
     except (InvalidOperation, TypeError):
-        inr_amount = Decimal("1791.69")
+        inr_amount = Decimal("1844.03")
 
     client = razorpay.Client(
         auth=(

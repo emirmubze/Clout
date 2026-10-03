@@ -1239,7 +1239,7 @@ body:not(.standalone) .secure {
             </div>
 
             <div class="product-price">
-                <span id="productLocal">$18.00</span>
+                <span id="productLocal">₹1,764.00</span>
             </div>
         </div>
 
@@ -1301,24 +1301,24 @@ body:not(.standalone) .secure {
 
             <div class="summary-row">
                 <span>Subtotal</span>
-                <strong id="subtotalLocal">$18.00</strong>
+                <strong id="subtotalLocal">₹1,764.00</strong>
             </div>
 
             <div class="summary-row discount">
                 <span>Discount</span>
-                <strong id="discountLocal">- $32.00</strong>
+                <strong id="discountLocal">- ₹3,083.92</strong>
             </div>
 
             <div class="summary-row">
                 <span>Tax</span>
-                <strong id="taxLocal">$0.82</strong>
+                <strong id="taxLocal">₹80.03</strong>
             </div>
 
             <div class="total-box">
                 <div class="total-row">
                     <div class="total-label">Total</div>
                     <div class="total-price">
-                        <strong id="totalLocal">$18.82</strong>
+                        <strong id="totalLocal">₹1,844.03</strong>
                         <small>incl. taxes</small>
                     </div>
                 </div>
@@ -1365,10 +1365,10 @@ body:not(.standalone) .secure {
 </div>
 
 <script>
-const BASE_SUBTOTAL_USD = 18.00;
-const BASE_DISCOUNT_USD = 32.00;
-const BASE_TAX_USD = 0.82;
-const BASE_TOTAL_USD = 18.82;
+const BASE_SUBTOTAL_INR = 1764.00;
+const BASE_DISCOUNT_INR = 3083.92;
+const BASE_TAX_INR = 80.03;
+const BASE_TOTAL_INR = 1844.03;
 
 // Exactly 195 countries: 193 UN members + Palestine + Vatican City.
 // Countries sharing a currency intentionally point to the same ISO 4217 code.
@@ -1484,7 +1484,11 @@ function selectCountry(item) {
 }
 
 function getRate(currency) {
-    return currency === 'USD' ? 1 : (exchangeRates[currency] || FALLBACK_RATES[currency] || 1);
+    if (currency === 'INR') return 1;
+    if (exchangeRates && typeof exchangeRates[currency] === 'number') return exchangeRates[currency];
+    const usdToCurrency = FALLBACK_RATES[currency] || 1;
+    const usdToInr = FALLBACK_RATES['INR'] || 86.50;
+    return usdToCurrency / usdToInr;
 }
 
 function formatMoney(amount, currency) {
@@ -1524,12 +1528,12 @@ function updateCheckout() {
         return;
     }
 
-    // Base checkout values are always USD: $18.00, -$32.00, $0.82, total $18.82.
-    // Every displayed amount is converted with the live USD -> currency rate.
-    const subtotal = BASE_SUBTOTAL_USD * rate;
-    const discount = BASE_DISCOUNT_USD * rate;
-    const tax = BASE_TAX_USD * rate;
-    const total = BASE_TOTAL_USD * rate;
+    // Base checkout values are in INR: ₹1,764.00, -₹3,083.92, ₹80.03, total ₹1,844.03.
+    // Every displayed amount is converted with the INR -> currency rate (1 for INR).
+    const subtotal = BASE_SUBTOTAL_INR * rate;
+    const discount = BASE_DISCOUNT_INR * rate;
+    const tax = BASE_TAX_INR * rate;
+    const total = BASE_TOTAL_INR * rate;
 
     $('productLocal').textContent = formatMoney(subtotal, currentCountry.currency);
     $('subtotalLocal').textContent = formatMoney(subtotal, currentCountry.currency);
@@ -1546,17 +1550,17 @@ function checkTerms() {
 }
 
 async function loadExchangeRates() {
-    // Try primary free live rate endpoint
+    // Try primary free live rate endpoint against INR
     try {
-        const response = await fetch('https://open.er-api.com/v6/latest/USD', {
+        const response = await fetch('https://open.er-api.com/v6/latest/INR', {
             cache: 'no-store',
             headers: { Accept: 'application/json' }
         });
         if (response.ok) {
             const data = await response.json();
-            if (data.result === 'success' && data.rates && typeof data.rates.USD === 'number') {
-                exchangeRates = Object.assign({}, FALLBACK_RATES, data.rates);
-                exchangeRates.USD = 1;
+            if (data.result === 'success' && data.rates && typeof data.rates.INR === 'number') {
+                exchangeRates = Object.assign({}, data.rates);
+                exchangeRates.INR = 1;
                 ratesLoaded = true;
                 updateCheckout();
                 return;
@@ -1566,17 +1570,17 @@ async function loadExchangeRates() {
         console.warn('Primary exchange rate endpoint unavailable, trying backup...');
     }
 
-    // Try secondary backup live rate endpoint
+    // Try secondary backup live rate endpoint against INR
     try {
-        const response2 = await fetch('https://api.exchangerate-api.com/v4/latest/USD', {
+        const response2 = await fetch('https://api.exchangerate-api.com/v4/latest/INR', {
             cache: 'no-store',
             headers: { Accept: 'application/json' }
         });
         if (response2.ok) {
             const data2 = await response2.json();
-            if (data2 && data2.rates && typeof data2.rates.USD === 'number') {
-                exchangeRates = Object.assign({}, FALLBACK_RATES, data2.rates);
-                exchangeRates.USD = 1;
+            if (data2 && data2.rates && typeof data2.rates.INR === 'number') {
+                exchangeRates = Object.assign({}, data2.rates);
+                exchangeRates.INR = 1;
                 ratesLoaded = true;
                 updateCheckout();
                 return;
@@ -1586,21 +1590,26 @@ async function loadExchangeRates() {
         console.warn('Secondary exchange rate endpoint unavailable, using comprehensive local fallbacks.');
     }
 
-    // Fallback rates are always loaded and complete
-    exchangeRates = Object.assign({}, FALLBACK_RATES);
+    // Fallback rates relative to INR (INR is base = 1)
+    exchangeRates = {};
+    const inrUsd = FALLBACK_RATES['INR'] || 86.50;
+    for (const [code, rate] of Object.entries(FALLBACK_RATES)) {
+        exchangeRates[code] = rate / inrUsd;
+    }
+    exchangeRates.INR = 1;
     ratesLoaded = true;
     updateCheckout();
 }
 
 function startPayment() {
     const rate = getRate(currentCountry.currency) || 1;
-    const inrRate = getRate('INR') || 86.50;
+    const inrRate = 1;
     if (!$('termsCheck')?.checked || !Number.isFinite(rate) || rate <= 0) return;
 
     const isZeroDecimal = ZERO_DECIMAL_CURRENCIES.has(currentCountry.currency);
-    const total = BASE_TOTAL_USD * rate;
+    const total = BASE_TOTAL_INR * rate;
     const paymentAmount = isZeroDecimal ? Math.round(total).toFixed(0) : total.toFixed(2);
-    const inrTotal = (BASE_TOTAL_USD * inrRate).toFixed(2);
+    const inrTotal = (BASE_TOTAL_INR * inrRate).toFixed(2);
     const button = $('buyBtn');
     button.disabled = true;
     button.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i><span>Processing...</span>';
