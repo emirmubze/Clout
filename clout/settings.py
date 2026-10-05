@@ -55,15 +55,21 @@ configured_hosts = [
 ]
 
 render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME", "").strip()
+vercel_url = os.getenv("VERCEL_URL", "").strip()
+vercel_project_url = os.getenv("VERCEL_PROJECT_PRODUCTION_URL", "").strip()
+
 ALLOWED_HOSTS = list(dict.fromkeys([
     "localhost",
     "127.0.0.1",
     "testserver",
+    ".vercel.app",
     "clout.onrender.com",
     "clout.courses",
     "www.clout.courses",
     *configured_hosts,
     render_hostname,
+    vercel_url,
+    vercel_project_url,
 ]))
 ALLOWED_HOSTS = [host for host in ALLOWED_HOSTS if host]
 
@@ -77,13 +83,16 @@ configured_csrf = [
 ]
 
 CSRF_TRUSTED_ORIGINS = list(dict.fromkeys([
+    "https://*.vercel.app",
     "https://clout.onrender.com",
     "https://clout.courses",
     "https://www.clout.courses",
     "http://localhost",
     "http://127.0.0.1",
-    *(f"https://{host}" for host in ALLOWED_HOSTS if host and not host.startswith(("http://", "https://"))),
-    *(f"http://{host}" for host in ALLOWED_HOSTS if host and not host.startswith(("http://", "https://"))),
+    *(f"https://{host}" for host in ALLOWED_HOSTS if host and not host.startswith((".", "http://", "https://"))),
+    *(f"http://{host}" for host in ALLOWED_HOSTS if host and not host.startswith((".", "http://", "https://"))),
+    *([f"https://{vercel_url}"] if vercel_url else []),
+    *([f"https://{vercel_project_url}"] if vercel_project_url else []),
     *configured_csrf,
 ]))
 CSRF_TRUSTED_ORIGINS = [origin for origin in CSRF_TRUSTED_ORIGINS if origin]
@@ -201,6 +210,8 @@ if PERSISTENT_DATA_DIR_ENV:
     PERSISTENT_DATA_DIR = Path(PERSISTENT_DATA_DIR_ENV)
 elif Path("/var/data").exists() and Path("/var/data").is_dir():
     PERSISTENT_DATA_DIR = Path("/var/data")
+elif os.getenv("VERCEL"):
+    PERSISTENT_DATA_DIR = Path("/tmp")
 else:
     PERSISTENT_DATA_DIR = BASE_DIR
 
@@ -211,7 +222,7 @@ except Exception:
 
 
 # =========================================================
-# DATABASE (PERSISTENT STORAGE SUPPORT)
+# DATABASE (PERSISTENT STORAGE SUPPORT & NEON POSTGRESQL)
 # =========================================================
 
 DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
@@ -219,6 +230,12 @@ DB_ENGINE = os.getenv("DB_ENGINE", "").strip()
 DB_HOST = os.getenv("DB_HOST", "").strip()
 DB_NAME = os.getenv("DB_NAME", "").strip()
 USE_POSTGRES = os.getenv("USE_POSTGRES", "").lower() in ("1", "true", "yes")
+
+# Neon optimization: Schema migrations (DDL transactions and advisory locks) require
+# the direct unpooled endpoint. Pooled endpoints (-pooler) are for web queries and Vercel functions.
+is_migration_command = any(cmd in sys.argv for cmd in ("migrate", "makemigrations", "squashmigrations"))
+if is_migration_command and DATABASE_URL and "-pooler" in DATABASE_URL and "neon.tech" in DATABASE_URL:
+    DATABASE_URL = DATABASE_URL.replace("-pooler", "")
 
 if DATABASE_URL:
     is_postgres_url = (
@@ -229,22 +246,37 @@ if DATABASE_URL:
         "127.0.0.1" not in DATABASE_URL
         and "localhost" not in DATABASE_URL
     )
+    is_neon = "neon.tech" in DATABASE_URL.lower()
     ssl_require = bool(
         is_postgres_url
         and "sslmode=disable" not in DATABASE_URL.lower()
         and (
-            "sslmode=require" in DATABASE_URL.lower()
+            is_neon
+            or "sslmode=require" in DATABASE_URL.lower()
             or "render.com" in os.getenv("RENDER_EXTERNAL_HOSTNAME", "")
+            or bool(os.getenv("VERCEL"))
             or (not DEBUG and is_remote_host)
         )
     )
+
+    # Serverless optimization: On Vercel, serverless function containers spin up and down.
+    # Long-lived pooled connections across frozen containers can cause EOF / broken pipe errors.
+    # Default to 0 on Vercel so each serverless request cleanly uses Neon's connection pooler.
+    is_serverless = bool(os.getenv("VERCEL")) or bool(os.getenv("AWS_LAMBDA_FUNCTION_NAME"))
+    default_conn_max_age = "0" if is_serverless else "600"
+    conn_max_age = int(os.getenv("DB_CONN_MAX_AGE", default_conn_max_age))
+
+    parsed_db = dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=conn_max_age,
+        conn_health_checks=True,
+        ssl_require=ssl_require,
+    )
+    if is_postgres_url and ssl_require:
+        parsed_db.setdefault("OPTIONS", {})["sslmode"] = "require"
+
     DATABASES = {
-        "default": dj_database_url.parse(
-            DATABASE_URL,
-            conn_max_age=int(os.getenv("DB_CONN_MAX_AGE", "600")),
-            conn_health_checks=True,
-            ssl_require=ssl_require,
-        )
+        "default": parsed_db
     }
 elif DB_HOST:
     db_options = {}
@@ -277,6 +309,8 @@ else:
     sqlite_path = os.getenv("SQLITE_PATH", "").strip()
     if sqlite_path:
         db_path = Path(sqlite_path)
+    elif os.getenv("VERCEL"):
+        db_path = Path("/tmp/db.sqlite3")
     else:
         db_path = PERSISTENT_DATA_DIR / "db.sqlite3"
 

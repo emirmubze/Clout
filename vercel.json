@@ -1,0 +1,7 @@
+{
+  "functions": {
+    "clout/wsgi.py": {
+      "maxDuration": 60
+    }
+  }
+}
