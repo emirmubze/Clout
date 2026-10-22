@@ -2005,6 +2005,14 @@
       }
     }
 
+    /* Leave room so the floating button doesn't cover the footer links
+       (beats the !important footer padding in responsive.css) */
+    @media (max-width: 768px) {
+      body .footer {
+        padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)) !important;
+      }
+    }
+
     /* =========================================================
        KEYFRAMES
     ========================================================= */
@@ -3277,10 +3285,15 @@
 
       const containerRect = navContainer ? navContainer.getBoundingClientRect() : null;
       const containerLeft = containerRect ? containerRect.left : 0;
+      const logo = document.querySelector(".nav-container .logo");
+      const navRight = document.querySelector(".nav-right");
+      const navGap = 24;
 
       if (navLinks && heroLeft) {
         const leftRect = heroLeft.getBoundingClientRect();
-        const offsetLeft = leftRect.left - containerLeft;
+        // Keep the links aligned with the hero, but never on top of the logo
+        const minLeft = logo ? logo.getBoundingClientRect().right - containerLeft + navGap : 0;
+        const offsetLeft = Math.max(leftRect.left - containerLeft, minLeft);
         navLinks.style.position = "absolute";
         navLinks.style.left = `${offsetLeft}px`;
         navLinks.style.top = "50%";
@@ -3290,7 +3303,13 @@
       if (courseDesktop && heroPriceCard) {
         const cardRect = heroPriceCard.getBoundingClientRect();
         const cardCenter = cardRect.left + cardRect.width / 2;
-        const offsetCenter = cardCenter - containerLeft;
+        let offsetCenter = cardCenter - containerLeft;
+        // Keep the course button clear of the login/logout buttons
+        if (navRight) {
+          const halfWidth = courseDesktop.offsetWidth / 2;
+          const maxCenter = navRight.getBoundingClientRect().left - containerLeft - navGap - halfWidth;
+          offsetCenter = Math.min(offsetCenter, maxCenter);
+        }
         courseDesktop.style.position = "absolute";
         courseDesktop.style.left = `${offsetCenter}px`;
         courseDesktop.style.top = "50%";
