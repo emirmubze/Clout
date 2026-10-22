@@ -19,6 +19,7 @@ from django.contrib.auth.views import LoginView
 from django.core.mail import send_mail
 from django.core.files.storage import default_storage
 from django.contrib.sessions.models import Session
+from django.core.exceptions import PermissionDenied, SuspiciousFileOperation
 from django.db import transaction
 from django.db.models import Q
 import mimetypes
@@ -27,6 +28,8 @@ from django.core.files.base import ContentFile
 from django.http import FileResponse, Http404, HttpResponse, JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.template.loader import render_to_string
+from django.utils import timezone
+from django.utils._os import safe_join
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.views.decorators.http import require_POST
@@ -84,6 +87,20 @@ def user_has_course_access(user):
             )
         )
     )
+
+
+def user_can_view_message(user, message):
+    if not user or not getattr(user, "is_authenticated", False):
+        return False
+
+    if user.is_staff:
+        return True
+
+    if user.id in (message.sender_id, message.recipient_id):
+        return True
+
+    # Admin broadcasts have no recipient and are shown to every user
+    return message.sender_is_admin and message.recipient_id is None
 
 
 # =========================================================
@@ -174,6 +191,55 @@ def index(request):
     )
 
 
+# Used only when the database has no course modules yet; mirrors the homepage curriculum
+FALLBACK_CURRICULUM = [
+    ("AI Income Foundations", "The fundamentals of AI-powered online income, profitable business models, and high-potential opportunities.", []),
+    ("Digital Products & PDFs", "Creating digital products and profitable PDFs with AI, automating content creation, and launching products that sell.", []),
+    ("AI Apps & Websites", "Building AI-powered apps and websites, finding winning business ideas, and creating scalable online products.", []),
+    ("AI Games & Automation", "Using AI to build game concepts, automate workflows, and turn creative ideas into opportunities.", []),
+    ("AI E-commerce Systems", "AI-powered e-commerce, product research, store automation, and traffic strategies.", []),
+    ("Scale to $10K+/Month", "Scaling multiple AI income streams, automating the business, and building long-term systems.", []),
+]
+
+
+def course_curriculum_prompt():
+    course = Course.objects.filter(
+        is_active=True,
+        modules__isnull=False,
+    ).distinct().first()
+
+    if course:
+        title = course.title
+        modules = [
+            (
+                module.title,
+                module.description or "",
+                [lesson.display_title for lesson in module.lessons.all()],
+            )
+            for module in course.modules.prefetch_related("lessons").order_by("order")
+        ]
+    else:
+        title = "The AI Income Playbook"
+        modules = FALLBACK_CURRICULUM
+
+    count = len(modules)
+    details = []
+    for number, (name, description, lessons) in enumerate(modules, start=1):
+        detail = f"Module {number}, {name}."
+        if description.strip():
+            detail += f" {description.strip().rstrip('.')}."
+        if lessons:
+            detail += f" Lessons: {'; '.join(lessons)}."
+        details.append(detail)
+
+    return (
+        f"The course '{title}' has exactly {count} modules: "
+        f"{', '.join(name for name, _, _ in modules)}. "
+        f"Use the following course curriculum as your source of truth: {' '.join(details)} "
+        f"If asked how many modules the course has, answer {count} and name all {count} modules. "
+    )
+
+
 @require_POST
 def ai_chat(request):
     try:
@@ -187,29 +253,13 @@ def ai_chat(request):
 
     system_prompt = (
         "You are the Clout course assistant for 'Make Money With AI'. "
-        "The course has exactly seven modules: Digital Products, AI Apps, "
-        "AI Websites, Marketing, Side Hustles, Dropshipping, and Claude AI. "
-        "Use the following course curriculum as your source of truth: "
-        "Digital Products covers e-books, courses, templates, AI art, "
-        "pricing, sales funnels, Shopify, Gumroad, and Kajabi; "
-        "AI Apps covers chatbots, image generators, productivity apps, "
-        "Bubble, Adalo, Zapier, APIs, and subscription, one-time, and "
-        "freemium monetization; AI Websites covers niche sites, AI content, "
-        "SEO, ads, affiliate links, and memberships; Marketing covers "
-        "Facebook, Google, and TikTok ads, email drip campaigns, and AI social "
-        "media workflows; Side Hustles covers AI copywriting, consulting, "
-        "micro-services, time management, and scaling; Dropshipping covers "
-        "AI-enhanced suppliers, niche products, fulfillment automation, "
-        "customer-service bots, and upsells; Claude AI covers Claude's strengths "
-        "and integrating it into apps, chatbots, and content creation. "
-        "You are the official AI assistant for the Make Money With AI course. "
+        + course_curriculum_prompt()
+        + "You are the official AI assistant for the Make Money With AI course. "
         "Answer only questions related to this course and its curriculum. "
         "If a question is unrelated, politely say that you can only answer "
         "questions about the course. Do not invent modules, lessons, tools, "
         "prices, guarantees, or information that is not provided here. "
         "Give direct answers based only on the available course information. "
-        "If asked how many modules the course has, answer seven and name all "
-        "seven modules. "
         "Keep answers concise unless the learner asks for detail. Preserve the "
         "course meaning and explain it in simple, natural language. If the learner "
         "asks about a specific module, explain only that module unless they ask "
@@ -456,7 +506,7 @@ def contact(request):
                     "message": message_obj.message,
                     "image_url": message_obj.image_url if message_obj.image else "",
                     "video_url": reverse("message_video", args=[message_obj.id]) if message_obj.video else "",
-                    "created_at": message_obj.created_at.strftime("%d %b, %H:%M"),
+                    "created_at": timezone.localtime(message_obj.created_at).strftime("%d %b, %H:%M"),
                 })
 
         return redirect("contact")
@@ -514,7 +564,7 @@ def contact(request):
                     "message": message.message or "",
                     "image_url": message.image_url if message.image else "",
                     "video_url": reverse("message_video", args=[message.id]) if message.video else "",
-                    "created_at": message.created_at.strftime("%d %b, %H:%M"),
+                    "created_at": timezone.localtime(message.created_at).strftime("%d %b, %H:%M"),
                 }
                 for message in new_messages
             ]
@@ -631,7 +681,7 @@ def admin_dashboard(request):
                     "sender_is_admin": message.sender_is_admin,
                     "image_url": message.image_url if message.image else "",
                     "video_url": reverse("message_video", args=[message.id]) if message.video else "",
-                    "created_at": message.created_at.strftime("%H:%M"),
+                    "created_at": timezone.localtime(message.created_at).strftime("%H:%M"),
                 }
                 for message in chat_messages
             ],
@@ -1688,7 +1738,7 @@ def admin_banner_add(request):
             "order": banner.order,
             "is_active": banner.is_active,
             "image_url": banner.image_public_url,
-            "created_at": banner.created_at.strftime("%b %d, %Y"),
+            "created_at": timezone.localtime(banner.created_at).strftime("%b %d, %Y"),
         }
     })
 
@@ -1902,7 +1952,7 @@ def admin_send_message(
                     ),
 
                     "created_at": (
-                        message_obj.created_at
+                        timezone.localtime(message_obj.created_at)
                         .strftime("%H:%M")
                     ),
 
@@ -2272,15 +2322,43 @@ def serve_inline_video(request, file_field):
 # SERVE MEDIA FILE
 # =========================================================
 
-def serve_media_file(request, path):
-    media_url_str = str(getattr(settings, "MEDIA_URL", "") or "").strip()
-    if getattr(settings, "USE_S3", False) and media_url_str.startswith(("http://", "https://")):
-        public_url = media_url_str.rstrip("/") + "/" + path.lstrip("/")
-        return redirect(public_url)
+PRIVATE_MEDIA_FIELDS = {
+    "contact_images/": "image",
+    "contact_videos/": "video",
+}
 
+
+def serve_media_file(request, path):
     clean_path = path.replace("\\", "/").lstrip("/")
 
-    if clean_path.startswith("course_videos/") or clean_path.lower().endswith((".mp4", ".webm", ".mov")):
+    # Never serve anything outside MEDIA_ROOT (e.g. /media/../.env)
+    try:
+        safe_join(settings.MEDIA_ROOT, clean_path)
+    except SuspiciousFileOperation:
+        raise Http404("File not found.")
+
+    private_field = next(
+        (field for prefix, field in PRIVATE_MEDIA_FIELDS.items() if clean_path.startswith(prefix)),
+        None,
+    )
+    is_course_video = not private_field and (
+        clean_path.startswith("course_videos/")
+        or clean_path.lower().endswith((".mp4", ".webm", ".mov"))
+    )
+
+    if private_field:
+        message = ContactMessage.objects.filter(**{private_field: clean_path}).first()
+        if not message or not user_can_view_message(request.user, message):
+            raise Http404("File not found.")
+    elif is_course_video and not user_has_course_access(request.user):
+        raise PermissionDenied
+
+    media_url_str = str(getattr(settings, "MEDIA_URL", "") or "").strip()
+    if getattr(settings, "USE_S3", False) and media_url_str.startswith(("http://", "https://")):
+        public_url = media_url_str.rstrip("/") + "/" + clean_path
+        return redirect(public_url)
+
+    if is_course_video:
         file_path = _resolve_playable_video_path(clean_path)
     else:
         file_path = os.path.join(settings.MEDIA_ROOT, clean_path)
@@ -2314,6 +2392,8 @@ def serve_media_file(request, path):
 
 @login_required(login_url="login")
 def serve_course_video(request, course_id):
+    if not user_has_course_access(request.user):
+        raise PermissionDenied
     course = get_object_or_404(Course, id=course_id)
     return serve_inline_video(request, course.video or "course_videos/course1.mp4")
 
@@ -2324,6 +2404,8 @@ def serve_course_video(request, course_id):
 
 @login_required(login_url="login")
 def serve_module_video(request, module_id):
+    if not user_has_course_access(request.user):
+        raise PermissionDenied
     module = get_object_or_404(Module, id=module_id)
     return serve_inline_video(request, module.video or "course_videos/course1.mp4")
 
@@ -2334,6 +2416,8 @@ def serve_module_video(request, module_id):
 
 @login_required(login_url="login")
 def serve_lesson_video(request, lesson_id):
+    if not user_has_course_access(request.user):
+        raise PermissionDenied
     lesson = get_object_or_404(Lesson, id=lesson_id)
     if lesson.video_url and lesson.video_url.startswith(("http://", "https://")):
         return redirect(lesson.video_url)
@@ -2354,6 +2438,11 @@ def serve_message_video(
         ContactMessage,
         id=message_id
     )
+
+    if not user_can_view_message(request.user, message):
+        raise Http404(
+            "Message video not found."
+        )
 
     if not message.video:
         raise Http404(
@@ -3304,8 +3393,8 @@ def api_admin_subtitle_details(request, subtitle_id):
             "cues": subtitle.cues_data,
             "vtt_url": subtitle.vtt_public_url,
             "srt_url": subtitle.srt_public_url,
-            "created_at": subtitle.created_at.strftime("%Y-%m-%d %H:%M"),
-            "updated_at": subtitle.updated_at.strftime("%Y-%m-%d %H:%M"),
+            "created_at": timezone.localtime(subtitle.created_at).strftime("%Y-%m-%d %H:%M"),
+            "updated_at": timezone.localtime(subtitle.updated_at).strftime("%Y-%m-%d %H:%M"),
         }
     })
 

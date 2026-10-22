@@ -49,7 +49,7 @@ services:
         value: emirmubze@gmail.com
 
       - key: ADMIN_PASSWORD
-        value: Mubashir@66
+        sync: false
 
 
       - key: RAZORPAY_KEY_ID

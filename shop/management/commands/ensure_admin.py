@@ -20,10 +20,10 @@ class Command(BaseCommand):
             or getattr(settings, "ADMIN_EMAIL", "").strip().lower()
             or "emirmubze@gmail.com"
         )
+        # Never fall back to a hard-coded password: this repository is public
         password = (
             os.getenv("ADMIN_PASSWORD", "").strip()
             or getattr(settings, "ADMIN_PASSWORD", "").strip()
-            or "Mubashir@66"
         )
 
         user = CustomUser.objects.filter(username__iexact=username).first()
@@ -33,9 +33,16 @@ class Command(BaseCommand):
         created = user is None
         if created:
             user = CustomUser(username=username, email=email)
+
+        if password and (created or not user.has_usable_password()):
             user.set_password(password)
-        elif not user.has_usable_password():
-            user.set_password(password)
+        elif created:
+            user.set_unusable_password()
+
+        if not user.has_usable_password():
+            self.stdout.write(self.style.WARNING(
+                f"Admin account {username} has no usable password. Set ADMIN_PASSWORD and run ensure_admin again."
+            ))
 
         user.username = username
         user.email = email
@@ -50,7 +57,7 @@ class Command(BaseCommand):
             mubashir_user.is_active = True
             mubashir_user.is_staff = True
             mubashir_user.is_superuser = True
-            if not mubashir_user.has_usable_password():
+            if password and not mubashir_user.has_usable_password():
                 mubashir_user.set_password(password)
             mubashir_user.save()
 

@@ -17,12 +17,14 @@ from .models import CustomUser, ContactMessage, Course, Module, Lesson, Order, f
 
 class UserAuthAndDashboardTests(TestCase):
     def test_ensure_admin_creates_and_repairs_admin(self):
-        call_command("ensure_admin")
+        CustomUser.objects.filter(username__iexact="mubze").delete()
+        with patch.dict(os.environ, {"ADMIN_PASSWORD": "Configured-Admin-Pass-123"}):
+            call_command("ensure_admin")
         admin = CustomUser.objects.filter(is_superuser=True, username="mubze").first()
         self.assertIsNotNone(admin)
         self.assertTrue(admin.is_staff)
         self.assertTrue(admin.is_superuser)
-        self.assertTrue(admin.check_password("Mubashir@66"))
+        self.assertTrue(admin.check_password("Configured-Admin-Pass-123"))
 
 
     @override_settings(EMAIL_BACKEND="django.core.mail.backends.locmem.EmailBackend")
@@ -1078,6 +1080,8 @@ class UserAuthAndDashboardTests(TestCase):
             password="StrongPass123!",
             name="Video Course User",
         )
+        user.course_access_approved = True
+        user.save()
         course = Course.objects.create(title="AI Bootcamp", price=99)
         module = Module.objects.create(
             course=course,
@@ -2283,6 +2287,152 @@ class AdminExcelExportTests(TestCase):
         self.assertContains(response, "Export Paid Users")
         self.assertContains(response, "Export Unpaid Users")
         self.assertContains(response, "Export All Users")
+
+
+class ProtectedMediaAccessTests(TestCase):
+    def setUp(self):
+        import tempfile
+
+        self.media_dir = tempfile.TemporaryDirectory(ignore_cleanup_errors=True)
+        self.addCleanup(self.media_dir.cleanup)
+        self.media_override = override_settings(MEDIA_ROOT=self.media_dir.name, USE_S3=False)
+        self.media_override.enable()
+        self.addCleanup(self.media_override.disable)
+
+        video_dir = os.path.join(self.media_dir.name, "course_videos")
+        os.makedirs(video_dir)
+        with open(os.path.join(video_dir, "lesson.mp4"), "wb") as fh:
+            fh.write(b"\x00\x00\x00\x18ftypmp42" + b"\x00" * 2048)
+
+        self.course = Course.objects.create(title="AI Bootcamp", price=99)
+        self.module = Module.objects.create(course=self.course, title="Intro", video="course_videos/lesson.mp4")
+        self.lesson = Lesson.objects.create(module=self.module, title="Lesson 1", video="course_videos/lesson.mp4", order=1)
+
+        self.free_user = CustomUser.objects.create_user(
+            username="freeuser", email="free@example.com", password="StrongPass123!",
+        )
+        self.paid_user = CustomUser.objects.create_user(
+            username="paiduser", email="paid@example.com", password="StrongPass123!",
+        )
+        self.paid_user.course_access_approved = True
+        self.paid_user.save()
+
+    def test_media_path_traversal_is_blocked(self):
+        for path in ("/media/../clout/settings.py", "/media/..%2Fclout%2Fsettings.py", "/media/%2e%2e/manage.py"):
+            response = self.client.get(path)
+            self.assertEqual(response.status_code, 404, path)
+
+    def test_anonymous_cannot_stream_course_video_from_media(self):
+        for path in ("/media/course_videos/lesson.mp4", "/media/made-up-name.mp4"):
+            response = self.client.get(path)
+            self.assertNotIn(response.status_code, (200, 206), path)
+
+    def test_paid_user_can_stream_course_video_from_media(self):
+        self.client.force_login(self.paid_user)
+        response = self.client.get("/media/course_videos/lesson.mp4")
+        self.assertEqual(response.status_code, 200)
+
+    def test_free_user_cannot_stream_lesson_course_or_module_video(self):
+        self.client.force_login(self.free_user)
+        for url in (
+            reverse("serve_lesson_video", args=[self.lesson.id]),
+            reverse("course_video", args=[self.course.id]),
+            reverse("module_video", args=[self.module.id]),
+            "/media/course_videos/lesson.mp4",
+        ):
+            response = self.client.get(url)
+            self.assertNotIn(response.status_code, (200, 206), url)
+
+    def test_paid_user_can_stream_lesson_video(self):
+        self.client.force_login(self.paid_user)
+        response = self.client.get(reverse("serve_lesson_video", args=[self.lesson.id]))
+        self.assertEqual(response.status_code, 200)
+
+    def test_message_video_only_visible_to_conversation_participants(self):
+        video_dir = os.path.join(self.media_dir.name, "contact_videos")
+        os.makedirs(video_dir)
+        with open(os.path.join(video_dir, "clip.mp4"), "wb") as fh:
+            fh.write(b"\x00\x00\x00\x18ftypmp42" + b"\x00" * 2048)
+        message = ContactMessage.objects.create(sender=self.paid_user, message="hi", video="contact_videos/clip.mp4")
+
+        self.client.force_login(self.free_user)
+        self.assertEqual(self.client.get(reverse("message_video", args=[message.id])).status_code, 404)
+        self.assertNotIn(self.client.get("/media/contact_videos/clip.mp4").status_code, (200, 206))
+
+        self.client.force_login(self.paid_user)
+        self.assertEqual(self.client.get(reverse("message_video", args=[message.id])).status_code, 200)
+
+
+class LiveChatTimezoneTests(TestCase):
+    @override_settings(TIME_ZONE="Asia/Kolkata")
+    def test_ajax_contact_message_time_uses_site_timezone(self):
+        from django.utils import timezone
+
+        user = CustomUser.objects.create_user(
+            username="tzuser", email="tz@example.com", password="StrongPass123!",
+        )
+        self.client.force_login(user)
+        response = self.client.post(
+            reverse("contact"),
+            {"message": "Timezone check"},
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",
+        )
+        self.assertEqual(response.status_code, 200)
+        message = ContactMessage.objects.get(message="Timezone check")
+        expected = timezone.localtime(message.created_at).strftime("%d %b, %H:%M")
+        self.assertEqual(response.json()["created_at"], expected)
+
+
+class AiChatCurriculumTests(TestCase):
+    @override_settings(GEMINI_API_KEY="test-key")
+    def test_ai_chat_prompt_uses_real_course_modules(self):
+        course = Course.objects.create(title="The AI Income Playbook", price=99, is_active=True)
+        module = Module.objects.create(course=course, title="AI Income Foundations", order=1)
+        Lesson.objects.create(module=module, title="Mindset for AI income", order=1)
+        Module.objects.create(course=course, title="Scale to $10K+/Month", order=2)
+
+        captured = {}
+
+        class FakeResponse:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def read(self):
+                return json.dumps({"candidates": [{"content": {"parts": [{"text": "ok"}]}}]}).encode()
+
+        def fake_urlopen(request, timeout=None):
+            captured["payload"] = json.loads(request.data.decode("utf-8"))
+            return FakeResponse()
+
+        with patch("shop.views.get_gemini_api_key", return_value="test-key"), \
+                patch("shop.views.urlopen", side_effect=fake_urlopen):
+            response = self.client.post(
+                reverse("ai_chat"),
+                data=json.dumps({"question": "How many modules?"}),
+                content_type="application/json",
+            )
+
+        self.assertEqual(response.status_code, 200)
+        prompt = captured["payload"]["system_instruction"]["parts"][0]["text"]
+        self.assertIn("AI Income Foundations", prompt)
+        self.assertIn("Scale to $10K+/Month", prompt)
+        self.assertIn("Mindset for AI income", prompt)
+        self.assertIn("exactly 2 modules", prompt)
+        self.assertNotIn("Dropshipping", prompt)
+
+
+class EnsureAdminPasswordTests(TestCase):
+    def test_ensure_admin_never_falls_back_to_a_hardcoded_password(self):
+        CustomUser.objects.filter(username__iexact="mubze").delete()
+        with patch.dict(os.environ, {"ADMIN_PASSWORD": ""}), override_settings(ADMIN_PASSWORD=""):
+            call_command("ensure_admin")
+        admin = CustomUser.objects.get(username="mubze")
+        self.assertTrue(admin.is_superuser)
+        self.assertFalse(admin.has_usable_password())
+        self.assertFalse(admin.check_password("Mubashir@66"))
 
 
 
