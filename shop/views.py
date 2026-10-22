@@ -1443,7 +1443,6 @@ def _admin_modules_save_impl(request):
                             has_video_change = True
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail"):
                         lesson_obj.thumbnail = lesson_item["thumbnail"]
-                        lesson_obj.thumbnail_url = _public_file_url(lesson_obj.thumbnail)
                     if isinstance(lesson_item, dict) and lesson_item.get("thumbnail_url"):
                         t_url = str(lesson_item["thumbnail_url"]).strip()
                         if t_url:
@@ -1456,6 +1455,16 @@ def _admin_modules_save_impl(request):
                             lesson_obj.thumbnail = cleaned_key
                             lesson_obj.thumbnail_url = _public_file_url(cleaned_key, explicit_url=t_key if t_key.startswith(("http://", "https://")) else "")
                     lesson_obj.save()
+                    if lesson_obj.thumbnail:
+                        correct_t_url = _public_file_url(lesson_obj.thumbnail, lesson_obj.thumbnail_url)
+                        if not lesson_obj.thumbnail_url or (
+                            lesson_obj.thumbnail_url.startswith("/media/")
+                            and not lesson_obj.thumbnail_url.startswith("/media/lesson_thumbnails/")
+                            and "lesson_thumbnails/" in getattr(lesson_obj.thumbnail, "name", "")
+                        ):
+                            if correct_t_url and lesson_obj.thumbnail_url != correct_t_url:
+                                lesson_obj.thumbnail_url = correct_t_url
+                                lesson_obj.save(update_fields=["thumbnail_url"])
                     saved_lesson_ids.append(lesson_obj.id)
 
                     if (get_gemini_api_key() or get_groq_api_key()) and (has_video_change or ((lesson_obj.video or lesson_obj.video_url) and lesson_obj.subtitle_status == "none")):
@@ -2366,7 +2375,17 @@ def serve_media_file(request, path):
             fallback_path = os.path.join(settings.BASE_DIR, "media", clean_path)
             if os.path.exists(fallback_path):
                 file_path = fallback_path
-            elif default_storage.exists(clean_path):
+            elif "/" not in clean_path:
+                for subdir in ("lesson_thumbnails", "course_thumbnails", "profiles", "course_images"):
+                    sub_candidate = os.path.join(settings.MEDIA_ROOT, subdir, clean_path)
+                    if os.path.exists(sub_candidate):
+                        file_path = sub_candidate
+                        break
+                    base_candidate = os.path.join(settings.BASE_DIR, "media", subdir, clean_path)
+                    if os.path.exists(base_candidate):
+                        file_path = base_candidate
+                        break
+            if (not file_path or not os.path.exists(file_path)) and default_storage.exists(clean_path):
                 try:
                     file_path = default_storage.path(clean_path)
                 except Exception:
@@ -2377,7 +2396,7 @@ def serve_media_file(request, path):
             thumb_dir = os.path.join(settings.MEDIA_ROOT, "lesson_thumbnails")
             if os.path.exists(thumb_dir):
                 for f in os.listdir(thumb_dir):
-                    if f.lower().endswith((".png", ".jpg", ".webp")):
+                    if f.lower().endswith((".png", ".jpg", ".jpeg", ".webp")):
                         file_path = os.path.join(thumb_dir, f)
                         break
         if not file_path or not os.path.exists(file_path):

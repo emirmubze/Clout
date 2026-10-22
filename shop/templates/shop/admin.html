@@ -4908,14 +4908,17 @@
                 </div>
                 <div class="editor-lesson-content">
                     <div>
-                        <div class="editor-thumbnail-box" onclick="this.nextElementSibling.click()">
+                        <div class="editor-thumbnail-box" onclick="this.nextElementSibling.click()" title="Click to upload or replace thumbnail image">
                             <span class="editor-thumbnail-placeholder">
                                 <span class="editor-thumbnail-plus">+</span>
                                 <span>Add Thumbnail</span>
                             </span>
                         </div>
                         <input class="editor-thumbnail-input" type="file" accept="image/*" onchange="previewEditorThumbnail(this)">
-                        <small style="display:block; margin-top:6px; color:#64748B; font-size:11px;">Recommended: 16:9 ratio</small>
+                        <div style="margin-top:6px;">
+                            <input class="editor-lesson-thumbnail-url" type="text" placeholder="Or paste Image URL / R2 Key" oninput="previewEditorThumbnailFromUrl(this)" style="font-size:11px; padding:5px 8px; width:100%; border:1px solid var(--border); border-radius:6px; box-sizing:border-box;">
+                        </div>
+                        <small style="display:block; margin-top:4px; color:#64748B; font-size:11px;">Upload image or paste URL (16:9 ratio)</small>
                     </div>
                     <div class="editor-form-row">
                         <div class="editor-form-group">
@@ -4947,10 +4950,17 @@
             const descInput = lesson.querySelector(".editor-lesson-description-input");
             if (descInput) descInput.value = lessonData?.description || "";
             if (lessonData?.thumbnail_url) {
+                const thumbUrlEl = lesson.querySelector(".editor-lesson-thumbnail-url");
+                if (thumbUrlEl) thumbUrlEl.value = lessonData.thumbnail_url;
                 const image = document.createElement("img");
                 image.alt = "Lesson thumbnail";
-                image.onerror = () => resetEditorThumbnailPlaceholder(image.parentElement);
                 image.src = lessonData.thumbnail_url;
+                image.onerror = function() {
+                    const parent = this.parentElement;
+                    if (parent && parent.classList.contains("editor-thumbnail-box")) {
+                        parent.innerHTML = '<div style="padding:10px 4px; text-align:center; color:#EF4444; font-size:11px; line-height:1.3;"><i class="fa-solid fa-triangle-exclamation" style="font-size:16px; margin-bottom:4px; display:block;"></i>Thumbnail linked<br><span style="color:#64748B; font-size:10px;">Click to re-upload</span></div>';
+                    }
+                };
                 lesson.querySelector(".editor-thumbnail-box").replaceChildren(image);
             }
             if (lessonData?.video_url) {
@@ -5005,15 +5015,46 @@
         }
 
         function previewEditorThumbnail(input) {
+            const lesson = input.closest(".editor-lesson");
             const box = input.previousElementSibling;
             if (!input.files[0]) {
-                resetEditorThumbnailPlaceholder(box);
+                const urlInput = lesson?.querySelector(".editor-lesson-thumbnail-url");
+                if (!urlInput?.value) resetEditorThumbnailPlaceholder(box);
                 return;
+            }
+            if (lesson) {
+                lesson.pendingThumbnail = input.files[0];
             }
             const image = document.createElement("img");
             image.alt = "Lesson thumbnail";
-            image.onerror = () => resetEditorThumbnailPlaceholder(box);
             image.src = URL.createObjectURL(input.files[0]);
+            box.replaceChildren(image);
+        }
+
+        function previewEditorThumbnailFromUrl(urlInput) {
+            const lesson = urlInput.closest(".editor-lesson");
+            if (!lesson) return;
+            const box = lesson.querySelector(".editor-thumbnail-box");
+            const fileInput = lesson.querySelector(".editor-thumbnail-input");
+            const val = (urlInput.value || "").trim();
+            if (!val) {
+                delete lesson.pendingThumbnail;
+                if (!fileInput?.files?.[0]) {
+                    resetEditorThumbnailPlaceholder(box);
+                }
+                return;
+            }
+            delete lesson.pendingThumbnail;
+            if (fileInput) fileInput.value = "";
+            const image = document.createElement("img");
+            image.alt = "Lesson thumbnail";
+            image.src = val;
+            image.onerror = function() {
+                const parent = this.parentElement;
+                if (parent && parent.classList.contains("editor-thumbnail-box")) {
+                    parent.innerHTML = '<div style="padding:10px 4px; text-align:center; color:#EF4444; font-size:11px; line-height:1.3;"><i class="fa-solid fa-triangle-exclamation" style="font-size:16px; margin-bottom:4px; display:block;"></i>Invalid URL<br><span style="color:#64748B; font-size:10px;">Check link</span></div>';
+                }
+            };
             box.replaceChildren(image);
         }
 
@@ -5071,6 +5112,7 @@
                     const lessonDescriptionInput = lesson.querySelector(".editor-lesson-description-input");
                     const lessonVideoInput = lesson.querySelector(".editor-video-input");
                     const lessonThumbnailInput = lesson.querySelector(".editor-thumbnail-input");
+                    const lessonThumbnailUrlInput = lesson.querySelector(".editor-lesson-thumbnail-url");
 
                     const lessonTitle = (lessonTitleInput?.value || `Lesson ${lessonIndex + 1}`).trim();
                     const lessonDescription = lessonDescriptionInput?.value.trim() || "";
@@ -5080,6 +5122,7 @@
                     formData.append(`module_${moduleIndex}_lesson_title_${lessonIndex}`, lessonTitle || `Lesson ${lessonIndex + 1}`);
                     formData.append(`module_${moduleIndex}_lesson_description_${lessonIndex}`, lessonDescription);
                     formData.append(`module_${moduleIndex}_lesson_video_url_${lessonIndex}`, lessonVideoUrlInput?.value.trim() || "");
+                    formData.append(`module_${moduleIndex}_lesson_thumbnail_url_${lessonIndex}`, lessonThumbnailUrlInput?.value.trim() || "");
                     if (lessonVideoInput?.files?.[0]) {
                         lesson.pendingVideo = lessonVideoInput.files[0];
                     }

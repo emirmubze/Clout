@@ -55,7 +55,7 @@ def _public_file_url(file_field, explicit_url=""):
         return f"https://{target.lstrip('/')}"
 
     file_name = target.lstrip("/")
-    for prefix in (
+    known_prefixes = (
         "course_videos/",
         "lesson_thumbnails/",
         "course_images/",
@@ -67,10 +67,17 @@ def _public_file_url(file_field, explicit_url=""):
         "contact_videos/",
         "course_thumbnails/",
         "promotional_banners/",
-    ):
+    )
+    for prefix in known_prefixes:
         if prefix in file_name:
             file_name = file_name[file_name.index(prefix):]
             break
+    else:
+        # Check if the field specifies upload_to
+        if file_field and hasattr(file_field, "field"):
+            upload_to = str(getattr(file_field.field, "upload_to", "") or "").strip("/")
+            if upload_to:
+                file_name = f"{upload_to}/{file_name.split('/')[-1]}"
 
     custom_domain = (
         str(getattr(settings, "AWS_S3_CUSTOM_DOMAIN", ""))
@@ -461,6 +468,26 @@ class Lesson(models.Model):
         if self.thumbnail and not self.thumbnail_url:
             self.thumbnail_url = _public_file_url(self.thumbnail)
         super().save(*args, **kwargs)
+        needs_update = False
+        update_fields = set()
+        if self.video and not self.video_url:
+            self.video_url = _public_file_url(self.video)
+            needs_update = True
+            update_fields.add("video_url")
+        if self.thumbnail:
+            correct_t_url = _public_file_url(self.thumbnail, self.thumbnail_url)
+            # If thumbnail_url is missing, empty, or incorrectly lacks the lesson_thumbnails prefix
+            if not self.thumbnail_url or (
+                self.thumbnail_url.startswith("/media/")
+                and not self.thumbnail_url.startswith("/media/lesson_thumbnails/")
+                and "lesson_thumbnails/" in getattr(self.thumbnail, "name", "")
+            ):
+                if correct_t_url and self.thumbnail_url != correct_t_url:
+                    self.thumbnail_url = correct_t_url
+                    needs_update = True
+                    update_fields.add("thumbnail_url")
+        if needs_update and self.pk:
+            Lesson.objects.filter(pk=self.pk).update(**{f: getattr(self, f) for f in update_fields})
 
     @property
     def display_title(self):
